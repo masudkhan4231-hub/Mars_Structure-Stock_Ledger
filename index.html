@@ -1,253 +1,329 @@
-stock ledger.html
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MARS STRUCTURE LIMITED - Stock Ledger App</title>
+  <meta name="theme-color" content="#0f2747">
+  <title>MARS STRUCTURE LIMITED — Stock Ledger</title>
   <script src="https://cdn.tailwindcss.com"></script>
-
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: '#0f2747',
+            brand: '#1769aa',
+            ink: '#172033',
+            muted: '#667085',
+            line: '#e6eaf0',
+            surface: '#f6f8fb'
+          },
+          boxShadow: {
+            soft: '0 8px 30px rgba(15,39,71,.07)'
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    .pdf-table th, .pdf-table td {
-      border: 1px solid #4a5568;
-      padding: 4px 2px;
-      text-align: center;
-      font-size: 9px;
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:#f6f8fb;color:#172033;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    .app-shell{min-height:100vh}
+    .topbar{background:#fff;border-bottom:1px solid #e6eaf0}
+    .sidebar{width:250px;background:#0f2747;color:#dbe7f5}
+    .main{min-width:0}
+    .nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;color:#c9d7e8;font-size:14px;font-weight:600;transition:.2s}
+    .nav-item:hover,.nav-item.active{background:rgba(255,255,255,.10);color:#fff}
+    .card{background:#fff;border:1px solid #e6eaf0;border-radius:16px;box-shadow:0 8px 30px rgba(15,39,71,.05)}
+    .field-label{display:block;font-size:12px;font-weight:700;color:#475467;margin:0 0 6px}
+    .field{width:100%;min-height:42px;padding:9px 11px;border:1px solid #d9dee7;border-radius:10px;background:#fff;color:#172033;font-size:13px;outline:none;transition:.2s}
+    .field:focus{border-color:#1769aa;box-shadow:0 0 0 3px rgba(23,105,170,.10)}
+    .btn{min-height:42px;border-radius:10px;padding:9px 15px;font-size:13px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:7px;transition:.2s;cursor:pointer}
+    .btn-primary{background:#1769aa;color:#fff}.btn-primary:hover{background:#12598f}
+    .btn-secondary{background:#fff;border:1px solid #d9dee7;color:#344054}.btn-secondary:hover{background:#f8fafc}
+    .btn-warning{background:#f59e0b;color:#fff}.btn-danger{background:#dc3545;color:#fff}
+    .btn-success{background:#159447;color:#fff}
+    .stat-card{padding:18px}
+    .stat-icon{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;background:#edf5fc;color:#1769aa;font-size:18px}
+    .table-wrap{overflow:auto;border:1px solid #e6eaf0;border-radius:12px}
+    .pdf-table{min-width:1250px;width:100%;border-collapse:separate;border-spacing:0}
+    .pdf-table th,.pdf-table td{border-right:1px solid #e6eaf0;border-bottom:1px solid #e6eaf0;padding:9px 7px;text-align:center;font-size:11px;white-space:nowrap}
+    .pdf-table th{background:#f3f6fa;color:#344054;font-weight:800}
+    .pdf-table tr:last-child td{border-bottom:0}
+    .pdf-table th:last-child,.pdf-table td:last-child{border-right:0}
+    .section-title{font-size:15px;font-weight:800;color:#172033}
+    .mobile-bottom{display:none}
+    .toast{position:fixed;right:18px;bottom:18px;z-index:100;max-width:360px}
+    .loading-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.65);backdrop-filter:blur(2px);z-index:90;place-items:center}
+    .loading-overlay.show{display:grid}
+    .spinner{width:34px;height:34px;border:3px solid #dce8f3;border-top-color:#1769aa;border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .empty-state{padding:50px 20px;text-align:center;color:#667085}
+    .pdf-header{border-bottom:1px solid #e6eaf0}
+    @media(max-width:900px){
+      .sidebar{display:none}
+      .mobile-bottom{display:flex}
+      .main{padding-bottom:76px}
     }
-    .pdf-table th {
-      background-color: #2b6cb0;
-      color: white;
+    @media(max-width:640px){
+      .page-pad{padding:14px}
+      .topbar-inner{padding:11px 14px}
+      .mobile-bottom{position:fixed;left:0;right:0;bottom:0;height:64px;background:#fff;border-top:1px solid #e6eaf0;z-index:80;justify-content:space-around}
+      .mobile-bottom button{flex:1;color:#667085;font-size:10px;font-weight:700}
+      .mobile-bottom button span{display:block;font-size:18px;line-height:20px}
+      .card{border-radius:13px}
+      .form-grid{grid-template-columns:1fr!important}
+      .stats-grid{grid-template-columns:1fr 1fr!important}
+      .top-actions .hide-mobile{display:none}
+      .pdf-card{padding:14px!important}
     }
-
-    @media print {
-      @page {
-        size: A4 landscape;
-        margin: 5mm;
+    @media print{
+      @page{size:A4 landscape;margin:5mm}
+      html,body{background:#fff!important;margin:0!important;padding:0!important}
+      body *{visibility:hidden!important}
+      #pdfCard,#pdfCard *{visibility:visible!important}
+      #pdfCard{
+        display:block!important;
+        position:absolute!important;
+        left:0!important;
+        top:0!important;
+        width:100%!important;
+        margin:0!important;
+        padding:0!important;
+        background:#fff!important;
+        box-shadow:none!important;
+        border:0!important;
+        border-radius:0!important;
       }
-      body {
-        background: white !important;
-        padding: 0 !important;
-      }
-      #inputFormSection, .top-bar, .action-col, #filterSection {
-        display: none !important;
-      }
-      #pdfCard {
-        box-shadow: none !important;
-        border: none !important ;
-        padding: 0 !important;
-        width: 100% !important;
-      }
-      .pdf-table th, .pdf-table td {
-        font-size: 8px !important;
-        padding: 2px 1px !important;
-      }
+      #pdfContent{width:100%!important}
+      .no-print,.sidebar,.mobile-bottom,.topbar,.filter-panel,#inputFormSection,
+      #advancedTools,#activitySection,.action-col{display:none!important}
+      .pdf-table{min-width:0!important;width:100%!important}
+      .pdf-table th,.pdf-table td{font-size:8px!important;padding:3px 2px!important}
     }
   </style>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAJUd8hT7FEveWPPqGbKshwQbYO_9CyYq0",
+    authDomain: "mars-stock-ledger.firebaseapp.com",
+    projectId: "mars-stock-ledger",
+    storageBucket: "mars-stock-ledger.firebasestorage.app",
+    messagingSenderId: "928783215923",
+    appId: "1:928783215923:web:2820bdcc27ca7ab8616246",
+    measurementId: "G-ZX2XPP521R"
+  };
+
+  try {
+    firebase.initializeApp(firebaseConfig);
+    window.MARS_FIREBASE = { db: firebase.firestore() };
+    window.MARS_FIREBASE_READY = true;
+  } catch (e) {
+    console.error("Firebase initialization failed:", e);
+    window.MARS_FIREBASE_READY = false;
+  }
+</script>
+
 </head>
-<body class="bg-gray-100 text-gray-800 p-4 min-h-screen">
-
-  <div class="max-w-7xl mx-auto space-y-6">
-    
-    <!-- Top Bar -->
-    <div class="top-bar flex justify-between items-center bg-blue-900 text-white p-3 rounded-lg shadow">
-      <div class="text-sm font-bold flex items-center gap-2">
-        <span>MARS STRUCTURE LIMITED</span>
-        <span id="adminBadge" class="hidden bg-green-500 text-xs px-2 py-0.5 rounded-full">Admin Mode Active</span>
+<body>
+<div class="app-shell">
+  <header class="topbar no-print sticky top-0 z-50">
+    <div class="topbar-inner max-w-[1600px] mx-auto px-5 py-3 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 min-w-0">
+        <button class="lg:hidden w-10 h-10 rounded-xl bg-slate-100 text-slate-700" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
+        <div class="w-10 h-10 rounded-xl bg-navy text-white grid place-items-center font-extrabold">M</div>
+        <div class="min-w-0">
+          <div class="font-extrabold text-navy text-sm md:text-base truncate">MARS STRUCTURE LIMITED</div>
+          <div class="text-[11px] text-muted">Stock Ledger Management System</div>
+        </div>
       </div>
-      <div class="flex gap-2">
-        <button onclick="changeAdminPassword()" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-1 px-3 rounded shadow">
-          ⚙️ Change Pass
-        </button>
-        <button id="btnAdminToggle" onclick="toggleAdminMode()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs font-bold py-1 px-3 rounded shadow">
-           Admin Login
-        </button>
+      <div class="top-actions flex items-center gap-2">
+        <span id="adminBadge" class="hidden px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold">● Admin Active</span>
+        <button onclick="changeAdminPassword()" class="btn btn-secondary hide-mobile">⚙️ Change Password</button>
+        <button id="btnAdminToggle" onclick="toggleAdminMode()" class="btn btn-primary">🔐 Admin Login</button>
       </div>
     </div>
+  </header>
 
-    <!-- Input Form Section -->
-    <div id="inputFormSection" class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-      <h2 class="text-xl font-bold text-blue-900 border-b pb-2 mb-2">Site Engineer Data Entry Form</h2>
-      
-      <div class="bg-amber-50 border-l-4 border-amber-500 text-amber-900 p-2.5 mb-4 rounded text-xs flex items-center gap-2">
-        <span class="text-base">⚠️</span>
-        <div>
-          <strong>Disclaimer:</strong> ডাটা ইনপুট দেওয়ার পর <strong>১ ঘণ্টার মধ্যে</strong> সংশোধন (Edit) বা মুছে ফেলা (Del) যাবে। ১ ঘণ্টা পার হয়ে গেলে অপশনগুলো লক হয়ে যাবে।
-        </div>
+  <div class="flex max-w-[1600px] mx-auto">
+    <aside id="sidebar" class="sidebar min-h-[calc(100vh-65px)] p-4 shrink-0">
+      <div class="text-[10px] uppercase tracking-[.16em] text-blue-200/70 px-3 mb-3">Workspace</div>
+      <nav class="space-y-1">
+        <a href="#dashboard" class="nav-item active"><span>▦</span> Dashboard</a>
+        <a href="#inputFormSection" class="nav-item"><span>＋</span> New Ledger Entry</a>
+        <a href="#pdfCard" class="nav-item"><span>▤</span> Stock Ledger</a>
+        <a href="#advancedTools" class="nav-item"><span>▥</span> Reports & Tools</a>
+        <a href="#activitySection" class="nav-item"><span>◷</span> Activity Log</a>
+        <button class="nav-item w-full text-left" onclick="downloadPDF()"><span>⇩</span> Print / PDF</button>
+      </nav>
+      <div class="mt-8 p-3 rounded-xl bg-white/5 border border-white/10">
+        <div class="text-xs font-bold text-white">Firebase Stock Ledger</div>
+        <p class="text-[11px] text-blue-100/70 mt-1 leading-5">Entries can be edited or deleted within 1 hour. Admin can manage locked entries.</p>
       </div>
-      
-      <!-- Meta Information -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-        <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">Select Project No</label>
-          <select id="selectProject" onchange="onProjectSelect()" class="w-full p-2 border rounded text-xs bg-white font-semibold border-blue-400">
-            <!-- Dynamic Options -->
-          </select>
-        </div>
+    </aside>
 
-        <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">Project ID</label>
-          <input type="text" id="metaProjectId" readonly class="w-full p-2 border rounded text-xs bg-gray-100 font-semibold">
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">Site Engineer Name</label>
-          <input type="text" id="metaEngineerName" readonly class="w-full p-2 border rounded text-xs bg-gray-100 font-semibold">
-        </div>
-
-        <!-- Material Dropdown + Manual Input -->
-        <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">Materials Acc Code / Name</label>
-          <input list="materialsList" id="metaMaterial" placeholder="Select or Type Material" value="MAT-5001 / 500W Deformed Bar (16mm Steel)" class="w-full p-2 border rounded text-xs bg-white border-blue-400 font-semibold" oninput="recalculateAndRender()">
-          <datalist id="materialsList">
-            <option value="MAT-5001 / 500W Deformed Bar (16mm Steel)">
-            <option value="MAT-5002 / 500W Deformed Bar (20mm Steel)">
-            <option value="MAT-5003 / 500W Deformed Bar (12mm Steel)">
-            <option value="MAT-5004 / 500W Deformed Bar (10mm Steel)">
-            <option value="MAT-5005 / 500W Deformed Bar (8mm Steel)">
-            <option value="MAT-6001 / PCC Cement (PNS/Holcim/Seven Rings)">
-            <option value="MAT-6002 / OPC Cement">
-            <option value="MAT-7001 / Coarse Sand (Sylhet Sand FM 2.5)">
-            <option value="MAT-7002 / Local Sand (FM 1.5)">
-            <option value="MAT-8001 / Stone Chips (3/4 Down)">
-            <option value="MAT-8002 / Brick Chips (Khoa)">
-            <option value="MAT-9001 / First Class Auto Bricks">
-            <option value="MAT-9502 / Binding Wire (G.I. Wire)">
-          </datalist>
-        </div>
-
-        <!-- Unit Dropdown + Manual Input -->
-        <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">Unit</label>
-          <input list="unitsList" id="metaUnit" placeholder="Select or Type Unit" value="Ton (MT)" class="w-full p-2 border rounded text-xs bg-white border-blue-400 font-semibold" oninput="recalculateAndRender()">
-          <datalist id="unitsList">
-            <option value="Ton (MT)">
-            <option value="Kg">
-            <option value="Bags">
-            <option value="Cft (Cubic Feet)">
-            <option value="Sft (Square Feet)">
-            <option value="Nos (Pcs)">
-            <option value="Ltr (Litre)">
-            <option value="Truck / Lorry">
-          </datalist>
-        </div>
-      </div>
-
-      <hr class="my-4">
-
-      <!-- Entry Form -->
-      <form id="ledgerForm" class="grid grid-cols-1 md:grid-cols-5 gap-3">
-        <div>
-          <label class="block text-xs font-bold text-blue-800 mb-1">Date of Entry</label>
-          <input type="date" id="entryDate" required class="w-full p-1.5 border rounded text-xs">
-        </div>
-        
-        <!-- Procurement -->
-        <div class="p-2 bg-blue-50 rounded border border-blue-100">
-          <span class="text-xs font-bold text-blue-900 block mb-1">Receiving Procurement</span>
-          <input type="text" id="procMrr" placeholder="MRR No." class="w-full p-1 border rounded text-xs mb-1">
-          <input type="number" step="0.01" id="procQty" placeholder="QTY" class="w-full p-1 border rounded text-xs">
-        </div>
-
-        <!-- Receiving Other Site -->
-        <div class="p-2 bg-teal-50 rounded border border-teal-100">
-          <span class="text-xs font-bold text-teal-900 block mb-1">Receiving Other Site</span>
-          <input type="text" id="recPrj" placeholder="Project No" class="w-full p-1 border rounded text-xs mb-1">
-          <input type="text" id="recGp" placeholder="Gate Pass No." class="w-full p-1 border rounded text-xs mb-1">
-          <input type="number" step="0.01" id="recQty" placeholder="QTY" class="w-full p-1 border rounded text-xs">
-        </div>
-
-        <!-- Transfers to Other Site -->
-        <div class="p-2 bg-amber-50 rounded border border-amber-100">
-          <span class="text-xs font-bold text-amber-900 block mb-1">Transfers to Other Site</span>
-          <input type="text" id="trGp" placeholder="Gate Pass" class="w-full p-1 border rounded text-xs mb-1">
-          <input type="text" id="trPrj" placeholder="Project No" class="w-full p-1 border rounded text-xs mb-1">
-          <input type="number" step="0.01" id="trQty" placeholder="QTY" class="w-full p-1 border rounded text-xs">
-        </div>
-
-        <!-- Issue of Work at Site -->
-        <div class="p-2 bg-purple-50 rounded border border-purple-100">
-          <span class="text-xs font-bold text-purple-900 block mb-1">Issue of Work at Site</span>
-          <input type="text" id="issuePurpose" placeholder="Purpose" class="w-full p-1 border rounded text-xs mb-1">
-          <input type="number" step="0.01" id="issueQty" placeholder="QTY" class="w-full p-1 border rounded text-xs">
-        </div>
-
-        <div class="md:col-span-5 flex justify-end gap-3 mt-2">
-          <button type="button" id="btnSubmit" onclick="saveEntry()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow text-sm">➕ Add Entry</button>
-          <button type="button" id="btnCancel" onclick="resetForm()" class="hidden bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded shadow text-sm">Cancel Edit</button>
-        </div>
-      </form>
-    </div>
-
-    <!-- Filter Control Panel -->
-    <div id="filterSection" class="bg-slate-800 text-white p-4 rounded-lg shadow-md flex flex-wrap items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <span class="text-sm font-bold text-amber-400"> Filter PDF View:</span>
-        <select id="filterProject" onchange="recalculateAndRender()" class="p-2 border rounded text-xs bg-gray-700 text-white font-semibold">
-          <option value="ALL">Show All Projects</option>
-        </select>
-      </div>
-      <button type="button" onclick="downloadPDF()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded shadow text-sm">️ Download / Print Continuous PDF</button>
-    </div>
-
-    <!-- Ledger Preview Layout -->
-    <div id="pdfCard" class="bg-white p-6 rounded-lg shadow-md overflow-x-auto">
-      <div id="pdfContent" class="bg-white">
-        
-        <!-- Header -->
-        <div class="text-center pb-2 mb-3">
-          <h1 class="text-xl font-bold uppercase tracking-wide">MARS STRUCTURE LIMITED</h1>
-          <h3 class="text-xs font-semibold">Project ID: <span id="hdrProjectId">-</span></h3>
-          <h2 class="text-md font-bold uppercase">Stock Ledger</h2>
-        </div>
-
-        <!-- Meta Information -->
-        <div class="flex justify-between text-xs font-semibold mb-2">
-          <div>Materials Acc Code/Name: <span id="lblMaterial" class="font-normal">-</span></div>
-          <div>Unit: <span id="lblUnit" class="font-normal">-</span></div>
-        </div>
-
-        <!-- Main Ledger Table (Exact Match to Picture) -->
-        <table class="w-full pdf-table border-collapse">
-          <thead>
-            <tr>
-              <th rowspan="2" width="6%">Date of Entry</th>
-              <th colspan="3">Receiving from Procurement</th>
-              <th colspan="4">Receiving from Other Site</th>
-              <th rowspan="2" width="6%">Cumulative Gross Received</th>
-              <th colspan="4">Transfers to Other Site</th>
-              <th rowspan="2" width="6%">Net Cumulative Received</th>
-              <th colspan="3">Issue of Work at Site</th>
-              <th rowspan="2" width="6%">Balance Quantity</th>
-              <th rowspan="2" width="5%" class="action-col">Action</th>
-            </tr>
-            <tr>
-              <th>MRR</th><th>QTY</th><th>Cumulative Rec Procurement</th>
-              <th>Project No</th><th>Gate Pass</th><th>QTY</th><th>Cumulative Rec Other Site</th>
-              <th>Gate Pass</th><th>Project No</th><th>QTY</th><th>Cumulative Transfer to Other Site</th>
-              <th>Purpose</th><th>QTY</th><th>Cumulative Issue</th>
-            </tr>
-          </thead>
-          <tbody id="ledgerTableBody">
-            <!-- Dynamic Serial Entries -->
-          </tbody>
-        </table>
-
-        <!-- Signatures -->
-        <div class="flex justify-between items-end mt-16 px-12 text-xs font-bold text-gray-700">
-          <div class="text-center border-t border-gray-600 pt-1 w-56">
-            Prepared By Site Engineer<br>
-            <span id="lblEngineerSignature" class="text-[10px] font-normal text-gray-600"></span>
+    <main class="main flex-1 page-pad p-5 md:p-7" id="dashboard">
+      <div class="max-w-[1350px] mx-auto space-y-6">
+        <section class="flex flex-col md:flex-row md:items-end justify-between gap-3">
+          <div>
+            <div class="text-xs font-bold text-brand uppercase tracking-wider">Operations</div>
+            <h1 class="text-2xl md:text-3xl font-extrabold text-ink mt-1">Stock Ledger Dashboard</h1>
+            <p class="text-sm text-muted mt-1">Track procurement, site transfers, issues and current material balance.</p>
           </div>
-          <div class="text-center border-t border-gray-600 pt-1 w-48">Checked By</div>
-        </div>
+          <button class="btn btn-primary no-print" onclick="document.getElementById('inputFormSection').scrollIntoView({behavior:'smooth'})">＋ Add New Entry</button>
+        </section>
 
+        <section class="stats-grid grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+          <div class="card stat-card"><div class="flex justify-between"><div><div class="text-xs text-muted">Total Entries</div><div id="statEntries" class="text-2xl font-extrabold mt-2">0</div></div><div class="stat-icon">▤</div></div></div>
+          <div class="card stat-card"><div class="flex justify-between"><div><div class="text-xs text-muted">Received</div><div id="statReceived" class="text-2xl font-extrabold mt-2">0.00</div></div><div class="stat-icon">↓</div></div></div>
+          <div class="card stat-card"><div class="flex justify-between"><div><div class="text-xs text-muted">Transferred</div><div id="statTransferred" class="text-2xl font-extrabold mt-2">0.00</div></div><div class="stat-icon">⇄</div></div></div>
+          <div class="card stat-card"><div class="flex justify-between"><div><div class="text-xs text-muted">Balance</div><div id="statBalance" class="text-2xl font-extrabold mt-2">0.00</div></div><div class="stat-icon">✓</div></div></div>
+        </section>
+
+        <section id="inputFormSection" class="card p-5 md:p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-line">
+            <div><div class="section-title">Site Engineer Data Entry</div><div class="text-xs text-muted mt-1">Enter material movement details accurately.</div></div>
+            <div class="px-3 py-2 rounded-lg bg-amber-50 text-amber-800 text-[11px] font-semibold">⚠ Edit/Delete window: 1 hour</div>
+          </div>
+
+          <div class="form-grid grid grid-cols-1 md:grid-cols-4 gap-4 mt-5">
+            <div><label class="field-label">Select Project No</label><select id="selectProject" onchange="onProjectSelect()" class="field"></select></div>
+            <div><label class="field-label">Project ID</label><input id="metaProjectId" readonly class="field bg-slate-50"></div>
+            <div><label class="field-label">Site Engineer</label><input id="metaEngineerName" readonly class="field bg-slate-50"></div>
+            <div><label class="field-label">Material Acc Code / Name</label><input list="materialsList" id="metaMaterial" class="field" oninput="recalculateAndRender()"></div>
+            <div><label class="field-label">Unit</label><input list="unitsList" id="metaUnit" class="field" oninput="recalculateAndRender()"></div>
+          </div>
+          <datalist id="materialsList">
+            <option value="MAT-5001 / 500W Deformed Bar (16mm Steel)"><option value="MAT-5002 / 500W Deformed Bar (20mm Steel)">
+            <option value="MAT-5003 / 500W Deformed Bar (12mm Steel)"><option value="MAT-5004 / 500W Deformed Bar (10mm Steel)">
+            <option value="MAT-5005 / 500W Deformed Bar (8mm Steel)"><option value="MAT-6001 / PCC Cement (PNS/Holcim/Seven Rings)">
+            <option value="MAT-6002 / OPC Cement"><option value="MAT-7001 / Coarse Sand (Sylhet Sand FM 2.5)">
+            <option value="MAT-7002 / Local Sand (FM 1.5)"><option value="MAT-8001 / Stone Chips (3/4 Down)">
+            <option value="MAT-8002 / Brick Chips (Khoa)"><option value="MAT-9001 / First Class Auto Bricks"><option value="MAT-9502 / Binding Wire (G.I. Wire)">
+          </datalist>
+          <datalist id="unitsList"><option value="Ton (MT)"><option value="Kg"><option value="Bags"><option value="Cft (Cubic Feet)"><option value="Sft (Square Feet)"><option value="Nos (Pcs)"><option value="Ltr (Litre)"><option value="Truck / Lorry"></datalist>
+
+          <form id="ledgerForm" class="grid grid-cols-1 md:grid-cols-5 gap-4 mt-5">
+            <div><label class="field-label">Date of Entry</label><input type="date" id="entryDate" required class="field"></div>
+            <div class="rounded-xl bg-blue-50/70 border border-blue-100 p-3"><div class="text-xs font-extrabold text-blue-900 mb-2">Receiving Procurement</div><input type="text" id="procMrr" placeholder="MRR No." class="field mb-2"><input type="number" step="0.01" id="procQty" placeholder="Quantity" class="field"></div>
+            <div class="rounded-xl bg-teal-50/70 border border-teal-100 p-3"><div class="text-xs font-extrabold text-teal-900 mb-2">Receiving Other Site</div><input type="text" id="recPrj" placeholder="Project No" class="field mb-2"><input type="text" id="recGp" placeholder="Gate Pass No." class="field mb-2"><input type="number" step="0.01" id="recQty" placeholder="Quantity" class="field"></div>
+            <div class="rounded-xl bg-amber-50/70 border border-amber-100 p-3"><div class="text-xs font-extrabold text-amber-900 mb-2">Transfers to Other Site</div><input type="text" id="trGp" placeholder="Gate Pass" class="field mb-2"><input type="text" id="trPrj" placeholder="Project No" class="field mb-2"><input type="number" step="0.01" id="trQty" placeholder="Quantity" class="field"></div>
+            <div class="rounded-xl bg-violet-50/70 border border-violet-100 p-3"><div class="text-xs font-extrabold text-violet-900 mb-2">Issue of Work at Site</div><input type="text" id="issuePurpose" placeholder="Purpose" class="field mb-2"><input type="number" step="0.01" id="issueQty" placeholder="Quantity" class="field"></div>
+            <div class="md:col-span-5 flex flex-col sm:flex-row justify-end gap-2 pt-1"><button type="button" id="btnCancel" onclick="resetForm()" class="hidden btn btn-secondary">Cancel Edit</button><button type="button" id="btnSubmit" onclick="saveEntry()" class="btn btn-primary">＋ Add Entry</button></div>
+          </form>
+        </section>
+
+        <section id="filterSection" class="filter-panel card p-4 md:p-5 no-print">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div><div class="section-title">Ledger View</div><div class="text-xs text-muted mt-1">Filter the report by project and print when ready.</div></div>
+            <div class="flex flex-col sm:flex-row gap-2"><select id="filterProject" onchange="recalculateAndRender()" class="field min-w-[220px]"><option value="ALL">Show All Projects</option></select><button type="button" onclick="downloadPDF()" class="btn btn-success">⇩ Individual PDF</button>
+              <button type="button" onclick="generateCombinedPDF()" class="btn btn-primary">▤ Combined PDF</button>
+              <button type="button" onclick="generateAllEngineerReports()" class="btn btn-secondary">⇩ All Project PDFs</button></div>
+          </div>
+        </section>
+
+        <section id="pdfCard" class="card pdf-card p-5 md:p-7">
+          <div id="pdfContent">
+            <div class="pdf-header text-center pb-4 mb-4">
+              <div class="text-lg md:text-xl font-extrabold tracking-wide">MARS STRUCTURE LIMITED</div>
+              <div class="text-xs text-muted mt-1">Project ID: <span id="hdrProjectId">-</span></div>
+              <div class="text-base font-extrabold mt-1">STOCK LEDGER</div>
+            </div>
+            <div class="flex flex-col sm:flex-row sm:justify-between gap-2 text-xs font-semibold mb-4">
+              <div>Material: <span id="lblMaterial" class="font-normal text-muted">-</span></div>
+              <div>Unit: <span id="lblUnit" class="font-normal text-muted">-</span></div>
+            </div>
+            <div class="table-wrap">
+              <table class="pdf-table">
+                <thead>
+                  <tr>
+                    <th rowspan="2">Date</th><th colspan="3">Receiving from Procurement</th><th colspan="4">Receiving from Other Site</th><th rowspan="2">Gross Received</th><th colspan="4">Transfers to Other Site</th><th rowspan="2">Net Received</th><th colspan="3">Issue of Work</th><th rowspan="2">Balance</th><th rowspan="2" class="action-col">Action</th>
+                  </tr>
+                  <tr>
+                    <th>MRR</th><th>QTY</th><th>Cumulative</th><th>Project</th><th>Gate Pass</th><th>QTY</th><th>Cumulative</th><th>Gate Pass</th><th>Project</th><th>QTY</th><th>Cumulative</th><th>Purpose</th><th>QTY</th><th>Cumulative</th>
+                  </tr>
+                </thead>
+                <tbody id="ledgerTableBody"></tbody>
+              </table>
+            </div>
+            <div id="emptyLedger" class="empty-state hidden"><div class="text-3xl mb-2">▤</div><div class="font-bold text-ink">No ledger entries yet</div><div class="text-xs mt-1">Add your first stock movement using the form above.</div></div>
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-8 mt-14 px-2 md:px-10 text-xs font-bold text-gray-700">
+              <div class="text-center border-t border-gray-500 pt-1 w-56">Prepared By Site Engineer<br><span id="lblEngineerSignature" class="text-[10px] font-normal text-gray-500"></span></div>
+              <div class="text-center border-t border-gray-500 pt-1 w-48">Checked By</div>
+            </div>
+          </div>
+        </section>
       </div>
-    </div>
-
+    </main>
   </div>
 
-  <script>
-    const projectDatabase = [
+
+        <!-- Advanced tools -->
+        <section id="advancedTools" class="card p-5 md:p-6 no-print">
+          <div class="flex items-center justify-between gap-3 mb-4">
+            <div>
+              <div class="section-title">Reports, Search & Data Tools</div>
+              <div class="text-xs text-muted mt-1">Search, filter, export, backup and manage your stock records.</div>
+            </div>
+            <span id="syncStatus" class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-[11px] font-bold">● Firebase Ready</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div><label class="field-label">Search</label><input id="advancedSearch" class="field" placeholder="MRR, Gate Pass, Project, Purpose..." oninput="renderAdvanced()"></div>
+            <div><label class="field-label">From Date</label><input id="reportFrom" type="date" class="field" onchange="renderAdvanced()"></div>
+            <div><label class="field-label">To Date</label><input id="reportTo" type="date" class="field" onchange="renderAdvanced()"></div>
+            <div><label class="field-label">Transaction Type</label><select id="transactionFilter" class="field" onchange="renderAdvanced()"><option value="ALL">All Transactions</option><option value="RECEIVE">Receiving</option><option value="TRANSFER">Transfer</option><option value="ISSUE">Issue</option></select></div>
+          </div>
+
+          <div class="flex flex-wrap gap-2 mt-4">
+            <button class="btn btn-secondary" onclick="clearAdvancedFilters()">↺ Clear Filters</button>
+            <button class="btn btn-success" onclick="exportCSV()">⇩ CSV</button>
+            <button class="btn btn-primary" onclick="exportExcelCompatible()">▣ Excel</button>
+            <button class="btn btn-secondary" onclick="downloadPDF()">🖨 Print / PDF</button>
+            <button class="btn btn-secondary" onclick="backupData()">⬇ Backup</button>
+            <label class="btn btn-secondary cursor-pointer">⬆ Restore <input type="file" accept=".json,application/json" class="hidden" onchange="restoreData(event)"></label>
+            <button class="btn btn-warning" onclick="openStockSettings()">⚙ Stock Alert</button>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-5">
+            <div class="rounded-xl border border-line p-4">
+              <div class="flex justify-between items-center mb-3"><div class="font-extrabold text-sm">Project Summary</div><span class="text-[10px] text-muted">Current filtered data</span></div>
+              <div id="projectSummary" class="space-y-2"></div>
+            </div>
+            <div class="rounded-xl border border-line p-4">
+              <div class="flex justify-between items-center mb-3"><div class="font-extrabold text-sm">Material / Stock Alerts</div><span id="lowStockBadge" class="text-[10px] font-bold text-muted">0 alerts</span></div>
+              <div id="stockAlerts" class="space-y-2"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="activitySection" class="card p-5 no-print">
+          <div class="flex justify-between items-center mb-3"><div><div class="section-title">Activity Log</div><div class="text-xs text-muted mt-1">Local audit trail for important actions.</div></div><button class="btn btn-secondary" onclick="clearActivityLog()">Clear</button></div>
+          <div id="activityLog" class="space-y-2 text-xs text-muted"></div>
+        </section>
+
+        <div id="modalRoot"></div>
+
+  <nav class="mobile-bottom no-print">
+    <button onclick="document.getElementById('dashboard').scrollIntoView({behavior:'smooth'})"><span>⌂</span>Home</button>
+    <button onclick="document.getElementById('inputFormSection').scrollIntoView({behavior:'smooth'})"><span>＋</span>Add</button>
+    <button onclick="document.getElementById('pdfCard').scrollIntoView({behavior:'smooth'})"><span>▤</span>Ledger</button>
+    <button onclick="document.getElementById('advancedTools').scrollIntoView({behavior:'smooth'})"><span>▥</span>Reports</button>
+    <button onclick="downloadPDF()"><span>⇩</span>Print</button>
+  </nav>
+
+  <div id="loadingOverlay" class="loading-overlay"><div class="text-center"><div class="spinner mx-auto"></div><div class="text-xs font-bold text-muted mt-3">Processing...</div></div></div>
+  <div id="toast" class="toast hidden"></div>
+</div>
+
+<script>
+    // এখানে আপনার গুগল অ্যাপস স্ক্রিপ্ট লিংকটি সেট করা আছে
+    const SCRIPT_URL = "";
+const projectDatabase = [
       { prjNo: "Project:01", id: "ID:11-409-005", eng: "Site Engr. Mahedi Hasan Fahad" },
       { prjNo: "Project:02", id: "ID:12-409A-007", eng: "Site Engr. Rakib" },
       { prjNo: "Project:03", id: "ID:13A-502-004", eng: "Site Engr. Md Munfiqul Islam Kanon" },
@@ -260,13 +336,13 @@ stock ledger.html
       { prjNo: "Project:10", id: "ID:16-504-039", eng: "Site Engr. Motaher" },
       { prjNo: "Project:11", id: "ID: 16-505C-010", eng: "Site Engr. Shamim Ahmed Khan Prince" },
       { prjNo: "Project:12", id: "ID:13-406-017", eng: "Site Engr.Julhas Molla" },
-      { prjNo: "Project:13", id: "ID:14-504-019", eng: "Site Engr. Md Ripon Babu" },
+      { prjNo: "Project:13", id: "ID:14-504-019", eng: "" },
       { prjNo: "Project:14", id: "ID: 05-501-006", eng: "Site Engr. Md Ripon Babu" },
       { prjNo: "Project:15", id: "ID:11-404A-003", eng: "Site Engr. Saidul Islam" },
       { prjNo: "Project:16", id: "ID:09-506-013", eng: "Site Engr. Eyachin Arafat" },
-      { prjNo: "Project:17", id: "ID:13A-501-019", eng: "Site Engr. Mahedi Hasan Fahad" },
+      { prjNo: "Project:17", id: "ID:13A-501-019", eng: "" },
       { prjNo: "Project:18", id: "ID:11-410-006", eng: "Site Engr. Mahedi Hasan Fahad" },
-      { prjNo: "Project:19", id: "ID:11-510B-003", eng: "Site Engr. Mahedi Hasan Fahad" },
+      { prjNo: "Project:19", id: "ID:11-510B-003", eng: "" },
       { prjNo: "Project:20", id: "ID: 11-504-006", eng: "Md Naimul Islam" },
       { prjNo: "Project:21 / MARS-01", id: "ID: 07-410-039", eng: "Site Engineer" }
     ];
@@ -282,8 +358,8 @@ stock ledger.html
     const filterPrj = document.getElementById('filterProject');
 
     projectDatabase.forEach((p, idx) => {
-      selectPrj.innerHTML += `<option value="${idx}">${p.prjNo} (${p.id}) - ${p.eng}</option>`;
-      filterPrj.innerHTML += `<option value="${p.prjNo}">${p.prjNo} - ${p.eng}</option>`;
+      selectPrj.innerHTML += `<option value="${idx}">${p.prjNo} (${p.id})${p.eng ? " - " + p.eng : ""}</option>`;
+      filterPrj.innerHTML += `<option value="${p.prjNo}">${p.prjNo}${p.eng ? " - " + p.eng : ""}</option>`;
     });
 
     document.getElementById('entryDate').valueAsDate = new Date();
@@ -294,13 +370,23 @@ stock ledger.html
       const selected = projectDatabase[idx];
       document.getElementById('metaProjectId').value = selected.id;
       document.getElementById('hdrProjectId').innerText = selected.id;
-      document.getElementById('metaEngineerName').value = selected.eng;
-      document.getElementById('lblEngineerSignature').innerText = `(${selected.eng})`;
+      document.getElementById('metaEngineerName').value = selected.eng || "";
+      document.getElementById('lblEngineerSignature').innerText = selected.eng ? `(${selected.eng})` : "";
       recalculateAndRender();
     }
 
     function saveToStorage() {
       localStorage.setItem('mars_ledger_entries', JSON.stringify(entries));
+    }
+
+    function sendDataToGoogleSheet(dataObj) {
+      if (!SCRIPT_URL) return;
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dataObj)
+      }).catch(err => console.error("Sheet Sync Error:", err));
     }
 
     function toggleAdminMode() {
@@ -340,21 +426,35 @@ stock ledger.html
       }
     }
 
-    function saveEntry() {
+    let isSaving = false;
+    async function saveEntry() {
+      if (isSaving) return; // guard: ignore extra clicks/taps while a save is already in progress
+
       const date = document.getElementById('entryDate').value;
       const idx = document.getElementById('selectProject').value;
       const prjInfo = projectDatabase[idx];
 
       if (!date) { alert("Please select Entry Date"); return; }
 
-      const currentTime = new Date().getTime();
+      isSaving = true;
+      const btnSubmitEl = document.getElementById('btnSubmit');
+      const prevBtnText = btnSubmitEl.innerText;
+      btnSubmitEl.disabled = true;
+      btnSubmitEl.style.opacity = '0.6';
+      btnSubmitEl.style.cursor = 'not-allowed';
+      btnSubmitEl.innerText = 'Saving...';
+
+      const currentTime = Date.now();
+      const old = editIndex === -1 ? null : entries[editIndex];
 
       const newEntryData = {
-        createdAt: editIndex === -1 ? currentTime : entries[editIndex].createdAt,
+        createdAt: old?.createdAt || currentTime,
         dateStr: date,
         prjNo: prjInfo.prjNo,
         prjId: prjInfo.id,
-        engineerName: prjInfo.eng,
+        engineerName: prjInfo.eng || "",
+        material: document.getElementById('metaMaterial').value || "",
+        unit: document.getElementById('metaUnit').value || "",
         procMrr: document.getElementById('procMrr').value || '-',
         procQty: parseFloat(document.getElementById('procQty').value) || 0,
         recPrj: document.getElementById('recPrj').value || '-',
@@ -367,18 +467,36 @@ stock ledger.html
         issueQty: parseFloat(document.getElementById('issueQty').value) || 0
       };
 
-      if (editIndex === -1) {
-        entries.push(newEntryData);
-      } else {
-        entries[editIndex] = newEntryData;
-        editIndex = -1;
+      try{
+        setFirebaseStatus("Saving...", "loading");
+        if(editIndex === -1){
+          await saveEntryToFirebase(newEntryData);
+          logActivity('Entry Saved', `${newEntryData.prjNo} / ${newEntryData.dateStr}`);
+        }else{
+          await saveEntryToFirebase(newEntryData, old.firebaseId);
+          editIndex = -1;
+          logActivity('Entry Updated', `${newEntryData.prjNo} / ${newEntryData.dateStr}`);
+        }
+
+        // Do NOT manually push/update/render `entries` here — the Firestore
+        // onSnapshot listener (startFirebaseSync) is always active and will
+        // pick up this write automatically, re-sort, save to storage, and
+        // re-render. Doing it here too was causing every entry to appear twice.
+        resetForm();
+        showToast("Entry saved to Firebase successfully.");
+      }catch(err){
+        console.error(err);
+        setFirebaseStatus("Firebase Error","error");
+        showToast("Could not save to Firebase. Check Firestore Rules.","error");
+      }finally{
+        isSaving = false;
+        btnSubmitEl.disabled = false;
+        btnSubmitEl.style.opacity = '';
+        btnSubmitEl.style.cursor = '';
+        // resetForm() already restores the correct label/class on success;
+        // on failure, restore whatever label was showing before this attempt.
+        if (btnSubmitEl.innerText === 'Saving...') btnSubmitEl.innerText = prevBtnText;
       }
-
-      entries.sort((a, b) => new Date(a.dateStr) - new Date(b.dateStr));
-
-      saveToStorage();
-      resetForm();
-      recalculateAndRender();
     }
 
     function editEntry(index) {
@@ -415,19 +533,28 @@ stock ledger.html
       document.getElementById('btnCancel').classList.remove('hidden');
     }
 
-    function deleteEntry(index) {
+    async function deleteEntry(index) {
       const item = entries[index];
-      const currentTime = new Date().getTime();
+      const currentTime = Date.now();
 
       if (!isAdmin && (currentTime - item.createdAt > ONE_HOUR)) {
-        alert(" 1 hour time limit expired. Only Admin can delete this entry.");
+        alert("1 hour time limit expired. Only Admin can delete this entry.");
         return;
       }
 
-      if (confirm("Are you sure you want to delete this row?")) {
-        entries.splice(index, 1);
-        saveToStorage();
-        recalculateAndRender();
+      if (!confirm("Are you sure you want to delete this row?")) return;
+
+      try{
+        setFirebaseStatus("Deleting...", "loading");
+        await deleteEntryFromFirebase(item.firebaseId);
+        // entries/table/stats update automatically via the onSnapshot listener
+        logActivity('Entry Deleted', `${item.prjNo} / ${item.dateStr}`);
+        renderActivity();
+        showToast("Entry deleted successfully.");
+      }catch(err){
+        console.error(err);
+        setFirebaseStatus("Firebase Error","error");
+        showToast("Could not delete from Firebase. Check Firestore Rules.","error");
       }
     }
 
@@ -499,6 +626,9 @@ stock ledger.html
           </tr>
         `;
       });
+      const empty = document.getElementById('emptyLedger');
+      if (empty) empty.classList.toggle('hidden', tbody.children.length !== 0);
+      if (typeof updateStats === 'function') updateStats();
     }
 
     function formatDate(dStr) {
@@ -507,11 +637,293 @@ stock ledger.html
       return `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
 
+
+    function projectEntries(projectNo){
+      return entries.filter(e=>e.prjNo===projectNo).sort((a,b)=>String(a.dateStr).localeCompare(String(b.dateStr)));
+    }
+
+    function buildReportHtml(projectNo){
+      const p=projectDatabase.find(x=>x.prjNo===projectNo);
+      const list=projectEntries(projectNo);
+      let cp=0, cr=0, ct=0, ci=0;
+      const rows=list.map(e=>{
+        cp += +e.procQty||0; cr += +e.recQty||0; ct += +e.trQty||0; ci += +e.issueQty||0;
+        const gross=cp+cr, net=gross-ct, bal=net-ci;
+        return `<tr>
+          <td>${formatDate(e.dateStr)}</td><td>${escapeHtml(e.procMrr)}</td><td>${(+e.procQty||0).toFixed(2)}</td><td>${cp.toFixed(2)}</td>
+          <td>${escapeHtml(e.recPrj)}</td><td>${escapeHtml(e.recGp)}</td><td>${(+e.recQty||0).toFixed(2)}</td><td>${cr.toFixed(2)}</td><td>${gross.toFixed(2)}</td>
+          <td>${escapeHtml(e.trGp)}</td><td>${escapeHtml(e.trPrj)}</td><td>${(+e.trQty||0).toFixed(2)}</td><td>${ct.toFixed(2)}</td><td>${net.toFixed(2)}</td>
+          <td>${escapeHtml(e.purpose)}</td><td>${(+e.issueQty||0).toFixed(2)}</td><td>${ci.toFixed(2)}</td><td>${bal.toFixed(2)}</td>
+        </tr>`;
+      }).join("");
+
+      return `<!doctype html><html><head><meta charset="utf-8"><title>MARS ${escapeHtml(projectNo)} Stock Ledger</title>
+      <style>
+      @page{size:A4 landscape;margin:6mm}body{font-family:Arial,sans-serif;color:#172033;font-size:9px}
+      h1,h2,p{text-align:center;margin:3px}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}
+      table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:3px;text-align:center;white-space:nowrap}th{background:#eef2f7}
+      .sign{display:flex;justify-content:space-between;margin-top:45px}.sig{width:220px;border-top:1px solid #555;text-align:center;padding-top:4px}
+      </style></head><body>
+      <h1>MARS STRUCTURE LIMITED</h1>
+      <h2>STOCK LEDGER</h2>
+      <div class="meta"><span>Project: ${escapeHtml(p?.prjNo||projectNo)}</span><span>Project ID: ${escapeHtml(p?.id||"")}</span><span>Engineer: ${escapeHtml(p?.eng||"")}</span></div>
+      <table><thead><tr>
+      <th>Date</th><th>MRR</th><th>Proc Qty</th><th>Proc Cum.</th><th>Recv Project</th><th>Recv GP</th><th>Recv Qty</th><th>Recv Cum.</th><th>Gross</th>
+      <th>Transfer GP</th><th>Transfer Project</th><th>Transfer Qty</th><th>Transfer Cum.</th><th>Net Received</th><th>Purpose</th><th>Issue Qty</th><th>Issue Cum.</th><th>Balance</th>
+      </tr></thead><tbody>${rows || `<tr><td colspan="18">No ledger entries</td></tr>`}</tbody></table>
+      <div class="sign"><div class="sig">Prepared By Site Engineer<br>${escapeHtml(p?.eng||"")}</div><div class="sig">Checked By</div></div>
+      </body></html>`;
+    }
+
+    function printHtml(htmlDoc){
+      const w=window.open("","_blank","width=1200,height=800");
+      if(!w){alert("Please allow pop-ups to generate PDF/print.");return;}
+      w.document.open(); w.document.write(htmlDoc); w.document.close();
+      w.onload=()=>{w.focus();w.print();};
+    }
+
+    function generateCombinedPDF(){
+      const all=projectDatabase.map(p=>p.prjNo);
+      const sections=all.map(p=>{
+        const h=buildReportHtml(p);
+        return h.slice(h.indexOf("<body>")+6,h.indexOf("</body>"));
+      }).join('<div style="page-break-before:always"></div>');
+      const combined=`<!doctype html><html><head><meta charset="utf-8"><title>MARS Combined Stock Ledger</title>
+      <style>@page{size:A4 landscape;margin:6mm}body{font-family:Arial,sans-serif;font-size:9px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:3px;text-align:center}th{background:#eef2f7}h1,h2,p{text-align:center}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}.sign{display:flex;justify-content:space-between;margin-top:35px}.sig{width:220px;border-top:1px solid #555;text-align:center}</style>
+      </head><body>${sections}</body></html>`;
+      logActivity('Combined PDF',`${entries.length} records / ${all.length} projects`);
+      printHtml(combined);
+    }
+
+    function generateAllEngineerReports(){
+      const reports=projectDatabase.filter(p=>projectEntries(p.prjNo).length);
+      if(!reports.length){alert("No project ledger data found.");return;}
+      const sections=reports.map(p=>{
+        const h=buildReportHtml(p.prjNo);
+        return h.slice(h.indexOf("<body>")+6,h.indexOf("</body>"));
+      }).join('<div style="page-break-before:always"></div>');
+      const docHtml=`<!doctype html><html><head><meta charset="utf-8"><title>MARS All Project Reports</title>
+      <style>@page{size:A4 landscape;margin:6mm}body{font-family:Arial,sans-serif;font-size:9px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:3px;text-align:center}th{background:#eef2f7}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}h1,h2{text-align:center}</style>
+      </head><body>${sections}</body></html>`;
+      logActivity('All Project Reports',`${reports.length} project reports`);
+      printHtml(docHtml);
+    }
+
     function downloadPDF() {
       recalculateAndRender();
       window.print();
     }
   </script>
+
+<script>
+function toggleMobileMenu(){
+  const s=document.getElementById('sidebar');
+  if(!s)return;
+  s.style.display=s.style.display==='block'?'none':'block';
+  s.style.position='fixed'; s.style.left='0'; s.style.top='65px'; s.style.zIndex='70'; s.style.height='calc(100vh - 65px)';
+}
+function showLoading(show=true){ document.getElementById('loadingOverlay')?.classList.toggle('show',show); }
+function showToast(message,type='success'){
+  const t=document.getElementById('toast'); if(!t)return;
+  t.className='toast';
+  t.innerHTML='<div class="card px-4 py-3 text-sm font-semibold '+(type==='error'?'text-red-700':'text-emerald-700')+'">'+message+'</div>';
+  setTimeout(()=>t.classList.add('hidden'),3000);
+}
+function updateStats(){
+  const filter=document.getElementById('filterProject')?.value||'ALL';
+  const list=entries.filter(e=>filter==='ALL'||e.prjNo===filter);
+  let received=0, transferred=0, issue=0;
+  list.forEach(e=>{received+=(Number(e.procQty)||0)+(Number(e.recQty)||0);transferred+=(Number(e.trQty)||0);issue+=(Number(e.issueQty)||0)});
+  document.getElementById('statEntries').textContent=list.length;
+  document.getElementById('statReceived').textContent=received.toFixed(2);
+  document.getElementById('statTransferred').textContent=transferred.toFixed(2);
+  document.getElementById('statBalance').textContent=(received-transferred-issue).toFixed(2);
+}
+</script>
+
+
+<script>
+/* ---------- Pro feature layer ---------- */
+const ACTIVITY_KEY='mars_ledger_activity';
+const ALERT_KEY='mars_stock_alert';
+const DEFAULT_ALERT=10;
+
+function getActivity(){try{return JSON.parse(localStorage.getItem(ACTIVITY_KEY)||'[]')}catch(e){return[]}}
+function logActivity(action,detail=''){
+  const a=getActivity(); a.unshift({time:new Date().toISOString(),action,detail});
+  localStorage.setItem(ACTIVITY_KEY,JSON.stringify(a.slice(0,100))); renderActivity();
+}
+function renderActivity(){
+  const el=document.getElementById('activityLog'); if(!el)return;
+  const a=getActivity();
+  el.innerHTML=a.length?a.slice(0,15).map(x=>`<div class="flex justify-between gap-3 border-b border-line pb-2"><span><b>${escapeHtml(x.action)}</b> — ${escapeHtml(x.detail)}</span><span class="whitespace-nowrap">${new Date(x.time).toLocaleString()}</span></div>`).join(''):'<div class="text-center py-5">No activity yet.</div>';
+}
+function clearActivityLog(){if(confirm('Clear activity log?')){localStorage.removeItem(ACTIVITY_KEY);renderActivity();}}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+
+function getFilteredEntries(){
+  const q=(document.getElementById('advancedSearch')?.value||'').trim().toLowerCase();
+  const from=document.getElementById('reportFrom')?.value||'';
+  const to=document.getElementById('reportTo')?.value||'';
+  const type=document.getElementById('transactionFilter')?.value||'ALL';
+  return entries.filter(e=>{
+    if(from && e.dateStr<from)return false;if(to && e.dateStr>to)return false;
+    if(q){
+      const hay=[e.dateStr,e.prjNo,e.prjId,e.engineerName,e.procMrr,e.recPrj,e.recGp,e.trGp,e.trPrj,e.purpose].join(' ').toLowerCase();
+      if(!hay.includes(q))return false;
+    }
+    if(type==='RECEIVE' && !(Number(e.procQty)||0 || Number(e.recQty)||0))return false;
+    if(type==='TRANSFER' && !(Number(e.trQty)||0))return false;
+    if(type==='ISSUE' && !(Number(e.issueQty)||0))return false;
+    return true;
+  });
+}
+function renderAdvanced(){
+  const list=getFilteredEntries();
+  const ps={}; list.forEach(e=>{
+    const p=e.prjNo||'Unknown';
+    if(!ps[p])ps[p]={received:0,transfer:0,issue:0};
+    ps[p].received+=(+e.procQty||0)+(+e.recQty||0);ps[p].transfer+=(+e.trQty||0);ps[p].issue+=(+e.issueQty||0);
+  });
+  const pEl=document.getElementById('projectSummary');
+  if(pEl)pEl.innerHTML=Object.keys(ps).length?Object.entries(ps).map(([p,v])=>`<div class="flex items-center justify-between gap-3 rounded-lg bg-slate-50 px-3 py-2"><div class="font-bold text-xs">${escapeHtml(p)}</div><div class="text-[10px] text-muted">R ${v.received.toFixed(2)} · T ${v.transfer.toFixed(2)} · I ${v.issue.toFixed(2)} · <b>B ${(v.received-v.transfer-v.issue).toFixed(2)}</b></div></div>`).join(''):'<div class="text-xs text-muted py-4 text-center">No matching records.</div>';
+  renderStockAlerts(list);
+}
+function renderStockAlerts(list=entries){
+  const threshold=Number(localStorage.getItem(ALERT_KEY)||DEFAULT_ALERT);
+  let total=0, received=0, transfer=0, issue=0;
+  list.forEach(e=>{received+=+e.procQty||0;received+=+e.recQty||0;transfer+=+e.trQty||0;issue+=+e.issueQty||0});
+  total=received-transfer-issue;
+  const alerts=[];
+  if(total<0)alerts.push({title:'Negative balance',text:`Current balance is ${total.toFixed(2)} ${document.getElementById('metaUnit')?.value||''}`,bad:true});
+  else if(total<=threshold)alerts.push({title:'Low stock',text:`Balance ${total.toFixed(2)} is at/below alert level ${threshold}.`,bad:false});
+  const el=document.getElementById('stockAlerts');const badge=document.getElementById('lowStockBadge');
+  if(badge)badge.textContent=alerts.length+' alert'+(alerts.length===1?'':'s');
+  if(el)el.innerHTML=alerts.length?alerts.map(a=>`<div class="rounded-lg ${a.bad?'bg-red-50 text-red-700':'bg-amber-50 text-amber-800'} px-3 py-2"><div class="font-bold text-xs">${a.bad?'🚨':'⚠️'} ${a.title}</div><div class="text-[10px] mt-1">${a.text}</div></div>`).join(''):'<div class="rounded-lg bg-emerald-50 text-emerald-700 px-3 py-2 text-xs font-semibold">✓ Stock level looks healthy.</div>';
+}
+function clearAdvancedFilters(){
+  ['advancedSearch','reportFrom','reportTo'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});
+  document.getElementById('transactionFilter').value='ALL';renderAdvanced();
+}
+function csvCell(v){return '"'+String(v??'').replace(/"/g,'""')+'"'}
+function exportCSV(){
+  const list=getFilteredEntries();const rows=[['Date','Project','Project ID','Engineer','MRR','Procurement Qty','Other Site Project','Gate Pass','Received Qty','Transfer Gate Pass','Transfer Project','Transfer Qty','Purpose','Issue Qty']];
+  list.forEach(e=>rows.push([e.dateStr,e.prjNo,e.prjId,e.engineerName,e.procMrr,e.procQty,e.recPrj,e.recGp,e.recQty,e.trGp,e.trPrj,e.trQty,e.purpose,e.issueQty]));
+  const blob=new Blob(['\ufeff'+rows.map(r=>r.map(csvCell).join(',')).join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='MARS_Stock_Ledger.csv';a.click();URL.revokeObjectURL(a.href);
+  logActivity('CSV Export',`${list.length} records`);showToast('CSV exported successfully.');
+}
+function exportExcelCompatible(){
+  const list=getFilteredEntries();
+  const html='<table border="1"><tr><th>Date</th><th>Project</th><th>Engineer</th><th>MRR</th><th>Received</th><th>Transfer</th><th>Issue</th><th>Balance Impact</th></tr>'+list.map(e=>`<tr><td>${escapeHtml(e.dateStr)}</td><td>${escapeHtml(e.prjNo)}</td><td>${escapeHtml(e.engineerName)}</td><td>${escapeHtml(e.procMrr)}</td><td>${(+e.procQty||0)+(+e.recQty||0)}</td><td>${+e.trQty||0}</td><td>${+e.issueQty||0}</td><td>${((+e.procQty||0)+(+e.recQty||0)-(+e.trQty||0)-(+e.issueQty||0)).toFixed(2)}</td></tr>`).join('')+'</table>';
+  const blob=new Blob(['\ufeff'+html],{type:'application/vnd.ms-excel'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='MARS_Stock_Ledger.xls';a.click();URL.revokeObjectURL(a.href);
+  logActivity('Excel Export',`${list.length} records`);showToast('Excel-compatible file exported.');
+}
+function backupData(){
+  const payload={app:'MARS Stock Ledger',version:2,exportedAt:new Date().toISOString(),entries,activity:getActivity(),alertThreshold:Number(localStorage.getItem(ALERT_KEY)||DEFAULT_ALERT)};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='MARS_Stock_Ledger_Backup.json';a.click();URL.revokeObjectURL(a.href);
+  logActivity('Backup Created',`${entries.length} records`);
+}
+function restoreData(ev){
+  const file=ev.target.files?.[0];if(!file)return;
+  const reader=new FileReader();reader.onload=()=>{
+    try{
+      const d=JSON.parse(reader.result);if(!Array.isArray(d.entries))throw Error('Invalid backup');
+      if(!confirm(`Restore ${d.entries.length} entries? Current local entries will be replaced.`))return;
+      entries=d.entries;saveToStorage();
+      if(Array.isArray(d.activity))localStorage.setItem(ACTIVITY_KEY,JSON.stringify(d.activity));
+      if(Number.isFinite(d.alertThreshold))localStorage.setItem(ALERT_KEY,String(d.alertThreshold));
+      recalculateAndRender();renderAdvanced();renderActivity();logActivity('Backup Restored',`${entries.length} records`);showToast('Backup restored successfully.');
+    }catch(e){showToast('Invalid backup file.','error')}
+  };reader.readAsText(file);ev.target.value='';
+}
+function openStockSettings(){
+  const current=Number(localStorage.getItem(ALERT_KEY)||DEFAULT_ALERT);
+  const value=prompt('Low stock alert threshold:',current);
+  if(value!==null && !isNaN(value) && Number(value)>=0){localStorage.setItem(ALERT_KEY,String(Number(value)));renderStockAlerts();logActivity('Stock Alert Updated',`Threshold ${Number(value)}`);showToast('Stock alert threshold updated.')}
+}
+function setSyncStatus(label,type='ready'){
+  const e=document.getElementById('syncStatus');if(!e)return;
+  e.textContent=(type==='ok'?'● Synced':type==='error'?'● Sync Failed':type==='loading'?'● Syncing...':'● '+label);
+  e.className='px-3 py-1.5 rounded-full text-[11px] font-bold '+(type==='ok'?'bg-emerald-50 text-emerald-700':type==='error'?'bg-red-50 text-red-700':type==='loading'?'bg-blue-50 text-blue-700':'bg-slate-100 text-slate-600');
+}
+
+/* Improve existing Google Sheet sync feedback without changing its endpoint. */
+const _sendDataToGoogleSheet=sendDataToGoogleSheet;
+sendDataToGoogleSheet=function(dataObj){
+  setSyncStatus('Syncing...','loading');
+  if(!SCRIPT_URL){setSyncStatus('Not configured');return;}
+  fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(dataObj)})
+    .then(()=>{setSyncStatus('Synced','ok');logActivity('Sheet Sync','Entry sent to Google Sheet')})
+    .catch(()=>{setSyncStatus('Sync Failed','error');showToast('Google Sheet sync failed.','error')});
+};
+
+/* Initialize pro layer. */
+document.addEventListener('DOMContentLoaded',()=>{
+  renderAdvanced();renderActivity();setSyncStatus('Firebase Ready');
+  setTimeout(startFirebaseSync, 100);
+  const originalRecalc=recalculateAndRender;
+  window.recalculateAndRender=function(){originalRecalc();renderAdvanced()};
+});
+</script>
+
+<script>
+/* --- Firebase realtime sync helpers (restored: these were missing, which is why Firebase sync did not work) --- */
+let firebaseUnsubscribe = null;
+const FIREBASE_COLLECTION = "ledger_entries";
+
+function firebaseReady(){
+  return !!(window.MARS_FIREBASE_READY && window.MARS_FIREBASE && window.MARS_FIREBASE.db);
+}
+
+function setFirebaseStatus(label, type){
+  setSyncStatus(label, type);
+}
+
+function startFirebaseSync(){
+      if(!firebaseReady()){
+        setFirebaseStatus("Firebase not ready","error");
+        return;
+      }
+      try{
+        const db = window.MARS_FIREBASE.db;
+        const q = db.collection(FIREBASE_COLLECTION).orderBy("createdAt","asc");
+        firebaseUnsubscribe = q.onSnapshot(snap=>{
+          entries = snap.docs.map(d => ({...d.data(), firebaseId:d.id}));
+          entries.sort((a,b)=>String(a.dateStr||"").localeCompare(String(b.dateStr||"")));
+          saveToStorage();
+          recalculateAndRender();
+          renderAdvanced();
+          setFirebaseStatus("Firebase Synced","ok");
+        }, err=>{
+          console.error("Firestore listener error:", err);
+          setFirebaseStatus("Firebase Error","error");
+          showToast("Firebase read failed: " + (err.code || err.message), "error");
+        });
+      }catch(err){
+        console.error("Firebase sync start error:", err);
+        setFirebaseStatus("Firebase Error","error");
+        showToast("Firebase connection failed: " + err.message, "error");
+      }
+    }
+    async function saveEntryToFirebase(entry, existingId=null){
+      if(!firebaseReady()) throw new Error("Firebase is not ready");
+      const db = window.MARS_FIREBASE.db;
+      const clean={...entry};
+      delete clean.firebaseId;
+      clean.updatedAt = Date.now();
+
+      if(existingId){
+        await db.collection(FIREBASE_COLLECTION).doc(existingId).set(clean, {merge:true});
+      }else{
+        const ref=await db.collection(FIREBASE_COLLECTION).add(clean);
+        return ref.id;
+      }
+    }
+    async function deleteEntryFromFirebase(firebaseId){
+      if(!firebaseReady() || !firebaseId) return;
+      await window.MARS_FIREBASE.db.collection(FIREBASE_COLLECTION).doc(firebaseId).delete();
+    }
+</script>
 </body>
 </html>
-
