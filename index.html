@@ -498,6 +498,7 @@
               </div>
             </div>
           </div>
+          <div class="relative z-10 text-right text-[10px] text-muted mt-3">Developed by Md Masud Rana</div>
         </section>
 
         <section class="flex flex-col md:flex-row md:items-end justify-between gap-3 page-section" data-page="dashboard">
@@ -747,6 +748,7 @@
               <div class="text-center border-t border-gray-600 pt-1 w-56">Prepared By Site Engineer<br><span id="lblEngineerSignature" class="text-[10px] font-normal text-gray-400"></span></div>
               <div class="text-center border-t border-gray-600 pt-1 w-48">Checked By</div>
             </div>
+            <div class="text-right text-[9px] text-muted mt-2">Developed by Md Masud Rana</div>
           </div>
         </section>
       </div>
@@ -817,29 +819,45 @@
 <script>
     // এখানে আপনার গুগল অ্যাপস স্ক্রিপ্ট লিংকটি সেট করা আছে
     const SCRIPT_URL = "";
-const projectDatabase = [
-      { prjNo: "Project:01", id: "ID:11-409-005", eng: "Site Engr. Mahedi Hasan Fahad" },
-      { prjNo: "Project:02", id: "ID:12-409A-007", eng: "Site Engr. Rakib" },
-      { prjNo: "Project:03", id: "ID:13A-502-004", eng: "Site Engr. Md Munfiqul Islam Kanon" },
-      { prjNo: "Project:04", id: "ID:08-501-004", eng: "Site Engr. Ariful Islam" },
-      { prjNo: "Project:05", id: "ID: 09-303-001", eng: "Site Engr. Md Mehadi Hasan Anik" },
-      { prjNo: "Project:06", id: "ID: 17-501-020", eng: "Site Engr. Rintu Chakma" },
-      { prjNo: "Project:07", id: "ID:12-404-026", eng: "Site Eng. Tasriful Islam" },
-      { prjNo: "Project:08", id: "ID: 13A-502-010", eng: "Site Engr. Md Munfiqul Islam Kanon" },
-      { prjNo: "Project:09", id: "ID: 16-407-013", eng: "Site Engr. Abu Bockar" },
-      { prjNo: "Project:10", id: "ID:16-504-039", eng: "Site Engr. Motaher" },
-      { prjNo: "Project:11", id: "ID: 16-505C-010", eng: "Site Engr. Shamim Ahmed Khan Prince" },
-      { prjNo: "Project:12", id: "ID:13-406-017", eng: "Site Engr.Julhas Molla" },
-      { prjNo: "Project:13", id: "ID:14-504-019", eng: "" },
-      { prjNo: "Project:14", id: "ID: 05-501-006", eng: "Site Engr. Md Ripon Babu" },
-      { prjNo: "Project:15", id: "ID:11-404A-003", eng: "Site Engr. Saidul Islam" },
-      { prjNo: "Project:16", id: "ID:09-506-013", eng: "Site Engr. Eyachin Arafat" },
-      { prjNo: "Project:17", id: "ID:13A-501-019", eng: "" },
-      { prjNo: "Project:18", id: "ID:11-410-006", eng: "Site Engr. Mahedi Hasan Fahad" },
-      { prjNo: "Project:19", id: "ID:11-510B-003", eng: "" },
-      { prjNo: "Project:20", id: "ID: 11-504-006", eng: "Md Naimul Islam" },
-      { prjNo: "Project:21 / MARS-01", id: "ID: 07-410-039", eng: "Site Engineer" }
-    ];
+    function defaultProjectDatabase() {
+      return [
+        { prjNo: "Project:01", id: "ID:11-409-005", eng: "Site Engr. Mahedi Hasan Fahad" },
+        { prjNo: "Project:02", id: "ID:12-409A-007", eng: "Site Engr. Rakib" },
+        { prjNo: "Project:03", id: "ID:13A-502-004", eng: "Site Engr. Md Munfiqul Islam Kanon" },
+        { prjNo: "Project:04", id: "ID:08-501-004", eng: "Site Engr. Ariful Islam" },
+        { prjNo: "Project:05", id: "ID: 09-303-001", eng: "Site Engr. Md Mehadi Hasan Anik" },
+        { prjNo: "Project:06", id: "ID: 17-501-020", eng: "Site Engr. Rintu Chakma" },
+        { prjNo: "Project:07", id: "ID:12-404-026", eng: "Site Eng. Tasriful Islam" },
+        { prjNo: "Project:08", id: "ID: 13A-502-010", eng: "Site Engr. Md Munfiqul Islam Kanon" },
+        { prjNo: "Project:09", id: "ID: 16-407-013", eng: "Site Engr. Abu Bockar" },
+        { prjNo: "Project:10", id: "ID:16-504-039", eng: "Site Engr. Motaher" },
+        { prjNo: "Project:11", id: "ID: 16-505C-010", eng: "Site Engr. Shamim Ahmed Khan Prince" },
+        { prjNo: "Project:12", id: "ID:13-406-017", eng: "Site Engr.Julhas Molla" },
+        { prjNo: "Project:13", id: "ID:14-504-019", eng: "" },
+        { prjNo: "Project:14", id: "ID: 05-501-006", eng: "Site Engr. Md Ripon Babu" },
+        { prjNo: "Project:15", id: "ID:11-404A-003", eng: "Site Engr. Saidul Islam" },
+        { prjNo: "Project:16", id: "ID:09-506-013", eng: "Site Engr. Eyachin Arafat" },
+        { prjNo: "Project:17", id: "ID:13A-501-019", eng: "" },
+        { prjNo: "Project:18", id: "ID:11-410-006", eng: "Site Engr. Mahedi Hasan Fahad" },
+        { prjNo: "Project:19", id: "ID:11-510B-003", eng: "" },
+        { prjNo: "Project:20", id: "ID: 11-504-006", eng: "Md Naimul Islam" },
+        { prjNo: "Project:21 / MARS-01", id: "ID: 07-410-039", eng: "Site Engineer" }
+      ];
+    }
+    const PROJECT_DB_KEY = 'mars_project_database';
+    function getProjectDatabase() {
+      try {
+        const raw = localStorage.getItem(PROJECT_DB_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      const def = defaultProjectDatabase();
+      localStorage.setItem(PROJECT_DB_KEY, JSON.stringify(def));
+      return def;
+    }
+    function saveProjectDatabase(list) {
+      localStorage.setItem(PROJECT_DB_KEY, JSON.stringify(list));
+    }
+    let projectDatabase = getProjectDatabase();
 
     let entries = JSON.parse(localStorage.getItem('mars_ledger_entries')) || [];
     let editIndex = -1;
@@ -1229,10 +1247,18 @@ const projectDatabase = [
     const selectPrj = document.getElementById('selectProject');
     const filterPrj = document.getElementById('filterProject');
 
-    projectDatabase.forEach((p, idx) => {
-      selectPrj.innerHTML += `<option value="${idx}">${p.prjNo} (${p.id})${p.eng ? " - " + p.eng : ""}</option>`;
-      filterPrj.innerHTML += `<option value="${p.prjNo}">${p.prjNo}${p.eng ? " - " + p.eng : ""}</option>`;
-    });
+    function refreshProjectDropdowns(keepSelectIdx) {
+      const prevFilterVal = filterPrj.value;
+      selectPrj.innerHTML = '';
+      filterPrj.innerHTML = '<option value="ALL">Show All Projects</option>';
+      projectDatabase.forEach((p, idx) => {
+        selectPrj.innerHTML += `<option value="${idx}">${p.prjNo} (${p.id})${p.eng ? " - " + p.eng : ""}</option>`;
+        filterPrj.innerHTML += `<option value="${p.prjNo}">${p.prjNo}${p.eng ? " - " + p.eng : ""}</option>`;
+      });
+      if (keepSelectIdx !== undefined && projectDatabase[keepSelectIdx]) selectPrj.value = String(keepSelectIdx);
+      if (prevFilterVal && [...filterPrj.options].some(o => o.value === prevFilterVal)) filterPrj.value = prevFilterVal;
+    }
+    refreshProjectDropdowns();
 
     populateMaterialSelect('');
     document.getElementById('entryDate').valueAsDate = new Date();
@@ -1241,6 +1267,7 @@ const projectDatabase = [
     function onProjectSelect() {
       const idx = document.getElementById('selectProject').value;
       const selected = projectDatabase[idx];
+      if (!selected) return; // no projects in the database yet
       document.getElementById('metaProjectId').value = selected.id;
       document.getElementById('hdrProjectId').innerText = selected.id;
       document.getElementById('metaEngineerName').value = selected.eng || "";
@@ -1643,12 +1670,14 @@ const projectDatabase = [
       table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:3px;text-align:center;white-space:nowrap}th{background:#eef2f7}
       .mat-block{margin-bottom:14px}.mat-title{font-weight:bold;font-size:11px;margin:10px 0 4px;padding:3px 0;border-bottom:1px solid #333}
       .sign{display:flex;justify-content:space-between;margin-top:45px}.sig{width:220px;border-top:1px solid #555;text-align:center;padding-top:4px}
+      .dev-credit{font-size:7px;color:#999;text-align:right;margin-top:8px}
       </style></head><body>
       <h1>MARS STRUCTURE LIMITED</h1>
       <h2>STOCK LEDGER</h2>
       <div class="meta"><span>Project: ${escapeHtml(p?.prjNo||projectNo)}</span><span>Project ID: ${escapeHtml(p?.id||"")}</span><span>Engineer: ${escapeHtml(p?.eng||"")}</span></div>
       ${materialBlocks || `<table><tbody><tr><td>No ledger entries</td></tr></tbody></table>`}
       <div class="sign"><div class="sig">Prepared By Site Engineer<br>${escapeHtml(p?.eng||"")}</div><div class="sig">Checked By</div></div>
+      <div class="dev-credit">Developed by Md Masud Rana</div>
       </body></html>`;
     }
 
@@ -1666,7 +1695,7 @@ const projectDatabase = [
         return h.slice(h.indexOf("<body>")+6,h.indexOf("</body>"));
       }).join('<div style="page-break-before:always"></div>');
       const combined=`<!doctype html><html><head><meta charset="utf-8"><title>MARS Combined Stock Ledger</title>
-      <style>@page{size:A4 landscape;margin:6mm}body{font-family:Arial,sans-serif;font-size:9px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:3px;text-align:center}th{background:#eef2f7}h1,h2,p{text-align:center}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}.mat-block{margin-bottom:14px}.mat-title{font-weight:bold;font-size:11px;margin:10px 0 4px;padding:3px 0;border-bottom:1px solid #333}.sign{display:flex;justify-content:space-between;margin-top:35px}.sig{width:220px;border-top:1px solid #555;text-align:center;padding-top:4px}</style>
+      <style>@page{size:A4 landscape;margin:6mm}body{font-family:Arial,sans-serif;font-size:9px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:3px;text-align:center}th{background:#eef2f7}h1,h2,p{text-align:center}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}.mat-block{margin-bottom:14px}.mat-title{font-weight:bold;font-size:11px;margin:10px 0 4px;padding:3px 0;border-bottom:1px solid #333}.sign{display:flex;justify-content:space-between;margin-top:35px}.sig{width:220px;border-top:1px solid #555;text-align:center;padding-top:4px}.dev-credit{font-size:7px;color:#999;text-align:right;margin-top:8px}</style>
       </head><body>${sections}</body></html>`;
       logActivity('Combined PDF',`${entries.length} records / ${all.length} projects`);
       printHtml(combined);
@@ -1680,7 +1709,7 @@ const projectDatabase = [
         return h.slice(h.indexOf("<body>")+6,h.indexOf("</body>"));
       }).join('<div style="page-break-before:always"></div>');
       const docHtml=`<!doctype html><html><head><meta charset="utf-8"><title>MARS All Project Reports</title>
-      <style>@page{size:A4 landscape;margin:6mm}body{font-family:Arial,sans-serif;font-size:9px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:3px;text-align:center}th{background:#eef2f7}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}h1,h2{text-align:center}.mat-block{margin-bottom:14px}.mat-title{font-weight:bold;font-size:11px;margin:10px 0 4px;padding:3px 0;border-bottom:1px solid #333}.sign{display:flex;justify-content:space-between;margin-top:45px}.sig{width:220px;border-top:1px solid #555;text-align:center;padding-top:4px}</style>
+      <style>@page{size:A4 landscape;margin:6mm}body{font-family:Arial,sans-serif;font-size:9px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:3px;text-align:center}th{background:#eef2f7}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}h1,h2{text-align:center}.mat-block{margin-bottom:14px}.mat-title{font-weight:bold;font-size:11px;margin:10px 0 4px;padding:3px 0;border-bottom:1px solid #333}.sign{display:flex;justify-content:space-between;margin-top:45px}.sig{width:220px;border-top:1px solid #555;text-align:center;padding-top:4px}.dev-credit{font-size:7px;color:#999;text-align:right;margin-top:8px}</style>
       </head><body>${sections}</body></html>`;
       logActivity('All Project Reports',`${reports.length} project reports`);
       printHtml(docHtml);
@@ -2122,6 +2151,7 @@ function renderAdminSettingsModal(activeTab){
       <div class="flex gap-2 mb-4 flex-wrap">
         <button class="btn ${tab==='stock'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('stock')">Opening Stock</button>
         <button class="btn ${tab==='materials'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('materials')">Materials & Units</button>
+        <button class="btn ${tab==='projects'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('projects')">Projects</button>
         <button class="btn ${tab==='alert'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('alert')">Low Stock Alert</button>
       </div>
       ${tab==='stock' ? `
@@ -2154,6 +2184,28 @@ function renderAdminSettingsModal(activeTab){
               <div class="min-w-0"><div class="font-bold truncate">${escHtmlLocal(m.name)}</div><div class="text-muted">${escHtmlLocal(m.unit)}</div></div>
               <button class="text-red-400 font-bold" onclick="adminDeleteMaterial(${i})">✕</button>
             </div>`).join('') : '<div class="text-xs text-muted text-center py-6">No materials yet.</div>'}
+        </div>
+      ` : ''}
+      ${tab==='projects' ? `
+        <div class="text-xs text-muted mb-3">Add a new project — leave "Engineer Name" blank if none is assigned yet; you can come back and add it later by editing the project. Changes appear instantly in every dropdown for every user.</div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-2 mb-4">
+          <input id="newPrjNo" placeholder="Project No (e.g. Project:22)" class="field">
+          <input id="newPrjId" placeholder="Project ID" class="field">
+          <input id="newPrjEng" placeholder="Engineer Name (optional)" class="field">
+          <button class="btn btn-primary" onclick="adminAddProject()">＋ Add Project</button>
+        </div>
+        <div class="space-y-2 max-h-80 overflow-auto">
+          ${projectDatabase.length ? projectDatabase.map((p,i)=>`
+            <div class="rounded-lg bg-white/5 px-3 py-2 text-xs" id="prjRow${i}">
+              <div class="flex items-center justify-between gap-2">
+                <div class="min-w-0"><div class="font-bold truncate">${escHtmlLocal(p.prjNo)}</div><div class="text-muted truncate">${escHtmlLocal(p.id)}</div></div>
+                <div class="flex items-center gap-3 shrink-0">
+                  ${p.eng ? `<span class="text-right">${escHtmlLocal(p.eng)}</span>` : `<span class="text-amber-400 font-semibold">No engineer set</span>`}
+                  <button class="text-blue-400 font-bold" onclick="adminEditProjectEngineer(${i})">✎</button>
+                  <button class="text-red-400 font-bold" onclick="adminDeleteProject(${i})">✕</button>
+                </div>
+              </div>
+            </div>`).join('') : '<div class="text-xs text-muted text-center py-6">No projects yet.</div>'}
         </div>
       ` : ''}
       ${tab==='alert' ? `
@@ -2207,6 +2259,43 @@ function adminDeleteMaterial(index){
   saveMaterialCatalog(catalog);
   populateMaterialSelect(document.getElementById('metaMaterial').value);
   renderAdminSettingsModal('materials');
+}
+function adminAddProject(){
+  const prjNo = document.getElementById('newPrjNo').value.trim();
+  const id = document.getElementById('newPrjId').value.trim();
+  const eng = document.getElementById('newPrjEng').value.trim();
+  if(!prjNo || !id){ showToast('Enter both Project No and Project ID.','error'); return; }
+  if(projectDatabase.some(p=>p.prjNo.toLowerCase()===prjNo.toLowerCase())){ showToast('This Project No already exists.','error'); return; }
+  projectDatabase.push({ prjNo, id, eng: eng || '' });
+  saveProjectDatabase(projectDatabase);
+  refreshProjectDropdowns();
+  logActivity('Project Added', `${prjNo}${eng ? ' / ' + eng : ' (no engineer yet)'}`);
+  showToast('Project added.');
+  renderAdminSettingsModal('projects');
+}
+function adminEditProjectEngineer(index){
+  const p = projectDatabase[index];
+  if(!p) return;
+  const newEng = prompt(`Engineer name for ${p.prjNo}:`, p.eng || '');
+  if(newEng === null) return; // cancelled
+  p.eng = newEng.trim();
+  saveProjectDatabase(projectDatabase);
+  refreshProjectDropdowns(Number(document.getElementById('selectProject').value));
+  onProjectSelect();
+  logActivity('Project Engineer Updated', `${p.prjNo} → ${p.eng || '(cleared)'}`);
+  showToast('Engineer name updated.');
+  renderAdminSettingsModal('projects');
+}
+function adminDeleteProject(index){
+  const p = projectDatabase[index];
+  if(!p) return;
+  if(!confirm(`Remove ${p.prjNo} from the project list? (Past ledger entries under this project are not affected.)`)) return;
+  projectDatabase.splice(index,1);
+  saveProjectDatabase(projectDatabase);
+  refreshProjectDropdowns();
+  onProjectSelect();
+  logActivity('Project Removed', p.prjNo);
+  renderAdminSettingsModal('projects');
 }
 function adminSaveThreshold(){
   const value = document.getElementById('alertThresholdInput').value;
