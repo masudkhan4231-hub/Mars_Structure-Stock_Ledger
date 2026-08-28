@@ -102,6 +102,8 @@
     .hero-eyebrow{font-size:11px;font-weight:800;letter-spacing:.14em;color:#fb923c;text-transform:uppercase}
     .hero-title{font-size:26px;font-weight:900;color:#fff;margin-top:4px}
     .hero-sub{font-size:13px;color:#a7b0c4;margin-top:6px;max-width:520px}
+    .dev-credit-glow{position:relative;z-index:1;text-align:right;font-size:11px;font-weight:700;letter-spacing:.02em;margin-top:14px;color:#6ee7a8;text-shadow:0 0 6px rgba(52,211,153,.85),0 0 16px rgba(52,211,153,.55),0 0 28px rgba(16,185,129,.35);animation:devCreditPulse 2.6s ease-in-out infinite}
+    @keyframes devCreditPulse{0%,100%{opacity:.75;text-shadow:0 0 6px rgba(52,211,153,.7),0 0 14px rgba(52,211,153,.4)}50%{opacity:1;text-shadow:0 0 10px rgba(52,211,153,1),0 0 24px rgba(16,185,129,.7),0 0 36px rgba(16,185,129,.4)}}
 
     /* ---- Full finance-style dashboard (rail / trend / mini / dynamics / team / table) ---- */
     .fd-rail-wrap{position:relative;overflow:hidden;border-radius:20px}
@@ -498,7 +500,7 @@
               </div>
             </div>
           </div>
-          <div class="relative z-10 text-right text-[10px] text-muted mt-3">Developed by Md Masud Rana</div>
+          <div class="dev-credit-glow">Developed by Md Masud Rana</div>
         </section>
 
         <section class="flex flex-col md:flex-row md:items-end justify-between gap-3 page-section" data-page="dashboard">
@@ -748,7 +750,6 @@
               <div class="text-center border-t border-gray-600 pt-1 w-56">Prepared By Site Engineer<br><span id="lblEngineerSignature" class="text-[10px] font-normal text-gray-400"></span></div>
               <div class="text-center border-t border-gray-600 pt-1 w-48">Checked By</div>
             </div>
-            <div class="text-right text-[9px] text-muted mt-2">Developed by Md Masud Rana</div>
           </div>
         </section>
       </div>
@@ -1670,14 +1671,12 @@
       table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:3px;text-align:center;white-space:nowrap}th{background:#eef2f7}
       .mat-block{margin-bottom:14px}.mat-title{font-weight:bold;font-size:11px;margin:10px 0 4px;padding:3px 0;border-bottom:1px solid #333}
       .sign{display:flex;justify-content:space-between;margin-top:45px}.sig{width:220px;border-top:1px solid #555;text-align:center;padding-top:4px}
-      .dev-credit{font-size:7px;color:#999;text-align:right;margin-top:8px}
       </style></head><body>
       <h1>MARS STRUCTURE LIMITED</h1>
       <h2>STOCK LEDGER</h2>
       <div class="meta"><span>Project: ${escapeHtml(p?.prjNo||projectNo)}</span><span>Project ID: ${escapeHtml(p?.id||"")}</span><span>Engineer: ${escapeHtml(p?.eng||"")}</span></div>
       ${materialBlocks || `<table><tbody><tr><td>No ledger entries</td></tr></tbody></table>`}
       <div class="sign"><div class="sig">Prepared By Site Engineer<br>${escapeHtml(p?.eng||"")}</div><div class="sig">Checked By</div></div>
-      <div class="dev-credit">Developed by Md Masud Rana</div>
       </body></html>`;
     }
 
@@ -1695,7 +1694,7 @@
         return h.slice(h.indexOf("<body>")+6,h.indexOf("</body>"));
       }).join('<div style="page-break-before:always"></div>');
       const combined=`<!doctype html><html><head><meta charset="utf-8"><title>MARS Combined Stock Ledger</title>
-      <style>@page{size:A4 landscape;margin:6mm}body{font-family:Arial,sans-serif;font-size:9px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:3px;text-align:center}th{background:#eef2f7}h1,h2,p{text-align:center}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}.mat-block{margin-bottom:14px}.mat-title{font-weight:bold;font-size:11px;margin:10px 0 4px;padding:3px 0;border-bottom:1px solid #333}.sign{display:flex;justify-content:space-between;margin-top:35px}.sig{width:220px;border-top:1px solid #555;text-align:center;padding-top:4px}.dev-credit{font-size:7px;color:#999;text-align:right;margin-top:8px}</style>
+      <style>@page{size:A4 landscape;margin:6mm}body{font-family:Arial,sans-serif;font-size:9px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:3px;text-align:center}th{background:#eef2f7}h1,h2,p{text-align:center}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}.mat-block{margin-bottom:14px}.mat-title{font-weight:bold;font-size:11px;margin:10px 0 4px;padding:3px 0;border-bottom:1px solid #333}.sign{display:flex;justify-content:space-between;margin-top:35px}.sig{width:220px;border-top:1px solid #555;text-align:center;padding-top:4px}</style>
       </head><body>${sections}</body></html>`;
       logActivity('Combined PDF',`${entries.length} records / ${all.length} projects`);
       printHtml(combined);
@@ -1709,7 +1708,7 @@
         return h.slice(h.indexOf("<body>")+6,h.indexOf("</body>"));
       }).join('<div style="page-break-before:always"></div>');
       const docHtml=`<!doctype html><html><head><meta charset="utf-8"><title>MARS All Project Reports</title>
-      <style>@page{size:A4 landscape;margin:6mm}body{font-family:Arial,sans-serif;font-size:9px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:3px;text-align:center}th{background:#eef2f7}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}h1,h2{text-align:center}.mat-block{margin-bottom:14px}.mat-title{font-weight:bold;font-size:11px;margin:10px 0 4px;padding:3px 0;border-bottom:1px solid #333}.sign{display:flex;justify-content:space-between;margin-top:45px}.sig{width:220px;border-top:1px solid #555;text-align:center;padding-top:4px}.dev-credit{font-size:7px;color:#999;text-align:right;margin-top:8px}</style>
+      <style>@page{size:A4 landscape;margin:6mm}body{font-family:Arial,sans-serif;font-size:9px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:3px;text-align:center}th{background:#eef2f7}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}h1,h2{text-align:center}.mat-block{margin-bottom:14px}.mat-title{font-weight:bold;font-size:11px;margin:10px 0 4px;padding:3px 0;border-bottom:1px solid #333}.sign{display:flex;justify-content:space-between;margin-top:45px}.sig{width:220px;border-top:1px solid #555;text-align:center;padding-top:4px}</style>
       </head><body>${sections}</body></html>`;
       logActivity('All Project Reports',`${reports.length} project reports`);
       printHtml(docHtml);
