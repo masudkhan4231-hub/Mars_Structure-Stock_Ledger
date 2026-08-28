@@ -43,6 +43,7 @@
     .card{position:relative;background:rgba(255,255,255,.11);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);border:1px solid rgba(255,255,255,.20);border-radius:16px;box-shadow:0 18px 40px rgba(10,4,35,.45),inset 0 1px 0 rgba(255,255,255,.18)}
     .field-label{display:block;font-size:12px;font-weight:700;color:#c9c2ea;margin:0 0 6px}
     .field{width:100%;min-height:42px;padding:9px 11px;border:1px solid rgba(255,255,255,.18);border-radius:10px;background:rgba(255,255,255,.06);color:#f2eefc;font-size:13px;outline:none;transition:.2s}
+    .field option{background:#241457;color:#f2eefc}
     .field:focus{border-color:#f97316;box-shadow:0 0 0 3px rgba(249,115,22,.16)}
     .btn{min-height:42px;border-radius:10px;padding:9px 15px;font-size:13px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:7px;transition:.2s;cursor:pointer}
     .btn-primary{background:linear-gradient(135deg,#f97316,#ea580c);color:#fff}.btn-primary:hover{background:#ea580c}
@@ -311,6 +312,7 @@
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-auth-compat.js"></script>
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyAJUd8hT7FEveWPPqGbKshwQbYO_9CyYq0",
@@ -324,8 +326,26 @@
 
   try {
     firebase.initializeApp(firebaseConfig);
-    window.MARS_FIREBASE = { db: firebase.firestore() };
+    window.MARS_FIREBASE = { db: firebase.firestore(), auth: firebase.auth() };
     window.MARS_FIREBASE_READY = true;
+    window.MARS_FIREBASE_AUTH_READY = false;
+    // Every visitor — Site Engineer or Admin — must be a signed-in Firebase user
+    // before any Firestore read/write happens. Regular visitors are signed in
+    // anonymously (invisible to them); Admin later upgrades to a real
+    // email/password sign-in via the Admin Login screen (see MARS ROLE ACCESS
+    // ENGINE below). This lets the Firestore Security Rules require
+    // `request.auth != null` — closing off direct/unauthenticated access to
+    // the database from outside the app.
+    firebase.auth().onAuthStateChanged(function (user) {
+      if (user) {
+        window.MARS_FIREBASE_AUTH_READY = true;
+        if (typeof window.onMarsAuthReady === 'function') window.onMarsAuthReady(user);
+      } else {
+        firebase.auth().signInAnonymously().catch(function (e) {
+          console.error("Anonymous sign-in failed:", e);
+        });
+      }
+    });
   } catch (e) {
     console.error("Firebase initialization failed:", e);
     window.MARS_FIREBASE_READY = false;
@@ -377,7 +397,9 @@
       <div class="glass-logo"><span class="mark">M</span> MARS STRUCTURE LIMITED</div>
       <div class="glass-title" style="margin-top:16px">Admin Login</div>
       <div class="glass-sub" style="margin-bottom:18px">AUTHORIZED CONTROL ACCESS</div>
-      <div class="g-status" id="vaultStatus">ADMIN PASSWORD REQUIRED</div>
+      <div class="g-status" id="vaultStatus">ADMIN CREDENTIALS REQUIRED</div>
+      <label class="g-field-label">Admin Email</label>
+      <input id="vaultEmail" class="g-field" type="email" autocomplete="username" placeholder="admin@example.com" aria-label="Admin email" style="margin-bottom:12px">
       <label class="g-field-label">Password</label>
       <div class="g-field-wrap">
         <input id="vaultPassword" class="g-field" type="password" autocomplete="current-password" placeholder="Enter admin password" aria-label="Admin password">
@@ -643,7 +665,7 @@
 
         <section id="inputFormSection" class="card p-5 md:p-6 page-section page-hidden" data-page="entry">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-line">
-            <div><div class="section-title">Site Engineer Data Entry</div><div class="text-xs text-muted mt-1">Enter material movement details accurately.</div></div>
+            <div><div class="section-title">Site Engineer Data Entry</div><div class="text-xs text-muted mt-1">Enter material movement details accurately. Use "+ Add Item" to log several materials under the same date/project in one go.</div></div>
             <div class="px-3 py-2 rounded-lg bg-amber-500/15 text-amber-300 text-[11px] font-semibold">⚠ Edit/Delete window: 1 hour</div>
           </div>
 
@@ -651,19 +673,40 @@
             <div><label class="field-label">Select Project No</label><select id="selectProject" onchange="onProjectSelect()" class="field"></select></div>
             <div><label class="field-label">Project ID</label><input id="metaProjectId" readonly class="field bg-white/5"></div>
             <div><label class="field-label">Site Engineer</label><input id="metaEngineerName" readonly class="field bg-white/5"></div>
-            <div><label class="field-label">Material Acc Code / Name</label><select id="metaMaterial" class="field" onchange="onMaterialSelect()"><option value="">— Select Material —</option></select></div>
-            <div><label class="field-label">Unit</label><input id="metaUnit" readonly class="field bg-white/5"></div>
+            <div><label class="field-label">Date of Entry</label><input type="date" id="entryDate" required class="field"></div>
           </div>
           <datalist id="unitsList"><option value="Ton (MT)"><option value="Kg"><option value="Bags"><option value="Cft (Cubic Feet)"><option value="Sft (Square Feet)"><option value="Nos (Pcs)"><option value="Ltr (Litre)"><option value="Truck / Lorry"></datalist>
+          <datalist id="materialsDatalist"></datalist>
 
-          <form id="ledgerForm" class="grid grid-cols-1 md:grid-cols-5 gap-4 mt-5">
-            <div><label class="field-label">Date of Entry</label><input type="date" id="entryDate" required class="field"></div>
-            <div class="rounded-xl bg-blue-500/10 border border-blue-500/20 p-3"><div class="text-xs font-extrabold text-blue-300 mb-2">Receiving Procurement</div><input type="text" id="procMrr" placeholder="MRR No." class="field mb-2"><input type="number" step="0.01" id="procQty" placeholder="Quantity" class="field"></div>
-            <div class="rounded-xl bg-teal-500/10 border border-teal-500/20 p-3"><div class="text-xs font-extrabold text-teal-300 mb-2">Receiving Other Site</div><input type="text" id="recPrj" placeholder="Project No" class="field mb-2"><input type="text" id="recGp" placeholder="Gate Pass No." class="field mb-2"><input type="number" step="0.01" id="recQty" placeholder="Quantity" class="field"></div>
-            <div class="rounded-xl bg-amber-500/10 border border-amber-500/20 p-3"><div class="text-xs font-extrabold text-amber-300 mb-2">Transfers to Other Site</div><input type="text" id="trGp" placeholder="Gate Pass" class="field mb-2"><input type="text" id="trPrj" placeholder="Project No" class="field mb-2"><input type="number" step="0.01" id="trQty" placeholder="Quantity" class="field"></div>
-            <div class="rounded-xl bg-violet-500/10 border border-violet-500/20 p-3"><div class="text-xs font-extrabold text-violet-300 mb-2">Issue of Work at Site</div><input type="text" id="issuePurpose" placeholder="Purpose" class="field mb-2"><input type="number" step="0.01" id="issueQty" placeholder="Quantity" class="field"></div>
-            <div class="md:col-span-5 flex flex-col sm:flex-row justify-end gap-2 pt-1"><button type="button" id="btnCancel" onclick="resetForm()" class="hidden btn btn-secondary">Cancel Edit</button><button type="button" id="btnSubmit" onclick="saveEntry()" class="btn btn-primary">＋ Add Entry</button></div>
-          </form>
+          <div id="ledgerForm" class="mt-5">
+            <div id="itemRowsWrap">
+              <div class="item-row border border-line rounded-xl p-3 mb-3" data-row="0">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                  <div class="md:col-span-2">
+                    <div class="flex items-center justify-between"><label class="field-label">Material Acc Code / Name</label><button type="button" data-role="addMatBtn" onclick="toggleQuickAddMaterial(this)" class="text-[11px] font-bold text-orange-400 hover:text-orange-300">＋ New Material</button></div>
+                    <input type="text" id="metaMaterial" data-role="material" list="materialsDatalist" autocomplete="off" placeholder="Type to search material…" class="field" oninput="onMaterialSelect()">
+                    <div data-role="quickAddBox" class="hidden mt-2 p-2 rounded-lg border border-orange-500/30 bg-orange-500/10 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <input type="text" data-role="quickAddName" placeholder="New material name" class="field text-xs">
+                      <input type="text" data-role="quickAddUnit" list="unitsList" placeholder="Unit (e.g. Kg, Nos, Rft)" class="field text-xs">
+                      <div class="sm:col-span-2 flex gap-2 justify-end"><button type="button" onclick="cancelQuickAddMaterial(this)" class="text-[11px] text-muted">Cancel</button><button type="button" onclick="saveQuickAddMaterial(this)" class="btn btn-primary text-[11px] py-1 px-3">Save to Catalog</button></div>
+                    </div>
+                  </div>
+                  <div><label class="field-label">Unit</label><input id="metaUnit" data-role="unit" readonly class="field bg-white/5"></div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-3">
+                  <div class="rounded-xl bg-blue-500/10 border border-blue-500/20 p-3"><div class="text-xs font-extrabold text-blue-300 mb-2">Receiving Procurement</div><input type="text" id="procMrr" data-role="procMrr" placeholder="MRR No." class="field mb-2"><input type="number" step="0.01" id="procQty" data-role="procQty" placeholder="Quantity" class="field"></div>
+                  <div class="rounded-xl bg-teal-500/10 border border-teal-500/20 p-3"><div class="text-xs font-extrabold text-teal-300 mb-2">Receiving Other Site</div><input type="text" id="recPrj" data-role="recPrj" placeholder="Project No" class="field mb-2"><input type="text" id="recGp" data-role="recGp" placeholder="Gate Pass No." class="field mb-2"><input type="number" step="0.01" id="recQty" data-role="recQty" placeholder="Quantity" class="field"></div>
+                  <div class="rounded-xl bg-amber-500/10 border border-amber-500/20 p-3"><div class="text-xs font-extrabold text-amber-300 mb-2">Transfers to Other Site</div><input type="text" id="trGp" data-role="trGp" placeholder="Gate Pass" class="field mb-2"><input type="text" id="trPrj" data-role="trPrj" placeholder="Project No" class="field mb-2"><input type="number" step="0.01" id="trQty" data-role="trQty" placeholder="Quantity" class="field"></div>
+                  <div class="rounded-xl bg-violet-500/10 border border-violet-500/20 p-3"><div class="text-xs font-extrabold text-violet-300 mb-2">Issue of Work at Site</div><input type="text" id="issuePurpose" data-role="purpose" placeholder="Purpose" class="field mb-2"><input type="number" step="0.01" id="issueQty" data-role="issueQty" placeholder="Quantity" class="field"></div>
+                </div>
+              </div>
+            </div>
+            <div id="extraItemRows"></div>
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-2 mt-2">
+              <button type="button" id="btnAddItem" onclick="addItemRow()" class="btn btn-secondary">＋ Add Item (same MRR / Gate Pass)</button>
+              <div class="flex gap-2"><button type="button" id="btnCancel" onclick="resetForm()" class="hidden btn btn-secondary">Cancel Edit</button><button type="button" id="btnSubmit" onclick="saveEntry()" class="btn btn-primary">＋ Add Entry</button></div>
+            </div>
+          </div>
         </section>
 
         <section id="filterSection" class="filter-panel card p-4 md:p-5 no-print page-section page-hidden" data-page="print">
@@ -801,7 +844,8 @@ const projectDatabase = [
     let entries = JSON.parse(localStorage.getItem('mars_ledger_entries')) || [];
     let editIndex = -1;
     let isAdmin = false;
-    let adminPassword = localStorage.getItem('mars_admin_pass') || "admin123";
+    // Admin identity/authentication is now handled by Firebase Authentication
+    // (see MARS ROLE ACCESS ENGINE) instead of a locally stored password.
 
     const ONE_HOUR = 60 * 60 * 1000;
 
@@ -825,16 +869,187 @@ const projectDatabase = [
         { name: "MAT-8001 / Stone Chips (3/4 Down)", unit: "Cft (Cubic Feet)" },
         { name: "MAT-8002 / Brick Chips (Khoa)", unit: "Cft (Cubic Feet)" },
         { name: "MAT-9001 / First Class Auto Bricks", unit: "Nos (Pcs)" },
-        { name: "MAT-9502 / Binding Wire (G.I. Wire)", unit: "Kg" }
+        { name: "MAT-9502 / Binding Wire (G.I. Wire)", unit: "Kg" },
+        // ---- Civil Items ----
+        { name: "Cement", unit: "Bag" },
+        { name: "MS Rod -8mm", unit: "Kg/Ton" },
+        { name: "MS Rod -10mm", unit: "Kg/Ton" },
+        { name: "MS Rod -12mm", unit: "Kg/Ton" },
+        { name: "MS Rod -16mm", unit: "Kg/Ton" },
+        { name: "MS Rod -20mm", unit: "Kg/Ton" },
+        { name: "MS Rod -25mm", unit: "Kg/Ton" },
+        { name: "MS Rod -32mm", unit: "Kg/Ton" },
+        { name: "1st Class Bricks (Bangla)", unit: "Nos" },
+        { name: "Auto Bricks", unit: "Nos" },
+        { name: "Machine Made Bricks", unit: "Nos" },
+        { name: "Sylhet Sand", unit: "Cft" },
+        { name: "Local Sand", unit: "Cft" },
+        { name: "Viti Sand (Filling Sand)", unit: "Cft" },
+        { name: "3/4\" Stone Chips", unit: "Cft/Ton" },
+        { name: "1/2\" Stone Chips", unit: "Cft/Ton" },
+        { name: "Bricks Chips", unit: "Cft" },
+        { name: "MS Steel Profs", unit: "Kg/Pcs" },
+        { name: "MS Steel Shutter 3mm Thickness", unit: "Kg" },
+        { name: "MS Steel Shutter 2mm Thickness", unit: "Kg" },
+        { name: "3\"x3\" Hollow Box", unit: "Kg/Pcs" },
+        { name: "1.5\"x1.5\" Hollow Box", unit: "Kg/Pcs" },
+        { name: "2\"x2\" MS Hollow Box", unit: "Kg/Pcs" },
+        { name: "U-Head 24\"", unit: "Kg/Pcs" },
+        { name: "Base Plate 18\"", unit: "Kg/Pcs" },
+        { name: "Welding Machine", unit: "Pcs" },
+        { name: "Grinding Machine", unit: "Pcs" },
+        { name: "2\" MS Round Pipe 2.9mm", unit: "Kg/Pcs" },
+        { name: "1.5\" MS Round Pipe", unit: "Kg/Pcs" },
+        { name: "GP Sheet (Plain) 1.5mm Thickness", unit: "Kg" },
+        { name: "GP Sheet (Plain) 2mm Thickness", unit: "Kg" },
+        { name: "CI Sheet (Corrugated) 0.42mm", unit: "Ban/Pcs" },
+        { name: "CI Sheet (Corrugated) 0.46mm", unit: "Ban/Pcs" },
+        { name: "Plastic Door 2'-6\"", unit: "Pcs" },
+        { name: "Wooden Door 3'-4\"", unit: "Pcs" },
+        { name: "MS Grill", unit: "Sft/Kg" },
+        { name: "Aluminium Window Glass", unit: "Sft" },
+        { name: "Aluminium Sliding Door Glass", unit: "Sft" },
+        { name: "Aluminium Swing Door", unit: "Sft" },
+        { name: "Mixer Machine", unit: "Pcs" },
+        { name: "Vibrator Machine", unit: "Pcs" },
+        { name: "Generator", unit: "Pcs" },
+        { name: "Submersible Pump", unit: "Pcs" },
+        { name: "Zet Pump", unit: "Pcs" },
+        { name: "Mud Pump", unit: "Pcs" },
+        { name: "Vibrator Nozzle 1\"", unit: "Pcs" },
+        { name: "Vibrator Nozzle 2\"", unit: "Pcs" },
+        { name: "Floor Tiles 24\"x24\"", unit: "Sft" },
+        { name: "Floor Tiles 16\"x16\"", unit: "Sft" },
+        { name: "Wall Tiles 8\"x12\"", unit: "Sft" },
+        { name: "Wall Tiles 12\"x12\"", unit: "Sft" },
+        { name: "Wall Tiles 12\"x24\"", unit: "Sft" },
+        { name: "Tiles Putty", unit: "Packet" },
+        { name: "Marble", unit: "Sft" },
+        { name: "Granite", unit: "Sft" },
+        // ---- Electric Materials ----
+        { name: "Ceiling Fan 56\"", unit: "Pcs" },
+        { name: "Jally Fan 18\"", unit: "Pcs" },
+        { name: "15W LED Light", unit: "Pcs" },
+        { name: "18W LED Light", unit: "Pcs" },
+        { name: "100W LED Light", unit: "Pcs" },
+        // ---- Sanitary Materials ----
+        { name: "Basin", unit: "Pcs" },
+        { name: "Commode", unit: "Pcs" },
+        { name: "Sink Cock", unit: "Pcs" },
+        { name: "Pillar Cock", unit: "Pcs" },
+        { name: "Bib Cock", unit: "Pcs" },
+        { name: "Bathtub", unit: "Pcs" },
+        { name: "Looking Glass", unit: "Pcs" },
+        { name: "Glass Shelf", unit: "Pcs" },
+        { name: "Burner", unit: "Pcs" },
+        { name: "Angle Stop Cock", unit: "Pcs" },
+        { name: "Conceal Stop Cock", unit: "Pcs" },
+        { name: "Connection Pipe", unit: "Pcs" },
+        { name: "Magic Pipe", unit: "Pcs" },
+        { name: "Basin Waste", unit: "Pcs" },
+        { name: "Sink Waste", unit: "Pcs" },
+        { name: "Shower", unit: "Pcs" },
+        { name: "Basin Mixer", unit: "Pcs" },
+        { name: "Shower Mixer", unit: "Pcs" },
+        { name: "Soap Case", unit: "Pcs" },
+        { name: "Tissue Holder", unit: "Pcs" },
+        { name: "CPVC Pipe 2\"", unit: "Pcs/Rft" },
+        { name: "CPVC Pipe 1\"", unit: "Pcs/Rft" },
+        { name: "CPVC Pipe 1.5\"", unit: "Pcs/Rft" },
+        { name: "CPVC Pipe 3/4\"", unit: "Pcs/Rft" },
+        { name: "CPVC Pipe 1/2\"", unit: "Pcs/Rft" },
+        { name: "UPVC Pipe 8\"", unit: "Pcs/Rft" },
+        { name: "UPVC Pipe 6\"", unit: "Pcs/Rft" },
+        { name: "UPVC Pipe 4\"", unit: "Pcs/Rft" },
+        { name: "UPVC Pipe 2\"", unit: "Pcs/Rft" },
+        { name: "UPVC Pipe 1\"", unit: "Pcs/Rft" },
+        // ---- Electrical Estimate Items (CNS Project) ----
+        { name: "1/2\" PVC Pipe", unit: "Rft" },
+        { name: "3/4\" PVC Pipe", unit: "Rft" },
+        { name: "1\" PVC Pipe", unit: "Rft" },
+        { name: "1-1/4\" PVC Pipe", unit: "Rft" },
+        { name: "3\" UPVC Pipe", unit: "Rft" },
+        { name: "4\" UPVC Pipe", unit: "Rft" },
+        { name: "6\" UPVC Pipe", unit: "Rft" },
+        { name: "1/2\" Flexible Pipe", unit: "Rft" },
+        { name: "3/4\" Flexible Pipe", unit: "Rft" },
+        { name: "1\" Flexible Pipe", unit: "Rft" },
+        { name: "1-1/4\" Flexible Pipe", unit: "Rft" },
+        { name: "2\" Flexible Pipe", unit: "Rft" },
+        { name: "3/4\" PVC Bend", unit: "Nos" },
+        { name: "3/4\" PVC Socket", unit: "Nos" },
+        { name: "1\" PVC Bend", unit: "Nos" },
+        { name: "1\" PVC Socket", unit: "Nos" },
+        { name: "Circular Box", unit: "Nos" },
+        { name: "Fan Box", unit: "Nos" },
+        { name: "Spot Light Box", unit: "Nos" },
+        { name: "Join Box", unit: "Nos" },
+        { name: "MK Box 1 Gang", unit: "Nos" },
+        { name: "MK Box 2 Gang", unit: "Nos" },
+        { name: "MK Box 3 Gang", unit: "Nos" },
+        { name: "SDB Box", unit: "Nos" },
+        { name: "Expanded Metal", unit: "Sft" },
+        { name: "1.5 RM Cable", unit: "Rft" },
+        { name: "2.5 RM Cable", unit: "Rft" },
+        { name: "4 RM Cable", unit: "Rft" },
+        { name: "RG 6 Dish Cable", unit: "Rft" },
+        { name: "RG 11 Dish Cable", unit: "Rft" },
+        { name: "20A SP MCB Circuit Breaker", unit: "Nos" },
+        { name: "20A TP MCB Circuit Breaker", unit: "Nos" },
+        { name: "40A TP MCB Circuit Breaker", unit: "Nos" },
+        { name: "63A TP MCB Circuit Breaker", unit: "Nos" },
+        { name: "125A TP MCCB Circuit Breaker", unit: "Nos" },
+        { name: "250A TP MCCB Circuit Breaker", unit: "Nos" },
+        { name: "320A TP MCCB Circuit Breaker", unit: "Nos" },
+        { name: "Ebonite Cover", unit: "Nos" },
+        { name: "Batten Holder", unit: "Nos" },
+        { name: "Ceiling Rose", unit: "Nos" },
+        { name: "Exhaust Fan", unit: "Nos" },
+        { name: "Spot Light", unit: "Nos" },
+        { name: "Wall Bracket", unit: "Nos" },
+        { name: "LED Panel Light", unit: "Nos" },
+        { name: "Tube Light", unit: "Nos" },
+        { name: "Garden Light", unit: "Nos" },
+        { name: "Gate Light", unit: "Nos" },
+        { name: "Boundary Wall Light", unit: "Nos" },
+        { name: "Focus Light", unit: "Nos" },
+        { name: "Earthing Boring", unit: "Nos" },
+        { name: "Air Terminal Set", unit: "Set" },
+        { name: "SWG Copper Wire", unit: "Rft" },
+        { name: "GI Pipe", unit: "Rft" },
+        { name: "GI Socket", unit: "Nos" },
+        { name: "GI Wire", unit: "Kg" },
+        { name: "Multi ATS Box Set", unit: "Set" },
+        { name: "Fire Extinguisher", unit: "Nos" },
+        { name: "Motor Delta Starter Box", unit: "Set" },
+        { name: "Cable Lux 2.5 to 10 RM", unit: "Nos" },
+        { name: "Cable Lux 16 to 150 RM", unit: "Nos" }
       ];
     }
+    const MATERIAL_CATALOG_VERSION = 2;
+    const MATERIAL_CATALOG_VERSION_KEY = 'mars_material_catalog_version';
     function getMaterialCatalog() {
       try {
         const raw = localStorage.getItem(MATERIAL_CATALOG_KEY);
-        if (raw) return JSON.parse(raw);
+        if (raw) {
+          let list = JSON.parse(raw);
+          const storedVersion = parseInt(localStorage.getItem(MATERIAL_CATALOG_VERSION_KEY) || '0', 10);
+          if (storedVersion < MATERIAL_CATALOG_VERSION) {
+            // One-time merge: add any new default items (matched by name, case-insensitive)
+            // that aren't already in this browser's saved catalog — without touching or
+            // duplicating anything the user already has or added themselves.
+            const existingNames = new Set(list.map(m => String(m.name || '').trim().toLowerCase()));
+            const additions = defaultMaterialCatalog().filter(m => !existingNames.has(String(m.name || '').trim().toLowerCase()));
+            if (additions.length) list = list.concat(additions);
+            localStorage.setItem(MATERIAL_CATALOG_KEY, JSON.stringify(list));
+            localStorage.setItem(MATERIAL_CATALOG_VERSION_KEY, String(MATERIAL_CATALOG_VERSION));
+          }
+          return list;
+        }
       } catch (e) {}
       const def = defaultMaterialCatalog();
       localStorage.setItem(MATERIAL_CATALOG_KEY, JSON.stringify(def));
+      localStorage.setItem(MATERIAL_CATALOG_VERSION_KEY, String(MATERIAL_CATALOG_VERSION));
       return def;
     }
     function saveMaterialCatalog(list) {
@@ -859,32 +1074,156 @@ const projectDatabase = [
       if (!qty) { delete map[key]; } else { map[key] = Number(qty); }
       saveOpeningStockMap(map);
     }
-    function populateMaterialSelect(keepValue) {
-      const sel = document.getElementById('metaMaterial');
-      if (!sel) return;
-      const current = keepValue !== undefined ? keepValue : sel.value;
-      const catalog = getMaterialCatalog();
-      sel.innerHTML = '<option value="">— Select Material —</option>' +
-        catalog.map(m => `<option value="${escHtmlLocal(m.name)}" data-unit="${escHtmlLocal(m.unit)}">${escHtmlLocal(m.name)}</option>`).join('');
-      if (current && catalog.some(m => m.name === current)) {
-        sel.value = current;
-      } else if (current) {
-        // Preserve a legacy/custom material name (from older entries) even if not in catalog.
-        sel.insertAdjacentHTML('beforeend', `<option value="${escHtmlLocal(current)}">${escHtmlLocal(current)} (custom)</option>`);
-        sel.value = current;
+    let materialUnitMap = {};
+    function buildMaterialUnitMap() {
+      materialUnitMap = {};
+      getMaterialCatalog().forEach(m => { materialUnitMap[String(m.name || '').trim().toLowerCase()] = m.unit || ''; });
+    }
+    function populateMaterialDatalist() {
+      buildMaterialUnitMap();
+      const dl = document.getElementById('materialsDatalist');
+      if (!dl) return;
+      dl.innerHTML = getMaterialCatalog().map(m => `<option value="${escHtmlLocal(m.name)}">`).join('');
+    }
+    function syncUnitFromMaterialInput(inputEl, unitField) {
+      if (!inputEl || !unitField) return;
+      const key = String(inputEl.value || '').trim().toLowerCase();
+      if (key && materialUnitMap.hasOwnProperty(key)) {
+        unitField.value = materialUnitMap[key];
+        unitField.readOnly = true;
+        unitField.classList.add('bg-white/5');
+      } else {
+        // Not (yet) a catalog match — let the user type a custom unit for this item.
+        unitField.readOnly = false;
+        unitField.classList.remove('bg-white/5');
       }
-      syncUnitFromMaterial();
+    }
+    function populateMaterialSelect(keepValue) {
+      populateMaterialDatalist();
+      const inputEl = document.getElementById('metaMaterial');
+      if (!inputEl) return;
+      if (keepValue !== undefined) inputEl.value = keepValue;
+      syncUnitFromMaterialInput(inputEl, document.getElementById('metaUnit'));
     }
     function syncUnitFromMaterial() {
-      const sel = document.getElementById('metaMaterial');
-      const unitField = document.getElementById('metaUnit');
-      if (!sel || !unitField) return;
-      const opt = sel.options[sel.selectedIndex];
-      unitField.value = (opt && opt.dataset.unit) ? opt.dataset.unit : (unitField.value || '');
+      syncUnitFromMaterialInput(document.getElementById('metaMaterial'), document.getElementById('metaUnit'));
     }
     function onMaterialSelect() {
       syncUnitFromMaterial();
       recalculateAndRender();
+    }
+    function onMaterialSelectRow(inputEl) {
+      const row = inputEl.closest('.item-row');
+      syncUnitFromMaterialInput(inputEl, row ? row.querySelector('[data-role="unit"]') : null);
+    }
+    let itemRowCounter = 0;
+    function addItemRow() {
+      itemRowCounter++;
+      const wrap = document.getElementById('extraItemRows');
+      const rows = document.querySelectorAll('.item-row');
+      const lastRow = rows[rows.length - 1];
+      const getVal = (role) => lastRow.querySelector(`[data-role="${role}"]`)?.value || '';
+      const div = document.createElement('div');
+      div.className = 'item-row border border-line rounded-xl p-3 mb-3 relative';
+      div.dataset.row = String(itemRowCounter);
+      div.innerHTML = `
+        <button type="button" class="absolute top-2 right-2 text-[11px] font-bold text-red-400 hover:text-red-300" onclick="this.closest('.item-row').remove()">✕ Remove Item</button>
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div class="md:col-span-2">
+            <div class="flex items-center justify-between"><label class="field-label">Material Acc Code / Name</label><button type="button" data-role="addMatBtn" onclick="toggleQuickAddMaterial(this)" class="text-[11px] font-bold text-orange-400 hover:text-orange-300">＋ New Material</button></div>
+            <input type="text" data-role="material" list="materialsDatalist" autocomplete="off" placeholder="Type to search material…" class="field" oninput="onMaterialSelectRow(this)">
+            <div data-role="quickAddBox" class="hidden mt-2 p-2 rounded-lg border border-orange-500/30 bg-orange-500/10 grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <input type="text" data-role="quickAddName" placeholder="New material name" class="field text-xs">
+              <input type="text" data-role="quickAddUnit" list="unitsList" placeholder="Unit (e.g. Kg, Nos, Rft)" class="field text-xs">
+              <div class="sm:col-span-2 flex gap-2 justify-end"><button type="button" onclick="cancelQuickAddMaterial(this)" class="text-[11px] text-muted">Cancel</button><button type="button" onclick="saveQuickAddMaterial(this)" class="btn btn-primary text-[11px] py-1 px-3">Save to Catalog</button></div>
+            </div>
+          </div>
+          <div><label class="field-label">Unit</label><input data-role="unit" readonly class="field bg-white/5"></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-3">
+          <div class="rounded-xl bg-blue-500/10 border border-blue-500/20 p-3"><div class="text-xs font-extrabold text-blue-300 mb-2">Receiving Procurement</div><input type="text" data-role="procMrr" placeholder="MRR No." class="field mb-2"><input type="number" step="0.01" data-role="procQty" placeholder="Quantity" class="field"></div>
+          <div class="rounded-xl bg-teal-500/10 border border-teal-500/20 p-3"><div class="text-xs font-extrabold text-teal-300 mb-2">Receiving Other Site</div><input type="text" data-role="recPrj" placeholder="Project No" class="field mb-2"><input type="text" data-role="recGp" placeholder="Gate Pass No." class="field mb-2"><input type="number" step="0.01" data-role="recQty" placeholder="Quantity" class="field"></div>
+          <div class="rounded-xl bg-amber-500/10 border border-amber-500/20 p-3"><div class="text-xs font-extrabold text-amber-300 mb-2">Transfers to Other Site</div><input type="text" data-role="trGp" placeholder="Gate Pass" class="field mb-2"><input type="text" data-role="trPrj" placeholder="Project No" class="field mb-2"><input type="number" step="0.01" data-role="trQty" placeholder="Quantity" class="field"></div>
+          <div class="rounded-xl bg-violet-500/10 border border-violet-500/20 p-3"><div class="text-xs font-extrabold text-violet-300 mb-2">Issue of Work at Site</div><input type="text" data-role="purpose" placeholder="Purpose" class="field mb-2"><input type="number" step="0.01" data-role="issueQty" placeholder="Quantity" class="field"></div>
+        </div>`;
+      wrap.appendChild(div);
+      // Convenience: copy MRR / Gate Pass / Purpose values from the previous row,
+      // since items added this way usually share the same MRR or Gate Pass number.
+      ['procMrr', 'recPrj', 'recGp', 'trGp', 'trPrj', 'purpose'].forEach(role => {
+        const f = div.querySelector(`[data-role="${role}"]`);
+        if (f) f.value = getVal(role);
+      });
+      div.querySelector('[data-role="material"]')?.focus();
+    }
+    function clearExtraItemRows() {
+      const wrap = document.getElementById('extraItemRows');
+      if (wrap) wrap.innerHTML = '';
+    }
+    function toggleQuickAddMaterial(btn) {
+      const row = btn.closest('.item-row');
+      const box = row.querySelector('[data-role="quickAddBox"]');
+      const nameField = row.querySelector('[data-role="material"]');
+      const isHidden = box.classList.contains('hidden');
+      box.classList.toggle('hidden');
+      if (isHidden) {
+        box.querySelector('[data-role="quickAddName"]').value = nameField.value.trim();
+        box.querySelector('[data-role="quickAddName"]').focus();
+      }
+    }
+    function cancelQuickAddMaterial(btn) {
+      btn.closest('[data-role="quickAddBox"]').classList.add('hidden');
+    }
+    function saveQuickAddMaterial(btn) {
+      const box = btn.closest('[data-role="quickAddBox"]');
+      const row = btn.closest('.item-row');
+      const name = box.querySelector('[data-role="quickAddName"]').value.trim();
+      const unit = box.querySelector('[data-role="quickAddUnit"]').value.trim();
+      if (!name) { showToast('Enter a material name.', 'error'); return; }
+
+      const catalog = getMaterialCatalog();
+      const existing = catalog.find(m => String(m.name).trim().toLowerCase() === name.toLowerCase());
+      if (existing) {
+        showToast('This material already exists — selected it below.', 'error');
+      } else {
+        catalog.push({ name, unit: unit || '' });
+        saveMaterialCatalog(catalog);
+        logActivity('Material Added', name);
+        showToast('Material added to catalog.');
+      }
+
+      // Refresh the shared datalist/unit map so every row (this one and any others) sees it immediately.
+      populateMaterialDatalist();
+
+      const materialInput = row.querySelector('[data-role="material"]');
+      const unitField = row.querySelector('[data-role="unit"]');
+      materialInput.value = existing ? existing.name : name;
+      syncUnitFromMaterialInput(materialInput, unitField);
+      if (row.dataset.row === '0') recalculateAndRender();
+
+      box.classList.add('hidden');
+    }
+    function collectItemRowsData() {
+      // Row 0 first, then any extra rows in the order they were added.
+      const rows = [document.querySelector('.item-row[data-row="0"]'), ...document.querySelectorAll('#extraItemRows .item-row')];
+      const getField = (row, role) => row.querySelector(`[data-role="${role}"]`)?.value || '';
+      return rows.filter(Boolean).map(row => ({
+        material: getField(row, 'material'),
+        unit: getField(row, 'unit'),
+        procMrr: getField(row, 'procMrr') || '-',
+        procQty: parseFloat(getField(row, 'procQty')) || 0,
+        recPrj: getField(row, 'recPrj') || '-',
+        recGp: getField(row, 'recGp') || '-',
+        recQty: parseFloat(getField(row, 'recQty')) || 0,
+        trGp: getField(row, 'trGp') || '-',
+        trPrj: getField(row, 'trPrj') || '-',
+        trQty: parseFloat(getField(row, 'trQty')) || 0,
+        purpose: getField(row, 'purpose') || '-',
+        issueQty: parseFloat(getField(row, 'issueQty')) || 0
+      })).filter(item =>
+        // Skip a row that's completely empty (no material and no quantities) so an
+        // unused extra row doesn't create a blank ledger entry.
+        item.material || item.procQty || item.recQty || item.trQty || item.issueQty
+      );
     }
 
     const selectPrj = document.getElementById('selectProject');
@@ -931,6 +1270,9 @@ const projectDatabase = [
         document.body.classList.remove('admin-mode');
         document.getElementById('btnAdminToggle').innerText = "🔐 Admin Login";
         document.getElementById('btnAdminToggle').className = "btn btn-primary";
+        if (window.MARS_FIREBASE_READY && firebase.auth) {
+          firebase.auth().signOut().then(() => firebase.auth().signInAnonymously()).catch(e => console.error('Sign-out failed:', e));
+        }
         recalculateAndRender();
         openAccessPortal('role');
       } else {
@@ -939,19 +1281,31 @@ const projectDatabase = [
     }
 
     function changeAdminPassword() {
-      const currentPass = prompt("Enter Current Admin Password:");
-      if (currentPass === adminPassword) {
-        const newPass = prompt("Enter New Admin Password:");
-        if (newPass && newPass.trim() !== "") {
-          adminPassword = newPass.trim();
-          localStorage.setItem('mars_admin_pass', adminPassword);
-          alert("✅ Password successfully updated!");
-        } else {
-          alert("Password cannot be empty!");
-        }
-      } else if (currentPass !== null) {
-        alert("❌ Incorrect Current Password!");
+      const user = firebase.auth && firebase.auth().currentUser;
+      if (!isAdmin || !user || !user.email) {
+        alert("Please log in as Admin (with your admin email) first.");
+        return;
       }
+      const currentPass = prompt("Enter Current Admin Password (to confirm it's you):");
+      if (currentPass === null) return;
+      const newPass = prompt("Enter New Admin Password (min 6 characters):");
+      if (newPass === null) return;
+      if (!newPass.trim() || newPass.trim().length < 6) {
+        alert("Password must be at least 6 characters.");
+        return;
+      }
+      const cred = firebase.auth.EmailAuthProvider.credential(user.email, currentPass);
+      user.reauthenticateWithCredential(cred)
+        .then(() => user.updatePassword(newPass.trim()))
+        .then(() => alert("✅ Password successfully updated! Use the new password next time you log in."))
+        .catch((err) => {
+          console.error("Password change failed:", err);
+          if (String(err.code || '').includes('wrong-password') || String(err.code || '').includes('invalid-credential')) {
+            alert("❌ Incorrect current password!");
+          } else {
+            alert("❌ Could not update password: " + (err.message || err.code || "unknown error"));
+          }
+        });
     }
 
     let isSaving = false;
@@ -964,46 +1318,54 @@ const projectDatabase = [
 
       if (!date) { alert("Please select Entry Date"); return; }
 
+      const items = collectItemRowsData();
+      if (!items.length) { alert("Please add at least one material item."); return; }
+
       isSaving = true;
       const btnSubmitEl = document.getElementById('btnSubmit');
       const prevBtnText = btnSubmitEl.innerText;
       btnSubmitEl.disabled = true;
       btnSubmitEl.style.opacity = '0.6';
       btnSubmitEl.style.cursor = 'not-allowed';
-      btnSubmitEl.innerText = 'Saving...';
+      btnSubmitEl.innerText = items.length > 1 ? `Saving ${items.length} items...` : 'Saving...';
 
       const currentTime = Date.now();
       const old = editIndex === -1 ? null : entries[editIndex];
 
-      const newEntryData = {
+      const buildEntryData = (item) => ({
         createdAt: old?.createdAt || currentTime,
         dateStr: date,
         prjNo: prjInfo.prjNo,
         prjId: prjInfo.id,
         engineerName: prjInfo.eng || "",
-        material: document.getElementById('metaMaterial').value || "",
-        unit: document.getElementById('metaUnit').value || "",
-        procMrr: document.getElementById('procMrr').value || '-',
-        procQty: parseFloat(document.getElementById('procQty').value) || 0,
-        recPrj: document.getElementById('recPrj').value || '-',
-        recGp: document.getElementById('recGp').value || '-',
-        recQty: parseFloat(document.getElementById('recQty').value) || 0,
-        trGp: document.getElementById('trGp').value || '-',
-        trPrj: document.getElementById('trPrj').value || '-',
-        trQty: parseFloat(document.getElementById('trQty').value) || 0,
-        purpose: document.getElementById('issuePurpose').value || '-',
-        issueQty: parseFloat(document.getElementById('issueQty').value) || 0
-      };
+        material: item.material || "",
+        unit: item.unit || "",
+        procMrr: item.procMrr,
+        procQty: item.procQty,
+        recPrj: item.recPrj,
+        recGp: item.recGp,
+        recQty: item.recQty,
+        trGp: item.trGp,
+        trPrj: item.trPrj,
+        trQty: item.trQty,
+        purpose: item.purpose,
+        issueQty: item.issueQty
+      });
 
       try{
         setFirebaseStatus("Saving...", "loading");
         if(editIndex === -1){
-          await saveEntryToFirebase(newEntryData);
-          logActivity('Entry Saved', `${newEntryData.prjNo} / ${newEntryData.dateStr}`);
+          // Edit mode is always single-entry, but a fresh Add can carry several
+          // item rows (same MRR/Gate Pass, different materials) — save each as
+          // its own ledger entry.
+          for (const item of items) {
+            await saveEntryToFirebase(buildEntryData(item));
+          }
+          logActivity('Entry Saved', `${prjInfo.prjNo} / ${date} / ${items.length} item(s)`);
         }else{
-          await saveEntryToFirebase(newEntryData, old.firebaseId);
+          await saveEntryToFirebase(buildEntryData(items[0]), old.firebaseId);
           editIndex = -1;
-          logActivity('Entry Updated', `${newEntryData.prjNo} / ${newEntryData.dateStr}`);
+          logActivity('Entry Updated', `${prjInfo.prjNo} / ${date}`);
         }
 
         // Do NOT manually push/update/render `entries` here — the Firestore
@@ -1011,7 +1373,7 @@ const projectDatabase = [
         // pick up this write automatically, re-sort, save to storage, and
         // re-render. Doing it here too was causing every entry to appear twice.
         resetForm();
-        showToast("Entry saved to Firebase successfully.");
+        showToast(items.length > 1 ? `${items.length} entries saved to Firebase successfully.` : "Entry saved to Firebase successfully.");
       }catch(err){
         console.error(err);
         setFirebaseStatus("Firebase Error","error");
@@ -1023,7 +1385,7 @@ const projectDatabase = [
         btnSubmitEl.style.cursor = '';
         // resetForm() already restores the correct label/class on success;
         // on failure, restore whatever label was showing before this attempt.
-        if (btnSubmitEl.innerText === 'Saving...') btnSubmitEl.innerText = prevBtnText;
+        if (btnSubmitEl.innerText.startsWith('Saving')) btnSubmitEl.innerText = prevBtnText;
       }
     }
 
@@ -1037,6 +1399,8 @@ const projectDatabase = [
       }
 
       editIndex = index;
+      clearExtraItemRows();
+      document.getElementById('btnAddItem')?.classList.add('hidden');
 
       const pIdx = projectDatabase.findIndex(p => p.prjNo === item.prjNo);
       if (pIdx !== -1) {
@@ -1089,9 +1453,18 @@ const projectDatabase = [
 
     function resetForm() {
       editIndex = -1;
-      document.getElementById('ledgerForm').reset();
+      clearExtraItemRows();
+      document.getElementById('metaMaterial').value = '';
+      document.getElementById('metaUnit').value = '';
+      syncUnitFromMaterial();
+      document.querySelector('.item-row[data-row="0"] [data-role="quickAddBox"]')?.classList.add('hidden');
+      ['procMrr','procQty','recPrj','recGp','recQty','trGp','trPrj','trQty','issuePurpose','issueQty'].forEach(id=>{
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
       document.getElementById('entryDate').valueAsDate = new Date();
       onProjectSelect();
+      document.getElementById('btnAddItem')?.classList.remove('hidden');
       document.getElementById('btnSubmit').innerText = "➕ Add Entry";
       document.getElementById('btnSubmit').className = "bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-2 px-6 rounded shadow text-sm";
       document.getElementById('btnCancel').classList.add('hidden');
@@ -1103,6 +1476,22 @@ const projectDatabase = [
 
       document.getElementById('lblMaterial').innerText = document.getElementById('metaMaterial').value;
       document.getElementById('lblUnit').innerText = document.getElementById('metaUnit').value;
+
+      // Keep the printed header (Project ID + Site Engineer signature) in sync
+      // with whichever project is chosen on THIS page's filter dropdown, not
+      // with whatever was last picked on the Data Entry tab.
+      const hdrProjectIdEl = document.getElementById('hdrProjectId');
+      const hdrSigEl = document.getElementById('lblEngineerSignature');
+      if (hdrProjectIdEl && hdrSigEl) {
+        if (selectedFilter === 'ALL') {
+          hdrProjectIdEl.innerText = 'All Projects';
+          hdrSigEl.innerText = '';
+        } else {
+          const filterInfo = projectDatabase.find(p => p.prjNo === selectedFilter);
+          hdrProjectIdEl.innerText = filterInfo ? filterInfo.id : '-';
+          hdrSigEl.innerText = filterInfo && filterInfo.eng ? `(${filterInfo.eng})` : '';
+        }
+      }
 
       const tbody = document.getElementById('ledgerTableBody');
 
@@ -1277,7 +1666,7 @@ const projectDatabase = [
         return h.slice(h.indexOf("<body>")+6,h.indexOf("</body>"));
       }).join('<div style="page-break-before:always"></div>');
       const combined=`<!doctype html><html><head><meta charset="utf-8"><title>MARS Combined Stock Ledger</title>
-      <style>@page{size:A4 landscape;margin:6mm}body{font-family:Arial,sans-serif;font-size:9px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:3px;text-align:center}th{background:#eef2f7}h1,h2,p{text-align:center}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}.sign{display:flex;justify-content:space-between;margin-top:35px}.sig{width:220px;border-top:1px solid #555;text-align:center}</style>
+      <style>@page{size:A4 landscape;margin:6mm}body{font-family:Arial,sans-serif;font-size:9px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:3px;text-align:center}th{background:#eef2f7}h1,h2,p{text-align:center}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}.mat-block{margin-bottom:14px}.mat-title{font-weight:bold;font-size:11px;margin:10px 0 4px;padding:3px 0;border-bottom:1px solid #333}.sign{display:flex;justify-content:space-between;margin-top:35px}.sig{width:220px;border-top:1px solid #555;text-align:center;padding-top:4px}</style>
       </head><body>${sections}</body></html>`;
       logActivity('Combined PDF',`${entries.length} records / ${all.length} projects`);
       printHtml(combined);
@@ -1291,7 +1680,7 @@ const projectDatabase = [
         return h.slice(h.indexOf("<body>")+6,h.indexOf("</body>"));
       }).join('<div style="page-break-before:always"></div>');
       const docHtml=`<!doctype html><html><head><meta charset="utf-8"><title>MARS All Project Reports</title>
-      <style>@page{size:A4 landscape;margin:6mm}body{font-family:Arial,sans-serif;font-size:9px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:3px;text-align:center}th{background:#eef2f7}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}h1,h2{text-align:center}</style>
+      <style>@page{size:A4 landscape;margin:6mm}body{font-family:Arial,sans-serif;font-size:9px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:3px;text-align:center}th{background:#eef2f7}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}h1,h2{text-align:center}.mat-block{margin-bottom:14px}.mat-title{font-weight:bold;font-size:11px;margin:10px 0 4px;padding:3px 0;border-bottom:1px solid #333}.sign{display:flex;justify-content:space-between;margin-top:45px}.sig{width:220px;border-top:1px solid #555;text-align:center;padding-top:4px}</style>
       </head><body>${sections}</body></html>`;
       logActivity('All Project Reports',`${reports.length} project reports`);
       printHtml(docHtml);
@@ -1848,7 +2237,12 @@ sendDataToGoogleSheet=function(dataObj){
 /* Initialize pro layer. */
 document.addEventListener('DOMContentLoaded',()=>{
   renderAdvanced();renderActivity();setSyncStatus('Firebase Ready');
-  setTimeout(startFirebaseSync, 100);
+  if (window.MARS_FIREBASE_AUTH_READY) {
+    startFirebaseSync();
+  } else {
+    window.onMarsAuthReady = startFirebaseSync;
+    setTimeout(()=>{ if(!firebaseUnsubscribe) startFirebaseSync(); }, 4000); // safety fallback
+  }
   const originalRecalc=recalculateAndRender;
   window.recalculateAndRender=function(){originalRecalc();renderAdvanced()};
 });
@@ -1914,17 +2308,39 @@ async function deleteEntryFromFirebase(firebaseId){
   const adminPanel=document.getElementById('adminAccess');
   const engineerPanel=document.getElementById('engineerAccess');
   const card=document.getElementById('vaultLoginCard'), door=document.getElementById('vaultDoor');
-  const input=document.getElementById('vaultPassword'), unlock=document.getElementById('vaultUnlock'), status=document.getElementById('vaultStatus'), eye=document.getElementById('vaultEye');
+  const emailInput=document.getElementById('vaultEmail'), input=document.getElementById('vaultPassword'), unlock=document.getElementById('vaultUnlock'), status=document.getElementById('vaultStatus'), eye=document.getElementById('vaultEye');
   const engCard=document.getElementById('engineerCard'), engProject=document.getElementById('engineerProject'), engId=document.getElementById('engineerId'), engEnter=document.getElementById('engineerEnter'), engStatus=document.getElementById('engineerStatus');
   if(!overlay)return;
   window.currentAccessRole=null;
   function showOnly(which){chooser.classList.toggle('hidden-access',which!=='role');adminPanel.classList.toggle('hidden-access',which!=='admin');engineerPanel.classList.toggle('hidden-access',which!=='engineer');}
-  function resetAdmin(){card?.classList.remove('scanning','vault-shake','vault-success-glow');door?.classList.remove('open','vault-success-glow');if(input){input.value='';input.disabled=false;input.type='password'}if(unlock)unlock.disabled=false;status.textContent='ADMIN PASSWORD REQUIRED';status.className='vault-status'}
+  function resetAdmin(){card?.classList.remove('scanning','vault-shake','vault-success-glow');door?.classList.remove('open','vault-success-glow');if(emailInput)emailInput.value='';if(input){input.value='';input.disabled=false;input.type='password'}if(unlock)unlock.disabled=false;status.textContent='ADMIN CREDENTIALS REQUIRED';status.className='vault-status'}
   function resetEngineer(){engCard?.classList.remove('engineer-shake','engineer-success');engProject.value='';engId.value='';engEnter.disabled=false;engStatus.textContent='PROJECT DETAILS REQUIRED';engStatus.className='engineer-status'}
-  window.openAccessPortal=function(mode='role'){overlay.classList.remove('hidden-overlay');overlay.style.display='flex';window.currentAccessRole=null;resetAdmin();resetEngineer();showOnly(mode);setTimeout(()=>{if(mode==='admin')input?.focus();if(mode==='engineer')engProject?.focus()},120)};
+  window.openAccessPortal=function(mode='role'){overlay.classList.remove('hidden-overlay');overlay.style.display='flex';window.currentAccessRole=null;resetAdmin();resetEngineer();showOnly(mode);setTimeout(()=>{if(mode==='admin')emailInput?.focus();if(mode==='engineer')engProject?.focus()},120)};
   function setAdminStatus(t,c=''){status.textContent=t;status.className='vault-status'+(c?' '+c:'')}
-  function failAdmin(){card.classList.remove('vault-shake');void card.offsetWidth;card.classList.add('vault-shake');setAdminStatus('ACCESS DENIED','error');input.value='';input.disabled=false;unlock.disabled=false;setTimeout(()=>setAdminStatus('ADMIN PASSWORD REQUIRED'),1300)}
-  function unlockVault(){if(unlock.disabled)return;const pass=input.value.trim();if(!pass){setAdminStatus('PASSWORD REQUIRED','error');return}card.classList.add('scanning');input.disabled=true;unlock.disabled=true;setAdminStatus('VERIFYING CREDENTIALS','scanning');setTimeout(()=>{if(pass===adminPassword){isAdmin=true;window.currentAccessRole='admin';document.getElementById('adminBadge')?.classList.remove('hidden');document.body.classList.add('admin-mode');const btn=document.getElementById('btnAdminToggle');if(btn){btn.innerText='🚪 Logout Admin';btn.className='bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-1 px-3 rounded shadow'}setAdminStatus('ADMIN ACCESS GRANTED','success');card.classList.remove('scanning');door.classList.add('open','vault-success-glow');setTimeout(()=>{overlay.classList.add('hidden-overlay');overlay.style.display='none';if(typeof showPage==='function')showPage('dashboard');recalculateAndRender()},1250)}else failAdmin()},900)}
+  function failAdmin(msg){card.classList.remove('vault-shake');void card.offsetWidth;card.classList.add('vault-shake');setAdminStatus(msg||'ACCESS DENIED','error');input.value='';input.disabled=false;unlock.disabled=false;setTimeout(()=>setAdminStatus('ADMIN CREDENTIALS REQUIRED'),1600)}
+  function unlockVault(){
+    if(unlock.disabled)return;
+    const email=(emailInput?.value||'').trim();
+    const pass=input.value.trim();
+    if(!email||!pass){setAdminStatus('EMAIL AND PASSWORD REQUIRED','error');return}
+    if(!firebase.auth){setAdminStatus('AUTH NOT AVAILABLE','error');return}
+    card.classList.add('scanning');input.disabled=true;unlock.disabled=true;setAdminStatus('VERIFYING CREDENTIALS','scanning');
+    firebase.auth().signInWithEmailAndPassword(email,pass).then(()=>{
+      isAdmin=true;window.currentAccessRole='admin';
+      document.getElementById('adminBadge')?.classList.remove('hidden');
+      document.body.classList.add('admin-mode');
+      const btn=document.getElementById('btnAdminToggle');
+      if(btn){btn.innerText='🚪 Logout Admin';btn.className='bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-1 px-3 rounded shadow'}
+      setAdminStatus('ADMIN ACCESS GRANTED','success');
+      card.classList.remove('scanning');door.classList.add('open','vault-success-glow');
+      setTimeout(()=>{overlay.classList.add('hidden-overlay');overlay.style.display='none';if(typeof showPage==='function')showPage('dashboard');recalculateAndRender()},1250);
+    }).catch((err)=>{
+      console.error('Admin sign-in failed:',err);
+      const code=err && err.code || '';
+      const msg = code.includes('invalid-credential')||code.includes('wrong-password')||code.includes('user-not-found') ? 'ACCESS DENIED' : (code.includes('too-many-requests') ? 'TOO MANY ATTEMPTS — TRY LATER' : 'SIGN-IN FAILED');
+      failAdmin(msg);
+    });
+  }
   function normalize(v){return String(v||'').trim().toLowerCase().replace(/\s+/g,'')}
   function setEngineerStatus(t,c=''){engStatus.textContent=t;engStatus.className='engineer-status'+(c?' '+c:'')}
   function failEngineer(msg='PROJECT VERIFICATION FAILED'){engCard.classList.remove('engineer-shake');void engCard.offsetWidth;engCard.classList.add('engineer-shake');setEngineerStatus(msg,'error');engEnter.disabled=false}
@@ -1933,7 +2349,7 @@ async function deleteEntryFromFirebase(firebaseId){
   document.getElementById('chooseEngineer')?.addEventListener('click',()=>openAccessPortal('engineer'));
   document.getElementById('backFromAdmin')?.addEventListener('click',()=>openAccessPortal('role'));
   document.getElementById('backFromEngineer')?.addEventListener('click',()=>openAccessPortal('role'));
-  unlock?.addEventListener('click',unlockVault);input?.addEventListener('keydown',e=>{if(e.key==='Enter')unlockVault()});eye?.addEventListener('click',()=>{input.type=input.type==='password'?'text':'password'});
+  unlock?.addEventListener('click',unlockVault);emailInput?.addEventListener('keydown',e=>{if(e.key==='Enter')input?.focus()});input?.addEventListener('keydown',e=>{if(e.key==='Enter')unlockVault()});eye?.addEventListener('click',()=>{input.type=input.type==='password'?'text':'password'});
   engEnter?.addEventListener('click',verifyEngineer);engProject?.addEventListener('keydown',e=>{if(e.key==='Enter')engId.focus()});engId?.addEventListener('keydown',e=>{if(e.key==='Enter')verifyEngineer()});
 })();
 </script>
