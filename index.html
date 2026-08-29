@@ -428,22 +428,18 @@
     <div class="glass-panel glass-panel-narrow" id="engineerCard">
       <div class="glass-logo"><span class="mark">M</span> MARS STRUCTURE LIMITED</div>
       <div class="glass-title" style="margin-top:16px">Site Engineer Login</div>
-      <div class="glass-sub" style="margin-bottom:18px">VERIFY ENGINEER ID</div>
-      <div class="g-status" id="engineerStatus">ENGINEER ID REQUIRED</div>
-      <div id="engineerIdStep">
-        <label class="g-field-label">Engineer ID</label>
-        <div class="g-field-wrap">
-          <input id="engineerId" class="g-field" type="text" placeholder="e.g. ENG-001" autocomplete="off">
-        </div>
+      <div class="glass-sub" style="margin-bottom:18px">VERIFY PROJECT ASSIGNMENT</div>
+      <div class="g-status" id="engineerStatus">PROJECT DETAILS REQUIRED</div>
+      <label class="g-field-label">Project Number</label>
+      <div class="g-field-wrap">
+        <input id="engineerProject" class="g-field" type="text" placeholder="e.g. Project:20" autocomplete="off">
       </div>
-      <div id="engineerProjectStep" class="hidden">
-        <label class="g-field-label">Which project are you on right now?</label>
-        <div class="g-field-wrap">
-          <select id="engineerProjectPick" class="g-field"></select>
-        </div>
+      <label class="g-field-label">Project ID</label>
+      <div class="g-field-wrap">
+        <input id="engineerId" class="g-field" type="text" placeholder="e.g. ID: 11-504-006" autocomplete="off">
       </div>
       <button class="g-btn" id="engineerEnter" type="button">Verify &amp; Enter Site</button>
-      <div class="glass-footer" style="margin-top:16px">Site Engineer • Engineer ID access • MARS Structure Limited</div>
+      <div class="glass-footer" style="margin-top:16px">Site Engineer • Project-based access • MARS Structure Limited</div>
     </div>
   </div>
 </div>
@@ -1434,8 +1430,6 @@
         prjNo: prjInfo.prjNo,
         prjId: prjInfo.id,
         engineerName: prjInfo.eng || "",
-        loggedByEngineerId: window.currentEngineerId || "",
-        loggedByEngineerName: window.currentEngineerName || "",
         material: item.material || "",
         unit: item.unit || "",
         procMrr: item.procMrr,
@@ -2628,14 +2622,13 @@ async function deleteEntryFromFirebase(firebaseId){
   const engineerPanel=document.getElementById('engineerAccess');
   const card=document.getElementById('vaultLoginCard'), door=document.getElementById('vaultDoor');
   const emailInput=document.getElementById('vaultEmail'), input=document.getElementById('vaultPassword'), unlock=document.getElementById('vaultUnlock'), status=document.getElementById('vaultStatus'), eye=document.getElementById('vaultEye');
-  const engCard=document.getElementById('engineerCard'), engId=document.getElementById('engineerId'), engEnter=document.getElementById('engineerEnter'), engStatus=document.getElementById('engineerStatus');
-  const engIdStep=document.getElementById('engineerIdStep'), engProjectStep=document.getElementById('engineerProjectStep'), engProjectPick=document.getElementById('engineerProjectPick');
+  const engCard=document.getElementById('engineerCard'), engProject=document.getElementById('engineerProject'), engId=document.getElementById('engineerId'), engEnter=document.getElementById('engineerEnter'), engStatus=document.getElementById('engineerStatus');
   if(!overlay)return;
   window.currentAccessRole=null;
   function showOnly(which){chooser.classList.toggle('hidden-access',which!=='role');adminPanel.classList.toggle('hidden-access',which!=='admin');engineerPanel.classList.toggle('hidden-access',which!=='engineer');}
   function resetAdmin(){card?.classList.remove('scanning','vault-shake','vault-success-glow');door?.classList.remove('open','vault-success-glow');if(emailInput)emailInput.value='';if(input){input.value='';input.disabled=false;input.type='password'}if(unlock)unlock.disabled=false;status.textContent='ADMIN CREDENTIALS REQUIRED';status.className='vault-status'}
-  function resetEngineer(){engCard?.classList.remove('engineer-shake','engineer-success');engId.value='';engEnter.disabled=false;engStatus.textContent='ENGINEER ID REQUIRED';engStatus.className='engineer-status';engIdStep?.classList.remove('hidden');engProjectStep?.classList.add('hidden');window._pendingEngineer=null}
-  window.openAccessPortal=function(mode='role'){overlay.classList.remove('hidden-overlay');overlay.style.display='flex';window.currentAccessRole=null;resetAdmin();resetEngineer();showOnly(mode);setTimeout(()=>{if(mode==='admin')emailInput?.focus();if(mode==='engineer')engId?.focus()},120)};
+  function resetEngineer(){engCard?.classList.remove('engineer-shake','engineer-success');engProject.value='';engId.value='';engEnter.disabled=false;engStatus.textContent='PROJECT DETAILS REQUIRED';engStatus.className='engineer-status'}
+  window.openAccessPortal=function(mode='role'){overlay.classList.remove('hidden-overlay');overlay.style.display='flex';window.currentAccessRole=null;resetAdmin();resetEngineer();showOnly(mode);setTimeout(()=>{if(mode==='admin')emailInput?.focus();if(mode==='engineer')engProject?.focus()},120)};
   function setAdminStatus(t,c=''){status.textContent=t;status.className='vault-status'+(c?' '+c:'')}
   function failAdmin(msg){card.classList.remove('vault-shake');void card.offsetWidth;card.classList.add('vault-shake');setAdminStatus(msg||'ACCESS DENIED','error');input.value='';input.disabled=false;unlock.disabled=false;setTimeout(()=>setAdminStatus('ADMIN CREDENTIALS REQUIRED'),1600)}
   function unlockVault(){
@@ -2695,57 +2688,15 @@ async function deleteEntryFromFirebase(firebaseId){
   }
   function normalize(v){return String(v||'').trim().toLowerCase().replace(/\s+/g,'')}
   function setEngineerStatus(t,c=''){engStatus.textContent=t;engStatus.className='engineer-status'+(c?' '+c:'')}
-  function failEngineer(msg='ENGINEER ID NOT FOUND'){engCard.classList.remove('engineer-shake');void engCard.offsetWidth;engCard.classList.add('engineer-shake');setEngineerStatus(msg,'error');engEnter.disabled=false}
-  function enterProjectAndFinish(match, eng){
-    window.currentAccessRole='engineer';
-    window.currentEngineerProject=match;
-    window.currentEngineerId=eng.id;
-    window.currentEngineerName=eng.name;
-    document.getElementById('selectProject').value=String(projectDatabase.indexOf(match));
-    onProjectSelect();
-    setEngineerStatus('SITE ACCESS GRANTED • '+eng.name,'success');
-    engCard.classList.add('engineer-success');
-    setTimeout(()=>{overlay.classList.add('hidden-overlay');overlay.style.display='none';if(typeof showPage==='function')showPage('dashboard');recalculateAndRender();showToast('Site Engineer access granted: '+eng.name+' — '+match.prjNo,'success')},1200);
-  }
-  function verifyEngineer(){
-    if(engEnter.disabled)return;
-    // Second click: a project was already picked from the multi-project dropdown — finish login.
-    if(window._pendingEngineer){
-      const chosenPrjNo=engProjectPick.value;
-      const match=projectDatabase.find(p=>p.prjNo===chosenPrjNo);
-      if(!match){failEngineer('SELECTED PROJECT NOT FOUND');return}
-      engEnter.disabled=true;
-      enterProjectAndFinish(match, window._pendingEngineer);
-      return;
-    }
-    const idVal=engId.value.trim();
-    if(!idVal){setEngineerStatus('ENGINEER ID REQUIRED','error');return}
-    engEnter.disabled=true;setEngineerStatus('VERIFYING ENGINEER ID','');
-    const eng=engineerDatabase.find(e=>normalize(e.id)===normalize(idVal));
-    setTimeout(()=>{
-      if(!eng){failEngineer();return}
-      const assignedProjects=(eng.projects||[]).map(p=>projectDatabase.find(pd=>pd.prjNo===p)).filter(Boolean);
-      if(!assignedProjects.length){failEngineer('NO PROJECT ASSIGNED — CONTACT ADMIN');return}
-      if(assignedProjects.length===1){
-        enterProjectAndFinish(assignedProjects[0], eng);
-        return;
-      }
-      // Multiple projects — show the picker and wait for a second click.
-      window._pendingEngineer=eng;
-      engProjectPick.innerHTML=assignedProjects.map(p=>`<option value="${p.prjNo}">${p.prjNo}${p.id?' ('+p.id+')':''}</option>`).join('');
-      engIdStep.classList.add('hidden');
-      engProjectStep.classList.remove('hidden');
-      setEngineerStatus('WELCOME '+eng.name+' — CHOOSE YOUR PROJECT','');
-      engEnter.disabled=false;
-    },700);
-  }
+  function failEngineer(msg='PROJECT VERIFICATION FAILED'){engCard.classList.remove('engineer-shake');void engCard.offsetWidth;engCard.classList.add('engineer-shake');setEngineerStatus(msg,'error');engEnter.disabled=false}
+  function verifyEngineer(){if(engEnter.disabled)return;const prj=engProject.value.trim(), id=engId.value.trim();if(!prj||!id){setEngineerStatus('PROJECT NO. AND ID REQUIRED','error');return}engEnter.disabled=true;setEngineerStatus('SCANNING PROJECT DATABASE','');const match=projectDatabase.find(p=>normalize(p.prjNo)===normalize(prj)&&normalize(p.id)===normalize(id));setTimeout(()=>{if(!match){failEngineer();return}window.currentAccessRole='engineer';window.currentEngineerProject=match;document.getElementById('selectProject').value=String(projectDatabase.indexOf(match));onProjectSelect();setEngineerStatus('SITE ACCESS GRANTED • '+(match.eng||'SITE ENGINEER'),'success');engCard.classList.add('engineer-success');setTimeout(()=>{overlay.classList.add('hidden-overlay');overlay.style.display='none';if(typeof showPage==='function')showPage('dashboard');recalculateAndRender();showToast('Site Engineer access granted: '+match.prjNo,'success')},1200)},1000)}
   document.getElementById('chooseAdmin')?.addEventListener('click',()=>openAccessPortal('admin'));
   document.getElementById('chooseEngineer')?.addEventListener('click',()=>openAccessPortal('engineer'));
   document.getElementById('backFromAdmin')?.addEventListener('click',()=>openAccessPortal('role'));
   document.getElementById('backFromEngineer')?.addEventListener('click',()=>openAccessPortal('role'));
   unlock?.addEventListener('click',unlockVault);emailInput?.addEventListener('keydown',e=>{if(e.key==='Enter')input?.focus()});input?.addEventListener('keydown',e=>{if(e.key==='Enter')unlockVault()});eye?.addEventListener('click',()=>{input.type=input.type==='password'?'text':'password'});
   document.getElementById('vaultSignupLink')?.addEventListener('click',signUpVault);
-  engEnter?.addEventListener('click',verifyEngineer);engId?.addEventListener('keydown',e=>{if(e.key==='Enter')verifyEngineer()});
+  engEnter?.addEventListener('click',verifyEngineer);engProject?.addEventListener('keydown',e=>{if(e.key==='Enter')engId.focus()});engId?.addEventListener('keydown',e=>{if(e.key==='Enter')verifyEngineer()});
 })();
 </script>
 
