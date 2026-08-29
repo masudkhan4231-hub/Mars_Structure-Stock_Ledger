@@ -331,6 +331,14 @@
     window.MARS_FIREBASE = { db: firebase.firestore(), auth: firebase.auth() };
     window.MARS_FIREBASE_READY = true;
     window.MARS_FIREBASE_AUTH_READY = false;
+    // Offline persistence: entries/edits made with no network (common on
+    // construction sites) are queued in the browser and sent automatically
+    // once connectivity returns, instead of failing outright.
+    window.MARS_FIREBASE.db.enablePersistence({ synchronizeTabs: true }).catch(function (e) {
+      // 'failed-precondition' = another tab already has persistence open (fine,
+      // that tab handles the offline queue). 'unimplemented' = old browser.
+      console.warn('Offline persistence not enabled:', e.code);
+    });
     // Every visitor — Site Engineer or Admin — must be a signed-in Firebase user
     // before any Firestore read/write happens. Regular visitors are signed in
     // anonymously (invisible to them); Admin later upgrades to a real
@@ -408,6 +416,7 @@
         <button class="g-eye" id="vaultEye" type="button" aria-label="Show password">👁</button>
       </div>
       <button class="g-btn" id="vaultUnlock" type="button">Sign in</button>
+      <button class="text-[11px] text-muted underline mt-3" id="vaultSignupLink" type="button">Don't have an account? Create one</button>
       <div class="glass-footer" style="margin-top:16px">Protected workspace • MARS SECURE ACCESS</div>
     </div>
     <div id="vaultDoor" style="display:none"></div>
@@ -481,7 +490,7 @@
       </nav>
       <div class="mt-8 p-3 rounded-xl bg-white/5 border border-white/10">
         <div class="text-xs font-bold text-white">Firebase Stock Ledger</div>
-        <p class="text-[11px] text-blue-100/70 mt-1 leading-5">Entries can be edited or deleted within 1 hour. Admin can manage locked entries.</p>
+        <p class="text-[11px] text-blue-100/70 mt-1 leading-5">Entry edit/delete: <span data-edit-window-label>Admin only</span>.</p>
       </div>
     </aside>
 
@@ -669,7 +678,7 @@
         <section id="inputFormSection" class="card p-5 md:p-6 page-section page-hidden" data-page="entry">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-line">
             <div><div class="section-title">Site Engineer Data Entry</div><div class="text-xs text-muted mt-1">Enter material movement details accurately. Use "+ Add Item" to log several materials under the same date/project in one go.</div></div>
-            <div class="px-3 py-2 rounded-lg bg-amber-500/15 text-amber-300 text-[11px] font-semibold">⚠ Edit/Delete window: 1 hour</div>
+            <div class="px-3 py-2 rounded-lg bg-amber-500/15 text-amber-300 text-[11px] font-semibold">⚠ Edit/Delete window: <span data-edit-window-label>Admin only</span></div>
           </div>
 
           <div class="form-grid grid grid-cols-1 md:grid-cols-4 gap-4 mt-5">
@@ -857,8 +866,30 @@
     }
     function saveProjectDatabase(list) {
       localStorage.setItem(PROJECT_DB_KEY, JSON.stringify(list));
+      if (window.MARS_FIREBASE_READY) {
+        window.MARS_FIREBASE.db.collection('catalog').doc('projects').set({ items: list, updatedAt: Date.now() })
+          .catch(e => { console.error('Project sync failed:', e); showToast('Saved locally, but could not sync to other devices — check connection.', 'error'); });
+      }
     }
     let projectDatabase = getProjectDatabase();
+
+    const ENGINEER_DB_KEY = 'mars_engineer_database';
+    function getEngineerDatabase() {
+      try {
+        const raw = localStorage.getItem(ENGINEER_DB_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      localStorage.setItem(ENGINEER_DB_KEY, JSON.stringify([]));
+      return [];
+    }
+    function saveEngineerDatabase(list) {
+      localStorage.setItem(ENGINEER_DB_KEY, JSON.stringify(list));
+      if (window.MARS_FIREBASE_READY) {
+        window.MARS_FIREBASE.db.collection('catalog').doc('engineers').set({ items: list, updatedAt: Date.now() })
+          .catch(e => { console.error('Engineer sync failed:', e); showToast('Saved locally, but could not sync to other devices — check connection.', 'error'); });
+      }
+    }
+    let engineerDatabase = getEngineerDatabase();
 
     let entries = JSON.parse(localStorage.getItem('mars_ledger_entries')) || [];
     let editIndex = -1;
@@ -866,7 +897,35 @@
     // Admin identity/authentication is now handled by Firebase Authentication
     // (see MARS ROLE ACCESS ENGINE) instead of a locally stored password.
 
-    const ONE_HOUR = 60 * 60 * 1000;
+    let editWindowMinutes = 0; // 0 = Site Engineers cannot self-edit/delete at all; only Admin can. Change via Admin Settings → Access Control.
+    let ONE_HOUR = editWindowMinutes * 60 * 1000; // kept as a plain number so existing comparisons (`> ONE_HOUR`) work unchanged
+    async function loadEditWindowConfig() {
+      try {
+        if (!window.MARS_FIREBASE_READY) return;
+        const snap = await window.MARS_FIREBASE.db.collection('config').doc('settings').get();
+        if (snap.exists && typeof snap.data().editWindowMinutes === 'number') {
+          editWindowMinutes = snap.data().editWindowMinutes;
+        }
+      } catch (e) { console.error('Could not load edit-window config:', e); }
+      ONE_HOUR = editWindowMinutes * 60 * 1000;
+      document.querySelectorAll('[data-edit-window-label]').forEach(el => el.innerText = editWindowMinutes > 0 ? `${editWindowMinutes} min` : 'Admin only');
+    }
+    async function adminSaveEditWindow() {
+      const val = parseInt(document.getElementById('editWindowInput').value, 10);
+      if (!val || val < 1) { showToast('Enter a valid number of minutes.', 'error'); return; }
+      try {
+        await window.MARS_FIREBASE.db.collection('config').doc('settings').set({ editWindowMinutes: val }, { merge: true });
+        editWindowMinutes = val;
+        ONE_HOUR = editWindowMinutes * 60 * 1000;
+        document.querySelectorAll('[data-edit-window-label]').forEach(el => el.innerText = editWindowMinutes > 0 ? `${editWindowMinutes} min` : 'Admin only');
+        logActivity('Edit Window Updated', `${val} minutes`);
+        showToast('Edit/Delete window updated for everyone.');
+        recalculateAndRender();
+      } catch (e) {
+        console.error(e);
+        showToast('Could not save — check Firestore Rules allow admin writes to config/settings.', 'error');
+      }
+    }
 
     function escHtmlLocal(s) { return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
 
@@ -1073,6 +1132,10 @@
     }
     function saveMaterialCatalog(list) {
       localStorage.setItem(MATERIAL_CATALOG_KEY, JSON.stringify(list));
+      if (window.MARS_FIREBASE_READY) {
+        window.MARS_FIREBASE.db.collection('catalog').doc('materials').set({ items: list, updatedAt: Date.now() })
+          .catch(e => { console.error('Material sync failed:', e); showToast('Saved locally, but could not sync to other devices — check connection.', 'error'); });
+      }
     }
     function matKey(prjNo, material) {
       return prjNo + '||' + String(material || '').trim().toLowerCase();
@@ -1344,6 +1407,7 @@
       const idx = document.getElementById('selectProject').value;
       const prjInfo = projectDatabase[idx];
 
+      if (!prjInfo) { alert("Please select a valid Project first (add one under Admin → Projects if the list is empty)."); return; }
       if (!date) { alert("Please select Entry Date"); return; }
 
       const items = collectItemRowsData();
@@ -1422,7 +1486,7 @@
       const currentTime = new Date().getTime();
 
       if (!isAdmin && (currentTime - item.createdAt > ONE_HOUR)) {
-        alert(" 1 hour time limit expired. Only Admin can edit this entry.");
+        alert(editWindowMinutes > 0 ? `${editWindowMinutes}-minute time limit expired. Only Admin can edit this entry.` : "Only Admin can edit entries.");
         return;
       }
 
@@ -1459,7 +1523,7 @@
       const currentTime = Date.now();
 
       if (!isAdmin && (currentTime - item.createdAt > ONE_HOUR)) {
-        alert("1 hour time limit expired. Only Admin can delete this entry.");
+        alert(editWindowMinutes > 0 ? `${editWindowMinutes}-minute time limit expired. Only Admin can delete this entry.` : "Only Admin can delete entries.");
         return;
       }
 
@@ -2096,7 +2160,7 @@ function exportExcelCompatible(){
   logActivity('Excel Export',`${list.length} records`);showToast('Excel-compatible file exported.');
 }
 function backupData(){
-  const payload={app:'MARS Stock Ledger',version:3,exportedAt:new Date().toISOString(),entries,activity:getActivity(),alertThreshold:Number(localStorage.getItem(ALERT_KEY)||DEFAULT_ALERT),materialCatalog:getMaterialCatalog(),openingStock:getOpeningStockMap()};
+  const payload={app:'MARS Stock Ledger',version:4,exportedAt:new Date().toISOString(),entries,activity:getActivity(),alertThreshold:Number(localStorage.getItem(ALERT_KEY)||DEFAULT_ALERT),materialCatalog:getMaterialCatalog(),openingStock:getOpeningStockMap(),projectDatabase:projectDatabase,engineerDatabase:engineerDatabase};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='MARS_Stock_Ledger_Backup.json';a.click();URL.revokeObjectURL(a.href);
   logActivity('Backup Created',`${entries.length} records`);
 }
@@ -2111,7 +2175,10 @@ function restoreData(ev){
       if(Number.isFinite(d.alertThreshold))localStorage.setItem(ALERT_KEY,String(d.alertThreshold));
       if(Array.isArray(d.materialCatalog))saveMaterialCatalog(d.materialCatalog);
       if(d.openingStock && typeof d.openingStock==='object')saveOpeningStockMap(d.openingStock);
+      if(Array.isArray(d.projectDatabase)){projectDatabase=d.projectDatabase;saveProjectDatabase(projectDatabase);refreshProjectDropdowns();}
+      if(Array.isArray(d.engineerDatabase)){engineerDatabase=d.engineerDatabase;saveEngineerDatabase(engineerDatabase);}
       populateMaterialSelect(document.getElementById('metaMaterial').value);
+      onProjectSelect();
       recalculateAndRender();renderAdvanced();renderActivity();logActivity('Backup Restored',`${entries.length} records`);showToast('Backup restored successfully.');
     }catch(e){showToast('Invalid backup file.','error')}
   };reader.readAsText(file);ev.target.value='';
@@ -2151,7 +2218,9 @@ function renderAdminSettingsModal(activeTab){
         <button class="btn ${tab==='stock'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('stock')">Opening Stock</button>
         <button class="btn ${tab==='materials'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('materials')">Materials & Units</button>
         <button class="btn ${tab==='projects'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('projects')">Projects</button>
+        <button class="btn ${tab==='engineers'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('engineers')">Engineers</button>
         <button class="btn ${tab==='alert'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('alert')">Low Stock Alert</button>
+        <button class="btn ${tab==='access'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('access')">Access Control</button>
       </div>
       ${tab==='stock' ? `
         <div class="text-xs text-muted mb-3">Starting stock for a Project + Material. Added once, on top of all future entries — never mixes with other Projects or Materials (e.g. Project:20 and Project:6 stay fully separate).</div>
@@ -2207,6 +2276,48 @@ function renderAdminSettingsModal(activeTab){
             </div>`).join('') : '<div class="text-xs text-muted text-center py-6">No projects yet.</div>'}
         </div>
       ` : ''}
+      ${tab==='engineers' ? `
+        <div class="text-xs text-muted mb-3">Each Engineer gets their own login ID (separate from any Project) and can be assigned to one or more Projects. This is what powers accurate "who made this entry" tracking.</div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-2 mb-2">
+          <input id="newEngId" placeholder="Engineer ID (e.g. ENG-001)" class="field">
+          <input id="newEngName" placeholder="Engineer Name" class="field">
+          <select id="newEngProjects" multiple class="field md:col-span-1" style="min-height:74px">${projectDatabase.map(p=>`<option value="${escHtmlLocal(p.prjNo)}">${escHtmlLocal(p.prjNo)}</option>`).join('')}</select>
+          <button class="btn btn-primary" onclick="adminAddEngineer()">＋ Add Engineer</button>
+        </div>
+        <div class="text-[11px] text-muted mb-4">Hold Ctrl/Cmd (or tap multiple, on mobile) to assign more than one project.</div>
+        <div class="space-y-2 max-h-80 overflow-auto">
+          ${engineerDatabase.length ? engineerDatabase.map((e,i)=>`
+            <div class="rounded-lg bg-white/5 px-3 py-2 text-xs">
+              <div class="flex items-center justify-between gap-2">
+                <div class="min-w-0"><div class="font-bold truncate">${escHtmlLocal(e.name)} <span class="text-muted font-normal">(${escHtmlLocal(e.id)})</span></div><div class="text-muted truncate">${e.projects && e.projects.length ? escHtmlLocal(e.projects.join(', ')) : '<span class="text-amber-400">No project assigned</span>'}</div></div>
+                <div class="flex items-center gap-3 shrink-0">
+                  <button class="text-blue-400 font-bold" onclick="adminEditEngineerProjects(${i})">✎</button>
+                  <button class="text-red-400 font-bold" onclick="adminDeleteEngineer(${i})">✕</button>
+                </div>
+              </div>
+            </div>`).join('') : '<div class="text-xs text-muted text-center py-6">No engineers yet — add one above.</div>'}
+        </div>
+      ` : ''}
+      ${tab==='access' ? `
+        <div class="mb-6">
+          <div class="font-bold text-sm text-ink mb-1">Edit / Delete Window</div>
+          <div class="text-xs text-muted mb-3">How long (in minutes) a Site Engineer can edit or delete their own entry before it locks (Admin can always edit/delete). Applies instantly for everyone.</div>
+          <div class="flex items-center gap-2">
+            <input id="editWindowInput" type="number" step="1" value="${editWindowMinutes}" class="field max-w-[160px]">
+            <button class="btn btn-primary" onclick="adminSaveEditWindow()">Save</button>
+          </div>
+          <div class="text-[11px] text-amber-400 mt-2">⚠ Also update the matching value in your Firestore Security Rules (config/settings.editWindowMinutes) so it's enforced server-side too — ask me if you need the updated Rules text.</div>
+        </div>
+        <div class="border-t border-line pt-4">
+          <div class="font-bold text-sm text-ink mb-1">Manage Admins</div>
+          <div class="text-xs text-muted mb-3">To make someone else an Admin: have them open Admin Login → "Create an account", sign up with their own email/password, then share their User UID with you (they'll see it after signing up). Paste that UID below to grant them Admin access.</div>
+          <div class="flex items-center gap-2 mb-2">
+            <input id="newAdminUid" placeholder="Paste User UID here" class="field">
+            <button class="btn btn-primary" onclick="adminGrantAdminAccess()">＋ Grant Admin</button>
+          </div>
+          <div id="currentAdminUidBox" class="text-[11px] text-muted"></div>
+        </div>
+      ` : ''}
       ${tab==='alert' ? `
         <div class="text-xs text-muted mb-3">When the current Balance drops to or below this number, the Balance card pulses and an alert appears in Reports & Tools.</div>
         <div class="flex items-center gap-2">
@@ -2217,6 +2328,11 @@ function renderAdminSettingsModal(activeTab){
     </div>
   </div>`;
   document.getElementById('modalRoot').innerHTML = html;
+  if (tab === 'access') {
+    const box = document.getElementById('currentAdminUidBox');
+    const user = firebase.auth && firebase.auth().currentUser;
+    if (box && user) box.innerText = `You're signed in as ${user.email || 'unknown'} — your UID: ${user.uid}`;
+  }
 }
 
 function adminSaveOpeningStock(){
@@ -2265,9 +2381,10 @@ function adminAddProject(){
   const eng = document.getElementById('newPrjEng').value.trim();
   if(!prjNo || !id){ showToast('Enter both Project No and Project ID.','error'); return; }
   if(projectDatabase.some(p=>p.prjNo.toLowerCase()===prjNo.toLowerCase())){ showToast('This Project No already exists.','error'); return; }
+  const keepIdx = Number(document.getElementById('selectProject').value) || 0;
   projectDatabase.push({ prjNo, id, eng: eng || '' });
   saveProjectDatabase(projectDatabase);
-  refreshProjectDropdowns();
+  refreshProjectDropdowns(keepIdx);
   logActivity('Project Added', `${prjNo}${eng ? ' / ' + eng : ' (no engineer yet)'}`);
   showToast('Project added.');
   renderAdminSettingsModal('projects');
@@ -2289,12 +2406,64 @@ function adminDeleteProject(index){
   const p = projectDatabase[index];
   if(!p) return;
   if(!confirm(`Remove ${p.prjNo} from the project list? (Past ledger entries under this project are not affected.)`)) return;
+  const currentPrjNo = projectDatabase[Number(document.getElementById('selectProject').value)]?.prjNo;
   projectDatabase.splice(index,1);
   saveProjectDatabase(projectDatabase);
-  refreshProjectDropdowns();
+  const newIdx = currentPrjNo ? projectDatabase.findIndex(x=>x.prjNo===currentPrjNo) : -1;
+  refreshProjectDropdowns(newIdx !== -1 ? newIdx : 0);
   onProjectSelect();
   logActivity('Project Removed', p.prjNo);
   renderAdminSettingsModal('projects');
+}
+function adminAddEngineer(){
+  const id = document.getElementById('newEngId').value.trim();
+  const name = document.getElementById('newEngName').value.trim();
+  const projects = [...document.getElementById('newEngProjects').selectedOptions].map(o=>o.value);
+  if(!id || !name){ showToast('Enter both Engineer ID and Name.','error'); return; }
+  if(engineerDatabase.some(e=>e.id.toLowerCase()===id.toLowerCase())){ showToast('This Engineer ID already exists.','error'); return; }
+  engineerDatabase.push({ id, name, projects });
+  saveEngineerDatabase(engineerDatabase);
+  logActivity('Engineer Added', `${name} (${id})${projects.length ? ' → ' + projects.join(', ') : ''}`);
+  showToast('Engineer added.');
+  renderAdminSettingsModal('engineers');
+}
+function adminEditEngineerProjects(index){
+  const e = engineerDatabase[index];
+  if(!e) return;
+  const allPrjNos = projectDatabase.map(p=>p.prjNo);
+  const current = (e.projects||[]).join(', ');
+  const input = prompt(`Assign projects to ${e.name} (${e.id}).\nAvailable: ${allPrjNos.join(', ')}\nEnter comma-separated Project No(s):`, current);
+  if(input===null) return;
+  const chosen = input.split(',').map(s=>s.trim()).filter(Boolean);
+  const invalid = chosen.filter(p=>!allPrjNos.includes(p));
+  if(invalid.length){ showToast('Unknown project(s): ' + invalid.join(', '), 'error'); return; }
+  e.projects = chosen;
+  saveEngineerDatabase(engineerDatabase);
+  logActivity('Engineer Projects Updated', `${e.name} → ${chosen.join(', ') || '(none)'}`);
+  showToast('Engineer assignment updated.');
+  renderAdminSettingsModal('engineers');
+}
+function adminDeleteEngineer(index){
+  const e = engineerDatabase[index];
+  if(!e) return;
+  if(!confirm(`Remove Engineer ${e.name} (${e.id})? They will no longer be able to log in with this ID. Past ledger entries are not affected.`)) return;
+  engineerDatabase.splice(index,1);
+  saveEngineerDatabase(engineerDatabase);
+  logActivity('Engineer Removed', `${e.name} (${e.id})`);
+  renderAdminSettingsModal('engineers');
+}
+async function adminGrantAdminAccess(){
+  const uid = document.getElementById('newAdminUid').value.trim();
+  if(!uid){ showToast('Paste a User UID first.','error'); return; }
+  try{
+    await window.MARS_FIREBASE.db.collection('admins').doc(uid).set({ role:'admin', addedAt: Date.now(), addedBy: (firebase.auth().currentUser && firebase.auth().currentUser.email) || 'unknown' });
+    logActivity('Admin Granted', uid);
+    showToast('Admin access granted for that UID.');
+    document.getElementById('newAdminUid').value = '';
+  }catch(err){
+    console.error(err);
+    showToast('Could not grant access — check Firestore Rules allow admin writes to /admins.', 'error');
+  }
 }
 function adminSaveThreshold(){
   const value = document.getElementById('alertThresholdInput').value;
@@ -2327,9 +2496,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   renderAdvanced();renderActivity();setSyncStatus('Firebase Ready');
   if (window.MARS_FIREBASE_AUTH_READY) {
     startFirebaseSync();
+    startCatalogSync();
+    loadEditWindowConfig();
   } else {
-    window.onMarsAuthReady = startFirebaseSync;
-    setTimeout(()=>{ if(!firebaseUnsubscribe) startFirebaseSync(); }, 4000); // safety fallback
+    window.onMarsAuthReady = ()=>{ startFirebaseSync(); startCatalogSync(); loadEditWindowConfig(); };
+    setTimeout(()=>{ if(!firebaseUnsubscribe) { startFirebaseSync(); startCatalogSync(); loadEditWindowConfig(); } }, 4000); // safety fallback
   }
   const originalRecalc=recalculateAndRender;
   window.recalculateAndRender=function(){originalRecalc();renderAdvanced()};
@@ -2349,6 +2520,60 @@ function setFirebaseStatus(label, type){
   setSyncStatus(label, type);
 }
 
+let catalogSyncStarted = false;
+function startCatalogSync(){
+  if(!firebaseReady() || catalogSyncStarted) return;
+  catalogSyncStarted = true;
+  const db = window.MARS_FIREBASE.db;
+  const col = db.collection('catalog');
+
+  col.doc('projects').onSnapshot(snap=>{
+    if(snap.exists && Array.isArray(snap.data().items)){
+      projectDatabase = snap.data().items;
+      localStorage.setItem(PROJECT_DB_KEY, JSON.stringify(projectDatabase));
+      const keepIdx = Number(document.getElementById('selectProject')?.value);
+      refreshProjectDropdowns(Number.isFinite(keepIdx) ? keepIdx : undefined);
+      onProjectSelect();
+      if (window._adminModalTab === 'projects') renderAdminSettingsModal('projects');
+    }
+  }, err=>console.error('Project catalog sync error:',err));
+
+  col.doc('materials').onSnapshot(snap=>{
+    if(snap.exists && Array.isArray(snap.data().items)){
+      localStorage.setItem(MATERIAL_CATALOG_KEY, JSON.stringify(snap.data().items));
+      localStorage.setItem(MATERIAL_CATALOG_VERSION_KEY, String(MATERIAL_CATALOG_VERSION));
+      populateMaterialDatalist();
+      if (window._adminModalTab === 'materials') renderAdminSettingsModal('materials');
+    }
+  }, err=>console.error('Material catalog sync error:',err));
+
+  col.doc('engineers').onSnapshot(snap=>{
+    if(snap.exists && Array.isArray(snap.data().items)){
+      engineerDatabase = snap.data().items;
+      localStorage.setItem(ENGINEER_DB_KEY, JSON.stringify(engineerDatabase));
+      if (window._adminModalTab === 'engineers') renderAdminSettingsModal('engineers');
+    }
+  }, err=>console.error('Engineer catalog sync error:',err));
+}
+// Called once, right after a successful Admin login (see MARS ROLE ACCESS ENGINE).
+// Seeding needs a confirmed Admin session — checking isAdmin inside the onSnapshot
+// callbacks above isn't reliable on a cold start, since those listeners are set up
+// before anyone has logged in as Admin yet.
+async function seedCatalogsIfMissing(){
+  if(!firebaseReady()) return;
+  const col = window.MARS_FIREBASE.db.collection('catalog');
+  const jobs = [
+    { doc: 'projects', data: projectDatabase },
+    { doc: 'materials', data: getMaterialCatalog() },
+    { doc: 'engineers', data: engineerDatabase }
+  ];
+  for(const job of jobs){
+    try{
+      const snap = await col.doc(job.doc).get();
+      if(!snap.exists) await col.doc(job.doc).set({ items: job.data, updatedAt: Date.now() });
+    }catch(e){ console.error(`Seeding catalog/${job.doc} failed:`, e); }
+  }
+}
 function startFirebaseSync(){
   if(!firebaseReady()){ setFirebaseStatus("Firebase not ready","error"); return; }
   try{
@@ -2413,20 +2638,52 @@ async function deleteEntryFromFirebase(firebaseId){
     if(!email||!pass){setAdminStatus('EMAIL AND PASSWORD REQUIRED','error');return}
     if(!firebase.auth){setAdminStatus('AUTH NOT AVAILABLE','error');return}
     card.classList.add('scanning');input.disabled=true;unlock.disabled=true;setAdminStatus('VERIFYING CREDENTIALS','scanning');
-    firebase.auth().signInWithEmailAndPassword(email,pass).then(()=>{
-      isAdmin=true;window.currentAccessRole='admin';
-      document.getElementById('adminBadge')?.classList.remove('hidden');
-      document.body.classList.add('admin-mode');
-      const btn=document.getElementById('btnAdminToggle');
-      if(btn){btn.innerText='🚪 Logout Admin';btn.className='bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-1 px-3 rounded shadow'}
-      setAdminStatus('ADMIN ACCESS GRANTED','success');
-      card.classList.remove('scanning');door.classList.add('open','vault-success-glow');
-      setTimeout(()=>{overlay.classList.add('hidden-overlay');overlay.style.display='none';if(typeof showPage==='function')showPage('dashboard');recalculateAndRender()},1250);
+    firebase.auth().signInWithEmailAndPassword(email,pass).then((cred)=>{
+      // Signing in only proves this is a real account — it does NOT by itself
+      // mean this person is an approved Admin. Confirm their UID is actually
+      // listed in the `admins` Firestore collection before granting access.
+      return window.MARS_FIREBASE.db.collection('admins').doc(cred.user.uid).get().then((snap)=>{
+        if(!snap.exists){
+          const uid=cred.user.uid;
+          firebase.auth().signOut().then(()=>firebase.auth().signInAnonymously());
+          failAdmin('NOT YET AUTHORIZED AS ADMIN');
+          setTimeout(()=>alert('This account is signed in but not yet approved as Admin.\nYour UID: '+uid+'\nAsk an existing Admin to grant you access (Admin Settings → Access Control → Manage Admins) using this UID.'),300);
+          return;
+        }
+        isAdmin=true;window.currentAccessRole='admin';
+        document.getElementById('adminBadge')?.classList.remove('hidden');
+        document.body.classList.add('admin-mode');
+        const btn=document.getElementById('btnAdminToggle');
+        if(btn){btn.innerText='🚪 Logout Admin';btn.className='bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-1 px-3 rounded shadow'}
+        setAdminStatus('ADMIN ACCESS GRANTED','success');
+        card.classList.remove('scanning');door.classList.add('open','vault-success-glow');
+        if(typeof seedCatalogsIfMissing==='function') seedCatalogsIfMissing();
+        setTimeout(()=>{overlay.classList.add('hidden-overlay');overlay.style.display='none';if(typeof showPage==='function')showPage('dashboard');recalculateAndRender()},1250);
+      });
     }).catch((err)=>{
       console.error('Admin sign-in failed:',err);
       const code=err && err.code || '';
       const msg = code.includes('invalid-credential')||code.includes('wrong-password')||code.includes('user-not-found') ? 'ACCESS DENIED' : (code.includes('too-many-requests') ? 'TOO MANY ATTEMPTS — TRY LATER' : 'SIGN-IN FAILED');
       failAdmin(msg);
+    });
+  }
+  function signUpVault(){
+    if(unlock.disabled)return;
+    const email=(emailInput?.value||'').trim();
+    const pass=input.value.trim();
+    if(!email||!pass){setAdminStatus('ENTER EMAIL AND A PASSWORD (6+ CHARS) TO SIGN UP','error');return}
+    input.disabled=true;unlock.disabled=true;setAdminStatus('CREATING ACCOUNT','scanning');
+    firebase.auth().createUserWithEmailAndPassword(email,pass).then((cred)=>{
+      const uid=cred.user.uid;
+      firebase.auth().signOut().then(()=>firebase.auth().signInAnonymously());
+      setAdminStatus('ACCOUNT CREATED','success');
+      input.disabled=false;unlock.disabled=false;
+      setTimeout(()=>alert('Account created!\nYour UID: '+uid+'\nShare this UID with an existing Admin — they can grant you Admin access from Admin Settings → Access Control → Manage Admins.'),200);
+    }).catch((err)=>{
+      console.error('Sign-up failed:',err);
+      input.disabled=false;unlock.disabled=false;
+      const code=err && err.code || '';
+      setAdminStatus(code.includes('email-already-in-use') ? 'ACCOUNT ALREADY EXISTS — TRY SIGNING IN' : (code.includes('weak-password') ? 'PASSWORD TOO WEAK (6+ CHARS)' : 'SIGN-UP FAILED'),'error');
     });
   }
   function normalize(v){return String(v||'').trim().toLowerCase().replace(/\s+/g,'')}
@@ -2438,6 +2695,7 @@ async function deleteEntryFromFirebase(firebaseId){
   document.getElementById('backFromAdmin')?.addEventListener('click',()=>openAccessPortal('role'));
   document.getElementById('backFromEngineer')?.addEventListener('click',()=>openAccessPortal('role'));
   unlock?.addEventListener('click',unlockVault);emailInput?.addEventListener('keydown',e=>{if(e.key==='Enter')input?.focus()});input?.addEventListener('keydown',e=>{if(e.key==='Enter')unlockVault()});eye?.addEventListener('click',()=>{input.type=input.type==='password'?'text':'password'});
+  document.getElementById('vaultSignupLink')?.addEventListener('click',signUpVault);
   engEnter?.addEventListener('click',verifyEngineer);engProject?.addEventListener('keydown',e=>{if(e.key==='Enter')engId.focus()});engId?.addEventListener('keydown',e=>{if(e.key==='Enter')verifyEngineer()});
 })();
 </script>
