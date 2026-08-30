@@ -210,6 +210,28 @@
       .stats-grid{grid-template-columns:1fr 1fr!important}
       .top-actions .hide-mobile{display:none}
       .pdf-card{padding:14px!important}
+      /* Performance: backdrop-filter blur recalculates every scroll frame on
+         mobile GPUs, and is the main cause of scroll jank/stutter. Swap the
+         "glass" blur look for a plain semi-opaque background on small
+         screens — same layered look, far cheaper to render while scrolling.
+         Desktop keeps the full blur effect (untouched above). */
+      .card,.topbar,.sidebar,.hero-banner,.modal-box,.mobile-bottom{
+        backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+      }
+      .card{background:rgba(20,26,46,.92)}
+      .topbar{background:rgba(15,20,38,.96)}
+      .sidebar{background:rgba(15,20,38,.96)}
+      .hero-banner{background:rgba(20,26,46,.9)}
+      .modal-box{background:rgba(35,25,70,.96)}
+      .mobile-bottom{background:rgba(24,14,55,.96)}
+      /* Shrink + soften the fixed ambient glow blobs — large filter:blur()
+         on position:fixed elements forces the browser to keep re-compositing
+         them against every card's (now-removed) backdrop-filter as the page
+         scrolls underneath. */
+      .app-glow{filter:blur(60px);opacity:.35}
+      .app-glow-a,.app-glow-b{width:320px;height:320px}
+      .app-glow-c{width:280px;height:280px}
+      .hero-glow{filter:blur(40px)}
     }
     @media print{
       @page{size:A4 landscape;margin:5mm}
@@ -463,10 +485,10 @@
           <div class="text-[11px] text-muted">Stock Ledger Management System</div>
         </div>
       </div>
-      <div class="top-actions flex items-center gap-2">
+      <div class="top-actions flex items-center flex-wrap justify-end gap-2">
         <span id="adminBadge" class="hidden px-3 py-1.5 rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-bold">● Admin Active</span>
-        <button onclick="openAdminSettings()" class="admin-only btn btn-warning hide-mobile">⚙ Admin Settings</button>
-        <button onclick="changeAdminPassword()" class="btn btn-secondary hide-mobile">⚙️ Change Password</button>
+        <button onclick="openAdminSettings()" class="admin-only btn btn-warning">⚙ Admin Settings</button>
+        <button onclick="changeAdminPassword()" class="btn btn-secondary">⚙️ Change Password</button>
         <button id="btnAdminToggle" onclick="toggleAdminMode()" class="btn btn-primary">🔐 Admin Login</button>
       </div>
     </div>
@@ -1317,13 +1339,17 @@
 
     function refreshProjectDropdowns(keepSelectIdx) {
       const prevFilterVal = filterPrj.value;
+      const allowed = window.currentEngineerAllowedProjects; // set only during an active Engineer session
+      const visibleProjects = allowed ? projectDatabase.filter(p => allowed.includes(p.prjNo)) : projectDatabase;
       selectPrj.innerHTML = '';
       filterPrj.innerHTML = '<option value="ALL">Show All Projects</option>';
-      projectDatabase.forEach((p, idx) => {
-        selectPrj.innerHTML += `<option value="${idx}">${p.prjNo} (${p.id})${p.eng ? " - " + p.eng : ""}</option>`;
+      visibleProjects.forEach((p) => {
+        const realIdx = projectDatabase.indexOf(p);
+        selectPrj.innerHTML += `<option value="${realIdx}">${p.prjNo} (${p.id})${p.eng ? " - " + p.eng : ""}</option>`;
         filterPrj.innerHTML += `<option value="${p.prjNo}">${p.prjNo}${p.eng ? " - " + p.eng : ""}</option>`;
       });
-      if (keepSelectIdx !== undefined && projectDatabase[keepSelectIdx]) selectPrj.value = String(keepSelectIdx);
+      selectPrj.disabled = !!(allowed && visibleProjects.length <= 1); // lock the dropdown when the Engineer only has one project
+      if (keepSelectIdx !== undefined && projectDatabase[keepSelectIdx] && (!allowed || allowed.includes(projectDatabase[keepSelectIdx].prjNo))) selectPrj.value = String(keepSelectIdx);
       if (prevFilterVal && [...filterPrj.options].some(o => o.value === prevFilterVal)) filterPrj.value = prevFilterVal;
     }
     refreshProjectDropdowns();
@@ -2640,6 +2666,8 @@ async function deleteEntryFromFirebase(firebaseId){
   function failAdmin(msg){card.classList.remove('vault-shake');void card.offsetWidth;card.classList.add('vault-shake');setAdminStatus(msg||'ACCESS DENIED','error');input.value='';input.disabled=false;unlock.disabled=false;setTimeout(()=>setAdminStatus('ADMIN CREDENTIALS REQUIRED'),1600)}
   function finishAdminLogin(){
     isAdmin=true;window.currentAccessRole='admin';
+    window.currentEngineerAllowedProjects=null;
+    refreshProjectDropdowns();
     document.getElementById('adminBadge')?.classList.remove('hidden');
     document.body.classList.add('admin-mode');
     const btn=document.getElementById('btnAdminToggle');
@@ -2718,7 +2746,8 @@ async function deleteEntryFromFirebase(firebaseId){
     window.currentEngineerProject=match;
     window.currentEngineerId=eng.id;
     window.currentEngineerName=eng.name;
-    document.getElementById('selectProject').value=String(projectDatabase.indexOf(match));
+    window.currentEngineerAllowedProjects=(eng.projects||[]).slice();
+    refreshProjectDropdowns(projectDatabase.indexOf(match));
     onProjectSelect();
     setEngineerStatus('SITE ACCESS GRANTED • '+eng.name,'success');
     engCard.classList.add('engineer-success');
