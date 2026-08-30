@@ -2668,11 +2668,11 @@ async function deleteEntryFromFirebase(firebaseId){
         // been set up yet. If not, this device gets to become the first
         // Admin right here (no Firebase Console needed). This "bootstrap
         // door" locks itself permanently the moment it's used.
-        return db.collection('admins').doc('__bootstrap_done__').get().then((bootSnap)=>{
+        return db.collection('admins').doc('_bootstrap_done_').get().then((bootSnap)=>{
           if(!bootSnap.exists && confirm('No Admin has been set up for this app yet.\n\nMake THIS account the first Admin now?')){
             const batch=db.batch();
             batch.set(db.collection('admins').doc(uid), { role:'admin', addedAt: Date.now(), addedBy:'bootstrap' });
-            batch.set(db.collection('admins').doc('__bootstrap_done__'), { done:true, doneAt: Date.now(), doneBy: uid });
+            batch.set(db.collection('admins').doc('_bootstrap_done_'), { done:true, doneAt: Date.now(), doneBy: uid });
             return batch.commit().then(()=>finishAdminLogin()).catch((e)=>{
               console.error('Bootstrap failed:',e);
               firebase.auth().signOut().then(()=>firebase.auth().signInAnonymously());
