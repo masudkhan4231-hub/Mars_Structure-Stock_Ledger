@@ -2687,7 +2687,7 @@ async function deleteEntryFromFirebase(firebaseId){
     }).catch((err)=>{
       console.error('Admin sign-in failed:',err);
       const code=err && err.code || '';
-      const msg = code.includes('invalid-credential')||code.includes('wrong-password')||code.includes('user-not-found') ? 'ACCESS DENIED' : (code.includes('too-many-requests') ? 'TOO MANY ATTEMPTS — TRY LATER' : 'SIGN-IN FAILED');
+      const msg = code.includes('invalid-credential')||code.includes('wrong-password')||code.includes('user-not-found') ? 'ACCESS DENIED' : (code.includes('too-many-requests') ? 'TOO MANY ATTEMPTS — TRY LATER' : ('ERROR: '+(code||err?.message||'UNKNOWN')));
       failAdmin(msg);
     });
   }
