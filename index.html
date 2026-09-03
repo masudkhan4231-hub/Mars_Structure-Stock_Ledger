@@ -199,10 +199,31 @@
       .mobile-bottom{display:flex}
       .main{padding-bottom:76px}
     }
+    /* Performance: backdrop-filter blur recalculates every scroll frame and
+       was causing scroll jank/stutter on every device, not just mobile.
+       Swap the "glass" blur look for a plain semi-opaque background —
+       same layered look, far cheaper to render while scrolling. */
+    .card,.topbar,.sidebar,.hero-banner,.modal-box,.mobile-bottom{
+      backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+    }
+    .card{background:rgba(20,26,46,.92)}
+    .topbar{background:rgba(15,20,38,.96)}
+    .sidebar{background:rgba(15,20,38,.96)}
+    .hero-banner{background:rgba(20,26,46,.9)}
+    .modal-box{background:rgba(35,25,70,.96)}
+    .mobile-bottom{background:rgba(24,14,55,.96)}
+    /* Shrink + soften the fixed ambient glow blobs — large filter:blur() on
+       position:fixed elements forces the browser to keep re-compositing them
+       against every card's (now-removed) backdrop-filter as the page
+       scrolls underneath. */
+    .app-glow{filter:blur(60px);opacity:.35}
+    .app-glow-a,.app-glow-b{width:320px;height:320px}
+    .app-glow-c{width:280px;height:280px}
+    .hero-glow{filter:blur(40px)}
     @media(max-width:640px){
       .page-pad{padding:14px}
       .topbar-inner{padding:11px 14px}
-      .mobile-bottom{position:fixed;left:0;right:0;bottom:0;height:64px;background:rgba(30,15,65,.75);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);border-top:1px solid rgba(255,255,255,.18);z-index:80;justify-content:space-around}
+      .mobile-bottom{position:fixed;left:0;right:0;bottom:0;height:64px;border-top:1px solid rgba(255,255,255,.18);z-index:80;justify-content:space-around}
       .mobile-bottom button{flex:1;color:#94a3b8;font-size:10px;font-weight:700}
       .mobile-bottom button span{display:block;font-size:18px;line-height:20px}
       .card{border-radius:13px}
@@ -210,28 +231,6 @@
       .stats-grid{grid-template-columns:1fr 1fr!important}
       .top-actions .hide-mobile{display:none}
       .pdf-card{padding:14px!important}
-      /* Performance: backdrop-filter blur recalculates every scroll frame on
-         mobile GPUs, and is the main cause of scroll jank/stutter. Swap the
-         "glass" blur look for a plain semi-opaque background on small
-         screens — same layered look, far cheaper to render while scrolling.
-         Desktop keeps the full blur effect (untouched above). */
-      .card,.topbar,.sidebar,.hero-banner,.modal-box,.mobile-bottom{
-        backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
-      }
-      .card{background:rgba(20,26,46,.92)}
-      .topbar{background:rgba(15,20,38,.96)}
-      .sidebar{background:rgba(15,20,38,.96)}
-      .hero-banner{background:rgba(20,26,46,.9)}
-      .modal-box{background:rgba(35,25,70,.96)}
-      .mobile-bottom{background:rgba(24,14,55,.96)}
-      /* Shrink + soften the fixed ambient glow blobs — large filter:blur()
-         on position:fixed elements forces the browser to keep re-compositing
-         them against every card's (now-removed) backdrop-filter as the page
-         scrolls underneath. */
-      .app-glow{filter:blur(60px);opacity:.35}
-      .app-glow-a,.app-glow-b{width:320px;height:320px}
-      .app-glow-c{width:280px;height:280px}
-      .hero-glow{filter:blur(40px)}
     }
     @media print{
       @page{size:A4 landscape;margin:5mm}
@@ -505,8 +504,10 @@
     </div>
   </div>
 
+  <div id="sidebarBackdrop" onclick="toggleMobileMenu(false)" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:69"></div>
   <div class="flex max-w-[1600px] mx-auto">
     <aside id="sidebar" class="sidebar min-h-[calc(100vh-65px)] p-4 shrink-0">
+      <button class="lg:hidden w-full mb-3 py-2 rounded-lg bg-white/10 text-white text-sm font-bold" onclick="toggleMobileMenu(false)">✕ Close Menu</button>
       <div class="text-[10px] uppercase tracking-[.16em] text-blue-200/70 px-3 mb-3">Workspace</div>
       <nav class="space-y-1">
         <a href="javascript:void(0)" class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')"><span>▦</span> Dashboard</a>
@@ -1171,6 +1172,10 @@
     }
     function saveOpeningStockMap(map) {
       localStorage.setItem(OPENING_STOCK_KEY, JSON.stringify(map));
+      if (window.MARS_FIREBASE_READY) {
+        window.MARS_FIREBASE.db.collection('catalog').doc('openingStock').set({ data: map, updatedAt: Date.now() })
+          .catch(e => { console.error('Opening stock sync failed:', e); showToast('Saved locally, but could not sync to other devices — check connection.', 'error'); });
+      }
     }
     function getOpeningStock(prjNo, material) {
       const map = getOpeningStockMap();
@@ -1828,15 +1833,17 @@ function showPage(page){
     el.classList.toggle('mb-active', el.dataset.page===page);
   });
   window.currentPage=page;
-  const s=document.getElementById('sidebar');
-  if(s && window.innerWidth<900) s.style.display='none';
+  if(window.innerWidth<900 && typeof toggleMobileMenu==='function') toggleMobileMenu(false);
   window.scrollTo({top:0,behavior:'smooth'});
 }
-function toggleMobileMenu(){
+function toggleMobileMenu(forceState){
   const s=document.getElementById('sidebar');
+  const bd=document.getElementById('sidebarBackdrop');
   if(!s)return;
-  s.style.display=s.style.display==='block'?'none':'block';
-  s.style.position='fixed'; s.style.left='0'; s.style.top='65px'; s.style.zIndex='70'; s.style.height='calc(100vh - 65px)';
+  const willOpen = typeof forceState==='boolean' ? forceState : s.style.display!=='block';
+  s.style.display=willOpen?'block':'none';
+  s.style.position='fixed'; s.style.left='0'; s.style.top='65px'; s.style.zIndex='70'; s.style.height='calc(100vh - 65px)'; s.style.overflowY='auto';
+  if(bd) bd.style.display=willOpen?'block':'none';
 }
 function showLoading(show=true){ document.getElementById('loadingOverlay')?.classList.toggle('show',show); }
 function showToast(message,type='success'){
@@ -2586,6 +2593,14 @@ function startCatalogSync(){
       if (window._adminModalTab === 'engineers') renderAdminSettingsModal('engineers');
     }
   }, err=>console.error('Engineer catalog sync error:',err));
+
+  col.doc('openingStock').onSnapshot(snap=>{
+    if(snap.exists && snap.data().data && typeof snap.data().data === 'object'){
+      localStorage.setItem(OPENING_STOCK_KEY, JSON.stringify(snap.data().data));
+      recalculateAndRender();
+      if (window._adminModalTab === 'stock') renderAdminSettingsModal('stock');
+    }
+  }, err=>console.error('Opening stock catalog sync error:',err));
 }
 // Called once, right after a successful Admin login (see MARS ROLE ACCESS ENGINE).
 // Seeding needs a confirmed Admin session — checking isAdmin inside the onSnapshot
@@ -2595,14 +2610,15 @@ async function seedCatalogsIfMissing(){
   if(!firebaseReady()) return;
   const col = window.MARS_FIREBASE.db.collection('catalog');
   const jobs = [
-    { doc: 'projects', data: projectDatabase },
-    { doc: 'materials', data: getMaterialCatalog() },
-    { doc: 'engineers', data: engineerDatabase }
+    { doc: 'projects', field: 'items', data: projectDatabase },
+    { doc: 'materials', field: 'items', data: getMaterialCatalog() },
+    { doc: 'engineers', field: 'items', data: engineerDatabase },
+    { doc: 'openingStock', field: 'data', data: getOpeningStockMap() }
   ];
   for(const job of jobs){
     try{
       const snap = await col.doc(job.doc).get();
-      if(!snap.exists) await col.doc(job.doc).set({ items: job.data, updatedAt: Date.now() });
+      if(!snap.exists) await col.doc(job.doc).set({ [job.field]: job.data, updatedAt: Date.now() });
     }catch(e){ console.error(`Seeding catalog/${job.doc} failed:`, e); }
   }
 }
