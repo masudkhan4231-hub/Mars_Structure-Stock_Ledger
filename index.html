@@ -1704,6 +1704,35 @@
           </tr>`);
       });
 
+      // Materials that have an Opening Stock count but NO ledger entries yet
+      // (e.g. a physical inventory count for a pre-existing project, before
+      // any new procurement/issue has been logged in the app) were previously
+      // invisible here entirely. Show them as a standalone Opening Balance row.
+      const openingMapAll = getOpeningStockMap();
+      const catalogForNames = getMaterialCatalog();
+      Object.keys(openingMapAll).forEach(k => {
+        const sep = k.indexOf('||');
+        const prj = k.slice(0, sep), matLower = k.slice(sep + 2);
+        if (selectedFilter !== "ALL" && prj !== selectedFilter) return;
+        if (currentMaterial && matLower !== currentMaterial) return;
+        const cumKey = prj + '||' + matLower;
+        if (seenOpeningRow[cumKey]) return; // already shown above via an actual entry
+        const opening = Number(openingMapAll[k]) || 0;
+        if (!opening) return;
+        const catEntry = catalogForNames.find(m => String(m.name).trim().toLowerCase() === matLower);
+        const displayName = catEntry ? catEntry.name : matLower;
+        rowsHtml.push(`
+          <tr class="bg-white/5">
+            <td colspan="8" class="font-bold">Opening Balance — ${prj}${currentMaterial ? '' : ' / ' + displayName}</td>
+            <td class="font-bold bg-white/5">-</td>
+            <td colspan="4">-</td>
+            <td class="font-bold bg-white/5">-</td>
+            <td colspan="2">-</td>
+            <td class="font-bold bg-amber-400/15">${opening.toFixed(2)}</td>
+            <td class="action-col">-</td>
+          </tr>`);
+      });
+
       tbody.innerHTML = rowsHtml.join('');
       const empty = document.getElementById('emptyLedger');
       if (empty) empty.classList.toggle('hidden', tbody.children.length !== 0);
@@ -1721,7 +1750,7 @@
       return entries.filter(e=>e.prjNo===projectNo).sort((a,b)=>String(a.dateStr).localeCompare(String(b.dateStr)));
     }
 
-    function buildMaterialTableHtml(projectNo, materialName, list){
+    function buildMaterialTableHtml(projectNo, materialName, list, unitOverride){
       let cp=0, cr=0, ct=0, ci=0;
       const opening = (typeof getOpeningStock==='function') ? getOpeningStock(projectNo, materialName) : 0;
       let openingRow = '';
@@ -1738,8 +1767,9 @@
           <td>${escapeHtml(e.purpose)}</td><td>${(+e.issueQty||0).toFixed(2)}</td><td>${ci.toFixed(2)}</td><td>${bal.toFixed(2)}</td>
         </tr>`;
       }).join("");
+      const unit = list[0]?.unit || unitOverride || '';
       return `<div class="mat-block">
-      <div class="mat-title">Material: ${escapeHtml(materialName || '(Not specified)')}${list[0]?.unit ? ' &nbsp;|&nbsp; Unit: '+escapeHtml(list[0].unit) : ''}</div>
+      <div class="mat-title">Material: ${escapeHtml(materialName || '(Not specified)')}${unit ? ' &nbsp;|&nbsp; Unit: '+escapeHtml(unit) : ''}</div>
       <table><thead><tr>
       <th>Date</th><th>MRR</th><th>Proc Qty</th><th>Proc Cum.</th><th>Recv Project</th><th>Recv GP</th><th>Recv Qty</th><th>Recv Cum.</th><th>Gross</th>
       <th>Transfer GP</th><th>Transfer Project</th><th>Transfer Qty</th><th>Transfer Cum.</th><th>Net Received</th><th>Purpose</th><th>Issue Qty</th><th>Issue Cum.</th><th>Balance</th>
@@ -1760,9 +1790,23 @@
         if(!groups[key]){ groups[key]=[]; order.push(key); }
         groups[key].push(e);
       });
+      // Materials with an Opening Stock count but no ledger entries yet (e.g. a
+      // physical inventory count for a pre-existing project) would otherwise be
+      // completely absent from the report. Add them as their own block showing
+      // just the opening balance.
+      const openingMapAll = getOpeningStockMap();
+      const catalogForNames = getMaterialCatalog();
+      const openingOnlyKeys = Object.keys(openingMapAll).filter(k=>{
+        const sep=k.indexOf('||'); const prj=k.slice(0,sep), matLower=k.slice(sep+2);
+        return prj===projectNo && !groups[matLower] && Number(openingMapAll[k]);
+      });
       const materialBlocks = order.map(key=>{
         const groupList = groups[key];
         return buildMaterialTableHtml(projectNo, groupList[0].material || '(Not specified)', groupList);
+      }).join('') + openingOnlyKeys.map(k=>{
+        const sep=k.indexOf('||'); const matLower=k.slice(sep+2);
+        const catEntry = catalogForNames.find(m=>String(m.name).trim().toLowerCase()===matLower);
+        return buildMaterialTableHtml(projectNo, catEntry ? catEntry.name : matLower, [], catEntry ? catEntry.unit : '');
       }).join('');
 
       return `<!doctype html><html><head><meta charset="utf-8"><title>MARS ${escapeHtml(projectNo)} Stock Ledger</title>
@@ -1802,7 +1846,9 @@
     }
 
     function generateAllEngineerReports(){
-      const reports=projectDatabase.filter(p=>projectEntries(p.prjNo).length);
+      const openingMapForFilter = getOpeningStockMap();
+      const hasOpeningStock = (prjNo) => Object.keys(openingMapForFilter).some(k => k.startsWith(prjNo + '||') && Number(openingMapForFilter[k]));
+      const reports=projectDatabase.filter(p=>projectEntries(p.prjNo).length || hasOpeningStock(p.prjNo));
       if(!reports.length){alert("No project ledger data found.");return;}
       const sections=reports.map(p=>{
         const h=buildReportHtml(p.prjNo);
