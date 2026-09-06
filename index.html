@@ -513,6 +513,7 @@
         <a href="javascript:void(0)" class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')"><span>▦</span> Dashboard</a>
         <a href="javascript:void(0)" class="nav-item" data-page="entry" onclick="showPage('entry')"><span>＋</span> New Ledger Entry</a>
         <a href="javascript:void(0)" class="nav-item" data-page="print" onclick="showPage('print')"><span>▤</span> Stock Ledger &amp; Reports</a>
+        <a href="javascript:void(0)" class="nav-item" data-page="verify" onclick="showPage('verify')"><span>🔍</span> Physical Check</a>
         <button class="nav-item w-full text-left" onclick="downloadPDF()"><span>⇩</span> Print / PDF</button>
       </nav>
       <div class="mt-8 p-3 rounded-xl bg-white/5 border border-white/10">
@@ -748,6 +749,34 @@
           </div>
         </section>
 
+        <section id="verifySection" class="card p-5 md:p-6 page-section page-hidden" data-page="verify">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-line">
+            <div><div class="section-title">Physical Stock Verification</div><div class="text-xs text-muted mt-1">Count what's actually on site, compare against the system balance, and print a shortage/excess report for the office.</div></div>
+          </div>
+
+          <div class="form-grid grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+            <div><label class="field-label">Project</label><select id="verifyProject" class="field" onchange="onVerifyProjectChange()"></select></div>
+            <div><label class="field-label">Date of Check</label><input type="date" id="verifyDate" class="field"></div>
+          </div>
+
+          <div id="verifyItemRowsWrap" class="mt-5"></div>
+          <div class="flex flex-col sm:flex-row justify-between items-center gap-2 mt-2">
+            <button type="button" onclick="addVerifyItemRow()" class="btn btn-secondary">＋ Add Material to Check</button>
+            <button type="button" onclick="saveVerification()" class="btn btn-primary">✔ Save Verification</button>
+          </div>
+
+          <div class="mt-8 pt-5 border-t border-line">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+              <div class="font-bold text-sm text-ink">Verification History</div>
+              <div class="flex items-center gap-2">
+                <select id="verifyHistoryFilter" class="field text-xs" onchange="renderVerificationHistory()"><option value="ALL">All Projects</option></select>
+                <button type="button" onclick="printVerificationLog()" class="btn btn-secondary text-xs">🖨 Print Visit Log</button>
+              </div>
+            </div>
+            <div id="verifyHistoryBody" class="space-y-2 max-h-[480px] overflow-auto"></div>
+          </div>
+        </section>
+
         <section id="filterSection" class="filter-panel card p-4 md:p-5 no-print page-section page-hidden" data-page="print">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div><div class="section-title">Ledger View</div><div class="text-xs text-muted mt-1">Filter the report by project and print when ready.</div></div>
@@ -846,6 +875,7 @@
     <button data-page="dashboard" class="mb-active" onclick="showPage('dashboard')"><span>⌂</span>Home</button>
     <button data-page="entry" onclick="showPage('entry')"><span>＋</span>Add</button>
     <button data-page="print" onclick="showPage('print')"><span>▤</span>Reports</button>
+    <button data-page="verify" onclick="showPage('verify')"><span>🔍</span>Check</button>
     <button onclick="downloadPDF()"><span>⇩</span>Print</button>
   </nav>
 
@@ -1339,6 +1369,196 @@
       );
     }
 
+    /* ================= PHYSICAL VERIFICATION ================= */
+    let stockChecks = [];
+    function computeCurrentBalance(prjNo, material){
+      const matLower = String(material||'').trim().toLowerCase();
+      let proc=0, rec=0, tr=0, iss=0;
+      entries.forEach(e=>{
+        if(e.prjNo!==prjNo) return;
+        if((e.material||'').trim().toLowerCase()!==matLower) return;
+        proc+=Number(e.procQty)||0; rec+=Number(e.recQty)||0; tr+=Number(e.trQty)||0; iss+=Number(e.issueQty)||0;
+      });
+      return getOpeningStock(prjNo, material) + proc + rec - tr - iss;
+    }
+    function refreshVerifyProjectDropdown(){
+      const sel=document.getElementById('verifyProject');
+      const histFilter=document.getElementById('verifyHistoryFilter');
+      if(!sel) return;
+      const allowed = window.currentEngineerAllowedProjects;
+      const visible = allowed ? projectDatabase.filter(p=>allowed.includes(p.prjNo)) : projectDatabase;
+      const prevVal = sel.value;
+      sel.innerHTML = visible.map(p=>`<option value="${escHtmlLocal(p.prjNo)}">${escHtmlLocal(p.prjNo)} (${escHtmlLocal(p.id)})</option>`).join('');
+      if(visible.some(p=>p.prjNo===prevVal)) sel.value=prevVal;
+      sel.disabled = !!(allowed && visible.length<=1);
+      if(histFilter){
+        const prevHist=histFilter.value;
+        histFilter.innerHTML = '<option value="ALL">All Projects</option>' + visible.map(p=>`<option value="${escHtmlLocal(p.prjNo)}">${escHtmlLocal(p.prjNo)}</option>`).join('');
+        if([...histFilter.options].some(o=>o.value===prevHist)) histFilter.value=prevHist;
+      }
+    }
+    function onVerifyProjectChange(){
+      document.querySelectorAll('#verifySection .verify-row').forEach(row=>refreshVerifyRowBalance(row));
+    }
+    function refreshVerifyRowBalance(row){
+      const prjNo = document.getElementById('verifyProject').value;
+      const matInput = row.querySelector('[data-role="v-material"]');
+      const material = matInput.value.trim();
+      const sysBalEl = row.querySelector('[data-role="v-system"]');
+      const unitEl = row.querySelector('[data-role="v-unit"]');
+      const key = String(material||'').trim().toLowerCase();
+      const catEntry = materialUnitMap.hasOwnProperty(key) ? { unit: materialUnitMap[key] } : null;
+      unitEl.textContent = catEntry ? catEntry.unit : '';
+      if(prjNo && material){
+        const bal = computeCurrentBalance(prjNo, material);
+        sysBalEl.textContent = bal.toFixed(2);
+        row.dataset.systemBalance = bal;
+      } else {
+        sysBalEl.textContent = '-';
+        row.dataset.systemBalance = '';
+      }
+      updateVerifyRowVariance(row);
+    }
+    function updateVerifyRowVariance(row){
+      const sysBal = parseFloat(row.dataset.systemBalance);
+      const physInput = row.querySelector('[data-role="v-physical"]');
+      const varEl = row.querySelector('[data-role="v-variance"]');
+      const phys = parseFloat(physInput.value);
+      if(!Number.isFinite(sysBal) || !Number.isFinite(phys)){ varEl.textContent='-'; varEl.className='font-bold'; return; }
+      const diff = phys - sysBal;
+      varEl.textContent = (diff>0?'+':'')+diff.toFixed(2);
+      varEl.className = 'font-bold ' + (diff<0?'text-red-400':diff>0?'text-emerald-400':'text-muted');
+    }
+    let verifyRowCounter=0;
+    function addVerifyItemRow(){
+      verifyRowCounter++;
+      const wrap=document.getElementById('verifyItemRowsWrap');
+      const div=document.createElement('div');
+      div.className='verify-row border border-line rounded-xl p-3 mb-3 relative';
+      div.dataset.row=String(verifyRowCounter);
+      div.innerHTML=`
+        <button type="button" class="absolute top-2 right-2 text-[11px] font-bold text-red-400 hover:text-red-300" onclick="this.closest('.verify-row').remove()">✕ Remove</button>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div class="md:col-span-2"><label class="field-label">Material</label><input type="text" data-role="v-material" list="materialsDatalist" autocomplete="off" placeholder="Type to search material…" class="field" oninput="refreshVerifyRowBalance(this.closest('.verify-row'))"></div>
+          <div><label class="field-label">Unit</label><div class="field bg-white/5 flex items-center" data-role="v-unit"></div></div>
+          <div><label class="field-label">System Balance</label><div class="field bg-white/5 flex items-center font-bold" data-role="v-system">-</div></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
+          <div><label class="field-label">Physical Count (actual on site)</label><input type="number" step="0.01" data-role="v-physical" placeholder="Counted quantity" class="field" oninput="updateVerifyRowVariance(this.closest('.verify-row'))"></div>
+          <div><label class="field-label">Variance</label><div class="field bg-white/5 flex items-center" data-role="v-variance">-</div></div>
+          <div><label class="field-label">Remarks (optional)</label><input type="text" data-role="v-remarks" placeholder="e.g. damaged, miscount, theft…" class="field"></div>
+        </div>`;
+      wrap.appendChild(div);
+      div.querySelector('[data-role="v-material"]')?.focus();
+    }
+    function collectVerifyItemsData(){
+      return [...document.querySelectorAll('#verifySection .verify-row')].map(row=>{
+        const material = row.querySelector('[data-role="v-material"]').value.trim();
+        const physRaw = row.querySelector('[data-role="v-physical"]').value;
+        const sysBal = parseFloat(row.dataset.systemBalance);
+        const phys = parseFloat(physRaw);
+        return {
+          material,
+          unit: row.querySelector('[data-role="v-unit"]').textContent || '',
+          systemBalance: Number.isFinite(sysBal) ? sysBal : 0,
+          physicalCount: Number.isFinite(phys) ? phys : 0,
+          variance: (Number.isFinite(sysBal) && Number.isFinite(phys)) ? (phys - sysBal) : 0,
+          remarks: row.querySelector('[data-role="v-remarks"]').value.trim() || '-'
+        };
+      }).filter(it => it.material && document.querySelector(`#verifySection [data-role="v-physical"]`));
+    }
+    async function saveVerification(){
+      const prjNo = document.getElementById('verifyProject').value;
+      const prjInfo = projectDatabase.find(p=>p.prjNo===prjNo);
+      const dateStr = document.getElementById('verifyDate').value;
+      if(!prjInfo){ showToast('Select a project first.','error'); return; }
+      if(!dateStr){ showToast('Select the date of check.','error'); return; }
+      const items = [...document.querySelectorAll('#verifySection .verify-row')].map(row=>({
+        material: row.querySelector('[data-role="v-material"]').value.trim(),
+        unit: row.querySelector('[data-role="v-unit"]').textContent || '',
+        systemBalance: parseFloat(row.dataset.systemBalance) || 0,
+        physicalCount: parseFloat(row.querySelector('[data-role="v-physical"]').value) || 0,
+        variance: (parseFloat(row.querySelector('[data-role="v-physical"]').value)||0) - (parseFloat(row.dataset.systemBalance)||0),
+        remarks: row.querySelector('[data-role="v-remarks"]').value.trim() || '-'
+      })).filter(it => it.material);
+      if(!items.length){ showToast('Add at least one material with a physical count.','error'); return; }
+      const record = {
+        prjNo: prjInfo.prjNo, prjId: prjInfo.id,
+        dateStr, createdAt: Date.now(),
+        checkedByEngineerId: window.currentEngineerId || '', checkedByEngineerName: window.currentEngineerName || (isAdmin ? 'Admin' : ''),
+        items
+      };
+      try{
+        await window.MARS_FIREBASE.db.collection('stock_checks').add(record);
+        showToast('Verification saved.');
+        document.getElementById('verifyItemRowsWrap').innerHTML='';
+        addVerifyItemRow();
+        logActivity('Physical Check Saved', `${prjInfo.prjNo} / ${dateStr} / ${items.length} item(s)`);
+      }catch(e){
+        console.error(e);
+        showToast('Could not save — check connection/Firestore Rules.','error');
+      }
+    }
+    function startStockCheckSync(){
+      if(!firebaseReady()) return;
+      window.MARS_FIREBASE.db.collection('stock_checks').onSnapshot(snap=>{
+        stockChecks = snap.docs.map(d=>({firebaseId:d.id, ...d.data()})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+        renderVerificationHistory();
+      }, err=>console.error('Stock check sync error:',err));
+    }
+    function renderVerificationHistory(){
+      const body=document.getElementById('verifyHistoryBody');
+      if(!body) return;
+      const filter=document.getElementById('verifyHistoryFilter')?.value || 'ALL';
+      const list = stockChecks.filter(c=>filter==='ALL'||c.prjNo===filter);
+      if(!list.length){ body.innerHTML='<div class="text-xs text-muted text-center py-6">No physical checks recorded yet.</div>'; return; }
+      body.innerHTML = list.map(c=>{
+        const shortages = c.items.filter(i=>i.variance<0).length;
+        const statusBadge = shortages ? `<span class="text-red-400 font-bold">⚠ ${shortages} shortage${shortages>1?'s':''}</span>` : `<span class="text-emerald-400 font-bold">✔ Matched</span>`;
+        return `<div class="rounded-lg bg-white/5 px-3 py-2 text-xs">
+          <div class="flex items-center justify-between gap-2">
+            <div class="min-w-0"><div class="font-bold truncate">${escHtmlLocal(c.prjNo)} — ${formatDate(c.dateStr)}</div><div class="text-muted truncate">${escHtmlLocal(c.checkedByEngineerName||'—')} • ${c.items.length} material(s) • ${statusBadge}</div></div>
+            <button class="btn btn-secondary text-[11px] shrink-0" onclick="printVerification('${c.firebaseId}')">🖨 Print</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    function printVerification(firebaseId){
+      const c = stockChecks.find(x=>x.firebaseId===firebaseId);
+      if(!c) return;
+      const rows = c.items.map(i=>`<tr>
+        <td>${escapeHtml(i.material)}</td><td>${escapeHtml(i.unit)}</td>
+        <td>${(+i.systemBalance||0).toFixed(2)}</td><td>${(+i.physicalCount||0).toFixed(2)}</td>
+        <td style="color:${i.variance<0?'#c0392b':i.variance>0?'#1e8449':'#333'}">${i.variance>0?'+':''}${(+i.variance||0).toFixed(2)}</td>
+        <td>${escapeHtml(i.remarks)}</td>
+      </tr>`).join('');
+      const html=`<!doctype html><html><head><meta charset="utf-8"><title>Physical Verification — ${escapeHtml(c.prjNo)}</title>
+      <style>@page{size:A4 portrait;margin:12mm}body{font-family:Arial,sans-serif;font-size:12px}table{width:100%;border-collapse:collapse;margin-top:14px}th,td{border:1px solid #999;padding:5px;text-align:center}th{background:#eef2f7}h1,h2{text-align:center;margin:2px 0}.meta{display:flex;justify-content:space-between;margin:14px 0;font-weight:bold}.sign{display:flex;justify-content:space-between;margin-top:60px}.sig{width:220px;border-top:1px solid #555;text-align:center;padding-top:4px}</style>
+      </head><body>
+      <h1>MARS STRUCTURE LIMITED</h1><h2>PHYSICAL STOCK VERIFICATION REPORT</h2>
+      <div class="meta"><span>Project: ${escapeHtml(c.prjNo)}</span><span>Project ID: ${escapeHtml(c.prjId||'')}</span><span>Date: ${formatDate(c.dateStr)}</span></div>
+      <div class="meta"><span>Checked By: ${escapeHtml(c.checkedByEngineerName||'-')}</span><span>Engineer ID: ${escapeHtml(c.checkedByEngineerId||'-')}</span></div>
+      <table><thead><tr><th>Material</th><th>Unit</th><th>System Balance</th><th>Physical Count</th><th>Variance</th><th>Remarks</th></tr></thead><tbody>${rows}</tbody></table>
+      <div class="sign"><div class="sig">Checked By (Site Engineer)</div><div class="sig">Verified By (Office)</div></div>
+      </body></html>`;
+      const w=window.open('','_blank'); w.document.write(html); w.document.close(); setTimeout(()=>w.print(),300);
+    }
+    function printVerificationLog(){
+      const filter=document.getElementById('verifyHistoryFilter')?.value || 'ALL';
+      const list = stockChecks.filter(c=>filter==='ALL'||c.prjNo===filter).slice().sort((a,b)=>a.dateStr.localeCompare(b.dateStr));
+      if(!list.length){ alert('No physical checks recorded yet.'); return; }
+      const rows = list.map(c=>{
+        const shortages = c.items.filter(i=>i.variance<0).length;
+        return `<tr><td>${formatDate(c.dateStr)}</td><td>${escapeHtml(c.prjNo)}</td><td>${escapeHtml(c.checkedByEngineerName||'-')}</td><td>${c.items.length}</td><td>${shortages ? shortages+' shortage(s)' : 'Matched'}</td></tr>`;
+      }).join('');
+      const html=`<!doctype html><html><head><meta charset="utf-8"><title>Site Visit Log</title>
+      <style>@page{size:A4 portrait;margin:12mm}body{font-family:Arial,sans-serif;font-size:12px}table{width:100%;border-collapse:collapse;margin-top:14px}th,td{border:1px solid #999;padding:5px;text-align:center}th{background:#eef2f7}h1,h2{text-align:center;margin:2px 0}</style>
+      </head><body><h1>MARS STRUCTURE LIMITED</h1><h2>SITE VISIT / PHYSICAL CHECK LOG</h2>
+      <table><thead><tr><th>Date</th><th>Project</th><th>Checked By</th><th>Materials Checked</th><th>Result</th></tr></thead><tbody>${rows}</tbody></table>
+      </body></html>`;
+      const w=window.open('','_blank'); w.document.write(html); w.document.close(); setTimeout(()=>w.print(),300);
+    }
+
     const selectPrj = document.getElementById('selectProject');
     const filterPrj = document.getElementById('filterProject');
 
@@ -1356,12 +1576,15 @@
       selectPrj.disabled = !!(allowed && visibleProjects.length <= 1); // lock the dropdown when the Engineer only has one project
       if (keepSelectIdx !== undefined && projectDatabase[keepSelectIdx] && (!allowed || allowed.includes(projectDatabase[keepSelectIdx].prjNo))) selectPrj.value = String(keepSelectIdx);
       if (prevFilterVal && [...filterPrj.options].some(o => o.value === prevFilterVal)) filterPrj.value = prevFilterVal;
+      if (typeof refreshVerifyProjectDropdown === 'function') refreshVerifyProjectDropdown();
     }
     refreshProjectDropdowns();
 
     populateMaterialSelect('');
     document.getElementById('entryDate').valueAsDate = new Date();
     onProjectSelect();
+    document.getElementById('verifyDate').valueAsDate = new Date();
+    addVerifyItemRow();
 
     function onProjectSelect() {
       const idx = document.getElementById('selectProject').value;
@@ -2582,10 +2805,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   if (window.MARS_FIREBASE_AUTH_READY) {
     startFirebaseSync();
     startCatalogSync();
+    startStockCheckSync();
     loadEditWindowConfig();
   } else {
-    window.onMarsAuthReady = ()=>{ startFirebaseSync(); startCatalogSync(); loadEditWindowConfig(); };
-    setTimeout(()=>{ if(!firebaseUnsubscribe) { startFirebaseSync(); startCatalogSync(); loadEditWindowConfig(); } }, 4000); // safety fallback
+    window.onMarsAuthReady = ()=>{ startFirebaseSync(); startCatalogSync(); startStockCheckSync(); loadEditWindowConfig(); };
+    setTimeout(()=>{ if(!firebaseUnsubscribe) { startFirebaseSync(); startCatalogSync(); startStockCheckSync(); loadEditWindowConfig(); } }, 4000); // safety fallback
   }
   const originalRecalc=recalculateAndRender;
   window.recalculateAndRender=function(){originalRecalc();renderAdvanced()};
