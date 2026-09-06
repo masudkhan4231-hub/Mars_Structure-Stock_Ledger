@@ -183,6 +183,8 @@
     .pdf-header{border-bottom:1px solid rgba(255,255,255,.18)}
     .admin-only{display:none}
     .admin-mode .admin-only{display:inline-flex}
+    .admin-mode .nav-item.admin-only{display:flex}
+    .admin-mode .mobile-bottom button.admin-only{display:flex;flex:1}
     @keyframes lowStockPulse{
       0%{box-shadow:0 0 0 0 rgba(220,53,69,.55);transform:scale(1)}
       50%{box-shadow:0 0 0 10px rgba(220,53,69,0);transform:scale(1.03)}
@@ -513,7 +515,7 @@
         <a href="javascript:void(0)" class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')"><span>▦</span> Dashboard</a>
         <a href="javascript:void(0)" class="nav-item" data-page="entry" onclick="showPage('entry')"><span>＋</span> New Ledger Entry</a>
         <a href="javascript:void(0)" class="nav-item" data-page="print" onclick="showPage('print')"><span>▤</span> Stock Ledger &amp; Reports</a>
-        <a href="javascript:void(0)" class="nav-item" data-page="verify" onclick="showPage('verify')"><span>🔍</span> Physical Check</a>
+        <a href="javascript:void(0)" class="nav-item admin-only" data-page="verify" onclick="showPage('verify')"><span>🔍</span> Physical Check</a>
         <button class="nav-item w-full text-left" onclick="downloadPDF()"><span>⇩</span> Print / PDF</button>
       </nav>
       <div class="mt-8 p-3 rounded-xl bg-white/5 border border-white/10">
@@ -779,8 +781,11 @@
 
         <section id="filterSection" class="filter-panel card p-4 md:p-5 no-print page-section page-hidden" data-page="print">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
-            <div><div class="section-title">Ledger View</div><div class="text-xs text-muted mt-1">Filter the report by project and print when ready.</div></div>
-            <div class="flex flex-col sm:flex-row gap-2"><select id="filterProject" onchange="recalculateAndRender()" class="field min-w-[220px]"><option value="ALL">Show All Projects</option></select><button type="button" onclick="downloadPDF()" class="btn btn-success">⇩ Individual PDF</button>
+            <div><div class="section-title">Ledger View</div><div class="text-xs text-muted mt-1">Filter by project and/or material to focus the report — select both to see just that material's ledger for that project.</div></div>
+            <div class="flex flex-col sm:flex-row gap-2 flex-wrap">
+              <select id="filterProject" onchange="recalculateAndRender()" class="field min-w-[220px]"><option value="ALL">Show All Projects</option></select>
+              <input id="filterMaterial" list="materialsDatalist" autocomplete="off" oninput="recalculateAndRender()" placeholder="Filter by Material (optional)" class="field min-w-[200px]">
+              <button type="button" onclick="downloadPDF()" class="btn btn-success">⇩ Individual PDF</button>
               <button type="button" onclick="generateCombinedPDF()" class="btn btn-primary">▤ Combined PDF</button>
               <button type="button" onclick="generateAllEngineerReports()" class="btn btn-secondary">⇩ All Project PDFs</button></div>
           </div>
@@ -875,7 +880,7 @@
     <button data-page="dashboard" class="mb-active" onclick="showPage('dashboard')"><span>⌂</span>Home</button>
     <button data-page="entry" onclick="showPage('entry')"><span>＋</span>Add</button>
     <button data-page="print" onclick="showPage('print')"><span>▤</span>Reports</button>
-    <button data-page="verify" onclick="showPage('verify')"><span>🔍</span>Check</button>
+    <button data-page="verify" onclick="showPage('verify')" class="admin-only"><span>🔍</span>Check</button>
     <button onclick="downloadPDF()"><span>⇩</span>Print</button>
   </nav>
 
@@ -1161,6 +1166,12 @@
         { name: "Cable Lux 16 to 150 RM", unit: "Nos" }
       ];
     }
+    const DEFAULT_MATERIAL_CATEGORIES = {"MAT-5001 / 500W Deformed Bar (16mm Steel)":"Civil","MAT-5002 / 500W Deformed Bar (20mm Steel)":"Civil","MAT-5003 / 500W Deformed Bar (12mm Steel)":"Civil","MAT-5004 / 500W Deformed Bar (10mm Steel)":"Civil","MAT-5005 / 500W Deformed Bar (8mm Steel)":"Civil","MAT-6001 / PCC Cement (PNS/Holcim/Seven Rings)":"Civil","MAT-6002 / OPC Cement":"Civil","MAT-7001 / Coarse Sand (Sylhet Sand FM 2.5)":"Civil","MAT-7002 / Local Sand (FM 1.5)":"Civil","MAT-8001 / Stone Chips (3/4 Down)":"Civil","MAT-8002 / Brick Chips (Khoa)":"Civil","MAT-9001 / First Class Auto Bricks":"Civil","MAT-9502 / Binding Wire (G.I. Wire)":"Civil","Cement":"Civil","MS Rod -8mm":"Civil","MS Rod -10mm":"Civil","MS Rod -12mm":"Civil","MS Rod -16mm":"Civil","MS Rod -20mm":"Civil","MS Rod -25mm":"Civil","MS Rod -32mm":"Civil","1st Class Bricks (Bangla)":"Civil","Auto Bricks":"Civil","Machine Made Bricks":"Civil","Sylhet Sand":"Civil","Local Sand":"Civil","Viti Sand (Filling Sand)":"Civil","3/4\\\" Stone Chips":"Civil","1/2\\\" Stone Chips":"Civil","Bricks Chips":"Civil","MS Steel Profs":"Civil","MS Steel Shutter 3mm Thickness":"Civil","MS Steel Shutter 2mm Thickness":"Civil","3\\\"x3\\\" Hollow Box":"Civil","1.5\\\"x1.5\\\" Hollow Box":"Civil","2\\\"x2\\\" MS Hollow Box":"Civil","U-Head 24\\\"":"Civil","Base Plate 18\\\"":"Civil","Welding Machine":"Civil","Grinding Machine":"Civil","2\\\" MS Round Pipe 2.9mm":"Civil","1.5\\\" MS Round Pipe":"Civil","GP Sheet (Plain) 1.5mm Thickness":"Civil","GP Sheet (Plain) 2mm Thickness":"Civil","CI Sheet (Corrugated) 0.42mm":"Civil","CI Sheet (Corrugated) 0.46mm":"Civil","Plastic Door 2'-6\\\"":"Civil","Wooden Door 3'-4\\\"":"Civil","MS Grill":"Civil","Aluminium Window Glass":"Civil","Aluminium Sliding Door Glass":"Civil","Aluminium Swing Door":"Civil","Mixer Machine":"Civil","Vibrator Machine":"Civil","Generator":"Civil","Submersible Pump":"Civil","Zet Pump":"Civil","Mud Pump":"Civil","Vibrator Nozzle 1\\\"":"Civil","Vibrator Nozzle 2\\\"":"Civil","Floor Tiles 24\\\"x24\\\"":"Civil","Floor Tiles 16\\\"x16\\\"":"Civil","Wall Tiles 8\\\"x12\\\"":"Civil","Wall Tiles 12\\\"x12\\\"":"Civil","Wall Tiles 12\\\"x24\\\"":"Civil","Tiles Putty":"Civil","Marble":"Civil","Granite":"Civil","Ceiling Fan 56\\\"":"Electrical","Jally Fan 18\\\"":"Electrical","15W LED Light":"Electrical","18W LED Light":"Electrical","100W LED Light":"Electrical","Basin":"Sanitary","Commode":"Sanitary","Sink Cock":"Sanitary","Pillar Cock":"Sanitary","Bib Cock":"Sanitary","Bathtub":"Sanitary","Looking Glass":"Sanitary","Glass Shelf":"Sanitary","Burner":"Sanitary","Angle Stop Cock":"Sanitary","Conceal Stop Cock":"Sanitary","Connection Pipe":"Sanitary","Magic Pipe":"Sanitary","Basin Waste":"Sanitary","Sink Waste":"Sanitary","Shower":"Sanitary","Basin Mixer":"Sanitary","Shower Mixer":"Sanitary","Soap Case":"Sanitary","Tissue Holder":"Sanitary","CPVC Pipe 2\\\"":"Sanitary","CPVC Pipe 1\\\"":"Sanitary","CPVC Pipe 1.5\\\"":"Sanitary","CPVC Pipe 3/4\\\"":"Sanitary","CPVC Pipe 1/2\\\"":"Sanitary","UPVC Pipe 8\\\"":"Sanitary","UPVC Pipe 6\\\"":"Sanitary","UPVC Pipe 4\\\"":"Sanitary","UPVC Pipe 2\\\"":"Sanitary","UPVC Pipe 1\\\"":"Sanitary","1/2\\\" PVC Pipe":"Electrical","3/4\\\" PVC Pipe":"Electrical","1\\\" PVC Pipe":"Electrical","1-1/4\\\" PVC Pipe":"Electrical","3\\\" UPVC Pipe":"Electrical","4\\\" UPVC Pipe":"Electrical","6\\\" UPVC Pipe":"Electrical","1/2\\\" Flexible Pipe":"Electrical","3/4\\\" Flexible Pipe":"Electrical","1\\\" Flexible Pipe":"Electrical","1-1/4\\\" Flexible Pipe":"Electrical","2\\\" Flexible Pipe":"Electrical","3/4\\\" PVC Bend":"Electrical","3/4\\\" PVC Socket":"Electrical","1\\\" PVC Bend":"Electrical","1\\\" PVC Socket":"Electrical","Circular Box":"Electrical","Fan Box":"Electrical","Spot Light Box":"Electrical","Join Box":"Electrical","MK Box 1 Gang":"Electrical","MK Box 2 Gang":"Electrical","MK Box 3 Gang":"Electrical","SDB Box":"Electrical","Expanded Metal":"Electrical","1.5 RM Cable":"Electrical","2.5 RM Cable":"Electrical","4 RM Cable":"Electrical","RG 6 Dish Cable":"Electrical","RG 11 Dish Cable":"Electrical","20A SP MCB Circuit Breaker":"Electrical","20A TP MCB Circuit Breaker":"Electrical","40A TP MCB Circuit Breaker":"Electrical","63A TP MCB Circuit Breaker":"Electrical","125A TP MCCB Circuit Breaker":"Electrical","250A TP MCCB Circuit Breaker":"Electrical","320A TP MCCB Circuit Breaker":"Electrical","Ebonite Cover":"Electrical","Batten Holder":"Electrical","Ceiling Rose":"Electrical","Exhaust Fan":"Electrical","Spot Light":"Electrical","Wall Bracket":"Electrical","LED Panel Light":"Electrical","Tube Light":"Electrical","Garden Light":"Electrical","Gate Light":"Electrical","Boundary Wall Light":"Electrical","Focus Light":"Electrical","Earthing Boring":"Electrical","Air Terminal Set":"Electrical","SWG Copper Wire":"Electrical","GI Pipe":"Electrical","GI Socket":"Electrical","GI Wire":"Electrical","Multi ATS Box Set":"Electrical","Fire Extinguisher":"Electrical","Motor Delta Starter Box":"Electrical","Cable Lux 2.5 to 10 RM":"Electrical","Cable Lux 16 to 150 RM":"Electrical"};
+    function inferCategory(name) {
+      const key = String(name || '').trim();
+      if (DEFAULT_MATERIAL_CATEGORIES[key]) return DEFAULT_MATERIAL_CATEGORIES[key];
+      return 'Other';
+    }
     const MATERIAL_CATALOG_VERSION = 2;
     const MATERIAL_CATALOG_VERSION_KEY = 'mars_material_catalog_version';
     function getMaterialCatalog() {
@@ -1209,12 +1220,23 @@
     }
     function getOpeningStock(prjNo, material) {
       const map = getOpeningStockMap();
-      return Number(map[matKey(prjNo, material)]) || 0;
+      const v = map[matKey(prjNo, material)];
+      if (v == null) return 0;
+      if (typeof v === 'object') return (Number(v.received) || 0) - (Number(v.historicalIssue) || 0);
+      return Number(v) || 0; // legacy: a plain number was the net opening balance directly
     }
-    function setOpeningStock(prjNo, material, qty) {
+    function getOpeningStockDetail(prjNo, material) {
+      const map = getOpeningStockMap();
+      const v = map[matKey(prjNo, material)];
+      if (v == null) return { received: 0, historicalIssue: 0 };
+      if (typeof v === 'object') return { received: Number(v.received) || 0, historicalIssue: Number(v.historicalIssue) || 0 };
+      return { received: Number(v) || 0, historicalIssue: 0 }; // legacy
+    }
+    function setOpeningStock(prjNo, material, received, historicalIssue) {
       const map = getOpeningStockMap();
       const key = matKey(prjNo, material);
-      if (!qty) { delete map[key]; } else { map[key] = Number(qty); }
+      const r = Number(received) || 0, h = Number(historicalIssue) || 0;
+      if (!r && !h) { delete map[key]; } else { map[key] = { received: r, historicalIssue: h }; }
       saveOpeningStockMap(map);
     }
     let materialUnitMap = {};
@@ -1824,7 +1846,7 @@
 
     function recalculateAndRender() {
       const selectedFilter = document.getElementById('filterProject').value;
-      const currentMaterial = (document.getElementById('metaMaterial').value || '').trim().toLowerCase();
+      const currentMaterial = (document.getElementById('filterMaterial')?.value || '').trim().toLowerCase();
 
       document.getElementById('lblMaterial').innerText = document.getElementById('metaMaterial').value;
       document.getElementById('lblUnit').innerText = document.getElementById('metaUnit').value;
@@ -2092,6 +2114,7 @@
 
 <script>
 function showPage(page){
+  if(page==='verify' && !isAdmin){ showToast('Physical Check is available to Admin only.','error'); page='dashboard'; }
   document.querySelectorAll('.page-section').forEach(el=>{
     el.classList.toggle('page-hidden', el.dataset.page!==page);
   });
@@ -2509,7 +2532,9 @@ function renderAdminSettingsModal(activeTab){
   const openingMap = getOpeningStockMap();
   const openingRows = Object.keys(openingMap).map(k=>{
     const sep = k.indexOf('||'); const prj = k.slice(0,sep); const mat = k.slice(sep+2);
-    return { prj, mat, qty: openingMap[k] };
+    const v = openingMap[k];
+    const detail = (v && typeof v === 'object') ? { received: Number(v.received)||0, historicalIssue: Number(v.historicalIssue)||0 } : { received: Number(v)||0, historicalIssue: 0 };
+    return { prj, mat, received: detail.received, historicalIssue: detail.historicalIssue, net: detail.received - detail.historicalIssue };
   }).sort((a,b)=> a.prj.localeCompare(b.prj) || a.mat.localeCompare(b.mat));
 
   const projectOptions = projectDatabase.map(p=>`<option value="${escHtmlLocal(p.prjNo)}">${escHtmlLocal(p.prjNo)}</option>`).join('');
@@ -2531,36 +2556,36 @@ function renderAdminSettingsModal(activeTab){
         <button class="btn ${tab==='access'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('access')">Access Control</button>
       </div>
       ${tab==='stock' ? `
-        <div class="text-xs text-muted mb-3">Starting stock for a Project + Material. Added once, on top of all future entries — never mixes with other Projects or Materials (e.g. Project:20 and Project:6 stay fully separate).</div>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-2 mb-4">
+        <div class="text-xs text-muted mb-3">Enter the material's history up to today: total ever received (Historical Received) and how much has already been used/consumed before this system started tracking it (Historical Issue / Adjustment). The system nets these into the actual starting balance — future entries build on top of that net figure, never mixing across Projects or Materials.</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
           <select id="osProject" class="field">${projectOptions}</select>
           <select id="osMaterial" class="field">${materialOptions || '<option value="">Add a material first</option>'}</select>
-          <input id="osQty" type="number" step="0.01" placeholder="Opening Qty" class="field">
-          <button class="btn btn-primary" onclick="adminSaveOpeningStock()">Save</button>
         </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
+          <div><label class="field-label">Historical Received (Total)</label><input id="osReceived" type="number" step="0.01" placeholder="e.g. 200" class="field" oninput="updateOpeningNetPreview()"></div>
+          <div><label class="field-label">Historical Issue / Adjustment</label><input id="osHistoricalIssue" type="number" step="0.01" placeholder="e.g. 150" class="field" oninput="updateOpeningNetPreview()"></div>
+          <div><label class="field-label">Net Opening Balance</label><div id="osNetPreview" class="field bg-white/5 flex items-center font-bold">0.00</div></div>
+        </div>
+        <button class="btn btn-primary mb-4" onclick="adminSaveOpeningStock()">Save</button>
         <div class="space-y-2 max-h-64 overflow-auto">
           ${openingRows.length ? openingRows.map(r=>`
             <div class="flex items-center justify-between gap-2 rounded-lg bg-white/5 px-3 py-2 text-xs">
-              <div><b>${escHtmlLocal(r.prj)}</b> — ${escHtmlLocal(r.mat)}</div>
-              <div class="flex items-center gap-3"><span class="font-bold">${Number(r.qty).toFixed(2)}</span>
+              <div><b>${escHtmlLocal(r.prj)}</b> — ${escHtmlLocal(r.mat)}${r.historicalIssue ? `<div class="text-muted">Received ${r.received.toFixed(2)} − Historical Issue ${r.historicalIssue.toFixed(2)}</div>` : ''}</div>
+              <div class="flex items-center gap-3"><span class="font-bold">${r.net.toFixed(2)}</span>
               <button class="text-red-400 font-bold" onclick="adminDeleteOpeningStock(${JSON.stringify(r.prj)},${JSON.stringify(r.mat)})">✕</button></div>
             </div>`).join('') : '<div class="text-xs text-muted text-center py-6">No opening stock set yet.</div>'}
         </div>
       ` : ''}
       ${tab==='materials' ? `
         <div class="text-xs text-muted mb-3">Materials added here appear instantly in the Material dropdown for every user — always showing the full list, no more typing or dropdown glitches.</div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-2 mb-2">
           <input id="newMatName" placeholder="Material name / code" class="field md:col-span-2">
           <input id="newMatUnit" list="unitsList" placeholder="Unit" class="field">
+          <select id="newMatCategory" class="field"><option value="">Auto-detect</option><option value="Civil">Civil</option><option value="Electrical">Electrical</option><option value="Sanitary">Sanitary</option><option value="Other">Other</option></select>
         </div>
         <button class="btn btn-primary mb-4" onclick="adminAddMaterial()">＋ Add Material</button>
-        <div class="space-y-2 max-h-64 overflow-auto">
-          ${catalog.length ? catalog.map((m,i)=>`
-            <div class="flex items-center justify-between gap-2 rounded-lg bg-white/5 px-3 py-2 text-xs">
-              <div class="min-w-0"><div class="font-bold truncate">${escHtmlLocal(m.name)}</div><div class="text-muted">${escHtmlLocal(m.unit)}</div></div>
-              <button class="text-red-400 font-bold" onclick="adminDeleteMaterial(${i})">✕</button>
-            </div>`).join('') : '<div class="text-xs text-muted text-center py-6">No materials yet.</div>'}
-        </div>
+        <input id="matSearchBox" placeholder="🔍 Search materials…" class="field mb-3" oninput="filterMaterialsList()">
+        <div id="materialsListContainer" class="space-y-4 max-h-96 overflow-auto"></div>
       ` : ''}
       ${tab==='projects' ? `
         <div class="text-xs text-muted mb-3">Add a new project — leave "Engineer Name" blank if none is assigned yet; you can come back and add it later by editing the project. Changes appear instantly in every dropdown for every user.</div>
@@ -2636,6 +2661,7 @@ function renderAdminSettingsModal(activeTab){
     </div>
   </div>`;
   document.getElementById('modalRoot').innerHTML = html;
+  if (tab === 'materials') { renderMaterialsList(); }
   if (tab === 'access') {
     const box = document.getElementById('currentAdminUidBox');
     const user = firebase.auth && firebase.auth().currentUser;
@@ -2643,14 +2669,24 @@ function renderAdminSettingsModal(activeTab){
   }
 }
 
+function updateOpeningNetPreview(){
+  const received = parseFloat(document.getElementById('osReceived')?.value) || 0;
+  const hIssue = parseFloat(document.getElementById('osHistoricalIssue')?.value) || 0;
+  const el = document.getElementById('osNetPreview');
+  if(el) el.textContent = (received - hIssue).toFixed(2);
+}
 function adminSaveOpeningStock(){
   const prj = document.getElementById('osProject').value;
   const mat = document.getElementById('osMaterial').value;
-  const qty = document.getElementById('osQty').value;
+  const received = document.getElementById('osReceived').value;
+  const hIssue = document.getElementById('osHistoricalIssue').value;
   if(!mat){ showToast('Please add a Material first.','error'); return; }
-  if(qty===''||isNaN(qty)){ showToast('Enter a valid quantity.','error'); return; }
-  setOpeningStock(prj, mat, Number(qty));
-  logActivity('Opening Stock Set', `${prj} / ${mat} = ${qty}`);
+  if(received===''&&hIssue===''){ showToast('Enter at least Historical Received.','error'); return; }
+  if(received!==''&&isNaN(received)){ showToast('Historical Received must be a number.','error'); return; }
+  if(hIssue!==''&&isNaN(hIssue)){ showToast('Historical Issue must be a number.','error'); return; }
+  setOpeningStock(prj, mat, Number(received)||0, Number(hIssue)||0);
+  const net=(Number(received)||0)-(Number(hIssue)||0);
+  logActivity('Opening Stock Set', `${prj} / ${mat} = Received ${Number(received)||0} - Historical Issue ${Number(hIssue)||0} = Net ${net}`);
   showToast('Opening stock saved.');
   renderAdminSettingsModal('stock');
   recalculateAndRender();
@@ -2665,10 +2701,11 @@ function adminDeleteOpeningStock(prj, mat){
 function adminAddMaterial(){
   const name = document.getElementById('newMatName').value.trim();
   const unit = document.getElementById('newMatUnit').value.trim();
+  const category = document.getElementById('newMatCategory').value || '';
   if(!name){ showToast('Enter a material name.','error'); return; }
   const catalog = getMaterialCatalog();
   if(catalog.some(m=>m.name.toLowerCase()===name.toLowerCase())){ showToast('This material already exists.','error'); return; }
-  catalog.push({ name, unit: unit || '' });
+  catalog.push({ name, unit: unit || '', category: category || inferCategory(name) });
   saveMaterialCatalog(catalog);
   populateMaterialSelect(document.getElementById('metaMaterial').value);
   logActivity('Material Added', name);
@@ -2683,6 +2720,50 @@ function adminDeleteMaterial(index){
   populateMaterialSelect(document.getElementById('metaMaterial').value);
   renderAdminSettingsModal('materials');
 }
+function adminEditMaterialCategory(index){
+  const catalog = getMaterialCatalog();
+  const m = catalog[index];
+  if(!m) return;
+  const current = m.category || inferCategory(m.name);
+  const next = prompt(`Category for ${m.name}:\nType one of: Civil, Electrical, Sanitary, Other (or your own label)`, current);
+  if(next===null) return;
+  const val = next.trim();
+  if(!val){ showToast('Category cannot be empty.','error'); return; }
+  m.category = val;
+  saveMaterialCatalog(catalog);
+  showToast('Category updated.');
+  renderAdminSettingsModal('materials');
+}
+function renderMaterialsList(){
+  const container = document.getElementById('materialsListContainer');
+  if(!container) return;
+  const catalog = getMaterialCatalog();
+  const q = (document.getElementById('matSearchBox')?.value || '').trim().toLowerCase();
+  const filtered = catalog.map((m,i)=>({...m,i})).filter(m => !q || m.name.toLowerCase().includes(q));
+  if(!filtered.length){ container.innerHTML = '<div class="text-xs text-muted text-center py-6">No materials found.</div>'; return; }
+  const groups = {};
+  filtered.forEach(m=>{
+    const cat = m.category || inferCategory(m.name);
+    (groups[cat] = groups[cat] || []).push(m);
+  });
+  const order = ['Civil','Electrical','Sanitary','Other'].filter(c=>groups[c]);
+  Object.keys(groups).forEach(c=>{ if(!order.includes(c)) order.push(c); });
+  container.innerHTML = order.map(cat => `
+    <div>
+      <div class="text-[11px] uppercase tracking-wide font-bold text-amber-400 mb-2">${escHtmlLocal(cat)} (${groups[cat].length})</div>
+      <div class="space-y-2">
+        ${groups[cat].map(m=>`
+          <div class="flex items-center justify-between gap-2 rounded-lg bg-white/5 px-3 py-2 text-xs">
+            <div class="min-w-0"><div class="font-bold truncate">${escHtmlLocal(m.name)}</div><div class="text-muted">${escHtmlLocal(m.unit)}</div></div>
+            <div class="flex items-center gap-3 shrink-0">
+              <button class="text-blue-400 font-bold" onclick="adminEditMaterialCategory(${m.i})">✎</button>
+              <button class="text-red-400 font-bold" onclick="adminDeleteMaterial(${m.i})">✕</button>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function filterMaterialsList(){ renderMaterialsList(); }
 function adminAddProject(){
   const prjNo = document.getElementById('newPrjNo').value.trim();
   const id = document.getElementById('newPrjId').value.trim();
