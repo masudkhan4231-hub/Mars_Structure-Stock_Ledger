@@ -1848,8 +1848,9 @@
       const selectedFilter = document.getElementById('filterProject').value;
       const currentMaterial = (document.getElementById('filterMaterial')?.value || '').trim().toLowerCase();
 
-      document.getElementById('lblMaterial').innerText = document.getElementById('metaMaterial').value;
-      document.getElementById('lblUnit').innerText = document.getElementById('metaUnit').value;
+      const filterMatVal = (document.getElementById('filterMaterial')?.value || '').trim();
+      document.getElementById('lblMaterial').innerText = filterMatVal || 'All Materials';
+      document.getElementById('lblUnit').innerText = filterMatVal ? (materialUnitMap[filterMatVal.toLowerCase()] || '') : '';
 
       // Keep the printed header (Project ID + Site Engineer signature) in sync
       // with whichever project is chosen on THIS page's filter dropdown, not
@@ -1962,7 +1963,8 @@
         if (currentMaterial && matLower !== currentMaterial) return;
         const cumKey = prj + '||' + matLower;
         if (seenOpeningRow[cumKey]) return; // already shown above via an actual entry
-        const opening = Number(openingMapAll[k]) || 0;
+        const rawVal = openingMapAll[k];
+        const opening = (rawVal && typeof rawVal === 'object') ? ((Number(rawVal.received)||0) - (Number(rawVal.historicalIssue)||0)) : (Number(rawVal) || 0);
         if (!opening) return;
         const catEntry = catalogForNames.find(m => String(m.name).trim().toLowerCase() === matLower);
         const displayName = catEntry ? catEntry.name : matLower;
@@ -2043,7 +2045,9 @@
       const catalogForNames = getMaterialCatalog();
       const openingOnlyKeys = Object.keys(openingMapAll).filter(k=>{
         const sep=k.indexOf('||'); const prj=k.slice(0,sep), matLower=k.slice(sep+2);
-        return prj===projectNo && !groups[matLower] && Number(openingMapAll[k]);
+        const rawVal = openingMapAll[k];
+        const net = (rawVal && typeof rawVal === 'object') ? ((Number(rawVal.received)||0) - (Number(rawVal.historicalIssue)||0)) : (Number(rawVal) || 0);
+        return prj===projectNo && !groups[matLower] && net;
       });
       const materialBlocks = order.map(key=>{
         const groupList = groups[key];
@@ -2092,7 +2096,8 @@
 
     function generateAllEngineerReports(){
       const openingMapForFilter = getOpeningStockMap();
-      const hasOpeningStock = (prjNo) => Object.keys(openingMapForFilter).some(k => k.startsWith(prjNo + '||') && Number(openingMapForFilter[k]));
+      const netOpeningValue = (v) => (v && typeof v === 'object') ? ((Number(v.received)||0) - (Number(v.historicalIssue)||0)) : (Number(v) || 0);
+      const hasOpeningStock = (prjNo) => Object.keys(openingMapForFilter).some(k => k.startsWith(prjNo + '||') && netOpeningValue(openingMapForFilter[k]));
       const reports=projectDatabase.filter(p=>projectEntries(p.prjNo).length || hasOpeningStock(p.prjNo));
       if(!reports.length){alert("No project ledger data found.");return;}
       const sections=reports.map(p=>{
@@ -2572,6 +2577,7 @@ function renderAdminSettingsModal(activeTab){
             <div class="flex items-center justify-between gap-2 rounded-lg bg-white/5 px-3 py-2 text-xs">
               <div><b>${escHtmlLocal(r.prj)}</b> — ${escHtmlLocal(r.mat)}${r.historicalIssue ? `<div class="text-muted">Received ${r.received.toFixed(2)} − Historical Issue ${r.historicalIssue.toFixed(2)}</div>` : ''}</div>
               <div class="flex items-center gap-3"><span class="font-bold">${r.net.toFixed(2)}</span>
+              <button class="text-blue-400 font-bold" onclick="adminEditOpeningStock(${JSON.stringify(r.prj)},${JSON.stringify(r.mat)})">✎</button>
               <button class="text-red-400 font-bold" onclick="adminDeleteOpeningStock(${JSON.stringify(r.prj)},${JSON.stringify(r.mat)})">✕</button></div>
             </div>`).join('') : '<div class="text-xs text-muted text-center py-6">No opening stock set yet.</div>'}
         </div>
@@ -2690,6 +2696,16 @@ function adminSaveOpeningStock(){
   showToast('Opening stock saved.');
   renderAdminSettingsModal('stock');
   recalculateAndRender();
+}
+function adminEditOpeningStock(prj, mat){
+  const detail = getOpeningStockDetail(prj, mat);
+  document.getElementById('osProject').value = prj;
+  document.getElementById('osMaterial').value = mat;
+  document.getElementById('osReceived').value = detail.received || '';
+  document.getElementById('osHistoricalIssue').value = detail.historicalIssue || '';
+  updateOpeningNetPreview();
+  showToast('Edit the values above, then click Save to update this entry.');
+  document.getElementById('osProject')?.scrollIntoView({behavior:'smooth', block:'center'});
 }
 function adminDeleteOpeningStock(prj, mat){
   if(!confirm('Remove this opening stock entry?')) return;
