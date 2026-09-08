@@ -185,6 +185,7 @@
     .admin-mode .admin-only{display:inline-flex}
     .admin-mode .nav-item.admin-only{display:flex}
     .admin-mode .mobile-bottom button.admin-only{display:flex;flex:1}
+    .admin-mode .card.admin-only:not(.page-hidden){display:block}
     @keyframes lowStockPulse{
       0%{box-shadow:0 0 0 0 rgba(220,53,69,.55);transform:scale(1)}
       50%{box-shadow:0 0 0 10px rgba(220,53,69,0);transform:scale(1.03)}
@@ -704,6 +705,15 @@
           </div>
         </div>
 
+        <div class="card p-5 md:p-6 mt-6 admin-only page-section" data-page="dashboard">
+          <div class="flex items-center justify-between mb-3">
+            <div class="section-title" style="font-size:15px">Project Check Status</div>
+            <button class="btn-outline" onclick="showPage('verify')">🔍 Go to Physical Check</button>
+          </div>
+          <div class="text-xs text-muted mb-3">Projects not physically checked in 30+ days are flagged — a quick way to see which sites are due for a visit.</div>
+          <div id="checkStatusBody" class="space-y-2 max-h-96 overflow-auto"></div>
+        </div>
+
 
         <section id="inputFormSection" class="card p-5 md:p-6 page-section page-hidden" data-page="entry">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-line">
@@ -787,7 +797,8 @@
               <input id="filterMaterial" list="materialsDatalist" autocomplete="off" oninput="recalculateAndRender()" placeholder="Filter by Material (optional)" class="field min-w-[200px]">
               <button type="button" onclick="downloadPDF()" class="btn btn-success">⇩ Individual PDF</button>
               <button type="button" onclick="generateCombinedPDF()" class="btn btn-primary">▤ Combined PDF</button>
-              <button type="button" onclick="generateAllEngineerReports()" class="btn btn-secondary">⇩ All Project PDFs</button></div>
+              <button type="button" onclick="generateAllEngineerReports()" class="btn btn-secondary">⇩ All Project PDFs</button>
+              <button type="button" onclick="generateMaterialsSummaryReport()" class="btn btn-warning admin-only">📊 Materials Summary (All Projects)</button></div>
           </div>
         </section>
 
@@ -1526,7 +1537,30 @@
       window.MARS_FIREBASE.db.collection('stock_checks').onSnapshot(snap=>{
         stockChecks = snap.docs.map(d=>({firebaseId:d.id, ...d.data()})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
         renderVerificationHistory();
+        renderCheckStatus();
       }, err=>console.error('Stock check sync error:',err));
+    }
+    function renderCheckStatus(){
+      const body=document.getElementById('checkStatusBody');
+      if(!body) return;
+      const today = new Date();
+      const rows = projectDatabase.map(p=>{
+        const lastCheck = stockChecks.find(c=>c.prjNo===p.prjNo);
+        let daysAgo = null;
+        if(lastCheck && lastCheck.dateStr){
+          const d = new Date(lastCheck.dateStr);
+          daysAgo = Math.floor((today - d) / (1000*60*60*24));
+        }
+        return { prjNo: p.prjNo, id: p.id, daysAgo, lastDate: lastCheck ? lastCheck.dateStr : null };
+      }).sort((a,b) => (b.daysAgo ?? 99999) - (a.daysAgo ?? 99999));
+      body.innerHTML = rows.map(r=>{
+        const overdue = r.daysAgo === null || r.daysAgo >= 30;
+        const statusText = r.daysAgo === null ? 'Never checked' : `Last checked: ${r.daysAgo} day${r.daysAgo===1?'':'s'} ago (${formatDate(r.lastDate)})`;
+        return `<div class="flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-xs ${overdue ? 'bg-red-500/10 border border-red-500/20' : 'bg-white/5'}">
+          <div><b>${escHtmlLocal(r.prjNo)}</b> <span class="text-muted">(${escHtmlLocal(r.id)})</span></div>
+          <div class="font-bold ${overdue ? 'text-red-400' : 'text-emerald-400'}">${overdue ? '⚠ ' : '✔ '}${statusText}</div>
+        </div>`;
+      }).join('');
     }
     function renderVerificationHistory(){
       const body=document.getElementById('verifyHistoryBody');
@@ -1599,6 +1633,7 @@
       if (keepSelectIdx !== undefined && projectDatabase[keepSelectIdx] && (!allowed || allowed.includes(projectDatabase[keepSelectIdx].prjNo))) selectPrj.value = String(keepSelectIdx);
       if (prevFilterVal && [...filterPrj.options].some(o => o.value === prevFilterVal)) filterPrj.value = prevFilterVal;
       if (typeof refreshVerifyProjectDropdown === 'function') refreshVerifyProjectDropdown();
+      if (typeof renderCheckStatus === 'function') renderCheckStatus();
     }
     refreshProjectDropdowns();
 
@@ -1887,15 +1922,19 @@
         }
 
         const cumKey = item.prjNo + '||' + (item.material || '').trim().toLowerCase();
-        if (!cumMap[cumKey]) cumMap[cumKey] = { proc: 0, recOther: 0, tr: 0, issue: 0, opening: getOpeningStock(item.prjNo, item.material) };
+        if (!cumMap[cumKey]) {
+          const detail = getOpeningStockDetail(item.prjNo, item.material);
+          cumMap[cumKey] = { proc: 0, recOther: 0, tr: 0, issue: 0, opening: (detail.received||0)-(detail.historicalIssue||0), openingDetail: detail };
+        }
         const c = cumMap[cumKey];
 
         if (!seenOpeningRow[cumKey]) {
           seenOpeningRow[cumKey] = true;
-          if (c.opening) {
+          if (c.opening || c.openingDetail.received || c.openingDetail.historicalIssue) {
+            const breakdownNote = c.openingDetail.historicalIssue ? ` <span class="text-[10px] font-normal text-muted">(Received ${c.openingDetail.received.toFixed(2)} − Historical Issue ${c.openingDetail.historicalIssue.toFixed(2)})</span>` : '';
             rowsHtml.push(`
           <tr class="bg-white/5">
-            <td colspan="8" class="font-bold">Opening Balance — ${item.prjNo}${currentMaterial ? '' : ' / ' + (item.material || '')}</td>
+            <td colspan="8" class="font-bold">Opening Balance — ${item.prjNo}${currentMaterial ? '' : ' / ' + (item.material || '')}${breakdownNote}</td>
             <td class="font-bold bg-white/5">-</td>
             <td colspan="4">-</td>
             <td class="font-bold bg-white/5">-</td>
@@ -1964,13 +2003,16 @@
         const cumKey = prj + '||' + matLower;
         if (seenOpeningRow[cumKey]) return; // already shown above via an actual entry
         const rawVal = openingMapAll[k];
-        const opening = (rawVal && typeof rawVal === 'object') ? ((Number(rawVal.received)||0) - (Number(rawVal.historicalIssue)||0)) : (Number(rawVal) || 0);
-        if (!opening) return;
+        const received = (rawVal && typeof rawVal === 'object') ? (Number(rawVal.received)||0) : (Number(rawVal) || 0);
+        const historicalIssue = (rawVal && typeof rawVal === 'object') ? (Number(rawVal.historicalIssue)||0) : 0;
+        const opening = received - historicalIssue;
+        if (!opening && !received && !historicalIssue) return;
         const catEntry = catalogForNames.find(m => String(m.name).trim().toLowerCase() === matLower);
         const displayName = catEntry ? catEntry.name : matLower;
+        const breakdownNote = historicalIssue ? ` <span class="text-[10px] font-normal text-muted">(Received ${received.toFixed(2)} − Historical Issue ${historicalIssue.toFixed(2)})</span>` : '';
         rowsHtml.push(`
           <tr class="bg-white/5">
-            <td colspan="8" class="font-bold">Opening Balance — ${prj}${currentMaterial ? '' : ' / ' + displayName}</td>
+            <td colspan="8" class="font-bold">Opening Balance — ${prj}${currentMaterial ? '' : ' / ' + displayName}${breakdownNote}</td>
             <td class="font-bold bg-white/5">-</td>
             <td colspan="4">-</td>
             <td class="font-bold bg-white/5">-</td>
@@ -1999,10 +2041,12 @@
 
     function buildMaterialTableHtml(projectNo, materialName, list, unitOverride){
       let cp=0, cr=0, ct=0, ci=0;
-      const opening = (typeof getOpeningStock==='function') ? getOpeningStock(projectNo, materialName) : 0;
+      const detail = (typeof getOpeningStockDetail==='function') ? getOpeningStockDetail(projectNo, materialName) : {received:0, historicalIssue:0};
+      const opening = (detail.received||0) - (detail.historicalIssue||0);
       let openingRow = '';
-      if(opening){
-        openingRow = `<tr><td colspan="8"><b>Opening Balance</b></td><td>-</td><td colspan="4">-</td><td>-</td><td colspan="2">-</td><td><b>${opening.toFixed(2)}</b></td></tr>`;
+      if(opening || detail.received || detail.historicalIssue){
+        const label = detail.historicalIssue ? `Opening Balance <span style="font-weight:normal;font-size:9px;color:#555">(Historical Received: ${detail.received.toFixed(2)} − Historical Issue: ${detail.historicalIssue.toFixed(2)})</span>` : 'Opening Balance';
+        openingRow = `<tr><td colspan="8"><b>${label}</b></td><td>-</td><td colspan="4">-</td><td>-</td><td colspan="2">-</td><td><b>${opening.toFixed(2)}</b></td></tr>`;
       }
       const rows=list.map(e=>{
         cp += +e.procQty||0; cr += +e.recQty||0; ct += +e.trQty||0; ci += +e.issueQty||0;
@@ -2108,6 +2152,72 @@
       <style>@page{size:A4 landscape;margin:6mm}body{font-family:Arial,sans-serif;font-size:9px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:3px;text-align:center}th{background:#eef2f7}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}h1,h2{text-align:center}.mat-block{margin-bottom:14px}.mat-title{font-weight:bold;font-size:11px;margin:10px 0 4px;padding:3px 0;border-bottom:1px solid #333}.sign{display:flex;justify-content:space-between;margin-top:45px}.sig{width:220px;border-top:1px solid #555;text-align:center;padding-top:4px}</style>
       </head><body>${sections}</body></html>`;
       logActivity('All Project Reports',`${reports.length} project reports`);
+      printHtml(docHtml);
+    }
+
+    function generateMaterialsSummaryReport(){
+      if(!isAdmin){ showToast('This report is available to Admin only.','error'); return; }
+      const catalog = getMaterialCatalog();
+      const openingMapAll = getOpeningStockMap();
+      const totals = {}; // key = material name lowercased -> {name, unit, opening, proc, rec, tr, issue}
+
+      const ensure = (matLower, displayName, unit) => {
+        if(!totals[matLower]) totals[matLower] = { name: displayName, unit: unit || '', opening:0, proc:0, rec:0, tr:0, issue:0 };
+        return totals[matLower];
+      };
+
+      // Seed with every catalog material so materials with zero activity still show a row.
+      catalog.forEach(m=>{
+        ensure(String(m.name).trim().toLowerCase(), m.name, m.unit);
+      });
+
+      // Sum opening stock (net of Historical Received − Historical Issue) across every project.
+      Object.keys(openingMapAll).forEach(k=>{
+        const sep=k.indexOf('||'); const matLower=k.slice(sep+2);
+        const rawVal = openingMapAll[k];
+        const net = (rawVal && typeof rawVal === 'object') ? ((Number(rawVal.received)||0) - (Number(rawVal.historicalIssue)||0)) : (Number(rawVal) || 0);
+        const catEntry = catalog.find(m=>String(m.name).trim().toLowerCase()===matLower);
+        const t = ensure(matLower, catEntry ? catEntry.name : matLower, catEntry ? catEntry.unit : '');
+        t.opening += net;
+      });
+
+      // Sum every ledger entry's movement, across every project, per material.
+      entries.forEach(e=>{
+        const matLower = String(e.material||'').trim().toLowerCase();
+        if(!matLower) return;
+        const catEntry = catalog.find(m=>String(m.name).trim().toLowerCase()===matLower);
+        const t = ensure(matLower, catEntry ? catEntry.name : (e.material||''), (catEntry ? catEntry.unit : (e.unit||'')));
+        t.proc += Number(e.procQty)||0;
+        t.rec += Number(e.recQty)||0;
+        t.tr += Number(e.trQty)||0;
+        t.issue += Number(e.issueQty)||0;
+      });
+
+      const rows = Object.values(totals)
+        .filter(t => t.opening || t.proc || t.rec || t.tr || t.issue) // skip materials with zero activity everywhere
+        .sort((a,b)=>a.name.localeCompare(b.name))
+        .map(t=>{
+          const gross = t.proc + t.rec;
+          const netReceived = gross - t.tr;
+          const balance = t.opening + netReceived - t.issue;
+          return `<tr>
+            <td style="text-align:left">${escapeHtml(t.name)}</td><td>${escapeHtml(t.unit)}</td>
+            <td>${t.opening.toFixed(2)}</td><td>${t.proc.toFixed(2)}</td><td>${t.rec.toFixed(2)}</td>
+            <td>${t.tr.toFixed(2)}</td><td>${t.issue.toFixed(2)}</td><td><b>${balance.toFixed(2)}</b></td>
+          </tr>`;
+        }).join('');
+
+      if(!rows){ alert('No material activity found across any project yet.'); return; }
+
+      const docHtml=`<!doctype html><html><head><meta charset="utf-8"><title>MARS Materials Summary — All Projects</title>
+      <style>@page{size:A4 landscape;margin:8mm}body{font-family:Arial,sans-serif;font-size:11px}table{width:100%;border-collapse:collapse;margin-top:14px}th,td{border:1px solid #999;padding:5px;text-align:center}th{background:#eef2f7}h1,h2{text-align:center;margin:2px 0}.meta{text-align:center;margin:8px 0;color:#555;font-size:10px}</style>
+      </head><body>
+      <h1>MARS STRUCTURE LIMITED</h1><h2>MATERIALS SUMMARY — ALL PROJECTS COMBINED</h2>
+      <div class="meta">Every project's Opening Balance, Procurement, Receiving, Transfer and Issue totals for each material, added together company-wide.</div>
+      <table><thead><tr><th>Material</th><th>Unit</th><th>Opening</th><th>Procurement</th><th>Received (Other Site)</th><th>Transferred</th><th>Issued</th><th>Balance</th></tr></thead>
+      <tbody>${rows}</tbody></table>
+      </body></html>`;
+      logActivity('Materials Summary Report','All projects, all materials');
       printHtml(docHtml);
     }
 
@@ -2575,7 +2685,7 @@ function renderAdminSettingsModal(activeTab){
         <div class="space-y-2 max-h-64 overflow-auto">
           ${openingRows.length ? openingRows.map(r=>`
             <div class="flex items-center justify-between gap-2 rounded-lg bg-white/5 px-3 py-2 text-xs">
-              <div><b>${escHtmlLocal(r.prj)}</b> — ${escHtmlLocal(r.mat)}${r.historicalIssue ? `<div class="text-muted">Received ${r.received.toFixed(2)} − Historical Issue ${r.historicalIssue.toFixed(2)}</div>` : ''}</div>
+              <div><b>${escHtmlLocal(r.prj)}</b> — ${escHtmlLocal(r.mat)}${r.received ? `<div class="mt-1">Historical Received: <span class="font-bold text-amber-400">${r.received.toFixed(2)}</span>${r.historicalIssue ? ` &nbsp;−&nbsp; Historical Issue: <span class="font-bold text-red-400">${r.historicalIssue.toFixed(2)}</span>` : ''}</div>` : ''}</div>
               <div class="flex items-center gap-3"><span class="font-bold">${r.net.toFixed(2)}</span>
               <button class="text-blue-400 font-bold" onclick="adminEditOpeningStock(${JSON.stringify(r.prj)},${JSON.stringify(r.mat)})">✎</button>
               <button class="text-red-400 font-bold" onclick="adminDeleteOpeningStock(${JSON.stringify(r.prj)},${JSON.stringify(r.mat)})">✕</button></div>
