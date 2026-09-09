@@ -184,7 +184,6 @@
     .admin-only{display:none}
     .admin-mode .admin-only{display:inline-flex}
     .admin-mode .nav-item.admin-only{display:flex}
-    .admin-mode .mobile-bottom button.admin-only{display:flex;flex:1}
     .admin-mode .card.admin-only:not(.page-hidden){display:block}
     @keyframes lowStockPulse{
       0%{box-shadow:0 0 0 0 rgba(220,53,69,.55);transform:scale(1)}
@@ -891,7 +890,6 @@
     <button data-page="dashboard" class="mb-active" onclick="showPage('dashboard')"><span>⌂</span>Home</button>
     <button data-page="entry" onclick="showPage('entry')"><span>＋</span>Add</button>
     <button data-page="print" onclick="showPage('print')"><span>▤</span>Reports</button>
-    <button data-page="verify" onclick="showPage('verify')" class="admin-only"><span>🔍</span>Check</button>
     <button onclick="downloadPDF()"><span>⇩</span>Print</button>
   </nav>
 
