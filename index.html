@@ -2684,7 +2684,7 @@ function renderAdminSettingsModal(activeTab){
         <div class="text-xs text-muted mb-3">Enter the material's history up to today: total ever received (Historical Received) and how much has already been used/consumed before this system started tracking it (Historical Issue / Adjustment). The system nets these into the actual starting balance — future entries build on top of that net figure, never mixing across Projects or Materials.</div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
           <select id="osProject" class="field">${projectOptions}</select>
-          <select id="osMaterial" class="field">${materialOptions || '<option value="">Add a material first</option>'}</select>
+          <input id="osMaterial" list="materialsDatalist" autocomplete="off" placeholder="Type to search material…" class="field">
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
           <div><label class="field-label">Historical Received (Total)</label><input id="osReceived" type="number" step="0.01" placeholder="e.g. 200" class="field" oninput="updateOpeningNetPreview()"></div>
