@@ -736,7 +736,7 @@
             <div><label class="field-label">Site Engineer</label><input id="metaEngineerName" readonly class="field bg-white/5"></div>
             <div><label class="field-label">Date of Entry</label><input type="date" id="entryDate" required class="field"></div>
           </div>
-          <datalist id="unitsList"><option value="Ton (MT)"><option value="Kg"><option value="Bags"><option value="Cft (Cubic Feet)"><option value="Sft (Square Feet)"><option value="Nos (Pcs)"><option value="Ltr (Litre)"><option value="Truck / Lorry"></datalist>
+          <datalist id="unitsList"></datalist>
           <datalist id="materialsDatalist"></datalist>
 
           <div id="ledgerForm" class="mt-5">
@@ -807,7 +807,8 @@
               <button type="button" onclick="downloadPDF()" class="btn btn-success">⇩ Individual PDF</button>
               <button type="button" onclick="generateCombinedPDF()" class="btn btn-primary">▤ Combined PDF</button>
               <button type="button" onclick="generateAllEngineerReports()" class="btn btn-secondary">⇩ All Project PDFs</button>
-              <button type="button" onclick="generateMaterialsSummaryReport()" class="btn btn-warning admin-only">📊 Materials Summary (All Projects)</button></div>
+              <button type="button" onclick="generateMaterialsSummaryReport()" class="btn btn-warning admin-only">📊 Materials Summary (All Projects)</button>
+              <button type="button" onclick="generateProjectMaterialsSummary()" class="btn btn-warning">📋 This Project's Materials (Serial-wise)</button></div>
           </div>
         </section>
 
@@ -934,6 +935,31 @@
         { prjNo: "Project:20", id: "ID: 11-504-006", eng: "Md Naimul Islam" },
         { prjNo: "Project:21 / MARS-01", id: "ID: 07-410-039", eng: "Site Engineer" }
       ];
+    }
+    function defaultUnitsList() {
+      return ["Ton (MT)", "Kg", "Bags", "Cft (Cubic Feet)", "Sft (Square Feet)", "Nos (Pcs)", "Ltr (Litre)", "Truck / Lorry"];
+    }
+    const UNITS_LIST_KEY = 'mars_units_list';
+    function getUnitsList() {
+      try {
+        const raw = localStorage.getItem(UNITS_LIST_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      const def = defaultUnitsList();
+      localStorage.setItem(UNITS_LIST_KEY, JSON.stringify(def));
+      return def;
+    }
+    function saveUnitsList(list) {
+      localStorage.setItem(UNITS_LIST_KEY, JSON.stringify(list));
+      if (window.MARS_FIREBASE_READY) {
+        window.MARS_FIREBASE.db.collection('catalog').doc('units').set({ items: list, updatedAt: Date.now() })
+          .catch(e => { console.error('Units sync failed:', e); showToast('Saved locally, but could not sync to other devices — check connection.', 'error'); });
+      }
+    }
+    function populateUnitsDatalist() {
+      const dl = document.getElementById('unitsList');
+      if (!dl) return;
+      dl.innerHTML = getUnitsList().map(u => `<option value="${escHtmlLocal(u)}">`).join('');
     }
     const PROJECT_DB_KEY = 'mars_project_database';
     function getProjectDatabase() {
@@ -1646,6 +1672,7 @@
     refreshProjectDropdowns();
 
     populateMaterialSelect('');
+    populateUnitsDatalist();
     document.getElementById('entryDate').valueAsDate = new Date();
     onProjectSelect();
     document.getElementById('verifyDate').valueAsDate = new Date();
@@ -2229,6 +2256,69 @@
       printHtml(docHtml);
     }
 
+    function generateProjectMaterialsSummary(){
+      const prjNo = document.getElementById('filterProject')?.value;
+      if(!prjNo || prjNo === 'ALL'){ alert('Please select one specific Project in the filter above first (not "Show All Projects").'); return; }
+      const p = projectDatabase.find(x=>x.prjNo===prjNo);
+      const catalog = getMaterialCatalog();
+      const openingMapAll = getOpeningStockMap();
+      const totals = {};
+
+      const ensure = (matLower, displayName, unit) => {
+        if(!totals[matLower]) totals[matLower] = { name: displayName, unit: unit || '', opening:0, proc:0, rec:0, tr:0, issue:0 };
+        return totals[matLower];
+      };
+
+      Object.keys(openingMapAll).forEach(k=>{
+        const sep=k.indexOf('||'); const kp=k.slice(0,sep), matLower=k.slice(sep+2);
+        if(kp !== prjNo) return;
+        const rawVal = openingMapAll[k];
+        const net = (rawVal && typeof rawVal === 'object') ? ((Number(rawVal.received)||0) - (Number(rawVal.historicalIssue)||0)) : (Number(rawVal) || 0);
+        const catEntry = catalog.find(m=>String(m.name).trim().toLowerCase()===matLower);
+        const t = ensure(matLower, catEntry ? catEntry.name : matLower, catEntry ? catEntry.unit : '');
+        t.opening += net;
+      });
+
+      entries.forEach(e=>{
+        if(e.prjNo !== prjNo) return;
+        const matLower = String(e.material||'').trim().toLowerCase();
+        if(!matLower) return;
+        const catEntry = catalog.find(m=>String(m.name).trim().toLowerCase()===matLower);
+        const t = ensure(matLower, catEntry ? catEntry.name : (e.material||''), (catEntry ? catEntry.unit : (e.unit||'')));
+        t.proc += Number(e.procQty)||0;
+        t.rec += Number(e.recQty)||0;
+        t.tr += Number(e.trQty)||0;
+        t.issue += Number(e.issueQty)||0;
+      });
+
+      const rows = Object.values(totals)
+        .filter(t => t.opening || t.proc || t.rec || t.tr || t.issue)
+        .sort((a,b)=>a.name.localeCompare(b.name))
+        .map((t,i)=>{
+          const gross = t.proc + t.rec;
+          const netReceived = gross - t.tr;
+          const balance = t.opening + netReceived - t.issue;
+          return `<tr>
+            <td>${i+1}</td><td style="text-align:left">${escapeHtml(t.name)}</td><td>${escapeHtml(t.unit)}</td>
+            <td>${t.opening.toFixed(2)}</td><td>${t.proc.toFixed(2)}</td><td>${t.rec.toFixed(2)}</td>
+            <td>${t.tr.toFixed(2)}</td><td>${t.issue.toFixed(2)}</td><td><b>${balance.toFixed(2)}</b></td>
+          </tr>`;
+        }).join('');
+
+      if(!rows){ alert('No material activity found for this project yet.'); return; }
+
+      const docHtml=`<!doctype html><html><head><meta charset="utf-8"><title>MARS Materials Summary — ${escapeHtml(prjNo)}</title>
+      <style>@page{size:A4 landscape;margin:8mm}body{font-family:Arial,sans-serif;font-size:11px}table{width:100%;border-collapse:collapse;margin-top:14px}th,td{border:1px solid #999;padding:5px;text-align:center}th{background:#eef2f7}h1,h2{text-align:center;margin:2px 0}.meta{text-align:center;margin:8px 0;color:#555;font-size:10px}</style>
+      </head><body>
+      <h1>MARS STRUCTURE LIMITED</h1><h2>MATERIALS SUMMARY — ${escapeHtml(prjNo)}</h2>
+      <div class="meta">Project ID: ${escapeHtml(p?.id||'')} &nbsp;|&nbsp; Engineer: ${escapeHtml(p?.eng||'')}</div>
+      <table><thead><tr><th>Sl. No.</th><th>Material</th><th>Unit</th><th>Opening</th><th>Procurement</th><th>Received (Other Site)</th><th>Transferred</th><th>Issued</th><th>Balance</th></tr></thead>
+      <tbody>${rows}</tbody></table>
+      </body></html>`;
+      logActivity('Project Materials Summary', prjNo);
+      printHtml(docHtml);
+    }
+
     function downloadPDF() {
       recalculateAndRender();
       window.print();
@@ -2712,6 +2802,16 @@ function renderAdminSettingsModal(activeTab){
         <button class="btn btn-primary mb-4" onclick="adminAddMaterial()">＋ Add Material</button>
         <input id="matSearchBox" placeholder="🔍 Search materials…" class="field mb-3" oninput="filterMaterialsList()">
         <div id="materialsListContainer" class="space-y-4 max-h-96 overflow-auto"></div>
+
+        <div class="border-t border-line mt-5 pt-4">
+          <div class="font-bold text-sm text-ink mb-1">Manage Units</div>
+          <div class="text-xs text-muted mb-2">These appear as suggestions in every Unit field across the app.</div>
+          <div class="flex gap-2 mb-3">
+            <input id="newUnitName" placeholder="e.g. Drum, Roll, Set" class="field">
+            <button class="btn btn-primary shrink-0" onclick="adminAddUnit()">＋ Add</button>
+          </div>
+          <div id="unitsListContainer" class="flex flex-wrap gap-2"></div>
+        </div>
       ` : ''}
       ${tab==='projects' ? `
         <div class="text-xs text-muted mb-3">Add a new project — leave "Engineer Name" blank if none is assigned yet; you can come back and add it later by editing the project. Changes appear instantly in every dropdown for every user.</div>
@@ -2787,7 +2887,7 @@ function renderAdminSettingsModal(activeTab){
     </div>
   </div>`;
   document.getElementById('modalRoot').innerHTML = html;
-  if (tab === 'materials') { renderMaterialsList(); }
+  if (tab === 'materials') { renderMaterialsList(); renderUnitsList(); }
   if (tab === 'access') {
     const box = document.getElementById('currentAdminUidBox');
     const user = firebase.auth && firebase.auth().currentUser;
@@ -2915,6 +3015,42 @@ function renderMaterialsList(){
     </div>`).join('');
 }
 function filterMaterialsList(){ renderMaterialsList(); }
+function renderUnitsList(){
+  const container = document.getElementById('unitsListContainer');
+  if(!container) return;
+  const units = getUnitsList();
+  if(!units.length){ container.innerHTML = '<div class="text-xs text-muted">No units yet.</div>'; return; }
+  container.innerHTML = units.map((u,i)=>`
+    <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs">
+      ${escHtmlLocal(u)}
+      <button class="text-red-400 font-bold" onclick="adminDeleteUnit(${i})">✕</button>
+    </span>`).join('');
+}
+function adminAddUnit(){
+  const input = document.getElementById('newUnitName');
+  const name = input.value.trim();
+  if(!name){ showToast('Enter a unit name.','error'); return; }
+  const units = getUnitsList();
+  if(units.some(u=>u.toLowerCase()===name.toLowerCase())){ showToast('This unit already exists.','error'); return; }
+  units.push(name);
+  saveUnitsList(units);
+  populateUnitsDatalist();
+  input.value = '';
+  logActivity('Unit Added', name);
+  showToast('Unit added.');
+  renderUnitsList();
+}
+function adminDeleteUnit(index){
+  const units = getUnitsList();
+  const removed = units[index];
+  if(!removed) return;
+  if(!confirm(`Remove unit "${removed}"?`)) return;
+  units.splice(index,1);
+  saveUnitsList(units);
+  populateUnitsDatalist();
+  logActivity('Unit Removed', removed);
+  renderUnitsList();
+}
 function adminAddProject(){
   const prjNo = document.getElementById('newPrjNo').value.trim();
   const id = document.getElementById('newPrjId').value.trim();
@@ -3096,6 +3232,14 @@ function startCatalogSync(){
     }
   }, err=>console.error('Engineer catalog sync error:',err));
 
+  col.doc('units').onSnapshot(snap=>{
+    if(snap.exists && Array.isArray(snap.data().items)){
+      localStorage.setItem(UNITS_LIST_KEY, JSON.stringify(snap.data().items));
+      populateUnitsDatalist();
+      if (window._adminModalTab === 'materials') renderAdminSettingsModal('materials');
+    }
+  }, err=>console.error('Units catalog sync error:',err));
+
   col.doc('openingStock').onSnapshot(snap=>{
     if(snap.exists && snap.data().data && typeof snap.data().data === 'object'){
       localStorage.setItem(OPENING_STOCK_KEY, JSON.stringify(snap.data().data));
@@ -3115,7 +3259,8 @@ async function seedCatalogsIfMissing(){
     { doc: 'projects', field: 'items', data: projectDatabase },
     { doc: 'materials', field: 'items', data: getMaterialCatalog() },
     { doc: 'engineers', field: 'items', data: engineerDatabase },
-    { doc: 'openingStock', field: 'data', data: getOpeningStockMap() }
+    { doc: 'openingStock', field: 'data', data: getOpeningStockMap() },
+    { doc: 'units', field: 'items', data: getUnitsList() }
   ];
   for(const job of jobs){
     try{
@@ -3340,6 +3485,14 @@ async function deleteEntryFromFirebase(firebaseId){
     },480);
   });
 })();
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./service-worker.js')
+        .catch((e) => console.error('Service worker registration failed:', e));
+    });
+  }
 </script>
 </body>
 </html>
