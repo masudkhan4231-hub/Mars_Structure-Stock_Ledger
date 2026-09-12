@@ -6,8 +6,6 @@
   <meta name="theme-color" content="#111f38">
   <title>MARS STRUCTURE LIMITED — Stock Ledger</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/svg+xml" href="apple-touch-icon.png">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -397,139 +395,8 @@
   }
 </script>
 
-<style id="mars-teal-visual-theme">
-:root{--teal:#18b7a8;--teal-dark:#108f87;--teal-soft:#e6f8f6;--page:#f4f8f9;--surface:#fff;--ink:#18384a;--muted-visual:#718792;--line-visual:#dce9ec}
-html,body{background:var(--page)!important;color:var(--ink)!important}
-body{background:linear-gradient(145deg,#f7fbfc 0%,#eef6f7 52%,#f9fbfb 100%)!important;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-.app-glow,.stats-glow-a,.stats-glow-b,.hero-glow{display:none!important}
-.topbar{background:rgba(255,255,255,.96)!important;border-bottom:1px solid var(--line-visual)!important;color:var(--ink)!important}
-.sidebar{background:#edf5f6!important;border-right:1px solid var(--line-visual)!important;color:#607985!important}
-.nav-item{color:#718792!important;border-radius:12px!important}.nav-item:hover{background:#dff3f1!important;color:var(--teal-dark)!important}.nav-item.active{background:var(--teal)!important;color:#fff!important;box-shadow:0 8px 18px rgba(24,183,168,.22)!important}
-.card,.hero-banner{background:rgba(255,255,255,.96)!important;border:1px solid var(--line-visual)!important;box-shadow:0 10px 28px rgba(29,73,84,.07),0 1px 2px rgba(29,73,84,.03)!important;color:var(--ink)!important}
-.field{background:#fff!important;border:1px solid #d7e6e9!important;color:var(--ink)!important}.field option{background:#fff!important;color:var(--ink)!important}.field:focus{border-color:var(--teal)!important;box-shadow:0 0 0 3px rgba(24,183,168,.14)!important}
-.field-label,.stat-label-v2,.sm-side-label,.fd-mini-date{color:var(--muted-visual)!important}
-.btn-primary{background:var(--teal)!important;color:#fff!important;box-shadow:0 6px 14px rgba(24,183,168,.16)!important}.btn-primary:hover{background:var(--teal-dark)!important}
-.btn-secondary,.btn-outline{background:#fff!important;border:1px solid #cfe1e5!important;color:#386274!important}.btn-secondary:hover,.btn-outline:hover{background:var(--teal-soft)!important;border-color:#9edbd5!important;color:var(--teal-dark)!important}
-.btn-warning{background:#f5a7b9!important;color:#7c2940!important}.btn-danger{background:#ef7895!important;color:#fff!important}.btn-success{background:#54c5a1!important;color:#fff!important}
-.stat-icon,.stat-icon-v2{background:var(--teal-soft)!important;color:var(--teal)!important}.stat-value-v2,.section-title,.hero-title,.fd-trend-big,.fd-mini-val,.fd-chip-name,.pdf-table td{color:var(--ink)!important}.stat-foot-v2,.hero-sub,.fd-trend-sub,.fd-meta,.empty-state{color:var(--muted-visual)!important}
-.ring-mask-v2{background:#fff!important;color:var(--ink)!important}.ring-v2{background:conic-gradient(var(--teal) 0% 0%,#dcebec 0% 100%)!important}.sm-side-item,.fd-chip{background:#f7fbfb!important;border-color:var(--line-visual)!important}.sm-side-value{color:var(--ink)!important}
-.hero-mark{background:var(--teal)!important;box-shadow:0 10px 24px rgba(24,183,168,.22)!important}.hero-eyebrow{color:var(--teal-dark)!important}.dev-credit-glow{color:var(--teal-dark)!important;text-shadow:none!important}
-.fd-spark i,.fd-spark.green i{background:linear-gradient(180deg,var(--teal),rgba(24,183,168,.15))!important}.fd-spark.blue i{background:linear-gradient(180deg,#65aabd,rgba(101,170,189,.15))!important}.fd-spark.amber i{background:linear-gradient(180deg,#ef9bae,rgba(239,155,174,.15))!important}.fd-chip-icon{background:var(--teal-soft)!important;color:var(--teal)!important}
-.fd-mat-table th,.pdf-table th{color:#607985!important;border-color:var(--line-visual)!important;background:#f2f8f9!important}.fd-mat-table td,.pdf-table td{border-color:var(--line-visual)!important}.pdf-table tr:hover td{background:#f4fbfb!important}.table-wrap{border-color:var(--line-visual)!important}
-.spinner{border-color:#d7e9eb!important;border-top-color:var(--teal)!important}.modal-overlay{background:rgba(24,56,74,.28)!important}.modal-box{background:#fff!important;border-color:var(--line-visual)!important;color:var(--ink)!important;box-shadow:0 25px 60px rgba(29,73,84,.18)!important}.mobile-bottom{background:rgba(255,255,255,.98)!important;border-top-color:var(--line-visual)!important}.mobile-bottom button{color:#718792!important}.mobile-bottom button.mb-active{color:var(--teal)!important}.toast .card{background:#fff!important}
-@media print{html,body{background:#fff!important}}
-</style>
-<style id="mars-teal-login-visual-theme">
-#accessOverlay{background:linear-gradient(145deg,#f3fbfb 0%,#e6f5f4 52%,#f8fbfb 100%)!important;color:#18384a!important}
-#introScreen{background:linear-gradient(145deg,#f3fbfb 0%,#e6f5f4 52%,#f8fbfb 100%)!important}
-.intro-stars{opacity:.25}.intro-stars span{background:#18b7a8!important}.intro-blob,.intro-glow{display:none!important}
-.intro-content{max-width:600px}.intro-title{color:#18384a!important}.intro-sub{color:#718792!important}.intro-highlight{color:#18a99d!important}
-.intro-btn{background:#18b7a8!important;box-shadow:0 0 0 0 rgba(24,183,168,.35)!important;color:#fff!important}.intro-btn:hover{background:#108f87!important}
-#accessOverlay .glass-blob{opacity:.25!important}.glass-blob.b1{background:radial-gradient(circle at 35% 30%,rgba(24,183,168,.22),transparent 70%)!important}.glass-blob.b2{background:radial-gradient(circle at 60% 60%,rgba(101,170,189,.18),transparent 70%)!important}.glass-blob.b3{background:radial-gradient(circle at 40% 40%,rgba(24,183,168,.22),transparent 72%)!important}.glass-blob.b4{background:radial-gradient(circle at 40% 40%,rgba(255,255,255,.7),transparent 72%)!important}
-.glass-panel{background:rgba(255,255,255,.96)!important;border:1px solid #dce9ec!important;box-shadow:0 25px 70px rgba(29,73,84,.12),0 1px 3px rgba(29,73,84,.04)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-.glass-logo{color:#18384a!important}.glass-logo .mark{background:#e6f8f6!important;color:#18a99d!important;box-shadow:none!important}.glass-title{color:#18384a!important}.glass-sub,.glass-footer{color:#718792!important}
-.glass-card{background:#f9fcfc!important;border:1px solid #dce9ec!important;color:#18384a!important}.glass-card:hover{background:#eaf8f7!important;border-color:#9edbd5!important}.glass-card .g-desc{color:#718792!important}.glass-card .g-enter{color:#18a99d!important}.glass-card .g-icon{filter:saturate(.7)}
-.back-role{background:#fff!important;border:1px solid #cfe1e5!important;color:#386274!important;backdrop-filter:none!important}.back-role:hover{background:#e6f8f6!important}
-.g-field-label{color:#607985!important}.g-field{background:#fff!important;border:1px solid #d7e6e9!important;color:#18384a!important}.g-field:focus{border-color:#18b7a8!important;box-shadow:0 0 0 3px rgba(24,183,168,.14)!important}.g-eye{color:#718792!important}.g-btn{background:#18b7a8!important;box-shadow:0 10px 22px rgba(24,183,168,.18)!important}.g-btn:hover{background:#108f87!important}.g-status,.vault-status,.engineer-status{color:#607985!important}.g-status.success,.vault-status.success,.engineer-status.success{color:#16966f!important}.g-status.error,.vault-status.error,.engineer-status.error{color:#d94d6b!important}
-#vaultSignupLink{color:#18a99d!important}.glass-panel-narrow .glass-footer{color:#718792!important}
-</style>
-<style id="mars-premium-visual-theme">
-/* Premium visual-only layer: no handlers, IDs, data, or business logic changed. */
-:root{--premium-teal:#18b7a8;--premium-teal-dark:#108f87;--premium-mint:#e6f8f6;--premium-ink:#18384a;--premium-muted:#718792;--premium-line:#dce9ec;--premium-page:#f4f8f9}
-html{scroll-behavior:smooth}body{background:var(--premium-page)!important;color:var(--premium-ink)!important;overflow-x:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-*,*:before,*:after{scrollbar-color:#b7dedb transparent;scrollbar-width:thin}.app-glow,.stats-glow-a,.stats-glow-b,.hero-glow{display:none!important}
-.topbar,.sidebar,.card,.hero-banner,.mobile-bottom{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.topbar{background:rgba(255,255,255,.98)!important;border-color:var(--premium-line)!important;box-shadow:0 3px 18px rgba(29,73,84,.05)!important}.sidebar{background:#edf5f6!important;border-color:var(--premium-line)!important}
-.nav-item{color:var(--premium-muted)!important;border-radius:14px!important;transition:background 160ms ease,color 160ms ease,transform 160ms ease,box-shadow 160ms ease!important}.nav-item:hover{background:#e2f5f3!important;color:var(--premium-teal-dark)!important;transform:translateX(2px)}.nav-item.active{background:var(--premium-teal)!important;color:#fff!important;box-shadow:0 8px 18px rgba(24,183,168,.22)!important}.nav-item span:first-child{font-family:Arial,sans-serif;font-weight:800}
-.card,.hero-banner{background:rgba(255,255,255,.98)!important;border:1px solid var(--premium-line)!important;box-shadow:0 10px 28px rgba(29,73,84,.07),0 1px 2px rgba(29,73,84,.03)!important;color:var(--premium-ink)!important}.section-title,.hero-title,.stat-value-v2,.fd-trend-big,.fd-mini-val,.fd-chip-name{color:var(--premium-ink)!important}.field{background:#fff!important;border-color:#d7e6e9!important;color:var(--premium-ink)!important}.field:focus{border-color:var(--premium-teal)!important;box-shadow:0 0 0 3px rgba(24,183,168,.14)!important}
-.btn,.g-btn,.intro-btn,.glass-card,.back-role,.mobile-bottom button{transition:transform 150ms cubic-bezier(.23,1,.32,1),box-shadow 150ms ease,background 150ms ease,border-color 150ms ease!important}.btn:active,.g-btn:active,.intro-btn:active{transform:scale(.97)!important}.btn-primary,.g-btn{background:var(--premium-teal)!important;color:#fff!important;box-shadow:0 7px 16px rgba(24,183,168,.17)!important}.btn-primary:hover,.g-btn:hover{background:var(--premium-teal-dark)!important;box-shadow:0 10px 22px rgba(24,183,168,.22)!important}.btn-secondary,.btn-outline{background:#fff!important;border-color:#cfe1e5!important;color:#386274!important}.btn-secondary:hover,.btn-outline:hover{background:var(--premium-mint)!important;border-color:#9edbd5!important}.btn-warning{background:#f3a4b8!important;color:#7c2940!important}.btn-danger{background:#ed7894!important}.btn-success{background:#54c5a1!important}
-.stat-icon,.stat-icon-v2,.fd-chip-icon{background:var(--premium-mint)!important;color:var(--premium-teal)!important}.field-label,.stat-label-v2,.stat-foot-v2,.hero-sub,.fd-trend-sub,.fd-meta,.empty-state{color:var(--premium-muted)!important}.hero-mark{background:var(--premium-teal)!important;box-shadow:0 10px 22px rgba(24,183,168,.2)!important}.hero-eyebrow{color:var(--premium-teal-dark)!important}.dev-credit-glow{color:var(--premium-teal-dark)!important;text-shadow:none!important}
-.pdf-table th,.fd-mat-table th{background:#f2f8f9!important;color:#607985!important;border-color:var(--premium-line)!important}.pdf-table td,.fd-mat-table td{border-color:var(--premium-line)!important}.pdf-table tr:hover td{background:#f4fbfb!important}.table-wrap{border-color:var(--premium-line)!important}.mobile-bottom{background:rgba(255,255,255,.98)!important;border-color:var(--premium-line)!important}.mobile-bottom button{color:var(--premium-muted)!important}.mobile-bottom button.mb-active{color:var(--premium-teal)!important}
-/* Login: calm premium entry surface with a restrained motion cue on the CTA. */
-#accessOverlay,#introScreen{background:linear-gradient(145deg,#f3fbfb 0%,#e6f5f4 52%,#f8fbfb 100%)!important}.intro-stars{opacity:.18}.intro-stars span{background:var(--premium-teal)!important}.intro-blob,.intro-glow,.glass-blob{display:none!important}.intro-title,.glass-title{color:var(--premium-ink)!important}.intro-sub,.glass-sub,.glass-footer{color:var(--premium-muted)!important}.intro-highlight{color:var(--premium-teal-dark)!important}.intro-btn{background:var(--premium-teal)!important;box-shadow:0 8px 20px rgba(24,183,168,.18)!important;animation:introUp .7s ease forwards .55s,premiumButtonPulse 2.8s ease-in-out infinite 1.4s!important}.intro-btn:hover{background:var(--premium-teal-dark)!important}.glass-panel{background:rgba(255,255,255,.98)!important;border-color:var(--premium-line)!important;box-shadow:0 25px 70px rgba(29,73,84,.12),0 1px 3px rgba(29,73,84,.04)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.glass-logo{color:var(--premium-ink)!important}.glass-logo .mark{background:var(--premium-mint)!important;color:var(--premium-teal)!important;box-shadow:none!important}.glass-card{background:#f9fcfc!important;border-color:var(--premium-line)!important;color:var(--premium-ink)!important}.glass-card:hover{background:#eaf8f7!important;border-color:#9edbd5!important;transform:translateY(-3px)}.glass-card .g-desc{color:var(--premium-muted)!important}.glass-card .g-enter{color:var(--premium-teal-dark)!important}.back-role{background:#fff!important;border-color:#cfe1e5!important;color:#386274!important;backdrop-filter:none!important}.back-role:hover{background:var(--premium-mint)!important}.g-field-label{color:#607985!important}.g-field{background:#fff!important;border-color:#d7e6e9!important;color:var(--premium-ink)!important}.g-field:focus{border-color:var(--premium-teal)!important;box-shadow:0 0 0 3px rgba(24,183,168,.14)!important}.g-eye{color:var(--premium-muted)!important}.g-status,.vault-status,.engineer-status{color:#607985!important}.g-status.success,.vault-status.success,.engineer-status.success{color:#16966f!important}.g-status.error,.vault-status.error,.engineer-status.error{color:#d94d6b!important}#vaultSignupLink{color:var(--premium-teal-dark)!important}
-/* Hide scan-only presentation without removing any code or changing system behavior. */
-[data-page="scan"],.scan-option,.scan-card,.barcode-card,.qr-card{display:none!important}
-/* Replace the most visible login emoji glyphs visually; underlying labels and handlers stay intact. */
-.glass-card .g-icon{font-size:0;width:42px;height:42px;border-radius:12px;background:var(--premium-mint);position:relative}.glass-card .g-icon:after{content:"";position:absolute;inset:11px;border:2px solid var(--premium-teal);border-radius:5px}.glass-card .g-icon:before{content:"";position:absolute;width:12px;height:2px;background:var(--premium-teal);left:15px;top:20px;box-shadow:0 -5px 0 var(--premium-teal),0 5px 0 var(--premium-teal)}
-@keyframes premiumButtonPulse{0%,100%{box-shadow:0 8px 20px rgba(24,183,168,.18)}50%{box-shadow:0 10px 28px rgba(24,183,168,.34),0 0 0 8px rgba(24,183,168,.06)}}
-@media(max-width:640px){body{font-size:14px}.card,.hero-banner{border-radius:14px}.btn,.g-btn{min-height:44px}.glass-panel{padding:24px 17px}.intro-title{font-size:32px}.intro-sub{font-size:14px}.glass-title{font-size:21px}.nav-item{min-height:44px}}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.001ms!important}}
-</style>
-<style id="mars-final-premium-pass">
-/* Final premium visual layer only: application logic and event handlers remain untouched. */
-:root{--fp-teal:#18b7a8;--fp-teal-dark:#108f87;--fp-mint:#e6f8f6;--fp-ink:#18384a;--fp-muted:#718792;--fp-line:#dce9ec;--fp-page:#f4f8f9;--fp-shadow:0 12px 30px rgba(29,73,84,.08)}
-html{scroll-behavior:smooth}body{background:linear-gradient(145deg,#f7fbfc,#eef6f7 58%,#fafcfc)!important;color:var(--fp-ink)!important;overflow-x:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-*,*:before,*:after{scrollbar-width:thin;scrollbar-color:#b7dedb transparent}.app-glow,.stats-glow-a,.stats-glow-b,.hero-glow{display:none!important}
-.topbar{background:rgba(255,255,255,.98)!important;border-bottom:1px solid var(--fp-line)!important;box-shadow:0 4px 20px rgba(29,73,84,.05)!important}.sidebar{background:#edf5f6!important;border-right:1px solid var(--fp-line)!important}.main{background:transparent!important}
-.topbar .bg-navy{font-size:0!important;background:var(--fp-mint) url('icon-192.png') center/cover no-repeat!important;box-shadow:0 5px 13px rgba(24,183,168,.15)!important}.topbar .text-navy{color:var(--fp-ink)!important}.topbar .text-muted{color:var(--fp-muted)!important}
-.nav-item{min-height:42px!important;color:var(--fp-muted)!important;border-radius:14px!important;transition:transform 150ms ease,background 150ms ease,color 150ms ease,box-shadow 150ms ease!important}.nav-item:hover{background:#e2f5f3!important;color:var(--fp-teal-dark)!important;transform:translateX(2px)}.nav-item.active{background:var(--fp-teal)!important;color:#fff!important;box-shadow:0 8px 18px rgba(24,183,168,.22)!important}.nav-item span:first-child{font-family:Arial,sans-serif;font-weight:800}
-.card,.hero-banner{background:rgba(255,255,255,.98)!important;border:1px solid var(--fp-line)!important;box-shadow:var(--fp-shadow)!important;color:var(--fp-ink)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.section-title,.hero-title,.stat-value-v2,.fd-trend-big,.fd-mini-val,.fd-chip-name{color:var(--fp-ink)!important}.field{background:#fff!important;border-color:#d7e6e9!important;color:var(--fp-ink)!important}.field:focus{border-color:var(--fp-teal)!important;box-shadow:0 0 0 3px rgba(24,183,168,.14)!important}
-.btn,.btn-outline,.g-btn,.intro-btn,.back-role,.glass-card{border-radius:12px!important;transition:transform 150ms cubic-bezier(.23,1,.32,1),box-shadow 150ms ease,background 150ms ease,border-color 150ms ease!important}.btn:active,.btn-outline:active,.g-btn:active,.intro-btn:active{transform:scale(.97)!important}.btn-primary,.g-btn{background:var(--fp-teal)!important;color:#fff!important;box-shadow:0 7px 16px rgba(24,183,168,.17)!important}.btn-primary:hover,.g-btn:hover{background:var(--fp-teal-dark)!important;box-shadow:0 10px 22px rgba(24,183,168,.22)!important}.btn-secondary,.btn-outline{background:#fff!important;border:1px solid #cfe1e5!important;color:#386274!important;box-shadow:0 2px 6px rgba(29,73,84,.04)!important}.btn-secondary:hover,.btn-outline:hover{background:var(--fp-mint)!important;border-color:#9edbd5!important;color:var(--fp-teal-dark)!important}.btn-warning{background:#f3a4b8!important;color:#7c2940!important}.btn-danger{background:#ed7894!important;color:#fff!important}.btn-success{background:#54c5a1!important;color:#fff!important}
-#btnAdminToggle{border-radius:12px!important;background:var(--fp-teal)!important;color:#fff!important;box-shadow:0 7px 16px rgba(24,183,168,.17)!important}.admin-only.btn-warning{background:#dff3f1!important;color:var(--fp-teal-dark)!important;border:1px solid #a9ded8!important}.topbar button{font-weight:800!important}
-.stat-icon,.stat-icon-v2,.fd-chip-icon{background:var(--fp-mint)!important;color:var(--fp-teal)!important}.field-label,.stat-label-v2,.stat-foot-v2,.hero-sub,.fd-trend-sub,.fd-meta,.empty-state{color:var(--fp-muted)!important}.hero-mark{background:var(--fp-teal)!important;box-shadow:0 10px 22px rgba(24,183,168,.2)!important}.hero-eyebrow{color:var(--fp-teal-dark)!important}.dev-credit-glow{color:var(--fp-teal-dark)!important;text-shadow:none!important}
-/* All visible dashboard actions receive consistent premium sizing. */
-.page-section button,.page-section .btn,.page-section .btn-outline,.topbar .btn,.sidebar button{min-height:40px;font-weight:800!important;letter-spacing:.005em}.page-section .btn-outline{border-radius:999px!important;padding-inline:16px!important}.pdf-table th,.fd-mat-table th{background:#f2f8f9!important;color:#607985!important;border-color:var(--fp-line)!important}.pdf-table td,.fd-mat-table td{border-color:var(--fp-line)!important}.pdf-table tr:hover td{background:#f4fbfb!important}.table-wrap{border-color:var(--fp-line)!important}
-/* Premium print/PDF surface for the existing print flow. */
-@media print{html,body{background:#fff!important;color:#18384a!important}#pdfCard{background:#fff!important;border:0!important;box-shadow:none!important}#pdfCard .pdf-header{padding:18px 0!important;border-bottom:2px solid #18b7a8!important}#pdfCard .pdf-table{border-collapse:separate!important;border-spacing:0!important;border:1px solid #dce9ec!important;border-radius:10px!important;overflow:hidden!important}.pdf-table th{background:#e6f8f6!important;color:#18384a!important;font-weight:800!important}.pdf-table td{background:#fff!important;color:#385766!important;border-color:#dce9ec!important}.pdf-table tr:nth-child(even) td{background:#f8fbfb!important}}
-/* Login surfaces. */
-#accessOverlay,#introScreen{background:linear-gradient(145deg,#f3fbfb,#e6f5f4 52%,#f8fbfb)!important}.intro-stars span{background:var(--fp-teal)!important}.intro-blob,.intro-glow,.glass-blob{display:none!important}.intro-title,.glass-title{color:var(--fp-ink)!important}.intro-sub,.glass-sub,.glass-footer{color:var(--fp-muted)!important}.intro-highlight{color:var(--fp-teal-dark)!important}.intro-btn{background:var(--fp-teal)!important;box-shadow:0 8px 20px rgba(24,183,168,.18)!important;animation:introUp .7s ease forwards .55s,fpPulse 2.8s ease-in-out infinite 1.4s!important}.intro-btn:hover{background:var(--fp-teal-dark)!important}.glass-panel{background:rgba(255,255,255,.98)!important;border-color:var(--fp-line)!important;box-shadow:0 25px 70px rgba(29,73,84,.12)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.glass-logo{color:var(--fp-ink)!important}.glass-logo .mark{background:var(--fp-mint)!important;color:var(--fp-teal)!important;box-shadow:none!important}.glass-card{background:#f9fcfc!important;border-color:var(--fp-line)!important;color:var(--fp-ink)!important}.glass-card:hover{background:#eaf8f7!important;border-color:#9edbd5!important;transform:translateY(-3px)}.glass-card .g-desc{color:var(--fp-muted)!important}.glass-card .g-enter{color:var(--fp-teal-dark)!important}.g-field-label{color:#607985!important}.g-field{background:#fff!important;border-color:#d7e6e9!important;color:var(--fp-ink)!important}.g-field:focus{border-color:var(--fp-teal)!important;box-shadow:0 0 0 3px rgba(24,183,168,.14)!important}.g-eye{color:var(--fp-muted)!important}.g-status,.vault-status,.engineer-status{color:#607985!important}.g-status.success,.vault-status.success,.engineer-status.success{color:#16966f!important}.g-status.error,.vault-status.error,.engineer-status.error{color:#d94d6b!important}.back-role{background:#fff!important;border-color:#cfe1e5!important;color:#386274!important}.back-role:hover{background:var(--fp-mint)!important}
-@keyframes fpPulse{0%,100%{box-shadow:0 8px 20px rgba(24,183,168,.18)}50%{box-shadow:0 10px 28px rgba(24,183,168,.34),0 0 0 8px rgba(24,183,168,.06)}}
-@media(max-width:640px){body{font-size:14px}.card,.hero-banner{border-radius:14px}.btn,.g-btn{min-height:44px}.page-section button,.page-section .btn{min-height:44px}.glass-panel{padding:24px 17px}.intro-title{font-size:32px}.glass-title{font-size:21px}.nav-item{min-height:44px}}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.001ms!important}}
-</style>
-<style id="mars-solid-premium-theme">
-/* Solid premium visual layer only. No blur, no glass, no heavy gradients, no logic changes. */
-:root{--sp-teal:#16a99c;--sp-teal-dark:#0d8179;--sp-navy:#193b52;--sp-ink:#17384a;--sp-muted:#6f8791;--sp-bg:#f2f7f8;--sp-card:#ffffff;--sp-line:#d8e6e9;--sp-mint:#e7f7f5;--sp-coral:#d96b82;--sp-gold:#c99639}
-html,body{background:var(--sp-bg)!important;color:var(--sp-ink)!important;filter:none!important}body{background:#f2f7f8!important;overflow-x:hidden;-webkit-font-smoothing:antialiased}
-*,*:before,*:after{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:none!important}
-.app-glow,.stats-glow-a,.stats-glow-b,.hero-glow,.intro-blob,.intro-glow,.glass-blob{display:none!important}
-.topbar{background:#fff!important;border-bottom:1px solid var(--sp-line)!important}.sidebar{background:#e8f1f3!important;border-right:1px solid var(--sp-line)!important}.main{background:#f2f7f8!important}
-.card,.hero-banner,.modal-box{background:#fff!important;border:1px solid var(--sp-line)!important;border-radius:16px!important;box-shadow:0 5px 14px rgba(24,59,82,.06)!important;color:var(--sp-ink)!important}
-.nav-item{color:var(--sp-muted)!important;border-radius:12px!important;transition:background 140ms ease,color 140ms ease,transform 140ms ease!important}.nav-item:hover{background:#d9f0ed!important;color:var(--sp-teal-dark)!important;transform:translateX(2px)}.nav-item.active{background:var(--sp-teal)!important;color:#fff!important;box-shadow:none!important}
-.btn,.btn-outline,.g-btn,.intro-btn,.back-role,.glass-card{transition:transform 140ms ease,background 140ms ease,border-color 140ms ease,color 140ms ease!important;box-shadow:none!important}.btn:active,.g-btn:active,.intro-btn:active{transform:scale(.98)!important}.btn-primary,.g-btn{background:var(--sp-teal)!important;color:#fff!important;border:1px solid var(--sp-teal-dark)!important}.btn-primary:hover,.g-btn:hover{background:var(--sp-teal-dark)!important}.btn-secondary,.btn-outline{background:#fff!important;color:var(--sp-navy)!important;border:1px solid #bcd2d7!important}.btn-secondary:hover,.btn-outline:hover{background:var(--sp-mint)!important;border-color:var(--sp-teal)!important;color:var(--sp-teal-dark)!important}.btn-warning{background:#f8e9c8!important;color:#805d16!important;border:1px solid #e4c77f!important}.btn-danger{background:#f6e0e5!important;color:#a43e58!important;border:1px solid #e5a8b7!important}.btn-success{background:#dff4eb!important;color:#197957!important;border:1px solid #a9dec8!important}
-.field,select.field,input.field,textarea.field{appearance:auto!important;background:#fff!important;color:var(--sp-ink)!important;border:1px solid #c9dde1!important;border-radius:11px!important;min-height:43px!important}.field:hover{border-color:#a8c8ce!important}.field:focus{border-color:var(--sp-teal)!important;box-shadow:0 0 0 3px #d9f2ef!important}.field option{background:#fff!important;color:var(--sp-ink)!important}
-.stat-icon,.stat-icon-v2,.fd-chip-icon{background:var(--sp-mint)!important;color:var(--sp-teal-dark)!important}.stat-value-v2,.section-title,.hero-title,.fd-trend-big,.fd-mini-val,.fd-chip-name{color:var(--sp-ink)!important}.field-label,.stat-label-v2,.stat-foot-v2,.hero-sub,.fd-trend-sub,.fd-meta,.empty-state{color:var(--sp-muted)!important}.hero-mark{background:var(--sp-teal)!important}.hero-eyebrow{color:var(--sp-teal-dark)!important}.dev-credit-glow{color:var(--sp-teal-dark)!important;text-shadow:none!important}
-.topbar .bg-navy{font-size:0!important;background:#dff4f1 url('icon-192.png') center/cover no-repeat!important;border-radius:12px!important}.topbar .text-navy{color:var(--sp-ink)!important}.topbar .text-muted{color:var(--sp-muted)!important}
-/* Premium role chooser */
-#accessOverlay,#introScreen{background:#edf6f7!important}.glass-panel{background:#fff!important;border:1px solid #cfe1e5!important;border-radius:22px!important;box-shadow:0 16px 36px rgba(24,59,82,.12)!important;padding:34px!important}.glass-logo{color:var(--sp-navy)!important;letter-spacing:.12em}.glass-logo .mark{background:var(--sp-mint)!important;color:var(--sp-teal-dark)!important;border:1px solid #bde3df!important;box-shadow:none!important}.glass-title{color:var(--sp-ink)!important;font-size:26px!important}.glass-sub,.glass-footer{color:var(--sp-muted)!important}.glass-cards{gap:18px!important}.glass-card{min-height:190px!important;background:#fbfefe!important;border:1px solid #cbdfe3!important;border-radius:18px!important;color:var(--sp-ink)!important;padding:24px 20px!important}.glass-card:hover{background:#effaf8!important;border-color:var(--sp-teal)!important;transform:translateY(-4px)!important}.glass-card .g-icon{background:var(--sp-mint)!important;color:var(--sp-teal-dark)!important;border-radius:13px!important}.glass-card .g-name{color:var(--sp-navy)!important}.glass-card .g-desc{color:var(--sp-muted)!important}.glass-card .g-enter{color:var(--sp-teal-dark)!important}.intro-title{color:var(--sp-ink)!important}.intro-sub{color:var(--sp-muted)!important}.intro-highlight{color:var(--sp-teal-dark)!important}.intro-btn{background:var(--sp-teal)!important;border:1px solid var(--sp-teal-dark)!important;animation:introUp .7s ease forwards .55s,solidPulse 2.8s ease-in-out infinite 1.4s!important}.intro-btn:hover{background:var(--sp-teal-dark)!important}
-/* Highly premium admin and site engineer cards */
-.glass-panel-narrow{width:min(92vw,430px)!important;padding:30px!important;border-top:4px solid var(--sp-teal)!important}.glass-panel-narrow .glass-title{font-size:25px!important;margin-top:18px!important}.glass-panel-narrow .glass-sub{letter-spacing:.12em!important}.g-field-label{color:var(--sp-navy)!important}.g-field{background:#fbfefe!important;color:var(--sp-ink)!important;border:1px solid #c9dde1!important;border-radius:11px!important;min-height:47px!important}.g-field:focus{border-color:var(--sp-teal)!important;box-shadow:0 0 0 3px #d9f2ef!important}.g-eye{color:var(--sp-muted)!important}.g-btn{min-height:48px!important;border-radius:11px!important;background:var(--sp-teal)!important;border:1px solid var(--sp-teal-dark)!important}.g-btn:hover{background:var(--sp-teal-dark)!important}.g-status,.vault-status,.engineer-status{color:var(--sp-muted)!important}.g-status.success,.vault-status.success,.engineer-status.success{color:#16805e!important}.g-status.error,.vault-status.error,.engineer-status.error{color:var(--sp-coral)!important}.back-role{background:#fff!important;color:var(--sp-navy)!important;border:1px solid #bfd5da!important}.back-role:hover{background:var(--sp-mint)!important;border-color:var(--sp-teal)!important}
-/* Dropdown bars and select controls */
-select,select.field,.topbar select{background-color:#fff!important;background-image:none!important;border:1px solid #c5dce0!important;color:var(--sp-ink)!important;border-radius:11px!important;min-height:42px!important;padding:9px 34px 9px 12px!important;outline:none!important}.topbar select:hover,select:hover{border-color:#8fcfc8!important}.topbar select:focus,select:focus{border-color:var(--sp-teal)!important;box-shadow:0 0 0 3px #d9f2ef!important}.topbar select option,select option{background:#fff!important;color:var(--sp-ink)!important}
-/* Existing generated PDF/table views */
-.pdf-table{border:1px solid var(--sp-line)!important;border-radius:10px!important;overflow:hidden!important;border-collapse:separate!important;border-spacing:0!important}.pdf-table th{background:#e5f5f3!important;color:var(--sp-navy)!important;border-color:var(--sp-line)!important}.pdf-table td{background:#fff!important;color:#385766!important;border-color:var(--sp-line)!important}.pdf-table tr:nth-child(even) td{background:#f7fbfb!important}
-@keyframes solidPulse{0%,100%{box-shadow:0 0 0 0 #bfe9e4}50%{box-shadow:0 0 0 7px #e2f6f3}}
-@media(max-width:640px){.glass-panel{padding:24px 17px!important;border-radius:18px!important}.glass-cards{grid-template-columns:1fr!important;gap:12px!important}.glass-card{min-height:142px!important;padding:20px!important}.glass-panel-narrow{padding:24px 18px!important}.btn,.g-btn{min-height:44px!important}.field,select.field{min-height:44px!important}.card,.hero-banner{border-radius:13px!important}}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
-</style>
-<style id="mars-mobile-launch-animation">
-/* Calm startup branding animation. No auth, data, or navigation logic is changed. */
-.intro-content{display:flex!important;flex-direction:column!important;align-items:center!important}
-.intro-content:before{content:"";display:block;width:82px;height:82px;margin:0 auto 18px;background:#e7f7f5 url('icon-192.png') center/cover no-repeat;border:1px solid #bfe5e0;border-radius:24px;box-shadow:0 8px 18px rgba(24,183,168,.14);animation:marsMarkEnter 520ms cubic-bezier(.23,1,.32,1) both}
-.intro-title:before{content:"MARS";display:block;color:#0d8179;font-size:12px;font-weight:900;letter-spacing:.26em;margin:0 0 8px;opacity:.9}
-.intro-title{letter-spacing:-.02em}
-.intro-sub{max-width:430px}
-@keyframes marsMarkEnter{from{opacity:0;transform:translateY(10px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
-@media(max-width:640px){.intro-content:before{width:74px;height:74px;border-radius:21px;margin-bottom:15px}.intro-title:before{font-size:11px;margin-bottom:7px}.intro-title{font-size:30px!important}}
-@media(prefers-reduced-motion:reduce){.intro-content:before{animation:none!important}}
-</style>
-<style id="mars-post-login-reveal-style">
-#marsPostLoginReveal{position:fixed;inset:0;z-index:100001;display:none;place-items:center;background:#edf6f7;pointer-events:none;opacity:0}
-#marsPostLoginReveal.is-playing{display:grid;animation:marsRevealBackdrop 1550ms ease both}
-.mars-reveal-stage{display:flex;flex-direction:column;align-items:center;gap:18px;color:#17384a}
-.mars-reveal-mark{width:112px;height:112px;border-radius:30px;background:#e7f7f5 url('icon-192.png') center/cover no-repeat;border:1px solid #bfe5e0;box-shadow:0 12px 26px rgba(24,183,168,.16);animation:marsBuildingTransform 1200ms cubic-bezier(.23,1,.32,1) both}
-.mars-reveal-name{font-size:clamp(20px,4vw,34px);font-weight:900;letter-spacing:.12em;color:#17384a;opacity:0;transform:translateY(10px);animation:marsNameReveal 620ms cubic-bezier(.23,1,.32,1) 720ms both}
-.mars-reveal-sub{font-size:10px;letter-spacing:.22em;color:#168f86;opacity:0;animation:marsNameReveal 420ms ease 980ms both}
-@keyframes marsRevealBackdrop{0%{opacity:0}12%,88%{opacity:1}100%{opacity:0}}
-@keyframes marsBuildingTransform{0%{opacity:0;transform:scale(.72) rotate(-5deg)}22%{opacity:1;transform:scale(1.04) rotate(0)}60%{transform:scale(.96)}100%{transform:scale(.74);opacity:.18}}
-@keyframes marsNameReveal{to{opacity:1;transform:translateY(0)}}
-@media(max-width:640px){.mars-reveal-mark{width:88px;height:88px;border-radius:24px}.mars-reveal-name{letter-spacing:.08em;font-size:20px}}
-@media(prefers-reduced-motion:reduce){#marsPostLoginReveal.is-playing{animation:none;opacity:1}.mars-reveal-mark,.mars-reveal-name,.mars-reveal-sub{animation:none;opacity:1;transform:none}}
-</style>
 </head>
 <body>
-
-<div id="marsPostLoginReveal" aria-hidden="true"><div class="mars-reveal-stage"><div class="mars-reveal-mark"></div><div class="mars-reveal-name">MARS STRUCTURE LIMITED</div><div class="mars-reveal-sub">CONSTRUCTION STOCK LEDGER</div></div></div>
-
 <!-- INTRO WELCOME SCREEN (shown before login) -->
 <div id="introScreen">
   <div class="intro-glow"></div>
@@ -623,13 +490,10 @@ select,select.field,.topbar select{background-color:#fff!important;background-im
     <div class="topbar-inner max-w-[1600px] mx-auto px-5 py-3 flex items-center justify-between gap-4">
       <div class="flex items-center gap-3 min-w-0">
         <button class="lg:hidden w-10 h-10 rounded-xl bg-white/10 text-white" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
-        <div class="mars-brand-lockup">
-          <img class="mars-brand-building" src="icon-192.png" alt="Mars Structure Limited building logo">
-          <div class="mars-brand-copy min-w-0">
-            <div class="mars-company-name">MARS STRUCTURE LIMITED</div>
-            <div class="mars-product-name">Stock Ledger Management System</div>
-            <div class="mars-developer-credit">Developed by Md. Masud Rana</div>
-          </div>
+        <div class="w-10 h-10 rounded-xl bg-navy text-white grid place-items-center font-extrabold">M</div>
+        <div class="min-w-0">
+          <div class="font-extrabold text-navy text-sm md:text-base truncate">MARS STRUCTURE LIMITED</div>
+          <div class="text-[11px] text-muted">Stock Ledger Management System</div>
         </div>
       </div>
       <div class="top-actions flex items-center flex-wrap justify-end gap-2">
@@ -656,11 +520,6 @@ select,select.field,.topbar select{background-color:#fff!important;background-im
   <div class="flex max-w-[1600px] mx-auto">
     <aside id="sidebar" class="sidebar min-h-[calc(100vh-65px)] p-4 shrink-0">
       <button class="lg:hidden w-full mb-3 py-2 rounded-lg bg-white/10 text-white text-sm font-bold" onclick="toggleMobileMenu(false)">✕ Close Menu</button>
-      <div class="mobile-drawer-actions">
-        <button onclick="openAdminSettings();toggleMobileMenu(false)" class="admin-only nav-item w-full text-left">⚙ Admin Settings</button>
-        <button onclick="changeAdminPassword();toggleMobileMenu(false)" class="admin-only nav-item w-full text-left">⚿ Change Password</button>
-        <button onclick="toggleAdminMode();toggleMobileMenu(false)" class="nav-item w-full text-left">⇥ Admin Login / Logout</button>
-      </div>
       <div class="text-[10px] uppercase tracking-[.16em] text-blue-200/70 px-3 mb-3">Workspace</div>
       <nav class="space-y-1">
         <a href="javascript:void(0)" class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')"><span>▦</span> Dashboard</a>
@@ -896,7 +755,7 @@ select,select.field,.topbar select{background-color:#fff!important;background-im
                   <div><label class="field-label">Unit</label><input id="metaUnit" data-role="unit" readonly class="field bg-white/5"></div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-3">
-                  <div class="rounded-xl bg-blue-500/10 border border-blue-500/20 p-3"><div class="text-xs font-extrabold text-blue-300 mb-2">Receiving Procurement</div><input type="text" id="procMrr" data-role="procMrr" placeholder="MRR Number" class="field mb-2"><input type="text" id="procChallan" data-role="procChallan" placeholder="Materials Challan Number" class="field mb-2"><select id="procSource" data-role="procSource" class="field mb-2"><option value="">Procurement Source</option><option value="LOCAL_PURCHASE">Local Purchase</option><option value="WORK_ORDER">Work Order</option></select><input type="number" step="0.01" id="procQty" data-role="procQty" placeholder="Quantity" class="field"></div>
+                  <div class="rounded-xl bg-blue-500/10 border border-blue-500/20 p-3"><div class="text-xs font-extrabold text-blue-300 mb-2">Receiving Procurement</div><input type="text" id="procMrr" data-role="procMrr" placeholder="MRR No." class="field mb-2"><input type="number" step="0.01" id="procQty" data-role="procQty" placeholder="Quantity" class="field"></div>
                   <div class="rounded-xl bg-teal-500/10 border border-teal-500/20 p-3"><div class="text-xs font-extrabold text-teal-300 mb-2">Receiving Other Site</div><input type="text" id="recPrj" data-role="recPrj" placeholder="Project No" class="field mb-2"><input type="text" id="recGp" data-role="recGp" placeholder="Gate Pass No." class="field mb-2"><input type="number" step="0.01" id="recQty" data-role="recQty" placeholder="Quantity" class="field"></div>
                   <div class="rounded-xl bg-amber-500/10 border border-amber-500/20 p-3"><div class="text-xs font-extrabold text-amber-300 mb-2">Transfers to Other Site</div><input type="text" id="trGp" data-role="trGp" placeholder="Gate Pass" class="field mb-2"><input type="text" id="trPrj" data-role="trPrj" placeholder="Project No" class="field mb-2"><input type="number" step="0.01" id="trQty" data-role="trQty" placeholder="Quantity" class="field"></div>
                   <div class="rounded-xl bg-violet-500/10 border border-violet-500/20 p-3"><div class="text-xs font-extrabold text-violet-300 mb-2">Issue of Work at Site</div><input type="text" id="issuePurpose" data-role="purpose" placeholder="Purpose" class="field mb-2"><input type="number" step="0.01" id="issueQty" data-role="issueQty" placeholder="Quantity" class="field"></div>
@@ -1051,7 +910,7 @@ select,select.field,.topbar select{background-color:#fff!important;background-im
 
 <script>
     // এখানে আপনার গুগল অ্যাপস স্ক্রিপ্ট লিংকটি সেট করা আছে
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0VleOJ0wFzt10S_0xJ3eZQMcZYg7qUsH-D4x99yVPB0KLXm1AJymP8X-OTAgOi4Nn/exec";
+    const SCRIPT_URL = "";
     function defaultProjectDatabase() {
       return [
         { prjNo: "Project:01", id: "ID:11-409-005", eng: "Site Engr. Mahedi Hasan Fahad" },
@@ -1492,7 +1351,7 @@ select,select.field,.topbar select{background-color:#fff!important;background-im
           <div><label class="field-label">Unit</label><input data-role="unit" readonly class="field bg-white/5"></div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-3">
-          <div class="rounded-xl bg-blue-500/10 border border-blue-500/20 p-3"><div class="text-xs font-extrabold text-blue-300 mb-2">Receiving Procurement</div><input type="text" data-role="procMrr" placeholder="MRR Number" class="field mb-2"><input type="text" data-role="procChallan" placeholder="Materials Challan Number" class="field mb-2"><select data-role="procSource" class="field mb-2"><option value="">Procurement Source</option><option value="LOCAL_PURCHASE">Local Purchase</option><option value="WORK_ORDER">Work Order</option></select><input type="number" step="0.01" data-role="procQty" placeholder="Quantity" class="field"></div>
+          <div class="rounded-xl bg-blue-500/10 border border-blue-500/20 p-3"><div class="text-xs font-extrabold text-blue-300 mb-2">Receiving Procurement</div><input type="text" data-role="procMrr" placeholder="MRR No." class="field mb-2"><input type="number" step="0.01" data-role="procQty" placeholder="Quantity" class="field"></div>
           <div class="rounded-xl bg-teal-500/10 border border-teal-500/20 p-3"><div class="text-xs font-extrabold text-teal-300 mb-2">Receiving Other Site</div><input type="text" data-role="recPrj" placeholder="Project No" class="field mb-2"><input type="text" data-role="recGp" placeholder="Gate Pass No." class="field mb-2"><input type="number" step="0.01" data-role="recQty" placeholder="Quantity" class="field"></div>
           <div class="rounded-xl bg-amber-500/10 border border-amber-500/20 p-3"><div class="text-xs font-extrabold text-amber-300 mb-2">Transfers to Other Site</div><input type="text" data-role="trGp" placeholder="Gate Pass" class="field mb-2"><input type="text" data-role="trPrj" placeholder="Project No" class="field mb-2"><input type="number" step="0.01" data-role="trQty" placeholder="Quantity" class="field"></div>
           <div class="rounded-xl bg-violet-500/10 border border-violet-500/20 p-3"><div class="text-xs font-extrabold text-violet-300 mb-2">Issue of Work at Site</div><input type="text" data-role="purpose" placeholder="Purpose" class="field mb-2"><input type="number" step="0.01" data-role="issueQty" placeholder="Quantity" class="field"></div>
@@ -1500,7 +1359,7 @@ select,select.field,.topbar select{background-color:#fff!important;background-im
       wrap.appendChild(div);
       // Convenience: copy MRR / Gate Pass / Purpose values from the previous row,
       // since items added this way usually share the same MRR or Gate Pass number.
-      ['procMrr', 'procChallan', 'procSource', 'recPrj', 'recGp', 'trGp', 'trPrj', 'purpose'].forEach(role => {
+      ['procMrr', 'recPrj', 'recGp', 'trGp', 'trPrj', 'purpose'].forEach(role => {
         const f = div.querySelector(`[data-role="${role}"]`);
         if (f) f.value = getVal(role);
       });
@@ -1561,8 +1420,6 @@ select,select.field,.topbar select{background-color:#fff!important;background-im
         material: getField(row, 'material'),
         unit: getField(row, 'unit'),
         procMrr: getField(row, 'procMrr') || '-',
-        procChallan: getField(row, 'procChallan') || '-',
-        procSource: getField(row, 'procSource') || '-',
         procQty: parseFloat(getField(row, 'procQty')) || 0,
         recPrj: getField(row, 'recPrj') || '-',
         recGp: getField(row, 'recGp') || '-',
@@ -1928,8 +1785,6 @@ select,select.field,.topbar select{background-color:#fff!important;background-im
         material: item.material || "",
         unit: item.unit || "",
         procMrr: item.procMrr,
-        procChallan: item.procChallan || '-',
-        procSource: item.procSource || '-',
         procQty: item.procQty,
         recPrj: item.recPrj,
         recGp: item.recGp,
@@ -1948,16 +1803,11 @@ select,select.field,.topbar select{background-color:#fff!important;background-im
           // item rows (same MRR/Gate Pass, different materials) — save each as
           // its own ledger entry.
           for (const item of items) {
-            const savedEntry = buildEntryData(item);
-            await saveEntryToFirebase(savedEntry);
-            sendDataToGoogleSheet(savedEntry);
+            await saveEntryToFirebase(buildEntryData(item));
           }
           logActivity('Entry Saved', `${prjInfo.prjNo} / ${date} / ${items.length} item(s)`);
         }else{
-          const updatedEntry = buildEntryData(items[0]);
-          await saveEntryToFirebase(updatedEntry, old.firebaseId);
-          // Do not append edited rows to Google Sheets; the current Apps Script uses appendRow.
-          // This avoids duplicate cloud rows. A future upsert can use a stable entry ID.
+          await saveEntryToFirebase(buildEntryData(items[0]), old.firebaseId);
           editIndex = -1;
           logActivity('Entry Updated', `${prjInfo.prjNo} / ${date}`);
         }
@@ -2005,8 +1855,6 @@ select,select.field,.topbar select{background-color:#fff!important;background-im
       document.getElementById('entryDate').value = item.dateStr;
       populateMaterialSelect(item.material || '');
       document.getElementById('procMrr').value = item.procMrr === '-' ? '' : item.procMrr;
-      document.getElementById('procChallan').value = item.procChallan === '-' ? '' : (item.procChallan || '');
-      document.getElementById('procSource').value = item.procSource === '-' ? '' : (item.procSource || '');
       document.getElementById('procQty').value = item.procQty || '';
       document.getElementById('recPrj').value = item.recPrj === '-' ? '' : item.recPrj;
       document.getElementById('recGp').value = item.recGp === '-' ? '' : item.recGp;
@@ -2054,7 +1902,7 @@ select,select.field,.topbar select{background-color:#fff!important;background-im
       document.getElementById('metaUnit').value = '';
       syncUnitFromMaterial();
       document.querySelector('.item-row[data-row="0"] [data-role="quickAddBox"]')?.classList.add('hidden');
-      ['procMrr','procChallan','procSource','procQty','recPrj','recGp','recQty','trGp','trPrj','trQty','issuePurpose','issueQty'].forEach(id=>{
+      ['procMrr','procQty','recPrj','recGp','recQty','trGp','trPrj','trQty','issuePurpose','issueQty'].forEach(id=>{
         const el = document.getElementById(id);
         if (el) el.value = '';
       });
@@ -3490,7 +3338,7 @@ async function deleteEntryFromFirebase(firebaseId){
     setAdminStatus('ADMIN ACCESS GRANTED','success');
     card.classList.remove('scanning');door.classList.add('open','vault-success-glow');
     if(typeof seedCatalogsIfMissing==='function') seedCatalogsIfMissing();
-    setTimeout(()=>{overlay.classList.add('hidden-overlay');overlay.style.display='none';if(typeof showPage==='function')showPage('dashboard');if(typeof playMarsPostLoginReveal==='function')playMarsPostLoginReveal();recalculateAndRender()},1250);
+    setTimeout(()=>{overlay.classList.add('hidden-overlay');overlay.style.display='none';if(typeof showPage==='function')showPage('dashboard');recalculateAndRender()},1250);
   }
   function unlockVault(){
     if(unlock.disabled)return;
@@ -3566,7 +3414,7 @@ async function deleteEntryFromFirebase(firebaseId){
     onProjectSelect();
     setEngineerStatus('SITE ACCESS GRANTED • '+eng.name,'success');
     engCard.classList.add('engineer-success');
-    setTimeout(()=>{overlay.classList.add('hidden-overlay');overlay.style.display='none';if(typeof showPage==='function')showPage('dashboard');if(typeof playMarsPostLoginReveal==='function')playMarsPostLoginReveal();recalculateAndRender();showToast('Site Engineer access granted: '+eng.name+' — '+match.prjNo,'success')},1200);
+    setTimeout(()=>{overlay.classList.add('hidden-overlay');overlay.style.display='none';if(typeof showPage==='function')showPage('dashboard');recalculateAndRender();showToast('Site Engineer access granted: '+eng.name+' — '+match.prjNo,'success')},1200);
   }
   function verifyEngineer(){
     if(engEnter.disabled)return;
@@ -3646,323 +3494,5 @@ async function deleteEntryFromFirebase(firebaseId){
     });
   }
 </script>
-
-<style id="mars-brand-color-revision">
-/* Brand color revision: no navy; orange only for the company name; PDF is black-only. */
-:root{--brand-teal:#16a99c;--brand-teal-dark:#0d8179;--brand-orange:#ef8b2c;--brand-red:#cf3f52;--brand-red-soft:#fdebed;--brand-ink:#294b54;--brand-muted:#71878d;--brand-bg:#f2f7f8;--brand-line:#d8e6e9}
-html,body{background:var(--brand-bg)!important;color:var(--brand-ink)!important}.topbar{background:#fff!important;border-color:var(--brand-line)!important}.sidebar{background:#e8f1f3!important;border-color:var(--brand-line)!important}.main{background:var(--brand-bg)!important}
-.topbar .text-navy,.topbar .text-ink,.hero-title,.section-title,.stat-value-v2,.fd-trend-big,.fd-mini-val,.fd-chip-name,.glass-title,.glass-logo,.glass-card .g-name{color:var(--brand-ink)!important}
-.topbar .font-extrabold.text-navy,.topbar .font-extrabold.text-ink{color:var(--brand-orange)!important}.hero-eyebrow{color:var(--brand-teal-dark)!important}
-.nav-item{color:var(--brand-muted)!important}.nav-item:hover{background:#d9f0ed!important;color:var(--brand-teal-dark)!important}.nav-item.active{background:var(--brand-teal)!important;color:#fff!important}
-.card,.hero-banner,.modal-box{background:#fff!important;border-color:var(--brand-line)!important;color:var(--brand-ink)!important}.field,select,select.field,input.field,textarea.field,.g-field{background:#fff!important;color:var(--brand-ink)!important;border-color:#c9dde1!important}.field:focus,.g-field:focus,select:focus{border-color:var(--brand-teal)!important;box-shadow:0 0 0 3px #d9f2ef!important}.field option,select option{background:#fff!important;color:var(--brand-ink)!important}
-.btn-primary,.g-btn{background:var(--brand-teal)!important;border-color:var(--brand-teal-dark)!important;color:#fff!important}.btn-primary:hover,.g-btn:hover{background:var(--brand-teal-dark)!important}.btn-secondary,.btn-outline{background:#fff!important;color:var(--brand-teal-dark)!important;border-color:#bcd2d7!important}.btn-secondary:hover,.btn-outline:hover{background:#e7f7f5!important;border-color:var(--brand-teal)!important}.btn-warning{background:#fff1d9!important;color:#9b5d0b!important;border-color:#e5c78e!important}.btn-danger{background:var(--brand-red-soft)!important;color:var(--brand-red)!important;border-color:#e6a7b1!important}.btn-success{background:#dff4eb!important;color:#197957!important;border-color:#a9dec8!important}
-.stat-icon,.stat-icon-v2,.fd-chip-icon{background:#e7f7f5!important;color:var(--brand-teal-dark)!important}.field-label,.stat-label-v2,.stat-foot-v2,.hero-sub,.fd-trend-sub,.fd-meta,.empty-state,.glass-sub,.glass-footer{color:var(--brand-muted)!important}.hero-mark{background:var(--brand-teal)!important}.dev-credit-glow{color:var(--brand-teal-dark)!important;text-shadow:none!important}
-.topbar .bg-navy{background:#e7f7f5 url('icon-192.png') center/cover no-repeat!important}.admin-only.btn-warning{background:#e7f7f5!important;color:var(--brand-teal-dark)!important;border-color:#a9ded8!important}#btnAdminToggle{background:var(--brand-teal)!important;color:#fff!important}
-/* Warning and error indicators are red, not navy/orange. */
-.low-stock-pulse,.low-stock-blink{border-color:var(--brand-red)!important}.low-stock-pulse .stat-icon{background:var(--brand-red-soft)!important;color:var(--brand-red)!important}.text-red-400,.text-red-500,.text-red-600{color:var(--brand-red)!important}.bg-red-500,.bg-red-600{background:var(--brand-red)!important}.text-amber-400,.text-amber-500{color:var(--brand-red)!important}.bg-amber-400,.bg-amber-500{background:var(--brand-red)!important}
-.g-status.error,.vault-status.error,.engineer-status.error{color:var(--brand-red)!important}.g-status.success,.vault-status.success,.engineer-status.success{color:#16805e!important}.glass-card:hover{background:#effaf8!important;border-color:var(--brand-teal)!important}.glass-card .g-enter{color:var(--brand-teal-dark)!important}.glass-logo .mark{background:#e7f7f5!important;color:var(--brand-teal-dark)!important;border-color:#bfe3df!important}.intro-title,.intro-sub{color:var(--brand-ink)!important}.intro-highlight{color:var(--brand-orange)!important}.intro-btn{background:var(--brand-teal)!important;border-color:var(--brand-teal-dark)!important}
-/* PDF/print output must remain strictly black and white. */
-@media print{html,body{background:#fff!important;color:#000!important}.pdf-header,.mars-pdf-brand{border-color:#000!important}.mars-pdf-brand strong,.mars-pdf-brand small,.pdf-table th,.pdf-table td,#pdfCard *{color:#000!important}.pdf-table,.pdf-table th,.pdf-table td{border-color:#000!important;background:#fff!important}.pdf-table th{font-weight:900!important}.mars-pdf-brand img{filter:grayscale(1)!important}.btn,.no-print{display:none!important}}
-</style>
-<style id="mars-logo-compact-premium">
-/* Premium controls and compact layout; no existing action handlers are removed. */
-.icon-edit,.icon-delete,.text-blue-400.font-bold,.text-red-400.font-bold{display:inline-grid!important;place-items:center!important;width:32px!important;height:32px!important;border-radius:9px!important;text-decoration:none!important;font-size:0!important;border:1px solid transparent!important;transition:background 140ms ease,border-color 140ms ease,transform 140ms ease!important}.icon-edit:after,.text-blue-400.font-bold:after{content:'Edit';font-size:10px;font-weight:800}.icon-delete:after,.text-red-400.font-bold:after{content:'Delete';font-size:10px;font-weight:800}.text-blue-400.font-bold{background:#e6f8f6!important;color:#0d8179!important;border-color:#bde3df!important}.text-red-400.font-bold{background:#f8e7eb!important;color:#a43e58!important;border-color:#e6b7c2!important}.text-blue-400.font-bold:hover,.text-red-400.font-bold:hover{transform:translateY(-1px)}
-.modal-box{max-height:90vh!important;overflow:auto!important}.modal-box .flex.gap-2.mb-4{position:sticky;top:-20px;z-index:4;padding:12px 0;background:#fff!important;border-bottom:1px solid #d8e6e9!important}.page-section{scroll-margin-top:76px}.table-wrap{max-height:62vh;overflow:auto!important}.table-wrap thead,.pdf-table thead{position:sticky;top:0;z-index:2}.table-wrap th{background:#e7f7f5!important}.page-section .card{margin-bottom:14px!important}
-#marsPdfLogoSettings{background:#f7fbfb!important;border:1px solid #d8e6e9!important;border-radius:14px!important;padding:14px!important;margin:0 0 16px!important}#marsPdfLogoSettings .logo-preview{width:52px;height:52px;border-radius:13px;object-fit:cover;background:#e7f7f5;border:1px solid #bfe5e0}
-.mars-pdf-brand{display:flex;align-items:center;gap:12px;padding:0 0 12px;border-bottom:2px solid #16a99c;margin-bottom:12px}.mars-pdf-brand img{width:48px;height:48px;border-radius:12px;object-fit:cover}.mars-pdf-brand strong{font-size:18px;color:#17384a}.mars-pdf-brand small{display:block;color:#6f8791;margin-top:3px}
-@media(max-width:640px){.modal-box .flex.gap-2.mb-4{top:-16px;overflow-x:auto;flex-wrap:nowrap!important}.table-wrap{max-height:58vh}.icon-edit,.icon-delete,.text-blue-400.font-bold,.text-red-400.font-bold{width:30px!important;height:30px!important}}
-</style>
-<script>
-(function(){
-  const LOGO_KEY='mars_pdf_logo_dataurl';
-  function logo(){try{return localStorage.getItem(LOGO_KEY)||''}catch(e){return''}}
-  window.saveMarsPdfLogo=function(input){
-    const file=input&&input.files&&input.files[0]; if(!file)return;
-    if(!/^image\/(png|jpeg|jpg|svg\+xml)$/.test(file.type)){alert('Please select a PNG, JPG, or SVG logo.');input.value='';return;}
-    if(file.size>2*1024*1024){alert('Logo must be smaller than 2 MB.');input.value='';return;}
-    const reader=new FileReader(); reader.onload=function(){try{localStorage.setItem(LOGO_KEY,reader.result);renderLogoBox()}catch(e){alert('Could not save logo on this device.')}}; reader.readAsDataURL(file);
-  };
-  window.clearMarsPdfLogo=function(){localStorage.removeItem(LOGO_KEY);renderLogoBox()};
-  function renderLogoBox(){
-    const modal=document.querySelector('.modal-box'); if(!modal)return;
-    let box=document.getElementById('marsPdfLogoSettings'); if(!box){box=document.createElement('div');box.id='marsPdfLogoSettings';modal.querySelector('.flex.items-center.justify-between')?.after(box)}
-    const src=logo(); box.innerHTML='<div style="display:flex;align-items:center;gap:12px"><img class="logo-preview" alt="PDF logo preview" src="'+(src||'mars-app-icon.svg')+'"><div style="flex:1"><div style="font-weight:900;color:#17384a">PDF Company Logo</div><div style="font-size:11px;color:#6f8791;margin-top:3px">Upload a logo for branded PDF reports. Saved on this device.</div></div><label class="btn btn-secondary" style="cursor:pointer">Upload Logo<input type="file" accept="image/png,image/jpeg,image/svg+xml" style="display:none" onchange="saveMarsPdfLogo(this)"></label>'+(src?'<button class="btn btn-warning" type="button" onclick="clearMarsPdfLogo()">Remove</button>':'')+'</div>';
-  }
-  function wrapSettings(){
-    if(typeof window.renderAdminSettingsModal!=='function'||window.__marsSettingsWrapped)return;
-    const original=window.renderAdminSettingsModal; window.renderAdminSettingsModal=function(tab){original(tab);setTimeout(renderLogoBox,0)}; window.__marsSettingsWrapped=true;
-  }
-  function wrapPdf(){
-    if(typeof window.downloadPDF!=='function'||window.__marsPdfWrapped)return;
-    const original=window.downloadPDF; window.downloadPDF=function(){
-      const content=document.getElementById('pdfContent'); const src=logo();
-      if(content&&src&&!content.querySelector('.mars-pdf-brand')){const brand=document.createElement('div');brand.className='mars-pdf-brand';brand.innerHTML='<img alt="Company logo" src="'+src+'"><div><strong>MARS STRUCTURE LIMITED</strong><small>Stock Ledger Management System</small></div>';content.prepend(brand)}
-      original.apply(this,arguments);
-    }; window.__marsPdfWrapped=true;
-  }
-  const timer=setInterval(function(){wrapSettings();wrapPdf();if(window.__marsSettingsWrapped&&window.__marsPdfWrapped)clearInterval(timer)},250);
-})();
-</script>
-<style id="mars-pdf-preview-control-style">
-#marsPdfLogoSettings .mars-preview-pdf{background:#e7f7f5!important;color:#0d8179!important;border:1px solid #bfe3df!important}
-#marsPdfLogoSettings .mars-preview-pdf:hover{background:#d6f1ed!important;border-color:#16a99c!important}
-</style>
-<script>
-(function(){
-  window.previewMarsPdf=function(){
-    if(typeof window.downloadPDF==='function'){window.downloadPDF();}
-    else{alert('PDF preview is not ready yet.');}
-  };
-  function addPreview(){
-    var box=document.getElementById('marsPdfLogoSettings'); if(!box||box.querySelector('.mars-preview-pdf'))return;
-    var row=box.querySelector('div'); if(!row)return;
-    var btn=document.createElement('button'); btn.type='button'; btn.className='btn btn-secondary mars-preview-pdf'; btn.textContent='Preview PDF'; btn.title='Open a branded print/PDF preview'; btn.onclick=window.previewMarsPdf;
-    var remove=row.querySelector('button[onclick*="clearMarsPdfLogo"]');
-    if(remove) row.insertBefore(btn,remove); else row.appendChild(btn);
-  }
-  var t=setInterval(function(){addPreview()},250); setTimeout(function(){clearInterval(t)},120000);
-})();
-</script>
-<style id="mars-workflow-polish">
-.mars-batch-guide{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 14px;margin:14px 0 16px;background:#e7f7f5;border:1px solid #bfe3df;border-radius:13px;color:#29606a}.mars-batch-guide strong{color:#0d8179}.mars-batch-guide small{display:block;color:#71878d;margin-top:3px}.mars-batch-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:#fff;border:1px solid #c7e1de;color:#0d8179;font-size:11px;font-weight:800}.mars-row-count{font-size:11px;color:#71878d;font-weight:800}.mars-offline{position:fixed;left:50%;top:10px;transform:translateX(-50%);z-index:100002;display:none;padding:8px 13px;border-radius:999px;background:#fdebed;border:1px solid #e6a7b1;color:#cf3f52;font-size:11px;font-weight:900;box-shadow:0 4px 12px rgba(120,40,60,.08)}.mars-offline.show{display:block}.item-row{border-color:#d8e6e9!important;background:#fff!important;box-shadow:0 4px 12px rgba(24,59,82,.04)!important}.item-row .rounded-xl{background:#f8fbfb!important;border:1px solid #d8e6e9!important}.item-row .text-blue-300,.item-row .text-teal-300,.item-row .text-amber-300,.item-row .text-violet-300{color:#0d8179!important}.item-row [data-role="addMatBtn"]{color:#ef8b2c!important}.item-row [onclick*="remove"]{color:#cf3f52!important;background:#fdebed!important;border:1px solid #e6a7b1!important;border-radius:9px!important;padding:5px 8px!important}.mars-batch-guide .btn{min-height:36px!important}
-</style>
-<script>
-(function(){
-  function addBatchGuide(){
-    var form=document.getElementById('ledgerForm'); if(!form||document.getElementById('marsBatchGuide'))return;
-    var wrap=document.getElementById('itemRowsWrap'); if(!wrap)return;
-    var guide=document.createElement('div'); guide.id='marsBatchGuide';guide.className='mars-batch-guide';
-    guide.innerHTML='<div><strong>One MRR / Gate Pass, multiple materials</strong><small>Add every material under the same project and movement reference, then save them together.</small></div><div style="display:flex;align-items:center;gap:8px"><span class="mars-batch-badge" id="marsRowCount">1 material</span><button type="button" class="btn btn-secondary" onclick="addItemRow()">+ Add material</button></div>';
-    form.insertBefore(guide,wrap);
-  }
-  function updateCount(){var el=document.getElementById('marsRowCount');if(!el)return;var n=document.querySelectorAll('#itemRowsWrap .item-row').length;el.textContent=n+' material'+(n===1?'':'s')}
-  function addOffline(){var el=document.createElement('div');el.id='marsOfflineIndicator';el.className='mars-offline';el.textContent='Offline mode — local changes will sync when connected';document.body.appendChild(el);function sync(){el.classList.toggle('show',navigator.onLine===false)}window.addEventListener('online',sync);window.addEventListener('offline',sync);sync()}
-  function addConfirm(){document.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var action=b.getAttribute('onclick')||'';if(/delete/i.test(action)&&!b.dataset.confirmed){if(!confirm('Are you sure you want to delete this item? This action cannot be undone.')){e.preventDefault();e.stopImmediatePropagation()}}},true)}
-  function addSaveState(){document.addEventListener('click',function(e){var b=e.target.closest('#btnSubmit');if(!b||b.dataset.busy)return;b.dataset.busy='1';var old=b.textContent;b.textContent='Saving…';b.setAttribute('aria-busy','true');setTimeout(function(){b.dataset.busy='';b.textContent=old;b.removeAttribute('aria-busy')},1400)})}
-  var t=setInterval(function(){addBatchGuide();updateCount();if(document.getElementById('extraItemRows')){new MutationObserver(updateCount).observe(document.getElementById('extraItemRows'),{childList:true});clearInterval(t)}},250);
-  addOffline();addConfirm();addSaveState();
-})();
-</script>
-<style id="mars-priority-workflow-theme">
-.mars-group-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0;padding:12px;background:#f7fbfb;border:1px solid #d8e6e9;border-radius:13px}.mars-group-summary .metric{padding:9px 10px;background:#fff;border:1px solid #e1ecee;border-radius:10px}.mars-group-summary small{display:block;color:#71878d;font-size:10px;font-weight:800}.mars-group-summary strong{display:block;color:#294b54;font-size:15px;margin-top:3px}.mars-balance-preview{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:10px;font-weight:800}.mars-balance-preview span{padding:5px 8px;border-radius:999px;background:#e7f7f5;color:#0d8179;border:1px solid #bfe3df}.mars-balance-preview .warn{background:#fdebed;color:#cf3f52;border-color:#e6a7b1}.mars-duplicate-row{font-size:10px!important;padding:5px 8px!important;background:#e7f7f5!important;color:#0d8179!important;border:1px solid #bfe3df!important;border-radius:8px!important}.mars-report-shortcuts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid #d8e6e9}.mars-report-shortcuts .btn{min-height:34px!important;font-size:11px!important}@media(max-width:700px){.mars-group-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
-</style>
-<script>
-(function(){
-  function rows(){return Array.from(document.querySelectorAll('.item-row'))}
-  function num(row,role){return Number(row?.querySelector('[data-role="'+role+'"]')?.value||0)||0}
-  function text(row,role){return (row?.querySelector('[data-role="'+role+'"]')?.value||'').trim()}
-  function updateSummary(){
-    var box=document.getElementById('marsGroupSummary'); if(!box)return; var rs=rows();
-    var proc=rs.reduce((a,r)=>a+num(r,'procQty'),0), rec=rs.reduce((a,r)=>a+num(r,'recQty'),0), tr=rs.reduce((a,r)=>a+num(r,'trQty'),0), issue=rs.reduce((a,r)=>a+num(r,'issueQty'),0);
-    box.querySelector('[data-metric="materials"]').textContent=rs.filter(r=>text(r,'material')||num(r,'procQty')||num(r,'recQty')||num(r,'trQty')||num(r,'issueQty')).length;
-    box.querySelector('[data-metric="received"]').textContent=(proc+rec).toFixed(2);box.querySelector('[data-metric="outgoing"]').textContent=(tr+issue).toFixed(2);box.querySelector('[data-metric="net"]').textContent=(proc+rec-tr-issue).toFixed(2);
-  }
-  function balancePreview(row){
-    var material=text(row,'material'),project=document.getElementById('selectProject')?.value||''; if(!material||!project)return;
-    var current=0;try{if(typeof computeCurrentBalance==='function')current=Number(computeCurrentBalance(project,material))||0}catch(e){}
-    var next=current+num(row,'procQty')+num(row,'recQty')-num(row,'trQty')-num(row,'issueQty');
-    var el=row.querySelector('.mars-balance-preview');if(!el){el=document.createElement('div');el.className='mars-balance-preview';row.querySelector('[data-role="material"]')?.parentElement?.appendChild(el)}
-    el.innerHTML='<span>Current: '+current.toFixed(2)+'</span><span class="'+(next<0?'warn':'')+'">After entry: '+next.toFixed(2)+'</span>'+(next<0?'<span class="warn">Insufficient balance</span>':'');
-  }
-  function duplicateRow(source){
-    if(typeof addItemRow!=='function')return;addItemRow();var rs=rows(),target=rs[rs.length-1];if(!target)return;['material','unit','procMrr','procQty','recPrj','recGp','recQty','trGp','trPrj','trQty','purpose','issueQty'].forEach(function(role){var a=source.querySelector('[data-role="'+role+'"]'),b=target.querySelector('[data-role="'+role+'"]');if(a&&b)b.value=a.value});if(typeof onMaterialSelectRow==='function'){var m=target.querySelector('[data-role="material"]');if(m)onMaterialSelectRow(m)}updateSummary();balancePreview(target)}
-  function addSummary(){var form=document.getElementById('ledgerForm'),wrap=document.getElementById('itemRowsWrap');if(!form||!wrap||document.getElementById('marsGroupSummary'))return;var b=document.createElement('div');b.id='marsGroupSummary';b.className='mars-group-summary';b.innerHTML='<div class="metric"><small>Materials</small><strong data-metric="materials">1</strong></div><div class="metric"><small>Total Received</small><strong data-metric="received">0.00</strong></div><div class="metric"><small>Total Outgoing</small><strong data-metric="outgoing">0.00</strong></div><div class="metric"><small>Net Movement</small><strong data-metric="net">0.00</strong></div>';wrap.before(b);updateSummary()}
-  function addRowControls(){rows().forEach(function(r){if(r.querySelector('.mars-duplicate-row'))return;var btn=document.createElement('button');btn.type='button';btn.className='mars-duplicate-row';btn.textContent='Duplicate';btn.onclick=function(){duplicateRow(r)};r.appendChild(btn);balancePreview(r)})}
-  function duplicateWarning(){
-    if(typeof entries==='undefined')return false;var project=document.getElementById('selectProject')?.value||'';var rs=rows();var refs=[];rs.forEach(function(r){['procMrr','recGp','trGp'].forEach(function(role){var v=text(r,role);if(v)refs.push(v.toLowerCase())})});var found=entries.filter(function(e){if(e.prjNo!==project)return false;return refs.some(function(ref){return [e.procMrr,e.recGp,e.trGp].map(x=>String(x||'').toLowerCase()).includes(ref)})});if(found.length){return confirm('This project already has entries under the same MRR/Gate Pass. Add these materials to the existing group?')}return true
-  }
-  function wrapSave(){if(typeof window.saveEntry!=='function'||window.__marsPrioritySaveWrapped)return;var original=window.saveEntry;window.saveEntry=function(){if(!duplicateWarning())return;return original.apply(this,arguments)};window.__marsPrioritySaveWrapped=true}
-  function observe(){var form=document.getElementById('ledgerForm');if(!form)return;var handler=function(e){if(e.target.matches('input,select')){updateSummary();var row=e.target.closest('.item-row');if(row)balancePreview(row)}};form.addEventListener('input',handler);form.addEventListener('change',handler);new MutationObserver(function(){addSummary();addRowControls();updateSummary()}).observe(form,{childList:true,subtree:true})}
-  var t=setInterval(function(){addSummary();addRowControls();wrapSave();if(document.getElementById('ledgerForm')){observe();clearInterval(t)}},300);
-})();
-</script>
-<style id="mars-report-builder-style">
-.mars-report-builder{margin-top:14px;padding:14px;background:#fff;border:1px solid #d8e6e9;border-radius:14px;box-shadow:0 5px 14px rgba(24,59,82,.05)}.mars-report-builder h3{margin:0;color:#294b54;font-size:15px}.mars-report-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:12px}.mars-report-grid label{font-size:10px;font-weight:900;color:#71878d}.mars-report-grid input,.mars-report-grid select{margin-top:4px;width:100%}.mars-report-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.mars-report-actions button{min-height:37px!important;font-size:11px!important}.mars-report-meta{margin-top:10px;color:#71878d;font-size:11px;font-weight:700}@media(max-width:760px){.mars-report-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:450px){.mars-report-grid{grid-template-columns:1fr}}
-</style>
-<script>
-(function(){
-  function esc(v){return typeof escapeHtml==='function'?escapeHtml(String(v??'')):String(v??'').replace(/[&<>"']/g,function(m){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m]})}
-  function add(){var host=document.getElementById('advancedTools');if(!host||document.getElementById('marsReportBuilder'))return;var box=document.createElement('section');box.id='marsReportBuilder';box.className='mars-report-builder';box.innerHTML='<h3>Report Builder</h3><div style="font-size:11px;color:#71878d;margin-top:3px">Filter and print complete stock movement records without abbreviations.</div><div class="mars-report-grid"><label>Material Receipt Report Number<input id="rbMrr" class="field" placeholder="Any MRR"></label><label>Materials Challan Number<input id="rbChallan" class="field" placeholder="Any challan"></label><label>Procurement Source<select id="rbSource" class="field"><option value="">All sources</option><option value="LOCAL_PURCHASE">Local Purchase</option><option value="WORK_ORDER">Work Order</option></select></label><label>Project Number<input id="rbProject" class="field" placeholder="Any project"></label><label>Material<input id="rbMaterial" class="field" placeholder="Any material"></label><label>Gate Pass Number<input id="rbGate" class="field" placeholder="Any gate pass"></label><label>From Date<input id="rbFrom" type="date" class="field"></label><label>To Date<input id="rbTo" type="date" class="field"></label></div><div class="mars-report-actions"><button type="button" class="btn btn-primary" id="rbPrint">Generate Full Report</button><button type="button" class="btn btn-secondary" id="rbMrrReport">MRR-wise Report</button><button type="button" class="btn btn-secondary" id="rbClear">Clear Filters</button></div><div id="rbMeta" class="mars-report-meta"></div>';host.appendChild(box);box.querySelector('#rbPrint').onclick=function(){printReport('complete')};box.querySelector('#rbMrrReport').onclick=function(){printReport('mrr')};box.querySelector('#rbClear').onclick=function(){box.querySelectorAll('input').forEach(function(x){x.value='' });box.querySelector('#rbSource').value='';box.querySelector('#rbMeta').textContent='Filters cleared'};}
-  function val(id){return (document.getElementById(id)?.value||'').trim().toLowerCase()}
-  function filtered(){var mrr=val('rbMrr'),ch=val('rbChallan'),src=val('rbSource'),prj=val('rbProject'),mat=val('rbMaterial'),gate=val('rbGate'),from=val('rbFrom'),to=val('rbTo');return (typeof entries==='undefined'?[]:entries).filter(function(e){var source=String(e.procSource||'').toLowerCase(),g=[e.recGp,e.trGp].map(function(x){return String(x||'').toLowerCase()});if(mrr&&!String(e.procMrr||'').toLowerCase().includes(mrr))return false;if(ch&&!String(e.procChallan||'').toLowerCase().includes(ch))return false;if(src&&source!==src)return false;if(prj&&!String(e.prjNo||'').toLowerCase().includes(prj))return false;if(mat&&!String(e.material||'').toLowerCase().includes(mat))return false;if(gate&&!g.some(function(x){return x.includes(gate)}))return false;if(from&&String(e.dateStr||'')<from)return false;if(to&&String(e.dateStr||'')>to)return false;return true})}
-  function printReport(mode){var list=filtered();var meta=document.getElementById('rbMeta');if(meta)meta.textContent=list.length+' record'+(list.length===1?'':'s')+' matched';var rows=list.map(function(e){return '<tr><td>'+esc(e.dateStr)+'</td><td>'+esc(e.prjNo)+'</td><td>'+esc(e.material)+'</td><td>'+esc(e.procMrr||'-')+'</td><td>'+esc(e.procChallan||'-')+'</td><td>'+esc(e.procSource==='LOCAL_PURCHASE'?'Local Purchase':e.procSource==='WORK_ORDER'?'Work Order':e.procSource||'-')+'</td><td>'+esc(e.procQty||0)+'</td><td>'+esc(e.recGp||'-')+'</td><td>'+esc(e.trGp||'-')+'</td><td>'+esc(e.issueQty||0)+'</td></tr>'}).join('');if(mode==='mrr'){var groups={};list.forEach(function(e){var k=e.procMrr||'No MRR';(groups[k]||(groups[k]=[])).push(e)});rows=Object.keys(groups).map(function(k){return '<tr class="group"><td colspan="10"><strong>Material Receipt Report Number: '+esc(k)+'</strong> — '+groups[k].length+' material record(s)</td></tr>'+groups[k].map(function(e){return '<tr><td>'+esc(e.dateStr)+'</td><td>'+esc(e.prjNo)+'</td><td>'+esc(e.material)+'</td><td>'+esc(e.procMrr||'-')+'</td><td>'+esc(e.procChallan||'-')+'</td><td>'+esc(e.procSource==='LOCAL_PURCHASE'?'Local Purchase':e.procSource==='WORK_ORDER'?'Work Order':e.procSource||'-')+'</td><td>'+esc(e.procQty||0)+'</td><td>'+esc(e.recGp||'-')+'</td><td>'+esc(e.trGp||'-')+'</td><td>'+esc(e.issueQty||0)+'</td></tr>'}).join('')}).join('')}
-    var w=window.open('','_blank','width=1280,height=850');if(!w)return;w.document.write('<!doctype html><html><head><title>MARS STRUCTURE LIMITED — Stock Ledger Report</title><style>@page{size:landscape;margin:12mm}body{font-family:Arial,sans-serif;color:#000;background:#fff}h1{font-size:20px;margin:0 0 4px}h2{font-size:13px;margin:0 0 14px;font-weight:normal}table{width:100%;border-collapse:collapse;font-size:10px}th,td{border:1px solid #000;padding:6px;text-align:left}th{font-weight:900;background:#fff}.group td{font-weight:bold;background:#eee}footer{margin-top:18px;font-size:10px}button{display:none}@media print{.group td{background:#fff}}</style></head><body><h1>MARS STRUCTURE LIMITED</h1><h2>Complete Stock Ledger Report</h2><table><thead><tr><th>Date</th><th>Project Number</th><th>Material</th><th>Material Receipt Report Number</th><th>Materials Challan Number</th><th>Procurement Source</th><th>Procurement Quantity</th><th>Receiving Gate Pass Number</th><th>Transfer Gate Pass Number</th><th>Issue Quantity</th></tr></thead><tbody>'+rows+'</tbody></table><footer>Generated: '+new Date().toLocaleString()+' | Total records: '+list.length+'</footer></body></html>');w.document.close();setTimeout(function(){w.print()},250)}
-  var t=setInterval(function(){add();if(document.getElementById('marsReportBuilder'))clearInterval(t)},300);
-})();
-</script>
-<style id="mars-dedicated-reports-style">
-.mars-dedicated-reports{margin-top:14px;padding:14px;background:#fff;border:1px solid #d8e6e9;border-radius:14px;box-shadow:0 5px 14px rgba(24,59,82,.05)}.mars-dedicated-reports h3{margin:0;color:#294b54;font-size:15px}.mars-report-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:10px 0}.mars-report-summary div{background:#f7fbfb;border:1px solid #e1ecee;border-radius:10px;padding:9px}.mars-report-summary small{display:block;color:#71878d;font-size:10px;font-weight:800}.mars-report-summary strong{display:block;color:#294b54;font-size:16px;margin-top:3px}.mars-dedicated-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.mars-dedicated-actions button{min-height:37px!important;font-size:11px!important}@media(max-width:650px){.mars-report-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
-</style>
-<script>
-(function(){
- function esc(v){return typeof escapeHtml==='function'?escapeHtml(String(v??'')):String(v??'')}
- function add(){var host=document.getElementById('advancedTools');if(!host||document.getElementById('marsDedicatedReports'))return;var s=document.createElement('section');s.id='marsDedicatedReports';s.className='mars-dedicated-reports';s.innerHTML='<h3>Dedicated Reports</h3><div style="font-size:11px;color:#71878d;margin-top:3px">Project-wise, Material-wise and Physical Verification Summary</div><div class="mars-report-summary"><div><small>Total Projects</small><strong id="drProjects">0</strong></div><div><small>Total Materials</small><strong id="drMaterials">0</strong></div><div><small>Total Received</small><strong id="drReceived">0.00</strong></div><div><small>Total Issued</small><strong id="drIssued">0.00</strong></div></div><div class="mars-dedicated-actions"><button type="button" class="btn btn-secondary" id="drProject">Project-wise Report</button><button type="button" class="btn btn-secondary" id="drMaterial">Material-wise Report</button><button type="button" class="btn btn-secondary" id="drPhysical">Physical Verification Summary</button></div>';host.appendChild(s);refresh();s.querySelector('#drProject').onclick=function(){printDedicated('project')};s.querySelector('#drMaterial').onclick=function(){printDedicated('material')};s.querySelector('#drPhysical').onclick=function(){printDedicated('physical')}}
- function refresh(){var es=typeof entries==='undefined'?[]:entries;var ps=new Set(),ms=new Set(),rec=0,iss=0;es.forEach(function(e){if(e.prjNo)ps.add(e.prjNo);if(e.material)ms.add(e.material);rec+=(+e.procQty||0)+(+e.recQty||0);iss+=(+e.issueQty||0)});var a=document.getElementById('drProjects');if(a)a.textContent=ps.size; a=document.getElementById('drMaterials');if(a)a.textContent=ms.size;a=document.getElementById('drReceived');if(a)a.textContent=rec.toFixed(2);a=document.getElementById('drIssued');if(a)a.textContent=iss.toFixed(2)}
- function printDedicated(kind){var es=typeof entries==='undefined'?[]:entries,w=window.open('','_blank','width=1280,height=850');if(!w)return;var title='',head='',rows='';if(kind==='project'){title='Project-wise Stock Report';head='<th>Project Number</th><th>Materials</th><th>Total Received</th><th>Total Transferred</th><th>Total Issued</th><th>Current Balance</th>';var g={};es.forEach(function(e){var k=e.prjNo||'Unknown';g[k]||(g[k]={m:new Set(),r:0,t:0,i:0});g[k].m.add(e.material||'-');g[k].r+=(+e.procQty||0)+(+e.recQty||0);g[k].t+=+e.trQty||0;g[k].i+=+e.issueQty||0});rows=Object.keys(g).map(function(k){var x=g[k];return '<tr><td>'+esc(k)+'</td><td>'+x.m.size+'</td><td>'+x.r.toFixed(2)+'</td><td>'+x.t.toFixed(2)+'</td><td>'+x.i.toFixed(2)+'</td><td>'+((x.r-x.t-x.i).toFixed(2))+'</td></tr>'}).join('')}else if(kind==='material'){title='Material-wise Stock Report';head='<th>Material</th><th>Projects</th><th>Total Received</th><th>Total Transferred</th><th>Total Issued</th><th>Current Balance</th>';var g={};es.forEach(function(e){var k=e.material||'Unknown';g[k]||(g[k]={p:new Set(),r:0,t:0,i:0});g[k].p.add(e.prjNo||'-');g[k].r+=(+e.procQty||0)+(+e.recQty||0);g[k].t+=+e.trQty||0;g[k].i+=+e.issueQty||0});rows=Object.keys(g).sort().map(function(k){var x=g[k];return '<tr><td>'+esc(k)+'</td><td>'+x.p.size+'</td><td>'+x.r.toFixed(2)+'</td><td>'+x.t.toFixed(2)+'</td><td>'+x.i.toFixed(2)+'</td><td>'+((x.r-x.t-x.i).toFixed(2))+'</td></tr>'}).join('')}else{title='Physical Verification Summary';head='<th>Date</th><th>Project Number</th><th>Checked By</th><th>Materials Checked</th><th>Shortage Items</th><th>Excess Items</th><th>Status</th>';var cs=typeof stockChecks==='undefined'?[]:stockChecks;rows=cs.map(function(c){var sh=(c.items||[]).filter(function(i){return Number(i.variance)<0}).length,ex=(c.items||[]).filter(function(i){return Number(i.variance)>0}).length;return '<tr><td>'+esc(c.dateStr||'-')+'</td><td>'+esc(c.prjNo||'-')+'</td><td>'+esc(c.checkedByEngineerName||'-')+'</td><td>'+((c.items||[]).length)+'</td><td>'+sh+'</td><td>'+ex+'</td><td>'+((sh||ex)?'Variance Found':'Matched')+'</td></tr>'}).join('')}
-w.document.write('<!doctype html><html><head><title>MARS STRUCTURE LIMITED — '+title+'</title><style>@page{size:landscape;margin:12mm}body{font-family:Arial,sans-serif;color:#000;background:#fff}h1{font-size:20px;margin:0 0 4px}h2{font-size:13px;margin:0 0 14px;font-weight:normal}table{width:100%;border-collapse:collapse;font-size:11px}th,td{border:1px solid #000;padding:7px;text-align:left}th{font-weight:900}footer{margin-top:18px;font-size:10px}</style></head><body><h1>MARS STRUCTURE LIMITED</h1><h2>'+title+'</h2><table><thead><tr>'+head+'</tr></thead><tbody>'+rows+'</tbody></table><footer>Generated: '+new Date().toLocaleString()+'</footer></body></html>');w.document.close();setTimeout(function(){w.print()},250)}
- var t=setInterval(function(){add();refresh();if(document.getElementById('marsDedicatedReports'))clearInterval(t)},300);
-})();
-</script>
-<script>
-(function(){function csv(v){return '"'+String(v??'').replace(/"/g,'""')+'"'}function add(){var box=document.getElementById('marsReportBuilder');if(!box||document.getElementById('marsExcelExport'))return;var b=document.createElement('button');b.id='marsExcelExport';b.type='button';b.className='btn btn-secondary';b.textContent='Download Excel CSV';b.onclick=function(){var es=typeof entries==='undefined'?[]:entries;var head=['Date','Project Number','Project ID','Engineer Name','Material','Material Receipt Report Number','Materials Challan Number','Procurement Source','Procurement Quantity','Receiving Project Number','Receiving Gate Pass Number','Receiving Quantity','Transfer Project Number','Transfer Gate Pass Number','Transfer Quantity','Work Purpose','Issue Quantity'];var lines=[head.map(csv).join(',')];es.forEach(function(e){lines.push([e.dateStr,e.prjNo,e.material,e.procMrr,e.procChallan,e.procSource==='LOCAL_PURCHASE'?'Local Purchase':e.procSource==='WORK_ORDER'?'Work Order':e.procSource,e.procQty,e.recPrj,e.recGp,e.recQty,e.trPrj,e.trGp,e.trQty,e.purpose,e.issueQty].map(csv).join(','))});var blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mars-stock-ledger-'+new Date().toISOString().slice(0,10)+'.csv';a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},500)};box.querySelector('.mars-report-actions')?.appendChild(b)}var t=setInterval(function(){add();if(document.getElementById('marsExcelExport'))clearInterval(t)},300)})();
-</script>
-<style id="mars-xlsx-export-style">.mars-xlsx-export{background:#fff!important;color:#0d8179!important;border-color:#bfe3df!important}.mars-xlsx-export:hover{background:#e7f7f5!important}</style>
-<script>
-(function(){
- function loadXLSX(cb){if(window.XLSX)return cb();var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';s.onload=cb;s.onerror=function(){alert('Excel workbook library could not load. Please check internet and try again.')};document.head.appendChild(s)}
- function esc(v){return String(v??'')}
- function add(){var box=document.getElementById('marsReportBuilder');if(!box||document.getElementById('marsXlsxExport'))return;var b=document.createElement('button');b.id='marsXlsxExport';b.type='button';b.className='btn btn-secondary mars-xlsx-export';b.textContent='Download Excel Workbook';b.onclick=function(){loadXLSX(build)};box.querySelector('.mars-report-actions')?.appendChild(b)}
- function rowsFor(list,title){var id='MARS-'+new Date().toISOString().replace(/[-:TZ.]/g,'').slice(0,14);var out=[['MARS STRUCTURE LIMITED'],[title],['Report ID',id],['Generated Date',new Date().toLocaleString()],['Prepared By','Stock Ledger System'],['Project ID',first.prjId||'Multiple / See rows'],['Engineer Name',first.engineerName||'Multiple / See rows'],[],['Date','Project Number','Project ID','Engineer Name','Material','Material Receipt Report Number','Materials Challan Number','Procurement Source','Procurement Quantity','Receiving Project Number','Receiving Gate Pass Number','Receiving Quantity','Transfer Project Number','Transfer Gate Pass Number','Transfer Quantity','Work Purpose','Issue Quantity']];list.forEach(function(e){out.push([e.dateStr,e.prjNo,e.prjId||'-',e.engineerName||'-',e.material,e.procMrr,e.procChallan,e.procSource==='LOCAL_PURCHASE'?'Local Purchase':e.procSource==='WORK_ORDER'?'Work Order':e.procSource,e.procQty,e.recPrj,e.recGp,e.recQty,e.trPrj,e.trGp,e.trQty,e.purpose,e.issueQty])});out.push([],['MARS STRUCTURE LIMITED — Stock Ledger Report Footer'],['Report ID',id],['Generated Date',new Date().toLocaleString()]);return out}
- function build(){var es=typeof entries==='undefined'?[]:entries,w=XLSX.utils.book_new(),id='MARS-'+new Date().toISOString().replace(/[-:TZ.]/g,'').slice(0,14);function add(name,data){var ws=XLSX.utils.aoa_to_sheet(data);ws['!cols']=Array(Math.max.apply(null,data.map(function(r){return r.length}))).fill({wch:22});XLSX.utils.book_append_sheet(w,ws,name.slice(0,31))}
-  var summary=[['MARS STRUCTURE LIMITED'],['Stock Ledger Excel Workbook'],['Report ID',id],['Generated Date',new Date().toLocaleString()],['Prepared By','Stock Ledger System'],[],['Metric','Value'],['Total Records',es.length],['Total Projects',new Set(es.map(function(e){return e.prjNo}).filter(Boolean)).size],['Total Materials',new Set(es.map(function(e){return e.material}).filter(Boolean)).size],['Total Received',es.reduce(function(a,e){return a+(+e.procQty||0)+(+e.recQty||0)},0)],['Total Transferred',es.reduce(function(a,e){return a+(+e.trQty||0)},0)],['Total Issued',es.reduce(function(a,e){return a+(+e.issueQty||0)},0)],[],['MARS STRUCTURE LIMITED — Company Footer'],['Report ID',id]];add('Summary',summary);add('All Entries',rowsFor(es,'Complete Stock Ledger Report'));
-  var projects={};es.forEach(function(e){(projects[e.prjNo||'Unassigned']||(projects[e.prjNo||'Unassigned']=[])).push(e)});Object.keys(projects).forEach(function(k){add(('Project - '+k),rowsFor(projects[k],'Project-wise Stock Report'))});var mats={};es.forEach(function(e){(mats[e.material||'Unassigned']||(mats[e.material||'Unassigned']=[])).push(e)});add('Material-wise',rowsFor(es,'Material-wise Stock Report'));var mrr={};es.forEach(function(e){(mrr[e.procMrr||'No MRR']||(mrr[e.procMrr||'No MRR']=[])).push(e)});add('MRR-Challan',rowsFor(es,'MRR and Materials Challan Report'));add('Local Purchase',rowsFor(es.filter(function(e){return e.procSource==='LOCAL_PURCHASE'}),'Local Purchase Report'));add('Work Order',rowsFor(es.filter(function(e){return e.procSource==='WORK_ORDER'}),'Work Order Report'));
-  var checks=typeof stockChecks==='undefined'?[]:stockChecks;var ph=[['MARS STRUCTURE LIMITED'],['Physical Verification Summary'],['Report ID',id],['Generated Date',new Date().toLocaleString()],[],['Date','Project Number','Project ID','Engineer Name','Checked By','Materials Checked','Shortage Items','Excess Items','Status']];checks.forEach(function(c){var sh=(c.items||[]).filter(function(i){return Number(i.variance)<0}).length,ex=(c.items||[]).filter(function(i){return Number(i.variance)>0}).length;ph.push([c.dateStr,c.prjNo,(projectDatabase.find(function(p){return p.prjNo===c.prjNo})||{}).id||'-',(projectDatabase.find(function(p){return p.prjNo===c.prjNo})||{}).eng||'-',c.checkedByEngineerName,(c.items||[]).length,sh,ex,(sh||ex)?'Variance Found':'Matched'])});ph.push([],['MARS STRUCTURE LIMITED — Company Footer'],['Report ID',id]);add('Physical Verification',ph);XLSX.writeFile(w,'mars-structure-stock-ledger-'+new Date().toISOString().slice(0,10)+'.xlsx')}
- var t=setInterval(function(){add();if(document.getElementById('marsXlsxExport'))clearInterval(t)},300)
-})();
-</script>
-
-<style id="mars-login-overscroll-fix">
-html,body{overscroll-behavior-y:none!important;overscroll-behavior-x:none!important}
-body{overflow-x:hidden!important}
-#accessOverlay,#introScreen{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;min-height:100dvh!important;z-index:2147483000!important;overflow:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:auto!important}
-#accessOverlay .glass-panel,#introScreen .glass-panel{max-height:calc(100dvh - 28px)!important;overflow-y:auto!important;overscroll-behavior:contain!important}
-.mobile-bottom,.sidebar,.topbar{z-index:20!important}
-@media(max-width:640px){#accessOverlay,#introScreen{padding-top:env(safe-area-inset-top)!important;padding-bottom:env(safe-area-inset-bottom)!important}#accessOverlay .glass-panel,#introScreen .glass-panel{max-height:calc(100dvh - 20px)!important}}
-</style>
-
-<style id="mars-mobile-menu-layout">
-@media(max-width:899px){
-  .hero-banner{display:none!important}
-  .topbar .top-actions{display:none!important}
-  .topbar button[onclick="toggleMobileMenu()"]{display:grid!important;place-items:center!important;width:42px!important;height:42px!important;background:#18b7a8!important;color:#fff!important;border:0!important;border-radius:12px!important;font-size:0!important;box-shadow:0 6px 14px rgba(24,183,168,.22)!important;position:relative!important;z-index:100!important}
-  .topbar button[onclick="toggleMobileMenu()"]:after{content:'☰';font-size:22px!important;line-height:1!important}
-  #sidebar{z-index:80!important}
-  .mobile-drawer-actions{display:flex!important;flex-direction:column!important;gap:8px!important;margin:0 0 18px!important;padding:0 0 14px!important;border-bottom:1px solid rgba(24,183,168,.18)!important}
-  .mobile-drawer-actions .nav-item{min-height:44px!important;background:#fff!important;color:#386274!important;border:1px solid #cfe1e5!important}
-  .mobile-drawer-actions .nav-item:hover{background:#e6f8f6!important;color:#108f87!important}
-}
-@media(min-width:900px){.mobile-drawer-actions{display:none!important}}
-</style>
-
-<style id="mars-brand-header-style">
-.mars-brand-lockup{display:flex;align-items:center;gap:12px;min-width:0}.mars-brand-building{width:54px;height:54px;object-fit:contain;border-radius:14px;background:#e6f8f6;border:1px solid #bfe3df;padding:4px;box-shadow:0 5px 14px rgba(24,183,168,.14)}.mars-company-name{font-size:clamp(19px,2vw,30px);line-height:1.05;letter-spacing:.035em;font-weight:950;color:#e28b2d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mars-product-name{margin-top:3px;font-size:11px;font-weight:750;color:#607985;letter-spacing:.02em}.mars-developer-credit{margin-top:2px;font-size:10px;font-weight:850;color:#137a59;letter-spacing:.02em}@media(max-width:640px){.mars-brand-lockup{gap:8px}.mars-brand-building{width:44px;height:44px;border-radius:11px;padding:3px}.mars-company-name{font-size:15px;letter-spacing:.02em}.mars-product-name{font-size:9px}.mars-developer-credit{font-size:9px}.topbar-inner{padding-left:12px!important;padding-right:12px!important;gap:8px!important}}
-</style>
-
-<style id="mars-brand-text-visibility">
-.mars-brand-copy{min-width:0!important;overflow:visible!important}.mars-company-name{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;word-break:normal!important}.mars-product-name,.mars-developer-credit{white-space:normal!important;overflow:visible!important}@media(max-width:640px){.topbar-inner{align-items:center!important}.mars-brand-lockup{flex:1;min-width:0!important}.mars-brand-copy{max-width:calc(100vw - 82px)!important}.mars-company-name{font-size:14px!important;line-height:1.14!important;letter-spacing:.01em!important}.mars-product-name{font-size:9px!important;line-height:1.2!important}.mars-developer-credit{font-size:9px!important;line-height:1.2!important}.mars-brand-building{flex:none!important}}
-</style>
-
-<style id="mars-readable-text-contrast">
-:root{--readable-ink:#18384a;--readable-muted:#607985;--readable-teal:#108f87}
-.topbar .text-navy,.topbar .text-muted{color:var(--readable-ink)!important}.topbar .text-muted{color:var(--readable-muted)!important}
-.sidebar .nav-item{color:#386274!important}.sidebar .nav-item span{color:inherit!important}.sidebar .text-white{color:#386274!important}.sidebar .text-blue-100,.sidebar .text-blue-200{color:#607985!important}
-.main h1,.main h2,.main h3,.main h4,.main h5,.main h6,.main p,.main label,.main .text-white,.main .text-navy,.main .text-ink{color:var(--readable-ink)!important}.main .text-muted,.main .text-slate-300,.main .text-gray-500,.main .text-gray-400{color:var(--readable-muted)!important}
-.field,select.field,input.field,textarea.field{color:var(--readable-ink)!important;background:#fff!important}.field::placeholder,input::placeholder,textarea::placeholder{color:#78909a!important;opacity:1!important}.field option,select option{color:var(--readable-ink)!important;background:#fff!important}
-.card .text-white,.card .text-navy,.card .text-ink{color:var(--readable-ink)!important}.card .text-muted{color:var(--readable-muted)!important}
-.btn,.g-btn,.intro-btn,.mobile-bottom button{color:inherit}.btn-primary,.btn-danger,.btn-success,.g-btn,.intro-btn,.mobile-bottom button.mb-active{color:#fff!important}
-@media(max-width:899px){.mobile-bottom button{color:#607985!important}.mobile-bottom button.mb-active{color:#108f87!important}.mobile-drawer-actions .nav-item{color:#386274!important}.mobile-drawer-actions .nav-item.admin-only{color:#386274!important}}
-</style>
-
-<style id="mars-deep-green-readable-text">
-:root{--mars-deep-green:#0d684b;--mars-deep-green-dark:#075239;--mars-soft-green:#3d7664}
-body,.app-shell,.main,.sidebar,.topbar{color:var(--mars-deep-green)!important}
-.main h1,.main h2,.main h3,.main h4,.main h5,.main h6,.main p,.main label,.main span:not(.btn):not(.g-btn),.main td,.main th,.main li,.main dt,.main dd,.main strong,.main small,.main div{color:var(--mars-deep-green)!important}
-.sidebar .nav-item,.sidebar .nav-item span,.sidebar div,.sidebar p,.sidebar small,.topbar .mars-product-name,.topbar .mars-developer-credit{color:var(--mars-deep-green)!important}
-.section-title,.hero-title,.hero-sub,.field-label,.stat-label-v2,.stat-foot-v2,.fd-trend-sub,.fd-meta,.empty-state,.text-muted,.text-navy,.text-ink{color:var(--mars-deep-green)!important}
-.field,select,input,textarea,.field option,select option{color:var(--mars-deep-green-dark)!important;background:#fff!important}.field::placeholder,input::placeholder,textarea::placeholder{color:var(--mars-soft-green)!important;opacity:1!important}
-.btn,.g-btn,.intro-btn,.mobile-bottom button{color:inherit!important}.btn-primary,.btn-danger,.btn-success,.g-btn,.intro-btn{color:#fff!important}.mobile-bottom button.mb-active{color:#0d8b78!important}.admin-only.btn-warning,.btn-warning{color:#075239!important}
-.mars-company-name{color:#d78122!important}.mars-developer-credit{color:#075239!important}
-</style>
-
-<style id="mars-premium-clean-dashboard">
-:root{--dash-ink:#0d684b;--dash-dark:#075239;--dash-teal:#0d9b84;--dash-mint:#eaf8f3;--dash-line:#d9ebe4;--dash-gold:#d78122;--dash-page:#f6fbf9}
-#dashboard{background:var(--dash-page)!important;color:var(--dash-ink)!important}.hero-banner{display:none!important}
-#dashboard .page-section{scroll-margin-top:76px}.fd-rail,.fd-mid-grid,.fd-bottom-grid{gap:14px!important}
-#dashboard .card,#dashboard .fd-rail-card,#dashboard .fd-trend-card,#dashboard .fd-mini,#dashboard .fd-dynamics,#dashboard .fd-team-card,#dashboard #stockOverviewCard{background:#fff!important;border:1px solid var(--dash-line)!important;border-radius:16px!important;box-shadow:0 5px 16px rgba(7,82,57,.06)!important;color:var(--dash-ink)!important}
-#dashboard .card:hover{border-color:#abd9c9!important;box-shadow:0 8px 20px rgba(7,82,57,.1)!important}
-#dashboard .section-title,#dashboard .stat-label-v2,#dashboard .fd-mini-date,#dashboard .fd-trend-sub,#dashboard .fd-meta,#dashboard .fd-mini-foot,#dashboard .text-muted{color:#3d7664!important}
-#dashboard .stat-value-v2,#dashboard .fd-trend-big,#dashboard .fd-mini-val,#dashboard .fd-chip-name,#dashboard .hero-title{color:var(--dash-dark)!important}
-#dashboard .fd-rail-card{min-height:116px!important;padding:18px!important}.fd-spark{opacity:.82!important}.fd-chip-icon{background:var(--dash-mint)!important;color:var(--dash-teal)!important}
-#dashboard .btn-outline{background:#fff!important;border:1px solid #a9d8c8!important;color:var(--dash-dark)!important;border-radius:10px!important;font-weight:800!important}#dashboard .btn-outline:hover{background:var(--dash-mint)!important}
-#dashboard .btn-primary{background:var(--dash-teal)!important;border-color:var(--dash-teal)!important;color:#fff!important;border-radius:11px!important;box-shadow:0 6px 15px rgba(13,155,132,.18)!important}
-#dashboard .top-actions .admin-only,#dashboard .mobile-drawer-actions .admin-only{background:#e2f6ee!important;border:1px solid #9ed6bf!important;color:var(--dash-dark)!important;border-radius:11px!important;box-shadow:0 3px 9px rgba(7,82,57,.06)!important;font-weight:850!important}
-#dashboard .top-actions .admin-only:hover,#dashboard .mobile-drawer-actions .admin-only:hover{background:#ccefe0!important;border-color:#62b994!important}
-#adminBadge{background:#dff6e9!important;color:#087548!important;border:1px solid #a9dfc0!important}
-.topbar .top-actions .btn-secondary{background:#fff!important;border:1px solid #b8d9cc!important;color:var(--dash-dark)!important}
-@media(max-width:899px){#dashboard{padding:14px!important}.fd-rail{grid-template-columns:repeat(2,minmax(0,1fr))!important}.fd-rail-card{min-height:102px!important;padding:14px!important}.fd-mid-grid,.fd-bottom-grid{grid-template-columns:1fr!important}.main.page-pad{padding:14px!important}}
-</style>
-
-<style id="mars-premium-login-design">
-:root{--login-green:#087b5b;--login-deep:#075239;--login-teal:#0d9b84;--login-mint:#e9f8f2;--login-line:#cfe7dc;--login-ink:#123d32}
-#introScreen,#accessOverlay{background:#f4fbf8!important;background-image:none!important;color:var(--login-ink)!important}
-#introScreen .intro-content{background:#fff!important;border:1px solid var(--login-line)!important;border-radius:24px!important;box-shadow:0 18px 45px rgba(7,82,57,.12)!important;padding:42px 30px!important;max-width:480px!important}
-#introScreen .intro-title{color:var(--login-deep)!important;font-weight:950!important;letter-spacing:.01em!important}.intro-sub{color:#517466!important}.intro-highlight{color:#c8751d!important}
-#introScreen .intro-btn,#accessOverlay .g-btn{position:relative!important;overflow:hidden!important;background:var(--login-teal)!important;border:1px solid #087e6c!important;color:#fff!important;border-radius:13px!important;box-shadow:0 8px 18px rgba(13,155,132,.2)!important;font-weight:900!important;letter-spacing:.01em!important;animation:marsLoginPulse 2.8s ease-in-out infinite!important;transition:transform .18s ease,background .18s ease,box-shadow .18s ease!important}
-#introScreen .intro-btn:hover,#accessOverlay .g-btn:hover{background:var(--login-green)!important;box-shadow:0 10px 24px rgba(8,123,91,.28)!important;transform:translateY(-2px)!important}
-#introScreen .intro-btn:active,#accessOverlay .g-btn:active{transform:scale(.97)!important}
-#introScreen .intro-btn:after,#accessOverlay .g-btn:after{content:"";position:absolute;top:0;left:-55%;width:28%;height:100%;background:rgba(255,255,255,.18);transform:skewX(-18deg);animation:marsLoginShine 3.8s ease-in-out infinite;pointer-events:none}
-#accessOverlay .glass-panel{background:#fff!important;border:1px solid var(--login-line)!important;border-radius:22px!important;box-shadow:0 18px 50px rgba(7,82,57,.12)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;color:var(--login-ink)!important}
-#accessOverlay .glass-logo{display:flex!important;align-items:center!important;gap:10px!important;color:var(--login-deep)!important;font-weight:950!important;letter-spacing:.02em!important}.glass-logo .mark{display:inline-grid!important;place-items:center!important;width:45px!important;height:45px!important;font-size:0!important;background:var(--login-mint) url('icon-192.png') center/contain no-repeat!important;border:1px solid var(--login-line)!important;border-radius:13px!important;box-shadow:none!important}
-#accessOverlay .glass-title{color:var(--login-deep)!important;font-weight:950!important}#accessOverlay .glass-sub{color:#66877a!important;letter-spacing:.13em!important}.glass-footer{color:#6d8b80!important}
-#accessOverlay .glass-card{background:#fbfefd!important;border:1px solid var(--login-line)!important;border-radius:16px!important;box-shadow:0 5px 14px rgba(7,82,57,.05)!important;color:var(--login-deep)!important;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease!important}.glass-card:hover{background:var(--login-mint)!important;border-color:#8dceb6!important;transform:translateY(-3px)!important;box-shadow:0 10px 22px rgba(7,82,57,.1)!important}.glass-card .g-name,.glass-card .g-desc{color:var(--login-deep)!important}.glass-card .g-desc{color:#608173!important}.glass-card .g-enter{color:var(--login-green)!important;font-weight:900!important}
-#accessOverlay .g-field-label{color:var(--login-deep)!important;font-weight:800!important}#accessOverlay .g-field{background:#fff!important;border:1px solid var(--login-line)!important;color:var(--login-deep)!important;border-radius:11px!important}#accessOverlay .g-field:focus{border-color:var(--login-teal)!important;box-shadow:0 0 0 3px rgba(13,155,132,.13)!important}.g-field::placeholder{color:#7a9b8d!important;opacity:1!important}.back-role{background:#fff!important;color:var(--login-deep)!important;border:1px solid var(--login-line)!important;border-radius:11px!important}.back-role:hover{background:var(--login-mint)!important;color:var(--login-green)!important}
-@keyframes marsLoginPulse{0%,100%{box-shadow:0 8px 18px rgba(13,155,132,.2)}50%{box-shadow:0 10px 24px rgba(13,155,132,.3),0 0 0 5px rgba(13,155,132,.06)}}@keyframes marsLoginShine{0%,62%,100%{left:-55%;opacity:0}70%{opacity:1}86%{left:125%;opacity:0}}
-@media(prefers-reduced-motion:reduce){#introScreen .intro-btn,#accessOverlay .g-btn{animation:none!important}#introScreen .intro-btn:after,#accessOverlay .g-btn:after{display:none!important}}
-@media(max-width:640px){#introScreen .intro-content{width:calc(100vw - 28px)!important;padding:34px 20px!important;border-radius:20px!important}#accessOverlay .glass-panel{border-radius:18px!important}.glass-logo .mark{width:40px!important;height:40px!important}}
-</style>
-
-<style id="mars-orange-post-login-typography">
-#marsPostLoginReveal{background:#f8fbf9!important}
-.mars-reveal-stage{color:#075239!important}.mars-reveal-name{color:#d78122!important;text-shadow:0 3px 0 rgba(215,129,34,.08)!important;font-weight:950!important}.mars-reveal-sub{color:#075239!important}
-</style>
-<script>
-(function(){
-  window.playMarsPostLoginReveal=function(){
-    try{if(sessionStorage.getItem('__marsPostLoginRevealPlayed')==='1')return;sessionStorage.setItem('__marsPostLoginRevealPlayed','1')}catch(e){}
-    const layer=document.getElementById('marsPostLoginReveal');
-    if(!layer)return;
-    layer.classList.remove('is-playing');
-    void layer.offsetWidth;
-    layer.classList.add('is-playing');
-    window.setTimeout(function(){layer.classList.remove('is-playing')},1700);
-  };
-})();
-</script>
-
-<style id="mars-vector-buttons">
-:root{--vector-green:#087b5b;--vector-teal:#0d9b84;--vector-line:#b9ddcf;--vector-mint:#eaf8f3}
-.btn,.g-btn,.intro-btn,.back-role,.mobile-bottom button,.sidebar .nav-item,.mobile-drawer-actions .nav-item{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;border-radius:12px!important;font-weight:850!important;transition:transform 160ms cubic-bezier(.23,1,.32,1),box-shadow 160ms ease,background 160ms ease,border-color 160ms ease!important}.btn:active,.g-btn:active,.intro-btn:active,.back-role:active,.mobile-bottom button:active,.nav-item:active{transform:scale(.97)!important}
-.vector-icon{display:inline-grid!important;place-items:center!important;flex:none!important;width:20px!important;height:20px!important;border:1.8px solid currentColor!important;border-radius:6px!important;font-size:0!important;position:relative!important;opacity:.96!important}.vector-icon:after{content:"";width:7px;height:7px;border:1.7px solid currentColor;border-radius:50%}.vector-icon--admin:after{border-radius:2px;width:8px;height:8px}.vector-icon--settings:before{content:"";position:absolute;width:10px;height:2px;background:currentColor;transform:rotate(45deg)}.vector-icon--settings:after{width:4px;height:4px;background:currentColor;border:0}.vector-icon--add{border-radius:50%}.vector-icon--add:before,.vector-icon--add:after{content:"";position:absolute;background:currentColor}.vector-icon--add:before{width:10px;height:2px}.vector-icon--add:after{width:2px;height:10px;border:0}.vector-icon--report:after{width:10px;height:8px;border:0;border-top:2px solid currentColor;box-shadow:0 3px 0 currentColor,0 6px 0 currentColor;border-radius:0}.vector-icon--print:after{width:10px;height:7px;border:1.7px solid currentColor;border-radius:2px}.vector-icon--menu{border-radius:5px}.vector-icon--menu:before{content:"";position:absolute;width:10px;height:2px;background:currentColor;box-shadow:0 -4px 0 currentColor,0 4px 0 currentColor}.vector-icon--menu:after{display:none}.topbar button[onclick="toggleMobileMenu()"]{font-size:0!important}.topbar button[onclick="toggleMobileMenu()"]:after{display:none!important}.topbar button[onclick="toggleMobileMenu()"] .vector-icon{width:22px!important;height:22px!important}
-@media(prefers-reduced-motion:reduce){.btn,.g-btn,.intro-btn,.back-role,.mobile-bottom button,.sidebar .nav-item{transition:none!important}}
-</style>
-<script>
-(function(){
-  function iconType(label,el){label=label.toLowerCase();if(label.includes('admin')||label.includes('password'))return'admin';if(label.includes('setting'))return'settings';if(label.includes('add')||label.includes('new'))return'add';if(label.includes('report')||label.includes('ledger'))return'report';if(label.includes('print')||label.includes('pdf'))return'print';return'menu'}
-  function vectorize(){
-    const emoji=/[\u{1F300}-\u{1FAFF}\u{1F1E6}-\u{1F1FF}\u2600-\u27BF]/gu;
-    document.querySelectorAll('button').forEach(function(btn){
-      if(btn.dataset.vectorized)return;
-      const raw=btn.textContent||'';
-      const clean=raw.replace(emoji,'').replace(/\s{2,}/g,' ').trim();
-      if(!clean)return;
-      btn.dataset.vectorized='1';
-      const ic=document.createElement('span');ic.className='vector-icon vector-icon--'+iconType(clean,btn);ic.setAttribute('aria-hidden','true');
-      btn.textContent='';btn.appendChild(ic);btn.appendChild(document.createTextNode(clean));
-    });
-  }
-  function smoothPageScroll(el){const page=el.getAttribute('data-page');if(!page)return;requestAnimationFrame(function(){const target=document.querySelector('.page-section[data-page="'+page+'"]')||document.getElementById(page);if(target)target.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})});}
-  document.addEventListener('DOMContentLoaded',function(){vectorize();document.addEventListener('click',function(e){const el=e.target.closest('[data-page]');if(el)smoothPageScroll(el)});});
-})();
-</script>
-
-<style id="mars-intro-login-visible-fix">
-#introLoginBtn{display:inline-flex!important;visibility:visible!important;opacity:1!important;position:relative!important;z-index:20!important;min-width:148px!important;min-height:50px!important;margin:22px auto 0!important;background:#0d9b84!important;color:#fff!important;border:1px solid #087e6c!important;border-radius:13px!important;box-shadow:0 8px 20px rgba(13,155,132,.24)!important;transform:none!important}
-#introLoginBtn:hover{background:#087b5b!important;transform:translateY(-2px)!important}
-#introLoginBtn:active{transform:scale(.97)!important}
-#introLoginBtn .vector-icon{border-color:#fff!important}
-#introLoginBtn .vector-icon:before{content:"";position:absolute;width:10px;height:2px;background:#fff;transform:rotate(45deg)}
-#introLoginBtn .vector-icon:after{width:7px;height:7px;border-color:#fff!important;border-left:0!important;border-bottom:0!important;border-radius:0!important;transform:rotate(45deg)}
-@media(max-width:640px){#introLoginBtn{display:inline-flex!important;min-height:48px!important;min-width:150px!important;font-size:15px!important}}
-</style>
 </body>
 </html>
