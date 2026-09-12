@@ -3847,5 +3847,31 @@ body{overflow-x:hidden!important}
 <style id="mars-brand-header-style">
 .mars-brand-lockup{display:flex;align-items:center;gap:12px;min-width:0}.mars-brand-building{width:54px;height:54px;object-fit:contain;border-radius:14px;background:#e6f8f6;border:1px solid #bfe3df;padding:4px;box-shadow:0 5px 14px rgba(24,183,168,.14)}.mars-company-name{font-size:clamp(19px,2vw,30px);line-height:1.05;letter-spacing:.035em;font-weight:950;color:#e28b2d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mars-product-name{margin-top:3px;font-size:11px;font-weight:750;color:#607985;letter-spacing:.02em}.mars-developer-credit{margin-top:2px;font-size:10px;font-weight:850;color:#137a59;letter-spacing:.02em}@media(max-width:640px){.mars-brand-lockup{gap:8px}.mars-brand-building{width:44px;height:44px;border-radius:11px;padding:3px}.mars-company-name{font-size:15px;letter-spacing:.02em}.mars-product-name{font-size:9px}.mars-developer-credit{font-size:9px}.topbar-inner{padding-left:12px!important;padding-right:12px!important;gap:8px!important}}
 </style>
+
+<style id="mars-brand-text-visibility">
+.mars-brand-copy{min-width:0!important;overflow:visible!important}.mars-company-name{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;word-break:normal!important}.mars-product-name,.mars-developer-credit{white-space:normal!important;overflow:visible!important}@media(max-width:640px){.topbar-inner{align-items:center!important}.mars-brand-lockup{flex:1;min-width:0!important}.mars-brand-copy{max-width:calc(100vw - 82px)!important}.mars-company-name{font-size:14px!important;line-height:1.14!important;letter-spacing:.01em!important}.mars-product-name{font-size:9px!important;line-height:1.2!important}.mars-developer-credit{font-size:9px!important;line-height:1.2!important}.mars-brand-building{flex:none!important}}
+</style>
+
+<style id="mars-readable-text-contrast">
+:root{--readable-ink:#18384a;--readable-muted:#607985;--readable-teal:#108f87}
+.topbar .text-navy,.topbar .text-muted{color:var(--readable-ink)!important}.topbar .text-muted{color:var(--readable-muted)!important}
+.sidebar .nav-item{color:#386274!important}.sidebar .nav-item span{color:inherit!important}.sidebar .text-white{color:#386274!important}.sidebar .text-blue-100,.sidebar .text-blue-200{color:#607985!important}
+.main h1,.main h2,.main h3,.main h4,.main h5,.main h6,.main p,.main label,.main .text-white,.main .text-navy,.main .text-ink{color:var(--readable-ink)!important}.main .text-muted,.main .text-slate-300,.main .text-gray-500,.main .text-gray-400{color:var(--readable-muted)!important}
+.field,select.field,input.field,textarea.field{color:var(--readable-ink)!important;background:#fff!important}.field::placeholder,input::placeholder,textarea::placeholder{color:#78909a!important;opacity:1!important}.field option,select option{color:var(--readable-ink)!important;background:#fff!important}
+.card .text-white,.card .text-navy,.card .text-ink{color:var(--readable-ink)!important}.card .text-muted{color:var(--readable-muted)!important}
+.btn,.g-btn,.intro-btn,.mobile-bottom button{color:inherit}.btn-primary,.btn-danger,.btn-success,.g-btn,.intro-btn,.mobile-bottom button.mb-active{color:#fff!important}
+@media(max-width:899px){.mobile-bottom button{color:#607985!important}.mobile-bottom button.mb-active{color:#108f87!important}.mobile-drawer-actions .nav-item{color:#386274!important}.mobile-drawer-actions .nav-item.admin-only{color:#386274!important}}
+</style>
+
+<style id="mars-deep-green-readable-text">
+:root{--mars-deep-green:#0d684b;--mars-deep-green-dark:#075239;--mars-soft-green:#3d7664}
+body,.app-shell,.main,.sidebar,.topbar{color:var(--mars-deep-green)!important}
+.main h1,.main h2,.main h3,.main h4,.main h5,.main h6,.main p,.main label,.main span:not(.btn):not(.g-btn),.main td,.main th,.main li,.main dt,.main dd,.main strong,.main small,.main div{color:var(--mars-deep-green)!important}
+.sidebar .nav-item,.sidebar .nav-item span,.sidebar div,.sidebar p,.sidebar small,.topbar .mars-product-name,.topbar .mars-developer-credit{color:var(--mars-deep-green)!important}
+.section-title,.hero-title,.hero-sub,.field-label,.stat-label-v2,.stat-foot-v2,.fd-trend-sub,.fd-meta,.empty-state,.text-muted,.text-navy,.text-ink{color:var(--mars-deep-green)!important}
+.field,select,input,textarea,.field option,select option{color:var(--mars-deep-green-dark)!important;background:#fff!important}.field::placeholder,input::placeholder,textarea::placeholder{color:var(--mars-soft-green)!important;opacity:1!important}
+.btn,.g-btn,.intro-btn,.mobile-bottom button{color:inherit!important}.btn-primary,.btn-danger,.btn-success,.g-btn,.intro-btn{color:#fff!important}.mobile-bottom button.mb-active{color:#0d8b78!important}.admin-only.btn-warning,.btn-warning{color:#075239!important}
+.mars-company-name{color:#d78122!important}.mars-developer-credit{color:#075239!important}
+</style>
 </body>
 </html>
