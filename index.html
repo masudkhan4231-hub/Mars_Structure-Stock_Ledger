@@ -3873,5 +3873,86 @@ body,.app-shell,.main,.sidebar,.topbar{color:var(--mars-deep-green)!important}
 .btn,.g-btn,.intro-btn,.mobile-bottom button{color:inherit!important}.btn-primary,.btn-danger,.btn-success,.g-btn,.intro-btn{color:#fff!important}.mobile-bottom button.mb-active{color:#0d8b78!important}.admin-only.btn-warning,.btn-warning{color:#075239!important}
 .mars-company-name{color:#d78122!important}.mars-developer-credit{color:#075239!important}
 </style>
+
+<style id="mars-premium-clean-dashboard">
+:root{--dash-ink:#0d684b;--dash-dark:#075239;--dash-teal:#0d9b84;--dash-mint:#eaf8f3;--dash-line:#d9ebe4;--dash-gold:#d78122;--dash-page:#f6fbf9}
+#dashboard{background:var(--dash-page)!important;color:var(--dash-ink)!important}.hero-banner{display:none!important}
+#dashboard .page-section{scroll-margin-top:76px}.fd-rail,.fd-mid-grid,.fd-bottom-grid{gap:14px!important}
+#dashboard .card,#dashboard .fd-rail-card,#dashboard .fd-trend-card,#dashboard .fd-mini,#dashboard .fd-dynamics,#dashboard .fd-team-card,#dashboard #stockOverviewCard{background:#fff!important;border:1px solid var(--dash-line)!important;border-radius:16px!important;box-shadow:0 5px 16px rgba(7,82,57,.06)!important;color:var(--dash-ink)!important}
+#dashboard .card:hover{border-color:#abd9c9!important;box-shadow:0 8px 20px rgba(7,82,57,.1)!important}
+#dashboard .section-title,#dashboard .stat-label-v2,#dashboard .fd-mini-date,#dashboard .fd-trend-sub,#dashboard .fd-meta,#dashboard .fd-mini-foot,#dashboard .text-muted{color:#3d7664!important}
+#dashboard .stat-value-v2,#dashboard .fd-trend-big,#dashboard .fd-mini-val,#dashboard .fd-chip-name,#dashboard .hero-title{color:var(--dash-dark)!important}
+#dashboard .fd-rail-card{min-height:116px!important;padding:18px!important}.fd-spark{opacity:.82!important}.fd-chip-icon{background:var(--dash-mint)!important;color:var(--dash-teal)!important}
+#dashboard .btn-outline{background:#fff!important;border:1px solid #a9d8c8!important;color:var(--dash-dark)!important;border-radius:10px!important;font-weight:800!important}#dashboard .btn-outline:hover{background:var(--dash-mint)!important}
+#dashboard .btn-primary{background:var(--dash-teal)!important;border-color:var(--dash-teal)!important;color:#fff!important;border-radius:11px!important;box-shadow:0 6px 15px rgba(13,155,132,.18)!important}
+#dashboard .top-actions .admin-only,#dashboard .mobile-drawer-actions .admin-only{background:#e2f6ee!important;border:1px solid #9ed6bf!important;color:var(--dash-dark)!important;border-radius:11px!important;box-shadow:0 3px 9px rgba(7,82,57,.06)!important;font-weight:850!important}
+#dashboard .top-actions .admin-only:hover,#dashboard .mobile-drawer-actions .admin-only:hover{background:#ccefe0!important;border-color:#62b994!important}
+#adminBadge{background:#dff6e9!important;color:#087548!important;border:1px solid #a9dfc0!important}
+.topbar .top-actions .btn-secondary{background:#fff!important;border:1px solid #b8d9cc!important;color:var(--dash-dark)!important}
+@media(max-width:899px){#dashboard{padding:14px!important}.fd-rail{grid-template-columns:repeat(2,minmax(0,1fr))!important}.fd-rail-card{min-height:102px!important;padding:14px!important}.fd-mid-grid,.fd-bottom-grid{grid-template-columns:1fr!important}.main.page-pad{padding:14px!important}}
+</style>
+
+<style id="mars-premium-login-design">
+:root{--login-green:#087b5b;--login-deep:#075239;--login-teal:#0d9b84;--login-mint:#e9f8f2;--login-line:#cfe7dc;--login-ink:#123d32}
+#introScreen,#accessOverlay{background:#f4fbf8!important;background-image:none!important;color:var(--login-ink)!important}
+#introScreen .intro-content{background:#fff!important;border:1px solid var(--login-line)!important;border-radius:24px!important;box-shadow:0 18px 45px rgba(7,82,57,.12)!important;padding:42px 30px!important;max-width:480px!important}
+#introScreen .intro-title{color:var(--login-deep)!important;font-weight:950!important;letter-spacing:.01em!important}.intro-sub{color:#517466!important}.intro-highlight{color:#c8751d!important}
+#introScreen .intro-btn,#accessOverlay .g-btn{position:relative!important;overflow:hidden!important;background:var(--login-teal)!important;border:1px solid #087e6c!important;color:#fff!important;border-radius:13px!important;box-shadow:0 8px 18px rgba(13,155,132,.2)!important;font-weight:900!important;letter-spacing:.01em!important;animation:marsLoginPulse 2.8s ease-in-out infinite!important;transition:transform .18s ease,background .18s ease,box-shadow .18s ease!important}
+#introScreen .intro-btn:hover,#accessOverlay .g-btn:hover{background:var(--login-green)!important;box-shadow:0 10px 24px rgba(8,123,91,.28)!important;transform:translateY(-2px)!important}
+#introScreen .intro-btn:active,#accessOverlay .g-btn:active{transform:scale(.97)!important}
+#introScreen .intro-btn:after,#accessOverlay .g-btn:after{content:"";position:absolute;top:0;left:-55%;width:28%;height:100%;background:rgba(255,255,255,.18);transform:skewX(-18deg);animation:marsLoginShine 3.8s ease-in-out infinite;pointer-events:none}
+#accessOverlay .glass-panel{background:#fff!important;border:1px solid var(--login-line)!important;border-radius:22px!important;box-shadow:0 18px 50px rgba(7,82,57,.12)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;color:var(--login-ink)!important}
+#accessOverlay .glass-logo{display:flex!important;align-items:center!important;gap:10px!important;color:var(--login-deep)!important;font-weight:950!important;letter-spacing:.02em!important}.glass-logo .mark{display:inline-grid!important;place-items:center!important;width:45px!important;height:45px!important;font-size:0!important;background:var(--login-mint) url('icon-192.png') center/contain no-repeat!important;border:1px solid var(--login-line)!important;border-radius:13px!important;box-shadow:none!important}
+#accessOverlay .glass-title{color:var(--login-deep)!important;font-weight:950!important}#accessOverlay .glass-sub{color:#66877a!important;letter-spacing:.13em!important}.glass-footer{color:#6d8b80!important}
+#accessOverlay .glass-card{background:#fbfefd!important;border:1px solid var(--login-line)!important;border-radius:16px!important;box-shadow:0 5px 14px rgba(7,82,57,.05)!important;color:var(--login-deep)!important;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease!important}.glass-card:hover{background:var(--login-mint)!important;border-color:#8dceb6!important;transform:translateY(-3px)!important;box-shadow:0 10px 22px rgba(7,82,57,.1)!important}.glass-card .g-name,.glass-card .g-desc{color:var(--login-deep)!important}.glass-card .g-desc{color:#608173!important}.glass-card .g-enter{color:var(--login-green)!important;font-weight:900!important}
+#accessOverlay .g-field-label{color:var(--login-deep)!important;font-weight:800!important}#accessOverlay .g-field{background:#fff!important;border:1px solid var(--login-line)!important;color:var(--login-deep)!important;border-radius:11px!important}#accessOverlay .g-field:focus{border-color:var(--login-teal)!important;box-shadow:0 0 0 3px rgba(13,155,132,.13)!important}.g-field::placeholder{color:#7a9b8d!important;opacity:1!important}.back-role{background:#fff!important;color:var(--login-deep)!important;border:1px solid var(--login-line)!important;border-radius:11px!important}.back-role:hover{background:var(--login-mint)!important;color:var(--login-green)!important}
+@keyframes marsLoginPulse{0%,100%{box-shadow:0 8px 18px rgba(13,155,132,.2)}50%{box-shadow:0 10px 24px rgba(13,155,132,.3),0 0 0 5px rgba(13,155,132,.06)}}@keyframes marsLoginShine{0%,62%,100%{left:-55%;opacity:0}70%{opacity:1}86%{left:125%;opacity:0}}
+@media(prefers-reduced-motion:reduce){#introScreen .intro-btn,#accessOverlay .g-btn{animation:none!important}#introScreen .intro-btn:after,#accessOverlay .g-btn:after{display:none!important}}
+@media(max-width:640px){#introScreen .intro-content{width:calc(100vw - 28px)!important;padding:34px 20px!important;border-radius:20px!important}#accessOverlay .glass-panel{border-radius:18px!important}.glass-logo .mark{width:40px!important;height:40px!important}}
+</style>
+
+<style id="mars-orange-post-login-typography">
+#marsPostLoginReveal{background:#f8fbf9!important}
+.mars-reveal-stage{color:#075239!important}.mars-reveal-name{color:#d78122!important;text-shadow:0 3px 0 rgba(215,129,34,.08)!important;font-weight:950!important}.mars-reveal-sub{color:#075239!important}
+</style>
+<script>
+(function(){
+  window.playMarsPostLoginReveal=function(){
+    try{if(sessionStorage.getItem('__marsPostLoginRevealPlayed')==='1')return;sessionStorage.setItem('__marsPostLoginRevealPlayed','1')}catch(e){}
+    const layer=document.getElementById('marsPostLoginReveal');
+    if(!layer)return;
+    layer.classList.remove('is-playing');
+    void layer.offsetWidth;
+    layer.classList.add('is-playing');
+    window.setTimeout(function(){layer.classList.remove('is-playing')},1700);
+  };
+})();
+</script>
+
+<style id="mars-vector-buttons">
+:root{--vector-green:#087b5b;--vector-teal:#0d9b84;--vector-line:#b9ddcf;--vector-mint:#eaf8f3}
+.btn,.g-btn,.intro-btn,.back-role,.mobile-bottom button,.sidebar .nav-item,.mobile-drawer-actions .nav-item{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;border-radius:12px!important;font-weight:850!important;transition:transform 160ms cubic-bezier(.23,1,.32,1),box-shadow 160ms ease,background 160ms ease,border-color 160ms ease!important}.btn:active,.g-btn:active,.intro-btn:active,.back-role:active,.mobile-bottom button:active,.nav-item:active{transform:scale(.97)!important}
+.vector-icon{display:inline-grid!important;place-items:center!important;flex:none!important;width:20px!important;height:20px!important;border:1.8px solid currentColor!important;border-radius:6px!important;font-size:0!important;position:relative!important;opacity:.96!important}.vector-icon:after{content:"";width:7px;height:7px;border:1.7px solid currentColor;border-radius:50%}.vector-icon--admin:after{border-radius:2px;width:8px;height:8px}.vector-icon--settings:before{content:"";position:absolute;width:10px;height:2px;background:currentColor;transform:rotate(45deg)}.vector-icon--settings:after{width:4px;height:4px;background:currentColor;border:0}.vector-icon--add{border-radius:50%}.vector-icon--add:before,.vector-icon--add:after{content:"";position:absolute;background:currentColor}.vector-icon--add:before{width:10px;height:2px}.vector-icon--add:after{width:2px;height:10px;border:0}.vector-icon--report:after{width:10px;height:8px;border:0;border-top:2px solid currentColor;box-shadow:0 3px 0 currentColor,0 6px 0 currentColor;border-radius:0}.vector-icon--print:after{width:10px;height:7px;border:1.7px solid currentColor;border-radius:2px}.vector-icon--menu{border-radius:5px}.vector-icon--menu:before{content:"";position:absolute;width:10px;height:2px;background:currentColor;box-shadow:0 -4px 0 currentColor,0 4px 0 currentColor}.vector-icon--menu:after{display:none}.topbar button[onclick="toggleMobileMenu()"]{font-size:0!important}.topbar button[onclick="toggleMobileMenu()"]:after{display:none!important}.topbar button[onclick="toggleMobileMenu()"] .vector-icon{width:22px!important;height:22px!important}
+@media(prefers-reduced-motion:reduce){.btn,.g-btn,.intro-btn,.back-role,.mobile-bottom button,.sidebar .nav-item{transition:none!important}}
+</style>
+<script>
+(function(){
+  function iconType(label,el){label=label.toLowerCase();if(label.includes('admin')||label.includes('password'))return'admin';if(label.includes('setting'))return'settings';if(label.includes('add')||label.includes('new'))return'add';if(label.includes('report')||label.includes('ledger'))return'report';if(label.includes('print')||label.includes('pdf'))return'print';return'menu'}
+  function vectorize(){
+    const emoji=/[\u{1F300}-\u{1FAFF}\u{1F1E6}-\u{1F1FF}\u2600-\u27BF]/gu;
+    document.querySelectorAll('button').forEach(function(btn){
+      if(btn.dataset.vectorized)return;
+      const raw=btn.textContent||'';
+      const clean=raw.replace(emoji,'').replace(/\s{2,}/g,' ').trim();
+      if(!clean)return;
+      btn.dataset.vectorized='1';
+      const ic=document.createElement('span');ic.className='vector-icon vector-icon--'+iconType(clean,btn);ic.setAttribute('aria-hidden','true');
+      btn.textContent='';btn.appendChild(ic);btn.appendChild(document.createTextNode(clean));
+    });
+  }
+  function smoothPageScroll(el){const page=el.getAttribute('data-page');if(!page)return;requestAnimationFrame(function(){const target=document.querySelector('.page-section[data-page="'+page+'"]')||document.getElementById(page);if(target)target.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})});}
+  document.addEventListener('DOMContentLoaded',function(){vectorize();document.addEventListener('click',function(e){const el=e.target.closest('[data-page]');if(el)smoothPageScroll(el)});});
+})();
+</script>
 </body>
 </html>
