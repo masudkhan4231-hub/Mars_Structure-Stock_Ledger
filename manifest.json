@@ -1,17 +1,2 @@
-{
-  "name": "MARS Stock Ledger",
-  "short_name": "MARS Ledger",
-  "description": "MARS Structure Limited — Stock Ledger Management System",
-  "start_url": "./index.html",
-  "scope": "./",
-  "display": "standalone",
-  "orientation": "portrait-primary",
-  "background_color": "#0a1428",
-  "theme_color": "#f97316",
-  "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
-  ]
-}
+manifest.json
+{ "name": "MARS STRUCTURE LIMITED — Stock Ledger", "short_name": "MARS Ledger", "description": "Mars Structure Limited construction stock ledger and project material management system.", "id": "./mars-structure-stock-ledger-google-final.html", "start_url": "./mars-structure-stock-ledger-google-final.html", "scope": "./", "display": "standalone", "orientation": "any", "background_color": "#f7fbfb", "theme_color": "#11a99d", "lang": "en", "icons": [ { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" }, { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" } ] }
