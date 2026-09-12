@@ -3954,5 +3954,15 @@ body,.app-shell,.main,.sidebar,.topbar{color:var(--mars-deep-green)!important}
   document.addEventListener('DOMContentLoaded',function(){vectorize();document.addEventListener('click',function(e){const el=e.target.closest('[data-page]');if(el)smoothPageScroll(el)});});
 })();
 </script>
+
+<style id="mars-intro-login-visible-fix">
+#introLoginBtn{display:inline-flex!important;visibility:visible!important;opacity:1!important;position:relative!important;z-index:20!important;min-width:148px!important;min-height:50px!important;margin:22px auto 0!important;background:#0d9b84!important;color:#fff!important;border:1px solid #087e6c!important;border-radius:13px!important;box-shadow:0 8px 20px rgba(13,155,132,.24)!important;transform:none!important}
+#introLoginBtn:hover{background:#087b5b!important;transform:translateY(-2px)!important}
+#introLoginBtn:active{transform:scale(.97)!important}
+#introLoginBtn .vector-icon{border-color:#fff!important}
+#introLoginBtn .vector-icon:before{content:"";position:absolute;width:10px;height:2px;background:#fff;transform:rotate(45deg)}
+#introLoginBtn .vector-icon:after{width:7px;height:7px;border-color:#fff!important;border-left:0!important;border-bottom:0!important;border-radius:0!important;transform:rotate(45deg)}
+@media(max-width:640px){#introLoginBtn{display:inline-flex!important;min-height:48px!important;min-width:150px!important;font-size:15px!important}}
+</style>
 </body>
 </html>
