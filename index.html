@@ -1081,7 +1081,10 @@
               <div class="section-title">Reports, Search & Data Tools</div>
               <div class="text-xs text-muted mt-1">Search, filter, export, backup and manage your stock records.</div>
             </div>
-            <span id="syncStatus" class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-500 text-[11px] font-bold">● Firebase Ready</span>
+            <div class="flex items-center gap-2">
+              <span id="syncStatus" class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-500 text-[11px] font-bold">● Firebase Ready</span>
+              <span id="sheetSyncStatus" class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-500 text-[11px] font-bold">● Sheet Idle</span>
+            </div>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -2031,6 +2034,7 @@
             const builtEntry = buildEntryData(item);
             await saveEntryToFirebase(builtEntry);
             syncEntryToSheet(builtEntry);
+            sendDataToGoogleSheet(builtEntry);
           }
           logActivity('Entry Saved', `${prjInfo.prjNo} / ${date} / ${items.length} item(s)`);
         }else{
@@ -3378,20 +3382,22 @@ function adminSaveThreshold(){
   updateStats();
   renderAdminSettingsModal('alert');
 }
-function setSyncStatus(label,type='ready'){
-  const e=document.getElementById('syncStatus');if(!e)return;
+function renderStatusBadge(elId,label,type='ready'){
+  const e=document.getElementById(elId);if(!e)return;
   e.textContent=(type==='ok'?'● Synced':type==='error'?'● Sync Failed':type==='loading'?'● Syncing...':'● '+label);
   e.className='px-3 py-1.5 rounded-full text-[11px] font-bold '+(type==='ok'?'bg-emerald-500/15 text-emerald-700':type==='error'?'bg-red-500/15 text-red-600':type==='loading'?'bg-blue-500/15 text-blue-700':'bg-slate-100 text-slate-500');
 }
+function setSyncStatus(label,type='ready'){ renderStatusBadge('syncStatus',label,type); }
+function setSheetSyncStatus(label,type='ready'){ renderStatusBadge('sheetSyncStatus',label,type); }
 
 /* Improve existing Google Sheet sync feedback without changing its endpoint. */
 const _sendDataToGoogleSheet=sendDataToGoogleSheet;
 sendDataToGoogleSheet=function(dataObj){
-  setSyncStatus('Syncing...','loading');
-  if(!SCRIPT_URL){setSyncStatus('Not configured');return;}
+  setSheetSyncStatus('Syncing...','loading');
+  if(!SCRIPT_URL){setSheetSyncStatus('Not configured');return;}
   fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(dataObj)})
-    .then(()=>{setSyncStatus('Synced','ok');logActivity('Sheet Sync','Entry sent to Google Sheet')})
-    .catch(()=>{setSyncStatus('Sync Failed','error');showToast('Google Sheet sync failed.','error')});
+    .then(()=>{setSheetSyncStatus('Synced','ok');logActivity('Sheet Sync','Entry sent to Google Sheet')})
+    .catch(()=>{setSheetSyncStatus('Sync Failed','error');showToast('Google Sheet sync failed.','error')});
 };
 
 /* Initialize pro layer. */
