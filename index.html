@@ -1126,7 +1126,6 @@
 
 <script>
     // এখানে আপনার গুগল অ্যাপস স্ক্রিপ্ট লিংকটি সেট করা আছে
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0VleOJ0wFzt10S_0xJ3eZQMcZYg7qUsH-D4x99yVPB0KLXm1AJymP8X-OTAgOi4Nn/exec";
     function defaultProjectDatabase() {
       return [
         { prjNo: "Project:01", id: "ID:11-409-005", eng: "Site Engr. Mahedi Hasan Fahad" },
@@ -1909,16 +1908,6 @@
       localStorage.setItem('mars_ledger_entries', JSON.stringify(entries));
     }
 
-    function sendDataToGoogleSheet(dataObj) {
-      if (!SCRIPT_URL) return;
-      fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dataObj)
-      }).catch(err => console.error("Sheet Sync Error:", err));
-    }
-
     function toggleAdminMode() {
       if (isAdmin) {
         isAdmin = false;
@@ -2022,7 +2011,6 @@
             const builtEntry = buildEntryData(item);
             await saveEntryToFirebase(builtEntry);
             syncEntryToSheet(builtEntry);
-            sendDataToGoogleSheet(builtEntry);
           }
           logActivity('Entry Saved', `${prjInfo.prjNo} / ${date} / ${items.length} item(s)`);
         }else{
@@ -2035,6 +2023,10 @@
         // onSnapshot listener (startFirebaseSync) is always active and will
         // pick up this write automatically, re-sort, save to storage, and
         // re-render. Doing it here too was causing every entry to appear twice.
+        // Refresh this project's Sheet tab too, so it always reflects the
+        // latest Opening Balance + every entry + running Balance — not just
+        // whatever it looked like the last time Opening Stock was saved.
+        if (typeof syncOpeningStockToSheet === 'function') syncOpeningStockToSheet(prjInfo.prjNo);
         resetForm();
         showToast(items.length > 1 ? `${items.length} entries saved to Firebase successfully.` : "Entry saved to Firebase successfully.");
       }catch(err){
@@ -2320,6 +2312,64 @@
       <th>Transfer GP</th><th>Transfer Project</th><th>Transfer Qty</th><th>Transfer Cum.</th><th>Net Received</th><th>Purpose</th><th>Issue Qty</th><th>Issue Cum.</th><th>Balance</th>
       </tr></thead><tbody>${openingRow}${rows || `<tr><td colspan="18">No ledger entries</td></tr>`}</tbody></table>
       </div>`;
+    }
+
+    // ---- Data-only versions of the report builders above, for Google Sheet sync ----
+    // Same numbers/columns as buildMaterialTableHtml/buildReportHtml (the print/PDF
+    // report), just returned as plain objects instead of an HTML table.
+    function buildMaterialReportData(projectNo, materialName, list, unitOverride){
+      let cp=0, cr=0, ct=0, ci=0;
+      const detail = (typeof getOpeningStockDetail==='function') ? getOpeningStockDetail(projectNo, materialName) : {received:0, historicalIssue:0};
+      const opening = (detail.received||0) - (detail.historicalIssue||0);
+      const openingRow = (opening || detail.received || detail.historicalIssue) ? {
+        received: detail.received||0, historicalIssue: detail.historicalIssue||0, net: opening
+      } : null;
+      const rows = list.map(e=>{
+        cp += +e.procQty||0; cr += +e.recQty||0; ct += +e.trQty||0; ci += +e.issueQty||0;
+        const gross=cp+cr, net=gross-ct, bal=opening+net-ci;
+        return {
+          date: formatDate(e.dateStr), mrr: e.procMrr||'', procQty:+e.procQty||0, procCum:cp,
+          recvProject: e.recPrj||'', recvGp: e.recGp||'', recvQty:+e.recQty||0, recvCum:cr, gross,
+          trGp: e.trGp||'', trProject: e.trPrj||'', trQty:+e.trQty||0, trCum:ct, netReceived:net,
+          purpose: e.purpose||'', issueQty:+e.issueQty||0, issueCum:ci, balance:bal
+        };
+      });
+      const unit = list[0]?.unit || unitOverride || '';
+      return { material: materialName || '(Not specified)', unit, openingRow, rows };
+    }
+
+    function buildProjectReportData(projectNo){
+      const p=projectDatabase.find(x=>x.prjNo===projectNo);
+      const list=projectEntries(projectNo);
+      const order=[]; const groups={};
+      list.forEach(e=>{
+        const key=String(e.material||'').trim().toLowerCase()||'—';
+        if(!groups[key]){ groups[key]=[]; order.push(key); }
+        groups[key].push(e);
+      });
+      const openingMapAll = getOpeningStockMap();
+      const catalogForNames = getMaterialCatalog();
+      const openingOnlyKeys = Object.keys(openingMapAll).filter(k=>{
+        const sep=k.indexOf('||'); const prj=k.slice(0,sep), matLower=k.slice(sep+2);
+        const rawVal = openingMapAll[k];
+        const net = (rawVal && typeof rawVal === 'object') ? ((Number(rawVal.received)||0) - (Number(rawVal.historicalIssue)||0)) : (Number(rawVal) || 0);
+        return prj===projectNo && !groups[matLower] && net;
+      });
+      const materials = order.map(key=>{
+        const groupList = groups[key];
+        return buildMaterialReportData(projectNo, groupList[0].material || '(Not specified)', groupList);
+      }).concat(openingOnlyKeys.map(k=>{
+        const sep=k.indexOf('||'); const matLower=k.slice(sep+2);
+        const catEntry = catalogForNames.find(m=>String(m.name).trim().toLowerCase()===matLower);
+        return buildMaterialReportData(projectNo, catEntry ? catEntry.name : matLower, [], catEntry ? catEntry.unit : '');
+      }));
+      return {
+        company: 'MARS STRUCTURE LIMITED',
+        prjNo: p?.prjNo || projectNo,
+        prjId: p?.id || '',
+        engineer: p?.eng || '',
+        materials
+      };
     }
 
     function buildReportHtml(projectNo){
@@ -3132,6 +3182,7 @@ function adminSaveOpeningStock(){
   setOpeningStock(prj, mat, Number(received)||0, Number(hIssue)||0);
   const net=(Number(received)||0)-(Number(hIssue)||0);
   logActivity('Opening Stock Set', `${prj} / ${mat} = Received ${Number(received)||0} - Historical Issue ${Number(hIssue)||0} = Net ${net}`);
+  if (typeof syncOpeningStockToSheet === 'function') syncOpeningStockToSheet(prj);
   showToast('Opening stock saved.');
   renderAdminSettingsModal('stock');
   recalculateAndRender();
@@ -3378,16 +3429,6 @@ function renderStatusBadge(elId,label,type='ready'){
 function setSyncStatus(label,type='ready'){ renderStatusBadge('syncStatus',label,type); }
 function setSheetSyncStatus(label,type='ready'){ renderStatusBadge('sheetSyncStatus',label,type); }
 
-/* Improve existing Google Sheet sync feedback without changing its endpoint. */
-const _sendDataToGoogleSheet=sendDataToGoogleSheet;
-sendDataToGoogleSheet=function(dataObj){
-  setSheetSyncStatus('Syncing...','loading');
-  if(!SCRIPT_URL){setSheetSyncStatus('Not configured');return;}
-  fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(dataObj)})
-    .then(()=>{setSheetSyncStatus('Synced','ok');logActivity('Sheet Sync','Entry sent to Google Sheet')})
-    .catch(()=>{setSheetSyncStatus('Sync Failed','error');showToast('Google Sheet sync failed.','error')});
-};
-
 /* Initialize pro layer. */
 document.addEventListener('DOMContentLoaded',()=>{
   renderAdvanced();renderActivity();setSyncStatus('Firebase Ready');
@@ -3415,19 +3456,50 @@ const FIREBASE_COLLECTION = "ledger_entries";
 // MARS-Sheet-Sync-AppsScript.gs for the script + setup steps). Leave this
 // as "" to skip Google Sheet sync entirely — Firebase saving still works
 // normally either way.
-const SHEET_WEBHOOK_URL = "";
+const SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx0VleOJ0wFzt10S_0xJ3eZQMcZYg7qUsH-D4x99yVPB0KLXm1AJymP8X-OTAgOi4Nn/exec";
 
 // Fire-and-forget: sends one saved entry to the Google Sheet webhook.
 // Never blocks or fails the Firebase save — Sheet sync is a bonus copy,
 // not the source of truth.
 function syncEntryToSheet(entry) {
-  if (!SHEET_WEBHOOK_URL) return;
+  if (!SHEET_WEBHOOK_URL) { if (typeof setSheetSyncStatus === 'function') setSheetSyncStatus('Not configured'); return; }
+  if (typeof setSheetSyncStatus === 'function') setSheetSyncStatus('Syncing...', 'loading');
   try {
     fetch(SHEET_WEBHOOK_URL, {
       method: 'POST',
       body: JSON.stringify(entry)
-    }).catch(() => { /* best-effort; Firebase already has the real copy */ });
-  } catch (e) { /* ignore */ }
+    }).then(() => {
+      if (typeof setSheetSyncStatus === 'function') setSheetSyncStatus('Synced', 'ok');
+    }).catch(() => {
+      /* best-effort; Firebase already has the real copy */
+      if (typeof setSheetSyncStatus === 'function') setSheetSyncStatus('Sync Failed', 'error');
+    });
+  } catch (e) { if (typeof setSheetSyncStatus === 'function') setSheetSyncStatus('Sync Failed', 'error'); }
+}
+
+// Fire-and-forget: sends a project's full Stock Ledger report — Opening
+// Balance (Historical Received − Historical Issue) plus every ledger entry
+// up to the current running Balance — to the same Sheet webhook, formatted
+// like the printed/PDF Stock Ledger report. One Sheet tab per project.
+// Triggered right after Opening Stock is saved (see adminSaveOpeningStock).
+function syncOpeningStockToSheet(projectNo) {
+  if (!SHEET_WEBHOOK_URL) { if (typeof setSheetSyncStatus === 'function') setSheetSyncStatus('Not configured'); return; }
+  if (typeof setSheetSyncStatus === 'function') setSheetSyncStatus('Syncing...', 'loading');
+  try {
+    const data = buildProjectReportData(projectNo);
+    fetch(SHEET_WEBHOOK_URL, {
+      method: 'POST',
+      body: JSON.stringify(Object.assign({ action: 'openingStockSync' }, data))
+    }).then(() => {
+      if (typeof setSheetSyncStatus === 'function') setSheetSyncStatus('Synced', 'ok');
+    }).catch(() => {
+      /* best-effort; Firestore already has the real copy */
+      if (typeof setSheetSyncStatus === 'function') setSheetSyncStatus('Sync Failed', 'error');
+    });
+  } catch (e) {
+    console.error('Opening stock sheet sync failed:', e);
+    if (typeof setSheetSyncStatus === 'function') setSheetSyncStatus('Sync Failed', 'error');
+  }
 }
 
 function firebaseReady(){
