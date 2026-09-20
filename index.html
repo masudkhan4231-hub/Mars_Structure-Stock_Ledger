@@ -164,7 +164,7 @@
     .fd-meta{display:flex;gap:14px;font-size:12px;color:#64748b}
 
     .fd-bottom-grid{display:grid;grid-template-columns:1fr 3fr;gap:16px}
-    .fd-mat-table{width:100%;border-collapse:collapse}
+    .fd-mat-table{width:100%;border-collapse:collapse;page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}tfoot{display:table-footer-group}
     .fd-mat-table th{text-align:left;font-size:11px;color:#64748b;font-weight:700;padding:6px 4px;border-bottom:1px solid #e2e7ee}
     .fd-mat-table td{padding:11px 4px;font-size:13px;border-bottom:1px solid #f2efe8;color:#14171c}
     .fd-mat-table tr:last-child td{border-bottom:0}
@@ -272,7 +272,9 @@
       #pdfContent{width:100%!important}
       .no-print,.sidebar,.mobile-bottom,.topbar,.filter-panel,#inputFormSection,
       #advancedTools,#activitySection,.action-col{display:none!important}
-      .pdf-table{min-width:0!important;width:100%!important}
+      .pdf-table{min-width:0!important;width:100%!important;page-break-inside:auto!important}
+      .pdf-table tr{page-break-inside:avoid!important;break-inside:avoid!important}
+      .pdf-table thead{display:table-header-group!important}
       .pdf-table th,.pdf-table td{font-size:8px!important;padding:3px 2px!important;border-color:#e6eaf0!important;background:transparent!important;color:#111!important}
       .pdf-table th{background:#f3f6fa!important}
       .pdf-header{border-color:#e6eaf0!important}
@@ -1838,7 +1840,7 @@
         <td>${escapeHtml(i.remarks)}</td>
       </tr>`).join('');
       const html=`<!doctype html><html><head><meta charset="utf-8"><title>Physical Verification — ${escapeHtml(c.prjNo)}</title>
-      <style>@page{size:A4 portrait;margin:12mm}body{font-family:Arial,sans-serif;font-size:12px}table{width:100%;border-collapse:collapse;margin-top:14px}th,td{border:1px solid #999;padding:5px;text-align:center}th{background:#eef2f7}h1,h2{text-align:center;margin:2px 0}.meta{display:flex;justify-content:space-between;margin:14px 0;font-weight:bold}.sign{display:flex;justify-content:space-between;margin-top:60px}.sig{width:220px;border-top:1px solid #555;text-align:center;padding-top:4px}</style>
+      <style>@page{size:A4 portrait;margin:12mm}body{font-family:Arial,sans-serif;font-size:12px}table{width:100%;border-collapse:collapse;margin-top:14px;page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}tfoot{display:table-footer-group}th,td{border:1px solid #999;padding:5px;text-align:center}th{background:#eef2f7}h1,h2{text-align:center;margin:2px 0}.meta{display:flex;justify-content:space-between;margin:14px 0;font-weight:bold}.sign{display:flex;justify-content:space-between;margin-top:60px}.sig{width:220px;border-top:1px solid #555;text-align:center;padding-top:4px}</style>
       </head><body>
       <h1>MARS STRUCTURE LIMITED</h1><h2>PHYSICAL STOCK VERIFICATION REPORT</h2>
       <div class="meta"><span>Project: ${escapeHtml(c.prjNo)}</span><span>Project ID: ${escapeHtml(c.prjId||'')}</span><span>Date: ${formatDate(c.dateStr)}</span></div>
@@ -1857,7 +1859,7 @@
         return `<tr><td>${formatDate(c.dateStr)}</td><td>${escapeHtml(c.prjNo)}</td><td>${escapeHtml(c.checkedByEngineerName||'-')}</td><td>${c.items.length}</td><td>${shortages ? shortages+' shortage(s)' : 'Matched'}</td></tr>`;
       }).join('');
       const html=`<!doctype html><html><head><meta charset="utf-8"><title>Site Visit Log</title>
-      <style>@page{size:A4 portrait;margin:12mm}body{font-family:Arial,sans-serif;font-size:12px}table{width:100%;border-collapse:collapse;margin-top:14px}th,td{border:1px solid #999;padding:5px;text-align:center}th{background:#eef2f7}h1,h2{text-align:center;margin:2px 0}</style>
+      <style>@page{size:A4 portrait;margin:12mm}body{font-family:Arial,sans-serif;font-size:12px}table{width:100%;border-collapse:collapse;margin-top:14px;page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}tfoot{display:table-footer-group}th,td{border:1px solid #999;padding:5px;text-align:center}th{background:#eef2f7}h1,h2{text-align:center;margin:2px 0}</style>
       </head><body><h1>MARS STRUCTURE LIMITED</h1><h2>SITE VISIT / PHYSICAL CHECK LOG</h2>
       <table><thead><tr><th>Date</th><th>Project</th><th>Checked By</th><th>Materials Checked</th><th>Result</th></tr></thead><tbody>${rows}</tbody></table>
       </body></html>`;
@@ -2410,7 +2412,7 @@
       <style>
       @page{size:A4 landscape;margin:6mm}body{font-family:Arial,sans-serif;color:#172033;font-size:9px}
       h1,h2,p{text-align:center;margin:3px}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}
-      table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:3px;text-align:center;white-space:nowrap}th{background:#eef2f7}
+      table{width:100%;border-collapse:collapse;page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}tfoot{display:table-footer-group}th,td{border:1px solid #999;padding:3px;text-align:center;white-space:nowrap}th{background:#eef2f7}
       .mat-block{margin-bottom:14px}.mat-title{font-weight:bold;font-size:11px;margin:10px 0 4px;padding:3px 0;border-bottom:1px solid #333}
       .sign{display:flex;justify-content:space-between;margin-top:45px}.sig{width:220px;border-top:1px solid #555;text-align:center;padding-top:4px}
       </style></head><body>
@@ -2436,7 +2438,7 @@
         return h.slice(h.indexOf("<body>")+6,h.indexOf("</body>"));
       }).join('<div style="page-break-before:always"></div>');
       const combined=`<!doctype html><html><head><meta charset="utf-8"><title>MARS Combined Stock Ledger</title>
-      <style>@page{size:A4 landscape;margin:6mm}body{font-family:Arial,sans-serif;font-size:9px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:3px;text-align:center}th{background:#eef2f7}h1,h2,p{text-align:center}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}.mat-block{margin-bottom:14px}.mat-title{font-weight:bold;font-size:11px;margin:10px 0 4px;padding:3px 0;border-bottom:1px solid #333}.sign{display:flex;justify-content:space-between;margin-top:35px}.sig{width:220px;border-top:1px solid #555;text-align:center;padding-top:4px}</style>
+      <style>@page{size:A4 landscape;margin:6mm}body{font-family:Arial,sans-serif;font-size:9px}table{width:100%;border-collapse:collapse;page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}tfoot{display:table-footer-group}th,td{border:1px solid #999;padding:3px;text-align:center}th{background:#eef2f7}h1,h2,p{text-align:center}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}.mat-block{margin-bottom:14px}.mat-title{font-weight:bold;font-size:11px;margin:10px 0 4px;padding:3px 0;border-bottom:1px solid #333}.sign{display:flex;justify-content:space-between;margin-top:35px}.sig{width:220px;border-top:1px solid #555;text-align:center;padding-top:4px}</style>
       </head><body>${sections}</body></html>`;
       logActivity('Combined PDF',`${entries.length} records / ${all.length} projects`);
       printHtml(combined);
@@ -2453,7 +2455,7 @@
         return h.slice(h.indexOf("<body>")+6,h.indexOf("</body>"));
       }).join('<div style="page-break-before:always"></div>');
       const docHtml=`<!doctype html><html><head><meta charset="utf-8"><title>MARS All Project Reports</title>
-      <style>@page{size:A4 landscape;margin:6mm}body{font-family:Arial,sans-serif;font-size:9px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:3px;text-align:center}th{background:#eef2f7}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}h1,h2{text-align:center}.mat-block{margin-bottom:14px}.mat-title{font-weight:bold;font-size:11px;margin:10px 0 4px;padding:3px 0;border-bottom:1px solid #333}.sign{display:flex;justify-content:space-between;margin-top:45px}.sig{width:220px;border-top:1px solid #555;text-align:center;padding-top:4px}</style>
+      <style>@page{size:A4 landscape;margin:6mm}body{font-family:Arial,sans-serif;font-size:9px}table{width:100%;border-collapse:collapse;page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}tfoot{display:table-footer-group}th,td{border:1px solid #999;padding:3px;text-align:center}th{background:#eef2f7}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}h1,h2{text-align:center}.mat-block{margin-bottom:14px}.mat-title{font-weight:bold;font-size:11px;margin:10px 0 4px;padding:3px 0;border-bottom:1px solid #333}.sign{display:flex;justify-content:space-between;margin-top:45px}.sig{width:220px;border-top:1px solid #555;text-align:center;padding-top:4px}</style>
       </head><body>${sections}</body></html>`;
       logActivity('All Project Reports',`${reports.length} project reports`);
       printHtml(docHtml);
@@ -2514,7 +2516,7 @@
       if(!rows){ alert('No material activity found across any project yet.'); return; }
 
       const docHtml=`<!doctype html><html><head><meta charset="utf-8"><title>MARS Materials Summary — All Projects</title>
-      <style>@page{size:A4 landscape;margin:8mm}body{font-family:Arial,sans-serif;font-size:11px}table{width:100%;border-collapse:collapse;margin-top:14px}th,td{border:1px solid #999;padding:5px;text-align:center}th{background:#eef2f7}h1,h2{text-align:center;margin:2px 0}.meta{text-align:center;margin:8px 0;color:#555;font-size:10px}</style>
+      <style>@page{size:A4 landscape;margin:8mm}body{font-family:Arial,sans-serif;font-size:11px}table{width:100%;border-collapse:collapse;margin-top:14px;page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}tfoot{display:table-footer-group}th,td{border:1px solid #999;padding:5px;text-align:center}th{background:#eef2f7}h1,h2{text-align:center;margin:2px 0}.meta{text-align:center;margin:8px 0;color:#555;font-size:10px}</style>
       </head><body>
       <h1>MARS STRUCTURE LIMITED</h1><h2>MATERIALS SUMMARY — ALL PROJECTS COMBINED</h2>
       <div class="meta">Every project's Opening Balance, Procurement, Receiving, Transfer and Issue totals for each material, added together company-wide.</div>
@@ -2577,7 +2579,7 @@
       if(!rows){ alert('No material activity found for this project yet.'); return; }
 
       const docHtml=`<!doctype html><html><head><meta charset="utf-8"><title>MARS Materials Summary — ${escapeHtml(prjNo)}</title>
-      <style>@page{size:A4 landscape;margin:8mm}body{font-family:Arial,sans-serif;font-size:11px}table{width:100%;border-collapse:collapse;margin-top:14px}th,td{border:1px solid #999;padding:5px;text-align:center}th{background:#eef2f7}h1,h2{text-align:center;margin:2px 0}.meta{text-align:center;margin:8px 0;color:#555;font-size:10px}</style>
+      <style>@page{size:A4 landscape;margin:8mm}body{font-family:Arial,sans-serif;font-size:11px}table{width:100%;border-collapse:collapse;margin-top:14px;page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}tfoot{display:table-footer-group}th,td{border:1px solid #999;padding:5px;text-align:center}th{background:#eef2f7}h1,h2{text-align:center;margin:2px 0}.meta{text-align:center;margin:8px 0;color:#555;font-size:10px}</style>
       </head><body>
       <h1>MARS STRUCTURE LIMITED</h1><h2>MATERIALS SUMMARY — ${escapeHtml(prjNo)}</h2>
       <div class="meta">Project ID: ${escapeHtml(p?.id||'')} &nbsp;|&nbsp; Engineer: ${escapeHtml(p?.eng||'')}</div>
