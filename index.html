@@ -288,8 +288,19 @@
       body.report-printing *{visibility:hidden!important}
       body.report-printing #reportPrintOverlay,
       body.report-printing #reportPrintOverlay *{visibility:visible!important}
+      /* The overlay used to be position:absolute, which takes it out of the
+         normal document flow. That meant the page's printable height was
+         still being measured from the (invisible) app-shell behind it, so
+         any report taller than that leftover height got silently cut off
+         after the first page instead of flowing onto page 2+ — no data was
+         lost, it just never got printed. Hiding the app-shell outright and
+         letting the overlay sit in normal (static) flow makes the overlay
+         itself the thing that determines document height, so long reports
+         paginate correctly across as many pages as they need. */
+      body.report-printing .app-shell,
+      body.report-printing #modalRoot{display:none!important}
       body.report-printing #reportPrintOverlay{
-        display:block!important;position:absolute!important;left:0!important;top:0!important;
+        display:block!important;position:static!important;
         width:100%!important;margin:0!important;padding:0!important;background:#fff!important;
       }
     }
