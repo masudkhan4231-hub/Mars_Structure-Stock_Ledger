@@ -2464,11 +2464,27 @@
         if(!overlay) throw new Error('reportPrintOverlay missing');
         overlay.innerHTML = bodyContent;
         document.body.classList.add('report-printing');
+
+        // Belt-and-braces: force-hide whatever page section is currently on
+        // screen (e.g. the Print & Reports page's own #pdfCard ledger
+        // preview) via a direct inline style, which always wins over any
+        // stylesheet rule regardless of specificity — so it can never bleed
+        // into this report's print output. Restored after printing.
+        const hiddenEls = [];
+        document.querySelectorAll('.page-section:not(.page-hidden)').forEach(el=>{
+          hiddenEls.push({el, prevDisplay: el.style.display, prevPriority: el.style.getPropertyPriority('display')});
+          el.style.setProperty('display','none','important');
+        });
+
         let done=false;
         const cleanup=()=>{
           if(done) return; done=true;
           document.body.classList.remove('report-printing');
           overlay.innerHTML='';
+          hiddenEls.forEach(({el,prevDisplay,prevPriority})=>{
+            if(prevDisplay){ el.style.setProperty('display', prevDisplay, prevPriority); }
+            else { el.style.removeProperty('display'); }
+          });
           window.removeEventListener('afterprint', cleanup);
         };
         window.addEventListener('afterprint', cleanup);
