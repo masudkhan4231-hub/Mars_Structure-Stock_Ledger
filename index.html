@@ -2567,7 +2567,10 @@
       });
 
       const rows = Object.values(totals)
-        .filter(t => t.opening || t.proc || t.rec || t.tr || t.issue) // skip materials with zero activity everywhere
+        // Every material here was explicitly tracked for this project (via
+        // an opening-stock record or at least one ledger entry) — even one
+        // that nets to exactly 0.00 (fully received then fully issued) is
+        // still part of the project's history, so it stays in the list.
         .sort((a,b)=>a.name.localeCompare(b.name))
         .map(t=>{
           const gross = t.proc + t.rec;
@@ -2630,7 +2633,8 @@
       });
 
       const rows = Object.values(totals)
-        .filter(t => t.opening || t.proc || t.rec || t.tr || t.issue)
+        // Same as above: don't drop materials that net to exactly 0.00 —
+        // they were still received and issued on this project historically.
         .sort((a,b)=>a.name.localeCompare(b.name))
         .map((t,i)=>{
           const gross = t.proc + t.rec;
