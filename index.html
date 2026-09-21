@@ -2544,14 +2544,20 @@
         ensure(String(m.name).trim().toLowerCase(), m.name, m.unit);
       });
 
-      // Sum opening stock (net of Historical Received − Historical Issue) across every project.
+      // Opening stock: show the true Historical Received in Opening and the
+      // Historical Issue in Issued (rather than silently netting them to 0),
+      // so a fully-used-up material's history stays visible in the report.
       Object.keys(openingMapAll).forEach(k=>{
         const sep=k.indexOf('||'); const matLower=k.slice(sep+2);
         const rawVal = openingMapAll[k];
-        const net = (rawVal && typeof rawVal === 'object') ? ((Number(rawVal.received)||0) - (Number(rawVal.historicalIssue)||0)) : (Number(rawVal) || 0);
         const catEntry = catalog.find(m=>String(m.name).trim().toLowerCase()===matLower);
         const t = ensure(matLower, catEntry ? catEntry.name : matLower, catEntry ? catEntry.unit : '');
-        t.opening += net;
+        if(rawVal && typeof rawVal === 'object'){
+          t.opening += Number(rawVal.received)||0;
+          t.issue += Number(rawVal.historicalIssue)||0;
+        } else {
+          t.opening += Number(rawVal) || 0;
+        }
       });
 
       // Sum every ledger entry's movement, across every project, per material.
@@ -2614,10 +2620,16 @@
         const sep=k.indexOf('||'); const kp=k.slice(0,sep), matLower=k.slice(sep+2);
         if(kp !== prjNo) return;
         const rawVal = openingMapAll[k];
-        const net = (rawVal && typeof rawVal === 'object') ? ((Number(rawVal.received)||0) - (Number(rawVal.historicalIssue)||0)) : (Number(rawVal) || 0);
         const catEntry = catalog.find(m=>String(m.name).trim().toLowerCase()===matLower);
         const t = ensure(matLower, catEntry ? catEntry.name : matLower, catEntry ? catEntry.unit : '');
-        t.opening += net;
+        // Show true Historical Received in Opening and Historical Issue in
+        // Issued (not a silently-netted number) — see note above.
+        if(rawVal && typeof rawVal === 'object'){
+          t.opening += Number(rawVal.received)||0;
+          t.issue += Number(rawVal.historicalIssue)||0;
+        } else {
+          t.opening += Number(rawVal) || 0;
+        }
       });
 
       entries.forEach(e=>{
