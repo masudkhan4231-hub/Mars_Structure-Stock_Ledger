@@ -775,6 +775,7 @@
         <a href="javascript:void(0)" class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg> Dashboard</a>
         <a href="javascript:void(0)" class="nav-item" data-page="entry" onclick="showPage('entry')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> New Ledger Entry</a>
         <a href="javascript:void(0)" class="nav-item" data-page="print" onclick="showPage('print')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6M9 9h1"/></svg> Stock Ledger &amp; Reports</a>
+        <a href="javascript:void(0)" class="nav-item" data-page="transfers" onclick="showPage('transfers')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h13l-3-3M17 17H4l3 3"/></svg> Transfers <span id="trBadge" class="hidden" style="background:#dc2626;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;margin-left:6px">0</span></a>
         <a href="javascript:void(0)" class="nav-item admin-only" data-page="verify" onclick="showPage('verify')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg> Physical Check</a>
         <button class="nav-item w-full text-left" onclick="downloadPDF()"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg> Print / PDF</button>
       </nav>
@@ -1006,6 +1007,21 @@
           </div>
         </section>
 
+        <section id="transferSection" class="card p-5 md:p-6 page-section page-hidden" data-page="transfers">
+          <h2 class="text-lg font-extrabold text-navy mb-1">Inter-Project Material Transfer</h2>
+          <p class="text-xs text-muted mb-4">Pending অবস্থায় কোনো balance বদলায় না। Receiver Approve করলে দুই project-এ ledger entry নিজে তৈরি হয়।</p>
+          <div class="grid md:grid-cols-5 gap-3 mb-4">
+            <div><label class="field-label">From Project</label><select id="trFrom" class="field"></select></div>
+            <div><label class="field-label">To Project</label><select id="trTo" class="field"></select></div>
+            <div><label class="field-label">Material</label><input id="trMat" list="materialsDatalist" class="field" placeholder="Material"></div>
+            <div><label class="field-label">Quantity</label><input id="trQ" type="number" step="0.01" class="field" placeholder="Qty"></div>
+            <div><label class="field-label">Gate Pass</label><input id="trG" class="field" placeholder="Optional"></div>
+          </div>
+          <button class="btn btn-primary" onclick="trSubmit()">Send Transfer Request</button>
+          <div class="text-xs font-extrabold text-navy mt-6 mb-2">Waiting for my approval</div><div id="trIncoming" class="space-y-2"></div>
+          <div class="text-xs font-extrabold text-navy mt-6 mb-2">All transfers</div><div id="trList" class="space-y-2"></div>
+        </section>
+
         <section id="verifySection" class="card p-5 md:p-6 page-section page-hidden" data-page="verify">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-line">
             <div><div class="section-title">Physical Stock Verification</div><div class="text-xs text-muted mt-1">Count what's actually on site, compare against the system balance, and print a shortage/excess report for the office.</div></div>
@@ -1140,6 +1156,7 @@
   <nav class="mobile-bottom no-print">
     <button data-page="dashboard" class="mb-active" onclick="showPage('dashboard')"><span><svg class="vic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/></svg></span>Home</button>
     <button data-page="entry" onclick="showPage('entry')"><span><svg class="vic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Add</button>
+    <button data-page="transfers" onclick="showPage('transfers')"><span style="position:relative">⇄<b id="trBadgeM" class="hidden" style="position:absolute;top:-6px;right:-10px;background:#dc2626;color:#fff;border-radius:99px;font-size:9px;padding:0 5px">0</b></span>Transfer</button>
     <button data-page="print" onclick="showPage('print')"><span><svg class="vic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></span>Reports</button>
     <button onclick="downloadPDF()"><span><svg class="vic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg></span>Print</button>
   </nav>
@@ -3891,6 +3908,99 @@ async function deleteEntryFromFirebase(firebaseId){
         .catch((e) => console.error('Service worker registration failed:', e));
     });
   }
+</script>
+<script>
+/* ================= INTER-PROJECT TRANSFER APPROVAL ================= */
+(function(){
+  let transfers=[], firstLoad=true;
+  let ac=null;
+  function unlockAudio(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();}catch(e){}}
+  ['click','touchstart','keydown'].forEach(ev=>document.addEventListener(ev,unlockAudio,{once:false,passive:true}));
+  function ring(){
+    try{
+      if(navigator.vibrate)navigator.vibrate([300,150,300,150,300]);
+      if(!ac||ac.state!=='running')return;
+      [0,0.45,0.9].forEach(d=>{
+        [880,660].forEach((f,i)=>{
+          const o=ac.createOscillator(),g=ac.createGain();
+          o.type='sine';o.frequency.value=f;
+          const t=ac.currentTime+d+i*0.18;
+          g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.5,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+0.17);
+          o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+0.18);
+        });
+      });
+    }catch(e){}
+  }
+  const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
+  const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  const myProjects=()=>isAdmin?null:(window.currentEngineerAllowedProjects||[]);
+  const canDecide=t=>isAdmin||(window.currentEngineerAllowedProjects||[]).includes(t.toPrj);
+  const isMine=t=>!isAdmin&&(window.currentEngineerAllowedProjects||[]).includes(t.fromPrj);
+  function fillSelects(){
+    const all=projectDatabase.map(p=>p.prjNo), mine=myProjects()||all;
+    const f=document.getElementById('trFrom'), t=document.getElementById('trTo'); if(!f||!t)return;
+    const fv=f.value, tv=t.value;
+    f.innerHTML=mine.map(x=>`<option>${esc(x)}</option>`).join('');
+    t.innerHTML=all.map(x=>`<option>${esc(x)}</option>`).join('');
+    if(fv)f.value=fv; if(tv)t.value=tv;
+  }
+  window.trSubmit=async function(){
+    const from=trFrom.value,to=trTo.value,mat=trMat.value.trim(),qty=parseFloat(trQ.value)||0;
+    if(!from||!to||!mat||qty<=0){showToast('Project, material ও quantity দিন।','error');return;}
+    if(from===to){showToast('From ও To একই project হতে পারে না।','error');return;}
+    const bal=computeCurrentBalance(from,mat);
+    if(qty>bal){showToast('Stock কম: '+from+'-এ balance '+bal.toFixed(2)+'।','error');return;}
+    buildMaterialUnitMap();
+    try{
+      await fb().collection('transfers').add({fromPrj:from,toPrj:to,material:mat,unit:materialUnitMap[mat.toLowerCase()]||'',qty,gp:trG.value.trim()||'-',status:'pending',createdAt:Date.now(),requestedBy:window.currentEngineerName||'Admin'});
+      trMat.value='';trQ.value='';trG.value='';showToast('Transfer request পাঠানো হয়েছে।');
+    }catch(e){console.error(e);showToast('Send failed — Firestore Rules-এ transfers collection allow করুন।','error');}
+  };
+  window.trDecide=async function(id,approve){
+    const db=fb(), ref=db.collection('transfers').doc(id), by=window.currentEngineerName||'Admin';
+    try{
+      await db.runTransaction(async tx=>{
+        const d=await tx.get(ref); if(!d.exists||d.data().status!=='pending')throw new Error('already-decided');
+        const t=d.data();
+        if(approve){
+          const day=new Date().toISOString().slice(0,10), now=Date.now();
+          const base=(prj)=>{const p=projectDatabase.find(x=>x.prjNo===prj)||{};return{createdAt:now,updatedAt:now,dateStr:day,prjNo:prj,prjId:p.id||'',engineerName:p.eng||'',loggedByEngineerName:by,material:t.material,unit:t.unit,procMrr:'-',procQty:0,recPrj:'-',recGp:'-',recQty:0,trGp:'-',trPrj:'-',trQty:0,purpose:'-',issueQty:0,transferId:id};};
+          const out=Object.assign(base(t.fromPrj),{trGp:t.gp,trPrj:t.toPrj,trQty:t.qty});
+          const inn=Object.assign(base(t.toPrj),{recGp:t.gp,recPrj:t.fromPrj,recQty:t.qty});
+          tx.set(db.collection(FIREBASE_COLLECTION).doc('tr_'+id+'_out'),out);
+          tx.set(db.collection(FIREBASE_COLLECTION).doc('tr_'+id+'_in'),inn);
+        }
+        tx.update(ref,{status:approve?'approved':'rejected',decidedBy:by,decidedAt:Date.now()});
+      });
+      showToast(approve?'Approved — দুই project-এর balance আপডেট হয়েছে।':'Rejected — কোনো balance বদলায়নি।');
+    }catch(e){showToast(e.message==='already-decided'?'এটি আগেই সিদ্ধান্ত হয়ে গেছে।':'Failed — Rules/connection দেখুন।','error');}
+  };
+  const badge={pending:'🟡 Pending',approved:'🟢 Approved',rejected:'🔴 Rejected'};
+  function card(t,actions){
+    return `<div class="rounded-xl border p-3 text-sm"><b>${esc(t.fromPrj)} → ${esc(t.toPrj)}</b> · ${esc(t.material)}: ${t.qty} ${esc(t.unit)}<div class="text-xs text-muted">${badge[t.status]} · by ${esc(t.requestedBy)}${t.decidedBy?' · decided by '+esc(t.decidedBy):''} · ${new Date(t.createdAt).toLocaleString()}</div>${actions?`<div class="mt-2 flex gap-2"><button class="btn btn-primary" onclick="trDecide('${t.id}',true)">Approve</button><button class="btn btn-secondary" onclick="trDecide('${t.id}',false)">Reject</button></div>`:''}</div>`;
+  }
+  function render(){
+    fillSelects();
+    const inc=transfers.filter(t=>t.status==='pending'&&canDecide(t));
+    trIncoming.innerHTML=inc.map(t=>card(t,true)).join('')||'<div class="text-xs text-muted">কোনো pending request নেই।</div>';
+    const vis=isAdmin?transfers:transfers.filter(t=>canDecide(t)||isMine(t));
+    trList.innerHTML=vis.map(t=>card(t,false)).join('')||'<div class="text-xs text-muted">এখনো কোনো transfer নেই।</div>';
+    [trBadge,trBadgeM].forEach(b=>{b.textContent=inc.length;b.classList.toggle('hidden',!inc.length);});
+  }
+  function start(){
+    if(!fb()){return setTimeout(start,800);}
+    fb().collection('transfers').orderBy('createdAt','desc').onSnapshot(snap=>{
+      if(!firstLoad)snap.docChanges().forEach(c=>{
+        const t=c.doc.data();
+        if(c.type==='added'&&t.status==='pending'&&canDecide(t)&&!isMine(t)){ring();showToast('🔔 New Transfer: '+t.fromPrj+' → '+t.toPrj+' · '+t.material+' '+t.qty);}
+        if(c.type==='modified'&&t.status!=='pending'&&(isAdmin||isMine(t))){ring();showToast((t.status==='approved'?'🟢 Approved: ':'🔴 Rejected: ')+t.fromPrj+' → '+t.toPrj+' · '+t.material);}
+      });
+      firstLoad=false;
+      transfers=snap.docs.map(d=>({id:d.id,...d.data()}));render();
+    },e=>console.error('transfers listener',e));
+  }
+  window.addEventListener('load',()=>{start();setInterval(fillSelects,4000);});
+})();
 </script>
 </body>
 </html>
