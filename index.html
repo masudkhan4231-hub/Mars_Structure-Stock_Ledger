@@ -1009,7 +1009,7 @@
 
         <section id="transferSection" class="card p-5 md:p-6 page-section page-hidden" data-page="transfers">
           <h2 class="text-lg font-extrabold text-navy mb-1">Inter-Project Material Transfer</h2>
-          <p class="text-xs text-muted mb-4">Pending অবস্থায় কোনো balance বদলায় না। Receiver Approve করলে দুই project-এ ledger entry নিজে তৈরি হয়।</p>
+          <p class="text-xs text-muted mb-4">Balances do not change while a request is pending. When the receiving project approves, ledger entries are created automatically for both projects.</p>
           <div class="grid md:grid-cols-5 gap-3 mb-4">
             <div><label class="field-label">From Project</label><select id="trFrom" class="field"></select></div>
             <div><label class="field-label">To Project</label><select id="trTo" class="field"></select></div>
@@ -3946,15 +3946,15 @@ async function deleteEntryFromFirebase(firebaseId){
   }
   window.trSubmit=async function(){
     const from=trFrom.value,to=trTo.value,mat=trMat.value.trim(),qty=parseFloat(trQ.value)||0;
-    if(!from||!to||!mat||qty<=0){showToast('Project, material ও quantity দিন।','error');return;}
-    if(from===to){showToast('From ও To একই project হতে পারে না।','error');return;}
+    if(!from||!to||!mat||qty<=0){showToast('Enter project, material and quantity.','error');return;}
+    if(from===to){showToast('From and To project cannot be the same.','error');return;}
     const bal=computeCurrentBalance(from,mat);
-    if(qty>bal){showToast('Stock কম: '+from+'-এ balance '+bal.toFixed(2)+'।','error');return;}
+    if(qty>bal){showToast('Not enough stock: '+from+' balance is '+bal.toFixed(2)+'.','error');return;}
     buildMaterialUnitMap();
     try{
       await fb().collection('transfers').add({fromPrj:from,toPrj:to,material:mat,unit:materialUnitMap[mat.toLowerCase()]||'',qty,gp:trG.value.trim()||'-',status:'pending',createdAt:Date.now(),requestedBy:window.currentEngineerName||'Admin'});
-      trMat.value='';trQ.value='';trG.value='';showToast('Transfer request পাঠানো হয়েছে।');
-    }catch(e){console.error(e);showToast('Send failed — Firestore Rules-এ transfers collection allow করুন।','error');}
+      trMat.value='';trQ.value='';trG.value='';showToast('Transfer request sent.');
+    }catch(e){console.error(e);showToast('Send failed — allow the transfers collection in Firestore Rules.','error');}
   };
   window.trDecide=async function(id,approve){
     const db=fb(), ref=db.collection('transfers').doc(id), by=window.currentEngineerName||'Admin';
@@ -3972,8 +3972,8 @@ async function deleteEntryFromFirebase(firebaseId){
         }
         tx.update(ref,{status:approve?'approved':'rejected',decidedBy:by,decidedAt:Date.now()});
       });
-      showToast(approve?'Approved — দুই project-এর balance আপডেট হয়েছে।':'Rejected — কোনো balance বদলায়নি।');
-    }catch(e){showToast(e.message==='already-decided'?'এটি আগেই সিদ্ধান্ত হয়ে গেছে।':'Failed — Rules/connection দেখুন।','error');}
+      showToast(approve?'Approved — both project balances updated.':'Rejected — no balance changed.');
+    }catch(e){showToast(e.message==='already-decided'?'This request was already decided.':'Failed — check Rules/connection.','error');}
   };
   const badge={pending:'🟡 Pending',approved:'🟢 Approved',rejected:'🔴 Rejected'};
   function card(t,actions){
@@ -3982,10 +3982,10 @@ async function deleteEntryFromFirebase(firebaseId){
   function render(){
     fillSelects();
     const inc=transfers.filter(t=>t.status==='pending'&&canDecide(t));
-    trIncoming.innerHTML=inc.map(t=>card(t,true)).join('')||'<div class="text-xs text-muted">কোনো pending request নেই।</div>';
+    trIncoming.innerHTML=inc.map(t=>card(t,true)).join('')||'<div class="text-xs text-muted">No pending requests.</div>';
     const vis=isAdmin?transfers:transfers.filter(t=>canDecide(t)||isMine(t));
-    trList.innerHTML=vis.map(t=>card(t,false)).join('')||'<div class="text-xs text-muted">এখনো কোনো transfer নেই।</div>';
-    [trBadge,trBadgeM].forEach(b=>{b.textContent=inc.length;b.classList.toggle('hidden',!inc.length);});
+    trList.innerHTML=vis.map(t=>card(t,false)).join('')||'<div class="text-xs text-muted">No transfers yet.</div>';
+    [trBadge,trBadgeM].forEach(b=>{b.textContent=inc.length;b.classList.toggle('hidden',!inc.length);});  return inc.length;
   }
   function start(){
     if(!fb()){return setTimeout(start,800);}
@@ -3999,7 +3999,7 @@ async function deleteEntryFromFirebase(firebaseId){
       transfers=snap.docs.map(d=>({id:d.id,...d.data()}));render();
     },e=>console.error('transfers listener',e));
   }
-  window.addEventListener('load',()=>{start();setInterval(fillSelects,4000);});
+  window.addEventListener('load',()=>{start();let k='';setInterval(()=>{const n=(isAdmin?'A':'E')+'|'+(window.currentEngineerAllowedProjects||[]).join(',');if(n!==k){k=n;const c=render();if(c>0&&n!=='E|'){ring();showToast('🔔 '+c+' transfer request(s) waiting for your approval');}}},1000);});
 })();
 </script>
 </body>
