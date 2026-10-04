@@ -776,6 +776,8 @@
         <a href="javascript:void(0)" class="nav-item" data-page="entry" onclick="showPage('entry')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> New Ledger Entry</a>
         <a href="javascript:void(0)" class="nav-item" data-page="print" onclick="showPage('print')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6M9 9h1"/></svg> Stock Ledger &amp; Reports</a>
         <a href="javascript:void(0)" class="nav-item" data-page="transfers" onclick="showPage('transfers')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h13l-3-3M17 17H4l3 3"/></svg> Transfers <span id="trBadge" class="hidden" style="background:#dc2626;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;margin-left:6px">0</span></a>
+        <a href="javascript:void(0)" class="nav-item" data-page="requisition" onclick="showPage('requisition')">📋 Requisition <span id="rqBadge" class="hidden" style="background:#dc2626;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;margin-left:6px">0</span></a>
+        <a href="javascript:void(0)" class="nav-item admin-only" data-page="idapps" onclick="showPage('idapps')">🪪 ID Applications <span id="idBadge" class="hidden" style="background:#dc2626;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;margin-left:6px">0</span></a>
         <a href="javascript:void(0)" class="nav-item admin-only" data-page="verify" onclick="showPage('verify')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg> Physical Check</a>
         <button class="nav-item w-full text-left" onclick="downloadPDF()"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg> Print / PDF</button>
       </nav>
@@ -1022,6 +1024,24 @@
           <div class="text-xs font-extrabold text-navy mt-6 mb-2">All transfers</div><div id="trList" class="space-y-2"></div>
         </section>
 
+        <section id="requisitionSection" class="card p-5 md:p-6 page-section page-hidden" data-page="requisition">
+          <h2 class="text-lg font-extrabold text-navy mb-1">Material Requisition</h2>
+          <p class="text-xs text-muted mb-4">Site Engineer → DPM (can cancel items) → Executive Director → Procurement. Procurement cannot edit or delete; unpurchased items stay pending.</p>
+          <div id="rqForm" class="hidden mb-5">
+            <label class="field-label">Project</label><select id="rqPrj" class="field mb-3"></select>
+            <div id="rqRows" class="space-y-2"></div>
+            <div class="flex gap-2 mt-3"><button class="btn btn-secondary" onclick="rqAddRow()">+ Add item</button><button class="btn btn-primary" onclick="rqSubmit()">Submit Requisition</button></div>
+          </div>
+          <div id="rqList" class="space-y-3"></div>
+          <div id="rqRoles" class="hidden mt-6"><div class="text-xs font-extrabold text-navy mb-2">Assign roles (Admin)</div><div id="rqRoleList" class="space-y-2"></div></div>
+        </section>
+
+        <section id="idappsSection" class="card p-5 md:p-6 page-section page-hidden admin-only" data-page="idapps">
+          <h2 class="text-lg font-extrabold text-navy mb-1">Engineer ID Applications</h2>
+          <p class="text-xs text-muted mb-4">Approve to create the Engineer ID. Tell the applicant their ID by phone or WhatsApp. NID, signature and address stay only in this list.</p>
+          <div id="idList" class="space-y-3"></div>
+        </section>
+
         <section id="verifySection" class="card p-5 md:p-6 page-section page-hidden" data-page="verify">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-line">
             <div><div class="section-title">Physical Stock Verification</div><div class="text-xs text-muted mt-1">Count what's actually on site, compare against the system balance, and print a shortage/excess report for the office.</div></div>
@@ -1157,6 +1177,7 @@
     <button data-page="dashboard" class="mb-active" onclick="showPage('dashboard')"><span><svg class="vic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/></svg></span>Home</button>
     <button data-page="entry" onclick="showPage('entry')"><span><svg class="vic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Add</button>
     <button data-page="transfers" onclick="showPage('transfers')"><span style="position:relative">⇄<b id="trBadgeM" class="hidden" style="position:absolute;top:-6px;right:-10px;background:#dc2626;color:#fff;border-radius:99px;font-size:9px;padding:0 5px">0</b></span>Transfer</button>
+    <button data-page="requisition" onclick="showPage('requisition')"><span style="position:relative">📋<b id="rqBadgeM" class="hidden" style="position:absolute;top:-6px;right:-10px;background:#dc2626;color:#fff;border-radius:99px;font-size:9px;padding:0 5px">0</b></span>Requisition</button>
     <button data-page="print" onclick="showPage('print')"><span><svg class="vic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></span>Reports</button>
     <button onclick="downloadPDF()"><span><svg class="vic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg></span>Print</button>
   </nav>
@@ -3823,6 +3844,7 @@ async function deleteEntryFromFirebase(firebaseId){
     window.currentAccessRole='engineer';
     window.currentEngineerProject=match;
     window.currentEngineerId=eng.id;
+    window.currentEngineerRole=eng.role||'site';
     window.currentEngineerName=eng.name;
     window.currentEngineerAllowedProjects=(eng.projects||[]).slice();
     refreshProjectDropdowns(projectDatabase.indexOf(match));
@@ -3849,6 +3871,7 @@ async function deleteEntryFromFirebase(firebaseId){
     setTimeout(()=>{
       if(!eng){failEngineer();return}
       const assignedProjects=(eng.projects||[]).map(p=>projectDatabase.find(pd=>pd.prjNo===p)).filter(Boolean);
+      if(!assignedProjects.length&&eng.role&&eng.role!=='site'){enterProjectAndFinish(projectDatabase[0],eng);return}
       if(!assignedProjects.length){failEngineer('NO PROJECT ASSIGNED — CONTACT ADMIN');return}
       if(assignedProjects.length===1){
         enterProjectAndFinish(assignedProjects[0], eng);
@@ -3913,7 +3936,7 @@ async function deleteEntryFromFirebase(firebaseId){
 /* ================= INTER-PROJECT TRANSFER APPROVAL ================= */
 (function(){
   let transfers=[], firstLoad=true;
-  let ac=null;
+  let ac=null; window.marsRing=function(){ring();};
   function unlockAudio(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();}catch(e){}}
   ['click','touchstart','keydown'].forEach(ev=>document.addEventListener(ev,unlockAudio,{once:false,passive:true}));
   function ring(){
@@ -4000,6 +4023,182 @@ async function deleteEntryFromFirebase(firebaseId){
     },e=>console.error('transfers listener',e));
   }
   window.addEventListener('load',()=>{start();let k='';setInterval(()=>{const n=(isAdmin?'A':'E')+'|'+(window.currentEngineerAllowedProjects||[]).join(',');if(n!==k){k=n;const c=render();if(c>0&&n!=='E|'){ring();showToast('🔔 '+c+' transfer request(s) waiting for your approval');}}},1000);});
+})();
+</script>
+<script>
+/* ================= REQUISITION WORKFLOW ================= */
+(function(){
+  const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
+  const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  const role=()=>isAdmin?'admin':(window.currentEngineerRole||'site');
+  const who=()=>window.currentEngineerName||'Admin';
+  const myPrj=()=>window.currentEngineerAllowedProjects||[];
+  const STAGE={dpm:'🟡 With DPM',ed:'🟠 With Executive Director',procurement:'🔵 With Procurement',closed:'🟢 Closed',rejected:'🔴 Rejected'};
+  const ROLES={site:'Site Engineer',dpm:'DPM',ed:'Executive Director',proc:'Procurement'};
+  let reqs=[],lastCount=0;
+  const pending=r=>(r.items||[]).filter(i=>i.state==='pending');
+  const actionable=r=>(role()==='dpm'&&r.stage==='dpm')||(role()==='ed'&&r.stage==='ed')||(role()==='proc'&&r.stage==='procurement'&&pending(r).length>0);
+  const hist=(r,a)=>(r.history||[]).concat([{by:who(),role:role(),action:a,at:Date.now()}]);
+  async function mut(id,fn){
+    const db=fb(),ref=db.collection('requisitions').doc(id);
+    try{await db.runTransaction(async tx=>{const d=await tx.get(ref);const x=fn(d.data());if(!x)throw new Error('blocked');const lg=x.ledger;delete x.ledger;(lg||[]).forEach(en=>tx.set(db.collection(FIREBASE_COLLECTION).doc(en.id),en.data));tx.update(ref,x);});showToast('Done.');}
+    catch(e){showToast(e.message==='blocked'?'Action not allowed at this stage.':'Failed — check Rules/connection.','error');}
+  }
+  window.rqAddRow=function(){
+    const d=document.createElement('div');d.className='grid grid-cols-6 gap-2';
+    d.innerHTML='<input class="field col-span-3 rq-m" list="materialsDatalist" placeholder="Material"><input class="field col-span-2 rq-q" type="number" step="0.01" placeholder="Qty"><button class="btn btn-secondary" onclick="this.parentNode.remove()">✕</button>';
+    rqRows.appendChild(d);
+  };
+  window.rqSubmit=async function(){
+    buildMaterialUnitMap();
+    const items=[...rqRows.children].map((r,i)=>{const m=r.querySelector('.rq-m').value.trim();return{id:'i'+i,material:m,qty:parseFloat(r.querySelector('.rq-q').value)||0,unit:materialUnitMap[m.toLowerCase()]||'',state:'pending'};}).filter(i=>i.material&&i.qty>0);
+    if(!items.length){showToast('Add at least one item with quantity.','error');return;}
+    try{
+      const db=fb(),dg=(rqPrj.value.match(/\d+/)||[''])[0],code='P'+(dg?dg.padStart(2,'0'):rqPrj.value.replace(/[^A-Za-z0-9]/g,'').toUpperCase()),yy=String(new Date().getFullYear()).slice(-2),pre='REQ-'+code+'-'+yy+'-',cref=db.collection('counters').doc('req_'+code+'_'+yy),nref=db.collection('requisitions').doc();
+      await db.runTransaction(async tx=>{const c=await tx.get(cref);const n=(c.exists?c.data().n:0)+1;tx.set(cref,{n});tx.set(nref,{no:pre+String(n).padStart(4,'0'),prjNo:rqPrj.value,requestedBy:who(),createdAt:Date.now(),stage:'dpm',items,history:[{by:who(),role:'site',action:'Submitted',at:Date.now()}]});});
+      rqRows.innerHTML='';rqAddRow();showToast('Requisition sent to DPM.');
+    }catch(e){showToast('Send failed — allow the requisitions and counters collections in Firestore Rules.','error');}
+  };
+  window.rqCancelItem=(id,iid)=>mut(id,r=>{
+    if(role()!=='dpm'||r.stage!=='dpm')return null;
+    const items=r.items.map(i=>i.id===iid&&i.state==='pending'?{...i,state:'cancelled',by:who()}:i);
+    const left=items.some(i=>i.state==='pending');
+    return{items,stage:left?'dpm':'closed',history:hist(r,'Cancelled item '+iid)};
+  });
+  window.rqForward=id=>mut(id,r=>role()==='dpm'&&r.stage==='dpm'&&pending(r).length?{stage:'ed',history:hist(r,'Checked and forwarded to ED')}:null);
+  window.rqEd=(id,ok)=>mut(id,r=>role()==='ed'&&r.stage==='ed'?{stage:ok?'procurement':'rejected',history:hist(r,ok?'Approved':'Rejected')}:null);
+  window.rqPurchase=id=>{
+    const ids=[...document.querySelectorAll('.rq-chk[data-r="'+id+'"]:checked')].map(c=>c.dataset.i);
+    if(!ids.length){showToast('Tick the items that were purchased.','error');return;}
+    if(!confirm('Mark '+ids.length+' item(s) as purchased and add them to the project stock? This cannot be undone.'))return;
+    mut(id,r=>{
+      if(role()!=='proc'||r.stage!=='procurement')return null;
+      const items=r.items.map(i=>ids.includes(i.id)&&i.state==='pending'?{...i,state:'purchased',by:who(),purchasedAt:Date.now()}:i);
+      const p=projectDatabase.find(x=>x.prjNo===r.prjNo)||{},now=Date.now(),day=new Date().toISOString().slice(0,10);
+      const ledger=r.items.filter(i=>ids.includes(i.id)&&i.state==='pending').map(i=>({id:'rq_'+r.id+'_'+i.id,data:{createdAt:now,updatedAt:now,dateStr:day,prjNo:r.prjNo,prjId:p.id||'',engineerName:p.eng||'',loggedByEngineerName:who(),material:i.material,unit:i.unit,procMrr:r.no,procQty:i.qty,recPrj:'-',recGp:'-',recQty:0,trGp:'-',trPrj:'-',trQty:0,purpose:'-',issueQty:0,requisitionId:r.id}}));
+      return{items,ledger,stage:items.some(i=>i.state==='pending')?'procurement':'closed',history:hist(r,'Purchased '+ids.length+' item(s), added to stock')};
+    });
+  };
+  window.rqSetRole=(i,v)=>{engineerDatabase[i].role=v;saveEngineerDatabase(engineerDatabase);showToast('Role updated.');};
+  const IS={pending:'⏳ Pending',cancelled:'❌ Cancelled',purchased:'✅ Purchased · added to stock'};
+  function card(r){
+    const rl=role();
+    const items=(r.items||[]).map(i=>{
+      let act='';
+      if(rl==='dpm'&&r.stage==='dpm'&&i.state==='pending')act=`<button class="btn btn-secondary" onclick="rqCancelItem('${r.id}','${i.id}')">Cancel item</button>`;
+      if(rl==='proc'&&r.stage==='procurement'&&i.state==='pending')act=`<label class="text-xs"><input type="checkbox" class="rq-chk" data-r="${r.id}" data-i="${i.id}"> Purchased</label>`;
+      return `<div class="flex justify-between items-center gap-2 py-1 border-t text-sm"><span>${esc(i.material)}: <b>${i.qty}</b> ${esc(i.unit)}<br><span class="text-xs text-muted">${IS[i.state]}</span></span>${act}</div>`;
+    }).join('');
+    let foot='';
+    if(rl==='dpm'&&r.stage==='dpm')foot=`<button class="btn btn-primary mt-2" onclick="rqForward('${r.id}')">Forward to Executive Director</button>`;
+    if(rl==='ed'&&r.stage==='ed')foot=`<div class="mt-2 flex gap-2"><button class="btn btn-primary" onclick="rqEd('${r.id}',true)">Approve</button><button class="btn btn-secondary" onclick="rqEd('${r.id}',false)">Reject</button></div>`;
+    if(rl==='proc'&&r.stage==='procurement'&&pending(r).length)foot=`<button class="btn btn-primary mt-2" onclick="rqPurchase('${r.id}')">Confirm purchased items</button>`;
+    return `<div class="rounded-xl border p-3"><b>${esc(r.no)}</b> · ${esc(r.prjNo)}<div class="text-xs text-muted mb-1">${STAGE[r.stage]} · by ${esc(r.requestedBy)} · ${new Date(r.createdAt).toLocaleString()}</div>${items}${foot}</div>`;
+  }
+  function render(notify){
+    const rl=role();
+    rqForm.classList.toggle('hidden',rl!=='site');
+    rqRoles.classList.toggle('hidden',rl!=='admin');
+    if(rl==='site'){rqPrj.innerHTML=myPrj().map(x=>`<option>${esc(x)}</option>`).join('');if(!rqRows.children.length)rqAddRow();}
+    if(rl==='admin')rqRoleList.innerHTML=(engineerDatabase||[]).map((e,i)=>`<div class="flex justify-between items-center gap-2 text-sm"><span>${esc(e.name)} (${esc(e.id)})</span><select class="field" style="max-width:170px" onchange="rqSetRole(${i},this.value)">${Object.keys(ROLES).map(k=>`<option value="${k}"${(e.role||'site')===k?' selected':''}>${ROLES[k]}</option>`).join('')}</select></div>`).join('');
+    const vis=reqs.filter(r=>rl==='site'?myPrj().includes(r.prjNo):true);
+    rqList.innerHTML=vis.map(card).join('')||'<div class="text-xs text-muted">No requisitions yet.</div>';
+    const c=reqs.filter(actionable).length;
+    [rqBadge,rqBadgeM].forEach(b=>{b.textContent=c;b.classList.toggle('hidden',!c);});
+    if(c>0&&(notify||c>lastCount)&&window.marsRing){window.marsRing();showToast('🔔 '+c+' requisition(s) waiting for your action');}
+    lastCount=c;
+  }
+  function start(){
+    if(!fb())return setTimeout(start,800);
+    fb().collection('requisitions').orderBy('createdAt','desc').onSnapshot(snap=>{reqs=snap.docs.map(d=>({id:d.id,...d.data()}));render(false);},e=>console.error('requisitions',e));
+  }
+  window.addEventListener('load',()=>{start();let k='';setInterval(()=>{const n=role()+'|'+myPrj().join(',');if(n!==k){k=n;render(n!=='site|');}},1000);});
+})();
+</script>
+<script>
+/* ============ ENGINEER ID REGISTRATION ============ */
+(function(){
+  const GEO={};"Dhaka:Dhamrai,Dohar,Keraniganj,Nawabganj,Savar,Dhaka Metropolitan|Gazipur:Gazipur Sadar,Kaliakair,Kaliganj,Kapasia,Sreepur|Narayanganj:Araihazar,Bandar,Narayanganj Sadar,Rupganj,Sonargaon|Narsingdi:Belabo,Monohardi,Narsingdi Sadar,Palash,Raipura,Shibpur|Manikganj:Daulatpur,Ghior,Harirampur,Manikganj Sadar,Saturia,Shivalaya,Singair|Munshiganj:Gazaria,Lohajang,Munshiganj Sadar,Sirajdikhan,Sreenagar,Tongibari|Faridpur:Alfadanga,Bhanga,Boalmari,Charbhadrasan,Faridpur Sadar,Madhukhali,Nagarkanda,Sadarpur,Saltha|Gopalganj:Gopalganj Sadar,Kashiani,Kotalipara,Muksudpur,Tungipara|Madaripur:Kalkini,Madaripur Sadar,Rajoir,Shibchar|Rajbari:Baliakandi,Goalanda,Kalukhali,Pangsha,Rajbari Sadar|Shariatpur:Bhedarganj,Damudya,Gosairhat,Naria,Shariatpur Sadar,Zajira|Kishoreganj:Austagram,Bajitpur,Bhairab,Hossainpur,Itna,Karimganj,Katiadi,Kishoreganj Sadar,Kuliarchar,Mithamain,Nikli,Pakundia,Tarail|Tangail:Basail,Bhuapur,Delduar,Dhanbari,Ghatail,Gopalpur,Kalihati,Madhupur,Mirzapur,Nagarpur,Sakhipur,Tangail Sadar|Chattogram:Anwara,Banshkhali,Boalkhali,Chandanaish,Fatikchhari,Hathazari,Karnaphuli,Lohagara,Mirsharai,Patiya,Rangunia,Raozan,Sandwip,Satkania,Sitakunda|Cox's Bazar:Chakaria,Cox's Bazar Sadar,Eidgaon,Kutubdia,Maheshkhali,Pekua,Ramu,Teknaf,Ukhia|Cumilla:Barura,Brahmanpara,Burichang,Chandina,Chauddagram,Daudkandi,Debidwar,Homna,Laksam,Lalmai,Meghna,Monohargonj,Muradnagar,Nangalkot,Cumilla Adarsha Sadar,Cumilla Sadar Dakshin,Titas|Brahmanbaria:Akhaura,Ashuganj,Bancharampur,Bijoynagar,Brahmanbaria Sadar,Kasba,Nabinagar,Nasirnagar,Sarail|Chandpur:Chandpur Sadar,Faridganj,Haimchar,Haziganj,Kachua,Matlab Dakshin,Matlab Uttar,Shahrasti|Feni:Chhagalnaiya,Daganbhuiyan,Feni Sadar,Fulgazi,Parshuram,Sonagazi|Lakshmipur:Kamalnagar,Lakshmipur Sadar,Raipur,Ramganj,Ramgati|Noakhali:Begumganj,Chatkhil,Companiganj,Hatiya,Kabirhat,Noakhali Sadar,Senbagh,Sonaimuri,Subarnachar|Khagrachhari:Dighinala,Guimara,Khagrachhari Sadar,Lakshmichhari,Mahalchhari,Manikchhari,Matiranga,Panchhari,Ramgarh|Rangamati:Baghaichhari,Barkal,Belaichhari,Juraichhari,Kaptai,Kawkhali,Langadu,Naniarchar,Rajasthali,Rangamati Sadar|Bandarban:Alikadam,Bandarban Sadar,Lama,Naikhongchhari,Rowangchhari,Ruma,Thanchi|Rajshahi:Bagha,Bagmara,Charghat,Durgapur,Godagari,Mohanpur,Paba,Puthia,Tanore|Bogura:Adamdighi,Bogura Sadar,Dhunat,Dhupchanchia,Gabtali,Kahaloo,Nandigram,Sariakandi,Shajahanpur,Sherpur,Shibganj,Sonatala|Chapainawabganj:Bholahat,Gomastapur,Nachole,Nawabganj Sadar,Shibganj|Joypurhat:Akkelpur,Joypurhat Sadar,Kalai,Khetlal,Panchbibi|Naogaon:Atrai,Badalgachhi,Dhamoirhat,Mahadebpur,Manda,Naogaon Sadar,Niamatpur,Patnitala,Porsha,Raninagar,Sapahar|Natore:Bagatipara,Baraigram,Gurudaspur,Lalpur,Naldanga,Natore Sadar,Singra|Pabna:Atgharia,Bera,Bhangura,Chatmohar,Faridpur,Ishwardi,Pabna Sadar,Santhia,Sujanagar|Sirajganj:Belkuchi,Chauhali,Kamarkhanda,Kazipur,Raiganj,Shahjadpur,Sirajganj Sadar,Tarash,Ullahpara|Khulna:Batiaghata,Dacope,Dighalia,Dumuria,Koyra,Paikgachha,Phultala,Rupsha,Terokhada|Bagerhat:Bagerhat Sadar,Chitalmari,Fakirhat,Kachua,Mollahat,Mongla,Morrelganj,Rampal,Sarankhola|Chuadanga:Alamdanga,Chuadanga Sadar,Damurhuda,Jibannagar|Jashore:Abhaynagar,Bagherpara,Chaugachha,Jashore Sadar,Jhikargachha,Keshabpur,Manirampur,Sharsha|Jhenaidah:Harinakunda,Jhenaidah Sadar,Kaliganj,Kotchandpur,Maheshpur,Shailkupa|Kushtia:Bheramara,Daulatpur,Khoksa,Kumarkhali,Kushtia Sadar,Mirpur|Magura:Magura Sadar,Mohammadpur,Shalikha,Sreepur|Meherpur:Gangni,Meherpur Sadar,Mujibnagar|Narail:Kalia,Lohagara,Narail Sadar,Naragati|Satkhira:Assasuni,Debhata,Kalaroa,Kaliganj,Satkhira Sadar,Shyamnagar,Tala|Barishal:Agailjhara,Babuganj,Bakerganj,Banaripara,Barishal Sadar,Gaurnadi,Hizla,Mehendiganj,Muladi,Wazirpur|Barguna:Amtali,Bamna,Barguna Sadar,Betagi,Patharghata,Taltali|Bhola:Bhola Sadar,Burhanuddin,Char Fasson,Daulatkhan,Lalmohan,Manpura,Tazumuddin|Jhalokati:Jhalokati Sadar,Kathalia,Nalchity,Rajapur|Patuakhali:Bauphal,Dashmina,Dumki,Galachipa,Kalapara,Mirzaganj,Patuakhali Sadar,Rangabali|Pirojpur:Bhandaria,Kawkhali,Mathbaria,Nazirpur,Nesarabad,Pirojpur Sadar,Zianagar|Sylhet:Balaganj,Beanibazar,Bishwanath,Companiganj,Dakshin Surma,Fenchuganj,Golapganj,Gowainghat,Jaintiapur,Kanaighat,Osmani Nagar,Sylhet Sadar,Zakiganj|Habiganj:Ajmiriganj,Bahubal,Baniachong,Chunarughat,Habiganj Sadar,Lakhai,Madhabpur,Nabiganj,Shayestaganj|Moulvibazar:Barlekha,Juri,Kamalganj,Kulaura,Moulvibazar Sadar,Rajnagar,Sreemangal|Sunamganj:Bishwamvarpur,Chhatak,Dakshin Sunamganj,Derai,Dharampasha,Dowarabazar,Jagannathpur,Jamalganj,Sullah,Sunamganj Sadar,Tahirpur|Rangpur:Badarganj,Gangachara,Kaunia,Mithapukur,Pirgachha,Pirganj,Rangpur Sadar,Taraganj|Dinajpur:Birampur,Birganj,Biral,Bochaganj,Chirirbandar,Dinajpur Sadar,Ghoraghat,Hakimpur,Kaharole,Khansama,Nawabganj,Parbatipur,Phulbari|Gaibandha:Fulchhari,Gaibandha Sadar,Gobindaganj,Palashbari,Sadullapur,Saghata,Sundarganj|Kurigram:Bhurungamari,Char Rajibpur,Chilmari,Kurigram Sadar,Nageshwari,Phulbari,Rajarhat,Raomari,Ulipur|Lalmonirhat:Aditmari,Hatibandha,Kaliganj,Lalmonirhat Sadar,Patgram|Nilphamari:Dimla,Domar,Jaldhaka,Kishoreganj,Nilphamari Sadar,Saidpur|Panchagarh:Atwari,Boda,Debiganj,Panchagarh Sadar,Tetulia|Thakurgaon:Baliadangi,Haripur,Pirganj,Ranisankail,Thakurgaon Sadar|Mymensingh:Bhaluka,Dhobaura,Fulbaria,Gaffargaon,Gauripur,Haluaghat,Ishwarganj,Muktagachha,Mymensingh Sadar,Nandail,Phulpur,Tarakanda,Trishal|Jamalpur:Bakshiganj,Dewanganj,Islampur,Jamalpur Sadar,Madarganj,Melandaha,Sarishabari|Netrokona:Atpara,Barhatta,Durgapur,Kalmakanda,Kendua,Khaliajuri,Madan,Mohanganj,Netrokona Sadar,Purbadhala|Sherpur:Jhenaigati,Nakla,Nalitabari,Sherpur Sadar,Sreebardi".split('|').forEach(x=>{const[a,b]=x.split(':');GEO[a]=b.split(',');});
+  const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
+  const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  const ROLES={site:'Site Engineer',dpm:'DPM',ed:'Executive Director',proc:'Procurement'};
+  let nidData='',sigData='',sigDirty=false;
+  function modal(){
+    let m=document.getElementById('idReg');if(m){m.style.display='flex';return;}
+    m=document.createElement('div');m.id='idReg';
+    m.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:12px';
+    const opt=a=>a.map(x=>`<option>${esc(x)}</option>`).join('');
+    m.innerHTML=`<div class="card p-5" style="background:#fff;max-width:480px;width:100%;margin:auto">
+      <h3 class="text-lg font-extrabold text-navy mb-3">Apply for Engineer ID</h3>
+      <div class="space-y-3">
+        <div><label class="field-label">Full Name</label><input id="rgName" class="field"></div>
+        <div><label class="field-label">Mobile</label><input id="rgMob" type="tel" class="field"></div>
+        <div><label class="field-label">Designation</label><select id="rgRole" class="field">${Object.keys(ROLES).map(k=>`<option value="${k}">${ROLES[k]}</option>`).join('')}</select></div>
+        <div><label class="field-label">Project</label><select id="rgPrj" class="field">${opt(projectDatabase.map(p=>p.prjNo))}</select></div>
+        <div><label class="field-label">NID Number</label><input id="rgNid" inputmode="numeric" class="field"></div>
+        <div><label class="field-label">NID Card Photo</label><input id="rgPhoto" type="file" accept="image/*" class="field"></div>
+        <div><label class="field-label">District</label><select id="rgDist" class="field"><option value="">Select district</option>${opt(Object.keys(GEO).sort())}</select></div>
+        <div><label class="field-label">Upazila</label><select id="rgUpa" class="field"><option value="">Select district first</option></select><input id="rgUpaO" class="field mt-2 hidden" placeholder="Type upazila name"></div>
+        <div><label class="field-label">Village / Area</label><input id="rgVil" class="field"></div>
+        <div><label class="field-label">Signature (draw below)</label><canvas id="rgSig" width="440" height="140" style="width:100%;height:140px;border:1px solid #cbd5e1;border-radius:12px;touch-action:none;background:#fff"></canvas><button type="button" class="btn btn-secondary mt-1" id="rgClr">Clear</button></div>
+      </div>
+      <div class="flex gap-2 mt-4"><button class="btn btn-primary" id="rgSend">Submit Application</button><button class="btn btn-secondary" id="rgClose">Close</button></div></div>`;
+    document.body.appendChild(m);
+    const $=id=>document.getElementById(id);
+    $('rgClose').onclick=()=>m.style.display='none';
+    $('rgDist').onchange=()=>{const u=GEO[$('rgDist').value]||[];$('rgUpa').innerHTML='<option value="">Select upazila</option>'+opt(u)+'<option value="__o">Other (type manually)</option>';$('rgUpaO').classList.add('hidden');};
+    $('rgUpa').onchange=()=>$('rgUpaO').classList.toggle('hidden',$('rgUpa').value!=='__o');
+    $('rgPhoto').onchange=e=>{const f=e.target.files[0];if(!f)return;const im=new Image();im.onload=()=>{const sc=Math.min(1,800/im.width),c=document.createElement('canvas');c.width=im.width*sc;c.height=im.height*sc;c.getContext('2d').drawImage(im,0,0,c.width,c.height);nidData=c.toDataURL('image/jpeg',.6);};im.src=URL.createObjectURL(f);};
+    const cv=$('rgSig'),cx=cv.getContext('2d');cx.lineWidth=2.5;cx.lineCap='round';let dr=false;
+    const pt=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)*cv.width/r.width,(e.clientY-r.top)*cv.height/r.height];};
+    cv.onpointerdown=e=>{dr=true;const[x,y]=pt(e);cx.beginPath();cx.moveTo(x,y);cv.setPointerCapture(e.pointerId);};
+    cv.onpointermove=e=>{if(!dr)return;const[x,y]=pt(e);cx.lineTo(x,y);cx.stroke();sigDirty=true;};
+    cv.onpointerup=()=>dr=false;
+    $('rgClr').onclick=()=>{cx.clearRect(0,0,cv.width,cv.height);sigDirty=false;};
+    $('rgSend').onclick=async()=>{
+      const upa=$('rgUpa').value==='__o'?$('rgUpaO').value.trim():$('rgUpa').value;
+      const d={name:$('rgName').value.trim(),mobile:$('rgMob').value.trim(),role:$('rgRole').value,prjNo:$('rgPrj').value,nid:$('rgNid').value.trim(),district:$('rgDist').value,upazila:upa,village:$('rgVil').value.trim()};
+      if(Object.values(d).some(v=>!v)||!nidData||!sigDirty){showToast('Fill every field, add NID photo and signature.','error');return;}
+      try{
+        await fb().collection('engineer_applications').add({...d,nidPhoto:nidData,signature:cv.toDataURL('image/png'),status:'pending',createdAt:Date.now()});
+        m.remove();nidData='';sigDirty=false;showToast('Application submitted. Admin will contact you with your ID.');
+      }catch(e){console.error(e);showToast('Submit failed — allow engineer_applications in Firestore Rules.','error');}
+    };
+  }
+  function addBtn(){
+    const st=document.getElementById('engineerIdStep');if(!st)return setTimeout(addBtn,800);
+    if(document.getElementById('idRegBtn'))return;
+    const b=document.createElement('button');b.id='idRegBtn';b.type='button';b.textContent='Apply for Engineer ID';
+    b.style.cssText='margin-top:12px;background:none;border:none;color:inherit;text-decoration:underline;font-size:13px;cursor:pointer;width:100%';
+    b.onclick=modal;st.appendChild(b);
+  }
+  /* ---- admin review ---- */
+  let apps=[];
+  window.idDecide=async function(id,ok){
+    const a=apps.find(x=>x.id===id);if(!isAdmin||!a||a.status!=='pending')return;
+    let nid='';
+    if(ok){
+      const used=new Set(engineerDatabase.map(e=>e.id));
+      do{nid='ENG'+Math.floor(1000+Math.random()*9000);}while(used.has(nid));
+      engineerDatabase.push({id:nid,name:a.name,projects:[a.prjNo],role:a.role});
+      saveEngineerDatabase(engineerDatabase);
+    }
+    try{await fb().collection('engineer_applications').doc(id).update({status:ok?'approved':'rejected',assignedId:nid,decidedAt:Date.now()});showToast(ok?'Approved. Engineer ID: '+nid:'Rejected.');}
+    catch(e){showToast('Failed — check Rules/connection.','error');}
+  };
+  function render(){
+    if(!document.getElementById('idList'))return;
+    const pend=apps.filter(a=>a.status==='pending').length;
+    idBadge.textContent=pend;idBadge.classList.toggle('hidden',!pend);
+    idList.innerHTML=apps.map(a=>`<div class="rounded-xl border p-3 text-sm"><b>${esc(a.name)}</b> · ${esc(ROLES[a.role])} · ${esc(a.prjNo)}<div class="text-xs text-muted">${esc(a.mobile)} · NID ${esc(a.nid)}<br>${esc(a.village)}, ${esc(a.upazila)}, ${esc(a.district)}<br>${a.status==='pending'?'🟡 Pending':a.status==='approved'?'🟢 Approved — ID '+esc(a.assignedId):'🔴 Rejected'} · ${new Date(a.createdAt).toLocaleString()}</div><div class="flex gap-2 mt-2"><img src="${a.nidPhoto}" style="height:90px;border-radius:8px"><img src="${a.signature}" style="height:90px;border:1px solid #e2e8f0;border-radius:8px;background:#fff"></div>${a.status==='pending'?`<div class="mt-2 flex gap-2"><button class="btn btn-primary" onclick="idDecide('${a.id}',true)">Approve &amp; create ID</button><button class="btn btn-secondary" onclick="idDecide('${a.id}',false)">Reject</button></div>`:''}</div>`).join('')||'<div class="text-xs text-muted">No applications yet.</div>';
+  }
+  function start(){
+    if(!fb())return setTimeout(start,800);
+    let on=false;
+    setInterval(()=>{if(isAdmin&&!on){on=true;
+      fb().collection('engineer_applications').orderBy('createdAt','desc').onSnapshot(sn=>{const was=apps.length;apps=sn.docs.map(d=>({id:d.id,...d.data()}));render();if(was&&apps.length>was&&window.marsRing){window.marsRing();showToast('🔔 New Engineer ID application');}},e=>console.error('apps',e));}},1000);
+  }
+  window.addEventListener('load',()=>{addBtn();start();});
 })();
 </script>
 </body>
