@@ -4041,8 +4041,8 @@ async function deleteEntryFromFirebase(firebaseId){
   const hist=(r,a)=>(r.history||[]).concat([{by:who(),role:role(),action:a,at:Date.now()}]);
   async function mut(id,fn){
     const db=fb(),ref=db.collection('requisitions').doc(id);
-    try{await db.runTransaction(async tx=>{const d=await tx.get(ref);const x=fn(d.data());if(!x)throw new Error('blocked');const lg=x.ledger;delete x.ledger;(lg||[]).forEach(en=>tx.set(db.collection(FIREBASE_COLLECTION).doc(en.id),en.data));tx.update(ref,x);});showToast('Done.');}
-    catch(e){showToast(e.message==='blocked'?'Action not allowed at this stage.':'Failed — check Rules/connection.','error');}
+    try{await db.runTransaction(async tx=>{const d=await tx.get(ref);const x=fn(Object.assign({},d.data(),{id}));if(!x)throw new Error('blocked');const lg=x.ledger;delete x.ledger;(lg||[]).forEach(en=>tx.set(db.collection(FIREBASE_COLLECTION).doc(en.id),en.data));tx.update(ref,x);});showToast('Done.');}
+    catch(e){showToast(e.message==='blocked'?'Action not allowed at this stage.':'Failed: '+(e.code||e.message||'check Rules/connection'),'error');console.error(e);}
   }
   window.rqAddRow=function(){
     const d=document.createElement('div');d.className='grid grid-cols-6 gap-2';
