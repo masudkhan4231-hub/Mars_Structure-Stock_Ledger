@@ -426,6 +426,16 @@
   }
 </script>
 
+<style>.ic{width:1.1em;height:1.1em;display:inline-block;vertical-align:-0.18em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}</style>
+<style>.mpill{display:inline-flex;align-items:center;gap:5px;padding:2px 10px 2px 7px;border-radius:999px;font-size:11.5px;font-weight:700;line-height:1.55;border:1px solid;white-space:nowrap;vertical-align:middle}.mpill svg{width:12px;height:12px;flex:none;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.mp-pending{background:#fffbeb;color:#92400e;border-color:#fde68a}.mp-approved{background:#f0fdf4;color:#166534;border-color:#bbf7d0}.mp-rejected{background:#fef2f2;color:#991b1b;border-color:#fecaca}.mp-progress{background:#eff6ff;color:#1e40af;border-color:#bfdbfe}.mp-delivery{background:#f5f3ff;color:#5b21b6;border-color:#ddd6fe}.mp-neutral{background:#f1f5f9;color:#475569;border-color:#e2e8f0}</style>
+<script>
+window.marsPill=function(kind,text){
+  var I={pending:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',approved:'<path d="M20 6L9 17l-5-5"/>',rejected:'<path d="M18 6L6 18M6 6l12 12"/>',progress:'<path d="M5 12h14M13 6l6 6-6 6"/>',delivery:'<path d="M1 4h14v11H1zM15 8h4l3 3v4h-7z"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>',neutral:'<circle cx="12" cy="12" r="9"/>'};
+  return '<span class="mpill mp-'+kind+'"><svg viewBox="0 0 24 24" aria-hidden="true">'+(I[kind]||I.neutral)+'</svg>'+text+'</span>';
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 <div id="appOpenSplash" style="position:fixed;inset:0;z-index:200000;background:#ffffff;">
@@ -666,11 +676,11 @@
     <div class="glass-sub">SELECT YOUR ACCESS TYPE</div>
     <div class="glass-cards">
       <button class="glass-card" id="chooseAdmin" type="button">
-        <div class="g-icon">🔐</div><div class="g-name">ADMIN</div>
+        <div class="g-icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></div><div class="g-name">ADMIN</div>
         <div class="g-desc">Password protected control access</div><div class="g-enter">Continue →</div>
       </button>
       <button class="glass-card" id="chooseEngineer" type="button">
-        <div class="g-icon">🏗️</div><div class="g-name">SITE ENGINEER</div>
+        <div class="g-icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17h16M6 17v-3a6 6 0 0112 0v3M12 8V5"/></svg></div><div class="g-name">SITE ENGINEER</div>
         <div class="g-desc">Project No. + Project ID verification</div><div class="g-enter">Continue →</div>
       </button>
     </div>
@@ -690,7 +700,7 @@
       <label class="g-field-label">Password</label>
       <div class="g-field-wrap">
         <input id="vaultPassword" class="g-field" type="password" autocomplete="current-password" placeholder="Enter admin password" aria-label="Admin password">
-        <button class="g-eye" id="vaultEye" type="button" aria-label="Show password">👁</button>
+        <button class="g-eye" id="vaultEye" type="button" aria-label="Show password"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
       </div>
       <button class="g-btn" id="vaultUnlock" type="button">Sign in</button>
       <button class="text-[11px] text-muted underline mt-3" id="vaultSignupLink" type="button">Don't have an account? Create one</button>
@@ -747,7 +757,7 @@
         </span>
         <button onclick="openAdminSettings()" class="admin-only btn btn-warning">
           <svg class="vic" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          <span class="btn-label">Admin Settings</span>
+          <span class="btn-label">Admin Panel</span>
         </button>
         <button onclick="changeAdminPassword()" class="btn btn-secondary">
           <svg class="vic" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
@@ -776,10 +786,16 @@
         <a href="javascript:void(0)" class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg> Dashboard</a>
         <a href="javascript:void(0)" class="nav-item" data-page="entry" onclick="showPage('entry')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> New Ledger Entry</a>
         <a href="javascript:void(0)" class="nav-item" data-page="print" onclick="showPage('print')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6M9 9h1"/></svg> Stock Ledger &amp; Reports</a>
+        <div id="acctNav" style="display:none"><a href="javascript:void(0)" class="nav-item" onclick="marsProfile()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profile</a>
+        <a href="javascript:void(0)" class="nav-item" onclick="marsChangePw()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg> Change Password</a>
+        <a href="javascript:void(0)" class="nav-item" onclick="marsLogout()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg> Logout</a></div>
+        <a href="javascript:void(0)" class="nav-item" data-page="dashboard" onclick="showPage('dashboard')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Dashboard</a>
         <a href="javascript:void(0)" class="nav-item" data-page="transfers" onclick="showPage('transfers')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h13l-3-3M17 17H4l3 3"/></svg> Transfers <span id="trBadge" class="hidden" style="background:#dc2626;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;margin-left:6px">0</span></a>
-        <a href="javascript:void(0)" class="nav-item" data-page="requisition" onclick="showPage('requisition')">📋 Requisition <span id="rqBadge" class="hidden" style="background:#dc2626;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;margin-left:6px">0</span></a>
-        <a href="javascript:void(0)" class="nav-item admin-only" data-page="idapps" onclick="showPage('idapps')">🪪 ID Applications <span id="idBadge" class="hidden" style="background:#dc2626;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;margin-left:6px">0</span></a>
-        <a href="javascript:void(0)" class="nav-item" id="pushNav" onclick="pushEnable(true)">🔔 Enable phone alerts</a>
+        <a href="javascript:void(0)" class="nav-item" data-page="purchaseorders" onclick="showPage('purchaseorders')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg> Purchase Orders</a>
+        <a href="javascript:void(0)" class="nav-item" data-page="track" onclick="showPage('track')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg> Track Requisition</a>
+        <a href="javascript:void(0)" class="nav-item" data-page="requisition" onclick="showPage('requisition')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/></svg> Requisition <span id="rqBadge" class="hidden" style="background:#dc2626;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;margin-left:6px">0</span></a>
+        <a href="javascript:void(0)" class="nav-item admin-only" onclick="openAdminSettings('apps')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M13 10h5M13 14h5"/></svg> Admin Panel <span id="idBadge" class="hidden" style="background:#dc2626;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;margin-left:6px">0</span></a>
+        <a href="javascript:void(0)" class="nav-item" id="pushNav" onclick="pushEnable(true)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg> Enable phone alerts</a>
         <a href="javascript:void(0)" class="nav-item admin-only" data-page="verify" onclick="showPage('verify')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg> Physical Check</a>
         <button class="nav-item w-full text-left" onclick="downloadPDF()"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg> Print / PDF</button>
       </nav>
@@ -902,7 +918,7 @@
                 <div class="ring-mask-v2" style="inset:5px;font-size:10px" id="healthRingText">0%</div>
               </div>
             </div>
-            <div class="fd-mini-foot"><span class="fd-mini-ic" style="background:#fef2f2;color:#dc2626">⚠</span> Project/material buckets within safe stock levels</div>
+            <div class="fd-mini-foot"><span class="fd-mini-ic" style="background:#fef2f2;color:#dc2626"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg></span> Project/material buckets within safe stock levels</div>
           </div>
 
           <div class="card fd-dynamics">
@@ -927,8 +943,8 @@
             <div class="flex items-center justify-between mt-3">
               <div class="fd-avatars" id="engineerAvatars"></div>
               <div class="fd-meta">
-                <span id="metaProjectsCount">📎 0</span>
-                <span id="metaMaterialsCount">✔ 0</span>
+                <span id="metaProjectsCount"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21.4 11.1l-9.2 9.2a5.5 5.5 0 01-7.8-7.8l9.2-9.2a3.7 3.7 0 015.2 5.2l-9.2 9.2a1.8 1.8 0 01-2.6-2.6l8.5-8.5"/></svg> 0</span>
+                <span id="metaMaterialsCount"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> 0</span>
               </div>
             </div>
           </div>
@@ -1026,6 +1042,21 @@
           <div class="text-xs font-extrabold text-navy mt-6 mb-2">All transfers</div><div id="trList" class="space-y-2"></div>
         </section>
 
+        <section id="dashSection" class="card p-5 md:p-6 page-section page-hidden" data-page="dashboard">
+          <h2 class="text-lg font-extrabold text-navy mb-1">Dashboard</h2>
+          <p class="text-xs text-muted mb-4">Live summary of requisitions, transfers and purchase orders. Items waiting more than 24 hours are flagged.</p>
+          <div class="flex flex-wrap items-center gap-2 mb-1"><input type="month" class="field exp-month" style="max-width:170px" onchange="marsSetMonth(this.value)"><button class="btn btn-secondary" onclick="marsExport()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Download Excel report</button></div>
+          <div class="text-xs text-muted mb-4">Pick a month to export only that month. Leave empty for all data.</div>
+          <div id="dashBox"></div>
+        </section>
+
+        <section id="trackSection" class="card p-5 md:p-6 page-section page-hidden" data-page="track">
+          <h2 class="text-lg font-extrabold text-navy mb-1">Track Requisition</h2>
+          <p class="text-xs text-muted mb-3">See which step each requisition has reached. Tap a requisition to open its route map. The PDF button prints the MPR form.</p>
+          <input id="trkQ" class="field mb-3" placeholder="Search REQ number" oninput="rqRenderTrack()">
+          <div id="trkList" class="space-y-3"></div>
+        </section>
+
         <section id="requisitionSection" class="card p-5 md:p-6 page-section page-hidden" data-page="requisition">
           <h2 class="text-lg font-extrabold text-navy mb-1">Material Requisition</h2>
           <p class="text-xs text-muted mb-4">Site Engineer → DPM (can cancel items) → Executive Director → Procurement. Procurement cannot edit or delete; unpurchased items stay pending.</p>
@@ -1035,13 +1066,14 @@
             <div class="flex gap-2 mt-3"><button class="btn btn-secondary" onclick="rqAddRow()">+ Add item</button><button class="btn btn-primary" onclick="rqSubmit()">Submit Requisition</button></div>
           </div>
           <div id="rqList" class="space-y-3"></div>
-          <div id="rqRoles" class="hidden mt-6"><div class="text-xs font-extrabold text-navy mb-2">Assign roles (Admin)</div><div id="rqRoleList" class="space-y-2"></div></div>
         </section>
 
-        <section id="idappsSection" class="card p-5 md:p-6 page-section page-hidden admin-only" data-page="idapps">
-          <h2 class="text-lg font-extrabold text-navy mb-1">Engineer ID Applications</h2>
-          <p class="text-xs text-muted mb-4">Approve to create the Engineer ID. Tell the applicant their ID by phone or WhatsApp. NID, signature and address stay only in this list.</p>
-          <div id="idList" class="space-y-3"></div>
+        <section id="poSection" class="card p-5 md:p-6 page-section page-hidden" data-page="purchaseorders">
+          <h2 class="text-lg font-extrabold text-navy mb-1">Purchase Orders</h2>
+          <p class="text-xs text-muted mb-3">Procurement can correct a PO (supplier, date, terms, rates). Every correction is recorded with name and time. A PO cannot be deleted.</p>
+          <div class="grid grid-cols-2 gap-2 mb-2"><select id="poFPrj" class="field" onchange="poRenderPage()"><option value="">All projects</option></select><input id="poFQ" class="field" placeholder="Search PO, REQ, supplier" oninput="poRenderPage()"></div>
+          <div class="flex justify-between items-center mb-3"><div id="poSum" class="text-sm font-bold"></div><button class="btn btn-secondary" onclick="poReport()">Print report</button></div>
+          <div id="poPageList" class="space-y-2"></div>
         </section>
 
         <section id="verifySection" class="card p-5 md:p-6 page-section page-hidden" data-page="verify">
@@ -1057,7 +1089,7 @@
           <div id="verifyItemRowsWrap" class="mt-5"></div>
           <div class="flex flex-col sm:flex-row justify-between items-center gap-2 mt-2">
             <button type="button" onclick="addVerifyItemRow()" class="btn btn-secondary">＋ Add Material to Check</button>
-            <button type="button" onclick="saveVerification()" class="btn btn-primary">✔ Save Verification</button>
+            <button type="button" onclick="saveVerification()" class="btn btn-primary"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> Save Verification</button>
           </div>
 
           <div class="mt-8 pt-5 border-t border-line">
@@ -1150,7 +1182,7 @@
             <button class="btn btn-secondary" onclick="downloadPDF()"><svg class="vic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg> Print / PDF</button>
             <button class="btn btn-secondary" onclick="backupData()">⬇ Backup</button>
             <label class="btn btn-secondary cursor-pointer">⬆ Restore <input type="file" accept=".json,application/json" class="hidden" onchange="restoreData(event)"></label>
-            <button class="btn btn-warning" onclick="openStockSettings()">⚙ Stock Alert</button>
+            <button class="btn btn-warning" onclick="openStockSettings()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg> Stock Alert</button>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-5">
@@ -1178,8 +1210,8 @@
   <nav class="mobile-bottom no-print">
     <button data-page="dashboard" class="mb-active" onclick="showPage('dashboard')"><span><svg class="vic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/></svg></span>Home</button>
     <button data-page="entry" onclick="showPage('entry')"><span><svg class="vic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Add</button>
-    <button data-page="transfers" onclick="showPage('transfers')"><span style="position:relative">⇄<b id="trBadgeM" class="hidden" style="position:absolute;top:-6px;right:-10px;background:#dc2626;color:#fff;border-radius:99px;font-size:9px;padding:0 5px">0</b></span>Transfer</button>
-    <button data-page="requisition" onclick="showPage('requisition')"><span style="position:relative">📋<b id="rqBadgeM" class="hidden" style="position:absolute;top:-6px;right:-10px;background:#dc2626;color:#fff;border-radius:99px;font-size:9px;padding:0 5px">0</b></span>Requisition</button>
+    <button data-page="transfers" onclick="showPage('transfers')"><span style="position:relative"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3l4 4-4 4M21 7H8M7 21l-4-4 4-4M3 17h13"/></svg><b id="trBadgeM" class="hidden" style="position:absolute;top:-6px;right:-10px;background:#dc2626;color:#fff;border-radius:99px;font-size:9px;padding:0 5px">0</b></span>Transfer</button>
+    <button data-page="requisition" onclick="showPage('requisition')"><span style="position:relative"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/></svg><b id="rqBadgeM" class="hidden" style="position:absolute;top:-6px;right:-10px;background:#dc2626;color:#fff;border-radius:99px;font-size:9px;padding:0 5px">0</b></span>Requisition</button>
     <button data-page="print" onclick="showPage('print')"><span><svg class="vic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></span>Reports</button>
     <button onclick="downloadPDF()"><span><svg class="vic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg></span>Print</button>
   </nav>
@@ -1616,7 +1648,7 @@
       div.className = 'item-row border border-line rounded-xl p-3 mb-3 relative';
       div.dataset.row = String(itemRowCounter);
       div.innerHTML = `
-        <button type="button" class="absolute top-2 right-2 text-[11px] font-bold text-red-600 hover:text-red-300" onclick="this.closest('.item-row').remove()">✕ Remove Item</button>
+        <button type="button" class="absolute top-2 right-2 text-[11px] font-bold text-red-600 hover:text-red-300" onclick="this.closest('.item-row').remove()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg> Remove Item</button>
         <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div class="md:col-span-2">
             <div class="flex items-center justify-between"><label class="field-label">Material Acc Code / Name</label><button type="button" data-role="addMatBtn" onclick="toggleQuickAddMaterial(this)" class="text-[11px] font-bold text-orange-600 hover:text-orange-300">＋ New Material</button></div>
@@ -1783,7 +1815,7 @@
       div.className='verify-row border border-line rounded-xl p-3 mb-3 relative';
       div.dataset.row=String(verifyRowCounter);
       div.innerHTML=`
-        <button type="button" class="absolute top-2 right-2 text-[11px] font-bold text-red-600 hover:text-red-300" onclick="this.closest('.verify-row').remove()">✕ Remove</button>
+        <button type="button" class="absolute top-2 right-2 text-[11px] font-bold text-red-600 hover:text-red-300" onclick="this.closest('.verify-row').remove()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg> Remove</button>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
           <div class="md:col-span-2"><label class="field-label">Material</label><input type="text" data-role="v-material" list="materialsDatalist" autocomplete="off" placeholder="Type to search material…" class="field" oninput="refreshVerifyRowBalance(this.closest('.verify-row'))"></div>
           <div><label class="field-label">Unit</label><div class="field bg-slate-100 flex items-center" data-role="v-unit"></div></div>
@@ -1871,7 +1903,7 @@
         const statusText = r.daysAgo === null ? 'Never checked' : `Last checked: ${r.daysAgo} day${r.daysAgo===1?'':'s'} ago (${formatDate(r.lastDate)})`;
         return `<div class="flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-xs ${overdue ? 'bg-red-500/10 border border-red-500/20' : 'bg-slate-100'}">
           <div><b>${escHtmlLocal(r.prjNo)}</b> <span class="text-muted">(${escHtmlLocal(r.id)})</span></div>
-          <div class="font-bold ${overdue ? 'text-red-600' : 'text-emerald-700'}">${overdue ? '⚠ ' : '✔ '}${statusText}</div>
+          <div class="font-bold ${overdue ? 'text-red-600' : 'text-emerald-700'}">${overdue ? '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg> ' : '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> '}${statusText}</div>
         </div>`;
       }).join('');
     }
@@ -1883,7 +1915,7 @@
       if(!list.length){ body.innerHTML='<div class="text-xs text-muted text-center py-6">No physical checks recorded yet.</div>'; return; }
       body.innerHTML = list.map(c=>{
         const shortages = c.items.filter(i=>i.variance<0).length;
-        const statusBadge = shortages ? `<span class="text-red-600 font-bold">⚠ ${shortages} shortage${shortages>1?'s':''}</span>` : `<span class="text-emerald-700 font-bold">✔ Matched</span>`;
+        const statusBadge = shortages ? `<span class="text-red-600 font-bold"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg> ${shortages} shortage${shortages>1?'s':''}</span>` : `<span class="text-emerald-700 font-bold"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> Matched</span>`;
         return `<div class="rounded-lg bg-slate-100 px-3 py-2 text-xs">
           <div class="flex items-center justify-between gap-2">
             <div class="min-w-0"><div class="font-bold truncate">${escHtmlLocal(c.prjNo)} — ${formatDate(c.dateStr)}</div><div class="text-muted truncate">${escHtmlLocal(c.checkedByEngineerName||'—')} • ${c.items.length} material(s) • ${statusBadge}</div></div>
@@ -2007,13 +2039,13 @@
       const cred = firebase.auth.EmailAuthProvider.credential(user.email, currentPass);
       user.reauthenticateWithCredential(cred)
         .then(() => user.updatePassword(newPass.trim()))
-        .then(() => alert("✅ Password successfully updated! Use the new password next time you log in."))
+        .then(() => alert("Password successfully updated! Use the new password next time you log in."))
         .catch((err) => {
           console.error("Password change failed:", err);
           if (String(err.code || '').includes('wrong-password') || String(err.code || '').includes('invalid-credential')) {
-            alert("❌ Incorrect current password!");
+            alert("Incorrect current password!");
           } else {
-            alert("❌ Could not update password: " + (err.message || err.code || "unknown error"));
+            alert("Could not update password: " + (err.message || err.code || "unknown error"));
           }
         });
     }
@@ -2837,7 +2869,7 @@ function renderStockOverview(){
           <div class="sm-side-text"><div class="sm-side-label">Total Received</div><div class="sm-side-value">${totalReceived.toFixed(2)}</div></div>
         </div>
         <div class="sm-side-item">
-          <div class="sm-side-icon" style="background:#fff7ed;color:#ea580c">⇄</div>
+          <div class="sm-side-icon" style="background:#fff7ed;color:#ea580c"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3l4 4-4 4M21 7H8M7 21l-4-4 4-4M3 17h13"/></svg></div>
           <div class="sm-side-text"><div class="sm-side-label">Transferred Out</div><div class="sm-side-value">${totalTransferred.toFixed(2)}</div></div>
         </div>
         <div class="sm-side-item">
@@ -2968,8 +3000,8 @@ function renderFullDashboard(){
   const avColors=['linear-gradient(135deg,#ff7a59,#ffb26b)','linear-gradient(135deg,#a855f7,#ec4899)','linear-gradient(135deg,#f2b155,#f97316)'];
   const avEl=document.getElementById('engineerAvatars');
   if(avEl) avEl.innerHTML=recentEngineers.map((n,i)=>`<div class="av" style="background:${avColors[i%avColors.length]}" title="${escapeHtml(n)}">${escapeHtml((n||'?').trim().charAt(0).toUpperCase())}</div>`).join('')||'<div class="av" style="background:#e2e7ee;color:#64748b">—</div>';
-  setTxt('metaProjectsCount', '📎 '+projectSet.size);
-  setTxt('metaMaterialsCount', '✔ '+materialSet.size);
+  {const el=document.getElementById('metaProjectsCount');if(el)el.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21.4 11.1l-9.2 9.2a5.5 5.5 0 01-7.8-7.8l9.2-9.2a3.7 3.7 0 015.2 5.2l-9.2 9.2a1.8 1.8 0 01-2.6-2.6l8.5-8.5"/></svg> '+projectSet.size;}
+  setTxt('metaMaterialsCount', '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> '+materialSet.size);
 
   // --- transferred, last 7 days ---
   const trWeekVals=d7.map(d=>byDate[d]?byDate[d].tr:0);
@@ -3125,14 +3157,14 @@ function openStockSettings(){
   if(!isAdmin){ showToast('Please login as Admin first.','error'); if(typeof openAccessPortal==='function') openAccessPortal('admin'); return; }
   renderAdminSettingsModal('alert');
 }
-function openAdminSettings(){
+function openAdminSettings(tab){
   if(!isAdmin){ showToast('Please login as Admin first.','error'); if(typeof openAccessPortal==='function') openAccessPortal('admin'); return; }
-  renderAdminSettingsModal();
+  renderAdminSettingsModal(tab);
 }
 function closeAdminModal(){ const r=document.getElementById('modalRoot'); if(r) r.innerHTML=''; }
 
 function renderAdminSettingsModal(activeTab){
-  const tab = activeTab || window._adminModalTab || 'stock';
+  const tab = activeTab || window._adminModalTab || 'apps';
   window._adminModalTab = tab;
   const threshold = Number(localStorage.getItem('mars_stock_alert')||10);
   const catalog = getMaterialCatalog();
@@ -3153,17 +3185,28 @@ function renderAdminSettingsModal(activeTab){
   <div class="modal-overlay" onclick="if(event.target===this)closeAdminModal()">
     <div class="modal-box p-5">
       <div class="flex items-center justify-between mb-4">
-        <div class="font-extrabold text-lg text-ink">⚙ Admin Settings</div>
-        <button class="btn btn-secondary" onclick="closeAdminModal()">✕ Close</button>
+        <div class="font-extrabold text-lg text-ink"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg> Admin Panel</div>
+        <button class="btn btn-secondary" onclick="closeAdminModal()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg> Close</button>
       </div>
       <div class="flex gap-2 mb-4 flex-wrap">
+        <button class="btn ${tab==='apps'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('apps')">ID Applications <b id="idBadge2" class="${(window.marsPendingApps&&marsPendingApps())?'':'hidden'}" style="background:#dc2626;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;margin-left:4px">${window.marsPendingApps?marsPendingApps():0}</b></button>
+        <button class="btn ${tab==='users'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('users')">Accounts</button>
+        <button class="btn ${tab==='log'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('log')">Activity Log</button>
+        <button class="btn ${tab==='backup'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('backup')">Backup</button>
         <button class="btn ${tab==='stock'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('stock')">Opening Stock</button>
         <button class="btn ${tab==='materials'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('materials')">Materials & Units</button>
         <button class="btn ${tab==='projects'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('projects')">Projects</button>
-        <button class="btn ${tab==='engineers'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('engineers')">Engineers</button>
+        <button class="btn ${tab==='engineers'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('engineers')">Engineers & Roles</button>
         <button class="btn ${tab==='alert'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('alert')">Low Stock Alert</button>
         <button class="btn ${tab==='access'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('access')">Access Control</button>
       </div>
+      ${tab==='apps' ? `
+        <div class="text-xs text-muted mb-3">Review each application. Choose the Role and Project, then Approve to create the Engineer ID. Reject erases all personal data.</div>
+        <div id="adminAppsBox" class="space-y-3"></div>
+      ` : ''}
+      ${tab==='users' ? `<div id="adminUsersBox"></div>` : ''}
+      ${tab==='log' ? `<div id="adminLogBox"></div>` : ''}
+      ${tab==='backup' ? `<div id="adminBackupBox"></div>` : ''}
       ${tab==='stock' ? `
         <div class="text-xs text-muted mb-3">Enter the material's history up to today: total ever received (Historical Received) and how much has already been used/consumed before this system started tracking it (Historical Issue / Adjustment). The system nets these into the actual starting balance — future entries build on top of that net figure, never mixing across Projects or Materials.</div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
@@ -3181,8 +3224,8 @@ function renderAdminSettingsModal(activeTab){
             <div class="flex items-center justify-between gap-2 rounded-lg bg-slate-100 px-3 py-2 text-xs">
               <div><b>${escHtmlLocal(r.prj)}</b> — ${escHtmlLocal(r.mat)}${r.received ? `<div class="mt-1">Historical Received: <span class="font-bold text-amber-700">${r.received.toFixed(2)}</span>${r.historicalIssue ? ` &nbsp;−&nbsp; Historical Issue: <span class="font-bold text-red-600">${r.historicalIssue.toFixed(2)}</span>` : ''}</div>` : ''}</div>
               <div class="flex items-center gap-3"><span class="font-bold">${r.net.toFixed(2)}</span>
-              <button class="text-blue-700 font-bold" onclick="adminEditOpeningStockByKey(&quot;${escHtmlLocal(r.key)}&quot;)">✎</button>
-              <button class="text-red-600 font-bold" onclick="adminDeleteOpeningStockByKey(&quot;${escHtmlLocal(r.key)}&quot;)">✕</button></div>
+              <button class="text-blue-700 font-bold" onclick="adminEditOpeningStockByKey(&quot;${escHtmlLocal(r.key)}&quot;)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button>
+              <button class="text-red-600 font-bold" onclick="adminDeleteOpeningStockByKey(&quot;${escHtmlLocal(r.key)}&quot;)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
             </div>`).join('') : '<div class="text-xs text-muted text-center py-6">No opening stock set yet.</div>'}
         </div>
       ` : ''}
@@ -3222,8 +3265,8 @@ function renderAdminSettingsModal(activeTab){
                 <div class="min-w-0"><div class="font-bold truncate">${escHtmlLocal(p.prjNo)}</div><div class="text-muted truncate">${escHtmlLocal(p.id)}</div></div>
                 <div class="flex items-center gap-3 shrink-0">
                   ${p.eng ? `<span class="text-right">${escHtmlLocal(p.eng)}</span>` : `<span class="text-amber-700 font-semibold">No engineer set</span>`}
-                  <button class="text-blue-700 font-bold" onclick="adminEditProjectEngineer(${i})">✎</button>
-                  <button class="text-red-600 font-bold" onclick="adminDeleteProject(${i})">✕</button>
+                  <button class="text-blue-700 font-bold" onclick="adminEditProjectEngineer(${i})"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button>
+                  <button class="text-red-600 font-bold" onclick="adminDeleteProject(${i})"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
                 </div>
               </div>
             </div>`).join('') : '<div class="text-xs text-muted text-center py-6">No projects yet.</div>'}
@@ -3244,10 +3287,11 @@ function renderAdminSettingsModal(activeTab){
               <div class="flex items-center justify-between gap-2">
                 <div class="min-w-0"><div class="font-bold truncate">${escHtmlLocal(e.name)} <span class="text-muted font-normal">(${escHtmlLocal(e.id)})</span></div><div class="text-muted truncate">${e.projects && e.projects.length ? escHtmlLocal(e.projects.join(', ')) : '<span class="text-amber-700">No project assigned</span>'}</div></div>
                 <div class="flex items-center gap-3 shrink-0">
-                  <button class="text-blue-700 font-bold" onclick="adminEditEngineerProjects(${i})">✎</button>
-                  <button class="text-red-600 font-bold" onclick="adminDeleteEngineer(${i})">✕</button>
+                  <button class="text-blue-700 font-bold" onclick="adminEditEngineerProjects(${i})"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button>
+                  <button class="text-red-600 font-bold" onclick="adminDeleteEngineer(${i})"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
                 </div>
               </div>
+              ${window.engCtl?engCtl(e,i):''}
             </div>`).join('') : '<div class="text-xs text-muted text-center py-6">No engineers yet — add one above.</div>'}
         </div>
       ` : ''}
@@ -3259,7 +3303,7 @@ function renderAdminSettingsModal(activeTab){
             <input id="editWindowInput" type="number" step="1" value="${editWindowMinutes}" class="field max-w-[160px]">
             <button class="btn btn-primary" onclick="adminSaveEditWindow()">Save</button>
           </div>
-          <div class="text-[11px] text-amber-700 mt-2">⚠ Also update the matching value in your Firestore Security Rules (config/settings.editWindowMinutes) so it's enforced server-side too — ask me if you need the updated Rules text.</div>
+          <div class="text-[11px] text-amber-700 mt-2"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg> Also update the matching value in your Firestore Security Rules (config/settings.editWindowMinutes) so it's enforced server-side too — ask me if you need the updated Rules text.</div>
         </div>
         <div class="border-t border-line pt-4">
           <div class="font-bold text-sm text-ink mb-1">Manage Admins</div>
@@ -3280,7 +3324,7 @@ function renderAdminSettingsModal(activeTab){
       ` : ''}
     </div>
   </div>`;
-  document.getElementById('modalRoot').innerHTML = html;
+  document.getElementById('modalRoot').innerHTML = html; if(tab==='apps'&&window.marsRenderApps)marsRenderApps(); if(tab==='log'&&window.marsRenderLog)marsRenderLog(); if(tab==='backup'&&window.marsRenderBackup)marsRenderBackup(); if(tab==='users'&&window.marsRenderUsers)marsRenderUsers();
   if (tab === 'materials') { renderMaterialsList(); renderUnitsList(); }
   if (tab === 'access') {
     const box = document.getElementById('currentAdminUidBox');
@@ -3402,8 +3446,8 @@ function renderMaterialsList(){
           <div class="flex items-center justify-between gap-2 rounded-lg bg-slate-100 px-3 py-2 text-xs">
             <div class="min-w-0"><div class="font-bold truncate">${escHtmlLocal(m.name)}</div><div class="text-muted">${escHtmlLocal(m.unit)}</div></div>
             <div class="flex items-center gap-3 shrink-0">
-              <button class="text-blue-700 font-bold" onclick="adminEditMaterialCategory(${m.i})">✎</button>
-              <button class="text-red-600 font-bold" onclick="adminDeleteMaterial(${m.i})">✕</button>
+              <button class="text-blue-700 font-bold" onclick="adminEditMaterialCategory(${m.i})"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button>
+              <button class="text-red-600 font-bold" onclick="adminDeleteMaterial(${m.i})"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
             </div>
           </div>`).join('')}
       </div>
@@ -3418,7 +3462,7 @@ function renderUnitsList(){
   container.innerHTML = units.map((u,i)=>`
     <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs">
       ${escHtmlLocal(u)}
-      <button class="text-red-600 font-bold" onclick="adminDeleteUnit(${i})">✕</button>
+      <button class="text-red-600 font-bold" onclick="adminDeleteUnit(${i})"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
     </span>`).join('');
 }
 function adminAddUnit(){
@@ -3855,6 +3899,7 @@ async function deleteEntryFromFirebase(firebaseId){
     engCard.classList.add('engineer-success');
     setTimeout(()=>{overlay.classList.add('hidden-overlay');overlay.style.display='none';if(typeof showPage==='function')showPage('dashboard');recalculateAndRender();showToast('Site Engineer access granted: '+eng.name+' — '+match.prjNo,'success')},1200);
   }
+  window.marsEnterProject=enterProjectAndFinish;
   function verifyEngineer(){
     if(engEnter.disabled)return;
     // Second click: a project was already picked from the multi-project dropdown — finish login.
@@ -3870,8 +3915,10 @@ async function deleteEntryFromFirebase(firebaseId){
     if(!idVal){setEngineerStatus('ENGINEER ID REQUIRED','error');return}
     engEnter.disabled=true;setEngineerStatus('VERIFYING ENGINEER ID','');
     const eng=engineerDatabase.find(e=>normalize(e.id)===normalize(idVal));
-    setTimeout(()=>{
+    setTimeout(async()=>{
       if(!eng){failEngineer();return}
+      if(eng.disabled){failEngineer('ID DISABLED — CONTACT ADMIN');return}
+      if(eng.pinHash){const okp=await window.marsCheckPin(eng,(document.getElementById('engPin')||{}).value||'');if(!okp){failEngineer(window.marsPinMsg||'WRONG ID OR PIN');return}}
       const assignedProjects=(eng.projects||[]).map(p=>projectDatabase.find(pd=>pd.prjNo===p)).filter(Boolean);
       if(!assignedProjects.length&&eng.role&&eng.role!=='site'){enterProjectAndFinish(projectDatabase[0],eng);return}
       if(!assignedProjects.length){failEngineer('NO PROJECT ASSIGNED — CONTACT ADMIN');return}
@@ -3937,7 +3984,7 @@ async function deleteEntryFromFirebase(firebaseId){
 <script>
 /* ================= INTER-PROJECT TRANSFER APPROVAL ================= */
 (function(){
-  let transfers=[], firstLoad=true;
+  let transfers=[], firstLoad=true; window.marsTransfers=()=>transfers;
   let ac=null; window.marsRing=function(){ring();};
   function unlockAudio(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();}catch(e){}}
   ['click','touchstart','keydown'].forEach(ev=>document.addEventListener(ev,unlockAudio,{once:false,passive:true}));
@@ -4000,7 +4047,7 @@ async function deleteEntryFromFirebase(firebaseId){
       showToast(approve?'Approved — both project balances updated.':'Rejected — no balance changed.');
     }catch(e){showToast(e.message==='already-decided'?'This request was already decided.':'Failed — check Rules/connection.','error');}
   };
-  const badge={pending:'🟡 Pending',approved:'🟢 Approved',rejected:'🔴 Rejected'};
+  const badge={pending:marsPill('pending','Pending'),approved:marsPill('approved','Approved'),rejected:marsPill('rejected','Rejected')};
   function card(t,actions){
     return `<div class="rounded-xl border p-3 text-sm"><b>${esc(t.fromPrj)} → ${esc(t.toPrj)}</b> · ${esc(t.material)}: ${t.qty} ${esc(t.unit)}<div class="text-xs text-muted">${badge[t.status]} · by ${esc(t.requestedBy)}${t.decidedBy?' · decided by '+esc(t.decidedBy):''} · ${new Date(t.createdAt).toLocaleString()}</div>${actions?`<div class="mt-2 flex gap-2"><button class="btn btn-primary" onclick="trDecide('${t.id}',true)">Approve</button><button class="btn btn-secondary" onclick="trDecide('${t.id}',false)">Reject</button></div>`:''}</div>`;
   }
@@ -4017,14 +4064,14 @@ async function deleteEntryFromFirebase(firebaseId){
     fb().collection('transfers').orderBy('createdAt','desc').onSnapshot(snap=>{
       if(!firstLoad)snap.docChanges().forEach(c=>{
         const t=c.doc.data();
-        if(c.type==='added'&&t.status==='pending'&&canDecide(t)&&!isMine(t)){ring();showToast('🔔 New Transfer: '+t.fromPrj+' → '+t.toPrj+' · '+t.material+' '+t.qty);}
-        if(c.type==='modified'&&t.status!=='pending'&&(isAdmin||isMine(t))){ring();showToast((t.status==='approved'?'🟢 Approved: ':'🔴 Rejected: ')+t.fromPrj+' → '+t.toPrj+' · '+t.material);}
+        if(c.type==='added'&&t.status==='pending'&&canDecide(t)&&!isMine(t)){ring();showToast('New Transfer: '+t.fromPrj+' → '+t.toPrj+' · '+t.material+' '+t.qty);}
+        if(c.type==='modified'&&t.status!=='pending'&&(isAdmin||isMine(t))){ring();showToast((t.status==='approved'?'Approved: ':'Rejected: ')+t.fromPrj+' → '+t.toPrj+' · '+t.material);}
       });
       firstLoad=false;
       transfers=snap.docs.map(d=>({id:d.id,...d.data()}));render();
     },e=>console.error('transfers listener',e));
   }
-  window.addEventListener('load',()=>{start();let k='';setInterval(()=>{const n=(isAdmin?'A':'E')+'|'+(window.currentEngineerAllowedProjects||[]).join(',');if(n!==k){k=n;const c=render();if(c>0&&n!=='E|'){ring();showToast('🔔 '+c+' transfer request(s) waiting for your approval');}}},1000);});
+  window.addEventListener('load',()=>{start();let k='';setInterval(()=>{const n=(isAdmin?'A':'E')+'|'+(window.currentEngineerAllowedProjects||[]).join(',');if(n!==k){k=n;const c=render();if(c>0&&n!=='E|'){ring();showToast(''+c+' transfer request(s) waiting for your approval');}}},1000);});
 })();
 </script>
 <script>
@@ -4035,26 +4082,28 @@ async function deleteEntryFromFirebase(firebaseId){
   const role=()=>isAdmin?'admin':(window.currentEngineerRole||'site');
   const who=()=>window.currentEngineerName||'Admin';
   const myPrj=()=>window.currentEngineerAllowedProjects||[];
-  const STAGE={dpm:'🟡 With DPM',ed:'🟠 With Executive Director',procurement:'🔵 With Procurement',closed:'🟢 Closed',rejected:'🔴 Rejected'};
+  const STAGE={delivery:marsPill('delivery','Awaiting delivery'),dpm:marsPill('pending','With DPM'),ed:marsPill('pending','With Executive Director'),procurement:marsPill('progress','With Procurement'),closed:marsPill('approved','Closed'),rejected:marsPill('rejected','Rejected')};
   const ROLES={site:'Site Engineer',dpm:'DPM',ed:'Executive Director',proc:'Procurement'};
   let reqs=[],lastCount=0;
   const pending=r=>(r.items||[]).filter(i=>i.state==='pending');
-  const actionable=r=>(role()==='dpm'&&r.stage==='dpm')||(role()==='ed'&&r.stage==='ed')||(role()==='proc'&&r.stage==='procurement'&&pending(r).length>0);
+  const actionable=r=>(role()==='site'&&myPrj().includes(r.prjNo)&&(r.items||[]).some(i=>i.state==='purchased'))||(role()==='dpm'&&r.stage==='dpm')||(role()==='ed'&&r.stage==='ed')||(role()==='proc'&&r.stage==='procurement'&&pending(r).length>0);
   const hist=(r,a)=>(r.history||[]).concat([{by:who(),role:role(),action:a,at:Date.now()}]);
   async function mut(id,fn){
     const db=fb(),ref=db.collection('requisitions').doc(id);
-    try{await db.runTransaction(async tx=>{const d=await tx.get(ref);const x=fn(Object.assign({},d.data(),{id}));if(!x)throw new Error('blocked');const lg=x.ledger;delete x.ledger;(lg||[]).forEach(en=>tx.set(db.collection(FIREBASE_COLLECTION).doc(en.id),en.data));tx.update(ref,x);});showToast('Done.');}
+    try{await db.runTransaction(async tx=>{const d=await tx.get(ref);const x=await fn(Object.assign({},d.data(),{id}),tx,db);if(!x)throw new Error('blocked');const lg=x.ledger;delete x.ledger;(lg||[]).forEach(en=>tx.set(db.collection(FIREBASE_COLLECTION).doc(en.id),en.data));tx.update(ref,x);});showToast('Done.');}
     catch(e){showToast(e.message==='blocked'?'Action not allowed at this stage.':'Failed: '+(e.code||e.message||'check Rules/connection'),'error');console.error(e);}
   }
   window.rqAddRow=function(){
-    const d=document.createElement('div');d.className='grid grid-cols-6 gap-2';
-    d.innerHTML='<input class="field col-span-3 rq-m" list="materialsDatalist" placeholder="Material"><input class="field col-span-2 rq-q" type="number" step="0.01" placeholder="Qty"><button class="btn btn-secondary" onclick="this.parentNode.remove()">✕</button>';
+    const d=document.createElement('div');d.className='rq-row border rounded-xl p-2 space-y-2';
+    d.innerHTML='<div class="grid grid-cols-6 gap-2"><input class="field col-span-3 rq-m" list="materialsDatalist" placeholder="Material"><input class="field col-span-2 rq-q" type="number" step="0.01" placeholder="Qty"><button class="btn btn-secondary" onclick="this.closest(\'.rq-row\').remove()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div><div class="grid grid-cols-2 gap-2"><div><label class="field-label">Required date</label><input class="field rq-d" type="date"></div><div><label class="field-label">Location to be used</label><input class="field rq-l" placeholder="e.g. Column, Roof beam"></div></div><input class="field rq-n" placeholder="Remarks (optional)">';
     rqRows.appendChild(d);
   };
   window.rqSubmit=async function(){
     buildMaterialUnitMap();
-    const items=[...rqRows.children].map((r,i)=>{const m=r.querySelector('.rq-m').value.trim();return{id:'i'+i,material:m,qty:parseFloat(r.querySelector('.rq-q').value)||0,unit:materialUnitMap[m.toLowerCase()]||'',state:'pending'};}).filter(i=>i.material&&i.qty>0);
+    const items=[...rqRows.children].map((r,i)=>{const m=r.querySelector('.rq-m').value.trim();let bal='';try{bal=m?Math.round(computeCurrentBalance(rqPrj.value,m)*100)/100:'';}catch(e){}
+      return{id:'i'+i,material:m,qty:parseFloat(r.querySelector('.rq-q').value)||0,unit:materialUnitMap[m.toLowerCase()]||'',state:'pending',reqDate:r.querySelector('.rq-d').value,loc:r.querySelector('.rq-l').value.trim(),remark:r.querySelector('.rq-n').value.trim(),bal};}).filter(i=>i.material&&i.qty>0);
     if(!items.length){showToast('Add at least one item with quantity.','error');return;}
+    if(items.some(i=>!i.reqDate)){showToast('Enter the required date for every item.','error');return;}
     try{
       const db=fb(),dg=(rqPrj.value.match(/\d+/)||[''])[0],code='P'+(dg?dg.padStart(2,'0'):rqPrj.value.replace(/[^A-Za-z0-9]/g,'').toUpperCase()),yy=String(new Date().getFullYear()).slice(-2),pre='REQ-'+code+'-'+yy+'-',cref=db.collection('counters').doc('req_'+code+'_'+yy),nref=db.collection('requisitions').doc();
       await db.runTransaction(async tx=>{const c=await tx.get(cref);const n=(c.exists?c.data().n:0)+1;tx.set(cref,{n});tx.set(nref,{no:pre+String(n).padStart(4,'0'),prjNo:rqPrj.value,requestedBy:who(),createdAt:Date.now(),stage:'dpm',items,history:[{by:who(),role:'site',action:'Submitted',at:Date.now()}]});});
@@ -4070,50 +4119,156 @@ async function deleteEntryFromFirebase(firebaseId){
   window.rqForward=id=>mut(id,r=>role()==='dpm'&&r.stage==='dpm'&&pending(r).length?{stage:'ed',history:hist(r,'Checked and forwarded to ED')}:null);
   window.rqEd=(id,ok)=>mut(id,r=>role()==='ed'&&r.stage==='ed'?{stage:ok?'procurement':'rejected',history:hist(r,ok?'Approved':'Rejected')}:null);
   window.rqPurchase=id=>{
-    const ids=[...document.querySelectorAll('.rq-chk[data-r="'+id+'"]:checked')].map(c=>c.dataset.i);
+    const sel={};
+    document.querySelectorAll('.rq-chk[data-r="'+id+'"]:checked').forEach(c=>{const inp=document.querySelector('.rq-pq[data-r="'+id+'"][data-i="'+c.dataset.i+'"]');sel[c.dataset.i]=parseFloat(inp&&inp.value)||0;});
+    const ids=Object.keys(sel),r0=reqs.find(x=>x.id===id);
     if(!ids.length){showToast('Tick the items that were purchased.','error');return;}
-    if(!confirm('Mark '+ids.length+' item(s) as purchased and add them to the project stock? This cannot be undone.'))return;
+    let part=0;
+    for(const k of ids){const it=r0.items.find(i=>i.id===k);if(!(sel[k]>0)||sel[k]>it.qty){showToast('Purchased quantity for '+it.material+' must be above 0 and up to '+it.qty+'.','error');return;}if(sel[k]<it.qty)part++;}
+    if(!confirm('Mark '+ids.length+' item(s) as purchased'+(part?' ('+part+' partly; the remaining quantity stays pending)':'')+'? Stock is added only after the Site Engineer confirms delivery. This cannot be undone.'))return;
     mut(id,r=>{
       if(role()!=='proc'||r.stage!=='procurement')return null;
-      const items=r.items.map(i=>ids.includes(i.id)&&i.state==='pending'?{...i,state:'purchased',by:who(),purchasedAt:Date.now()}:i);
-      const p=projectDatabase.find(x=>x.prjNo===r.prjNo)||{},now=Date.now(),day=new Date().toISOString().slice(0,10);
-      const ledger=r.items.filter(i=>ids.includes(i.id)&&i.state==='pending').map(i=>({id:'rq_'+r.id+'_'+i.id,data:{createdAt:now,updatedAt:now,dateStr:day,prjNo:r.prjNo,prjId:p.id||'',engineerName:p.eng||'',loggedByEngineerName:who(),material:i.material,unit:i.unit,procMrr:r.no,procQty:i.qty,recPrj:'-',recGp:'-',recQty:0,trGp:'-',trPrj:'-',trQty:0,purpose:'-',issueQty:0,requisitionId:r.id}}));
-      return{items,ledger,stage:items.some(i=>i.state==='pending')?'procurement':'closed',history:hist(r,'Purchased '+ids.length+' item(s), added to stock')};
+      const items=[];
+      r.items.forEach(i=>{
+        if(!(ids.includes(i.id)&&i.state==='pending')){items.push(i);return;}
+        const q=sel[i.id];
+        items.push({...i,qty:q,ofQty:i.ofQty||i.qty,state:'purchased',by:who(),purchasedAt:Date.now()});
+        if(q<i.qty){const {poNo,...rest}=i;items.push({...rest,id:i.id+'_'+Date.now().toString(36),qty:Math.round((i.qty-q)*100)/100,ofQty:i.ofQty||i.qty,state:'pending'});}
+      });
+      return{items,stage:items.some(i=>i.state==='pending')?'procurement':'delivery',history:hist(r,'Purchased '+ids.length+' item(s)'+(part?' (partly)':'')+', awaiting delivery')};
     });
   };
-  window.rqSetRole=(i,v)=>{engineerDatabase[i].role=v;saveEngineerDatabase(engineerDatabase);showToast('Role updated.');};
-  const IS={pending:'⏳ Pending',cancelled:'❌ Cancelled',purchased:'✅ Purchased · added to stock'};
+  window.rqReceive=(id,iid)=>{
+    const r0=reqs.find(x=>x.id===id),it=r0&&r0.items.find(i=>i.id===iid);if(!it)return;
+    const v=prompt('Quantity received for '+it.material+' (ordered '+it.qty+' '+it.unit+')',it.qty);if(v===null)return;
+    const q=parseFloat(v);if(!(q>0)||q>it.qty){showToast('Enter a quantity above 0 and up to '+it.qty+'.','error');return;}
+    mut(id,async(r,tx,db)=>{
+      const it2=r.items.find(i=>i.id===iid);
+      if(!(isAdmin||(role()==='site'&&myPrj().includes(r.prjNo)))||!it2||it2.state!=='purchased')return null;
+      const lref=db.collection(FIREBASE_COLLECTION).doc('rq_'+r.id+'_'+iid),ld=await tx.get(lref),legacy=ld.exists;
+      const items=r.items.map(i=>i.id===iid?{...i,state:'received',receivedQty:legacy?i.qty:q,receivedBy:who(),receivedAt:Date.now()}:i);
+      const p=projectDatabase.find(x=>x.prjNo===r.prjNo)||{},now=Date.now(),day=new Date().toISOString().slice(0,10);
+      const ledger=legacy?[]:[{id:'rq_'+r.id+'_'+iid,data:{createdAt:now,updatedAt:now,dateStr:day,prjNo:r.prjNo,prjId:p.id||'',engineerName:p.eng||'',loggedByEngineerName:who(),material:it2.material,unit:it2.unit,procMrr:r.no,procQty:q,recPrj:'-',recGp:'-',recQty:0,trGp:'-',trPrj:'-',trQty:0,purpose:'-',issueQty:0,requisitionId:r.id}}];
+      const open=items.some(i=>i.state==='pending'),wait=items.some(i=>i.state==='purchased');
+      return{items,ledger,stage:open?'procurement':(wait?'delivery':'closed'),history:hist(r,'Received '+(legacy?it2.qty:q)+' '+it2.unit+' '+it2.material)};
+    });
+  };
+  window.rqSetRole=(i,v)=>{engineerDatabase[i].role=v;saveEngineerDatabase(engineerDatabase);showToast('Role updated.');window.rqPanelRefresh&&rqPanelRefresh();};
+  const IS={pending:marsPill('pending','Pending'),cancelled:marsPill('rejected','Cancelled'),purchased:marsPill('progress','Purchased · awaiting delivery'),received:marsPill('approved','Received · added to stock')};
   function card(r){
     const rl=role();
     const items=(r.items||[]).map(i=>{
       let act='';
       if(rl==='dpm'&&r.stage==='dpm'&&i.state==='pending')act=`<button class="btn btn-secondary" onclick="rqCancelItem('${r.id}','${i.id}')">Cancel item</button>`;
-      if(rl==='proc'&&r.stage==='procurement'&&i.state==='pending')act=`<label class="text-xs"><input type="checkbox" class="rq-chk" data-r="${r.id}" data-i="${i.id}"> Purchased</label>`;
-      return `<div class="flex justify-between items-center gap-2 py-1 border-t text-sm"><span>${esc(i.material)}: <b>${i.qty}</b> ${esc(i.unit)}<br><span class="text-xs text-muted">${IS[i.state]}${i.poNo?' · '+i.poNo:''}</span></span>${act}</div>`;
+      if(rl==='proc'&&r.stage==='procurement'&&i.state==='pending')act=`<span class="flex items-center gap-1"><input type="number" step="0.01" class="field rq-pq" style="width:78px;padding:4px 6px" data-r="${r.id}" data-i="${i.id}" value="${i.qty}"><label class="text-xs"><input type="checkbox" class="rq-chk" data-r="${r.id}" data-i="${i.id}"> Bought</label></span>`;
+      if((rl==='admin'||(rl==='site'&&myPrj().includes(r.prjNo)))&&i.state==='purchased')act=`<button class="btn btn-primary" onclick="rqReceive('${r.id}','${i.id}')">Confirm received</button>`;
+      return `<div class="flex justify-between items-center gap-2 py-1 border-t text-sm"><span>${esc(i.material)}: <b>${i.qty}</b> ${esc(i.unit)}${i.ofQty&&i.ofQty!==i.qty?' <span class="text-xs text-muted">of '+i.ofQty+'</span>':''}<br><span class="text-xs text-muted">${IS[i.state]}${i.ofQty&&i.state==='pending'?' (balance)':''}${i.poNo?' · '+i.poNo:''}</span></span>${act}</div>`;
     }).join('');
     let foot='';
     if(rl==='dpm'&&r.stage==='dpm')foot=`<button class="btn btn-primary mt-2" onclick="rqForward('${r.id}')">Forward to Executive Director</button>`;
     if(rl==='ed'&&r.stage==='ed')foot=`<div class="mt-2 flex gap-2"><button class="btn btn-primary" onclick="rqEd('${r.id}',true)">Approve</button><button class="btn btn-secondary" onclick="rqEd('${r.id}',false)">Reject</button></div>`;
     if(rl==='proc'&&r.stage==='procurement'&&pending(r).length)foot=`<button class="btn btn-primary mt-2" onclick="rqPurchase('${r.id}')">Confirm purchased items</button>`;
-    return `<div class="rounded-xl border p-3"><b>${esc(r.no)}</b> · ${esc(r.prjNo)}<div class="text-xs text-muted mb-1">${STAGE[r.stage]} · by ${esc(r.requestedBy)} · ${new Date(r.createdAt).toLocaleString()}</div>${items}${foot}${window.poCardHtml?window.poCardHtml(r):''}</div>`;
+    return `<div class="rounded-xl border p-3"><b>${esc(r.no)}</b> · ${esc(r.prjNo)}<div class="text-xs text-muted mb-1">${STAGE[r.stage]} · by ${esc(r.requestedBy)} · ${new Date(r.createdAt).toLocaleString()}</div>${items}${foot}${window.poCardHtml?window.poCardHtml(r):''}<button class="btn btn-secondary mt-2" onclick="rqPdf('${r.id}')">PDF</button></div>`;
   }
   function render(notify){
     const rl=role();
     rqForm.classList.toggle('hidden',rl!=='site');
-    rqRoles.classList.toggle('hidden',rl!=='admin');
     if(rl==='site'){rqPrj.innerHTML=myPrj().map(x=>`<option>${esc(x)}</option>`).join('');if(!rqRows.children.length)rqAddRow();}
-    if(rl==='admin')rqRoleList.innerHTML=(engineerDatabase||[]).map((e,i)=>`<div class="flex justify-between items-center gap-2 text-sm"><span>${esc(e.name)} (${esc(e.id)})</span><select class="field" style="max-width:170px" onchange="rqSetRole(${i},this.value)">${Object.keys(ROLES).map(k=>`<option value="${k}"${(e.role||'site')===k?' selected':''}>${ROLES[k]}</option>`).join('')}</select></div>`).join('');
     const vis=reqs.filter(r=>rl==='site'?myPrj().includes(r.prjNo):true);
     rqList.innerHTML=vis.map(card).join('')||'<div class="text-xs text-muted">No requisitions yet.</div>';
     const c=reqs.filter(actionable).length;
     [rqBadge,rqBadgeM].forEach(b=>{b.textContent=c;b.classList.toggle('hidden',!c);});
-    if(c>0&&(notify||c>lastCount)&&window.marsRing){window.marsRing();showToast('🔔 '+c+' requisition(s) waiting for your action');}
+    if(c>0&&(notify||c>lastCount)&&window.marsRing){window.marsRing();showToast(''+c+' requisition(s) waiting for your action');}
+    renderTrack();
     lastCount=c;
   }
   function start(){
     if(!fb())return setTimeout(start,800);
     fb().collection('requisitions').orderBy('createdAt','desc').onSnapshot(snap=>{reqs=snap.docs.map(d=>({id:d.id,...d.data()}));render(false);},e=>console.error('requisitions',e));
   }
+  window.rqSetPin=async i=>{const e=engineerDatabase[i];const v=prompt('New 6-digit PIN for '+e.name);if(v===null)return;if(!/^\d{6}$/.test(v)){showToast('PIN must be exactly 6 digits.','error');return;}const salt=window.marsNewSalt();e.pinSalt=salt;e.pinHash=await window.marsHashPin(v,salt);saveEngineerDatabase(engineerDatabase);showToast('PIN saved for '+e.name+'.');render(false);window.rqPanelRefresh&&rqPanelRefresh();};
+  window.rqToggle=i=>{const e=engineerDatabase[i];if(!confirm((e.disabled?'Enable ':'Disable ')+e.name+' ('+e.id+')?'))return;e.disabled=!e.disabled;saveEngineerDatabase(engineerDatabase);showToast(e.disabled?'ID disabled.':'ID enabled.');render(false);window.rqPanelRefresh&&rqPanelRefresh();};
+
+  /* ---- tracking route map + MPR PDF ---- */
+  const I={
+    send:'<path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/>',
+    dpm:'<path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M17 11l2 2 4-4"/>',
+    ed:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>',
+    cart:'<path d="M6 6h15l-1.5 9h-12zM6 6L5 3H2"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/>',
+    bag:'<path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18"/><path d="M16 10a4 4 0 01-8 0"/>',
+    truck:'<path d="M1 3h15v13H1zM16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>',
+    x:'<path d="M18 6L6 18M6 6l12 12"/>'
+  };
+  const ico=(k,c)=>'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="'+c+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+I[k]+'</svg>';
+  const d8=t=>new Date(t).toLocaleDateString('en-GB');
+  const fdate=v=>{if(!v)return '-';const m=String(v).match(/^(\d{4})-(\d\d)-(\d\d)$/);return m?m[3]+'-'+m[2]+'-'+m[1].slice(2):esc(v);};
+  const lastH=(r,pre)=>{const a=(r.history||[]).filter(h=>String(h.action).startsWith(pre));return a[a.length-1];};
+  const who2=h=>h?esc(h.by)+' · '+d8(h.at):'';
+  function steps(r){
+    const it=(r.items||[]).filter(i=>i.state!=='cancelled'),tot=it.length;
+    const bought=it.filter(i=>i.state==='purchased'||i.state==='received').length,recv=it.filter(i=>i.state==='received').length;
+    const canc=(r.items||[]).length-tot;
+    const fw=lastH(r,'Checked and forwarded'),ap=lastH(r,'Approved'),rj=lastH(r,'Rejected');
+    const st=r.stage,after=n=>({dpm:1,ed:2,procurement:3,delivery:4,closed:5,rejected:2})[st]>=n;
+    const allCanc=st==='closed'&&!fw&&tot===0;
+    const pos=(window.marsPOs?window.marsPOs():[]).filter(o=>o.requisitionId===r.id).map(o=>o.no);
+    const S=[];
+    S.push({k:'send',t:'Submitted by Site Engineer',s:'done',d:esc(r.requestedBy)+' · '+d8(r.createdAt)});
+    S.push(allCanc?{k:'dpm',t:'DPM check',s:'bad',d:'All items cancelled'}:st==='dpm'?{k:'dpm',t:'DPM check',s:'cur',d:'Pending at DPM'}:{k:'dpm',t:'DPM check',s:'done',d:'Approved · '+who2(fw)+(canc?' · '+canc+' item(s) cancelled':'')});
+    S.push(allCanc?{k:'ed',t:'Executive Director',s:'wait',d:''}:st==='rejected'?{k:'ed',t:'Executive Director',s:'bad',d:'Rejected · '+who2(rj)}:st==='dpm'?{k:'ed',t:'Executive Director',s:'wait',d:''}:st==='ed'?{k:'ed',t:'Executive Director',s:'cur',d:'Pending at Executive Director'}:{k:'ed',t:'Executive Director',s:'done',d:'Approved · '+who2(ap)});
+    const pr=allCanc||st==='rejected'||!after(3)&&st!=='procurement';
+    S.push(pr&&st!=='procurement'?{k:'cart',t:'Procurement',s:'wait',d:''}:st==='procurement'?{k:'cart',t:'Procurement',s:'cur',d:'Purchasing in progress'+(pos.length?' · '+esc(pos.join(', ')):'')}:{k:'cart',t:'Procurement',s:'done',d:pos.length?esc(pos.join(', ')):'Processed'});
+    const dead=allCanc||st==='rejected'||st==='dpm'||st==='ed';
+    S.push(dead?{k:'bag',t:'Purchased',s:'wait',d:''}:bought===tot&&tot>0?{k:'bag',t:'Purchased',s:'done',d:'All '+tot+' item(s) purchased'}:bought>0?{k:'bag',t:'Purchased',s:'cur',d:bought+' of '+tot+' item(s) purchased, rest pending'}:{k:'bag',t:'Purchased',s:'wait',d:'Not purchased yet'});
+    S.push(dead?{k:'truck',t:'Delivered to site',s:'wait',d:''}:recv===tot&&tot>0?{k:'truck',t:'Delivered to site',s:'done',d:'All received at site'}:bought>0?{k:'truck',t:'Delivered to site',s:'cur',d:recv+' of '+tot+' item(s) received'}:{k:'truck',t:'Delivered to site',s:'wait',d:''});
+    return S;
+  }
+  function chip(r){
+    const it=(r.items||[]).filter(i=>i.state!=='cancelled'),bought=it.filter(i=>i.state==='purchased'||i.state==='received').length,recv=it.filter(i=>i.state==='received').length;
+    const st=r.stage;
+    if(st==='rejected')return['Rejected by Executive Director','rejected'];
+    if(st==='dpm')return['Pending at DPM','pending'];
+    if(st==='ed')return['Pending at Executive Director','pending'];
+    if(st==='procurement')return[bought?'Partly purchased':'With Procurement','progress'];
+    if(st==='delivery')return['Awaiting delivery','delivery'];
+    return it.length?['Completed','approved']:['All items cancelled','rejected'];
+  }
+  const COL={done:['#dcfce7','#15803d','#86efac'],cur:['#dbeafe','#1d4ed8','#93c5fd'],wait:['#f1f5f9','#94a3b8','#e2e8f0'],bad:['#fee2e2','#b91c1c','#fecaca']};
+  const openSet=new Set();
+  window.rqTog=(id,o)=>{o?openSet.add(id):openSet.delete(id);};
+  function renderTrack(){
+    const box=document.getElementById('trkList');if(!box)return;
+    const q=(document.getElementById('trkQ').value||'').trim().toLowerCase(),rl=role();
+    const L=reqs.filter(r=>(rl!=='site'||myPrj().includes(r.prjNo))&&(!q||String(r.no).toLowerCase().includes(q)));
+    box.innerHTML=L.map(r=>{
+      const[lab,c]=chip(r),S=steps(r);
+      const route=S.map((x,i)=>{const[bg,fg,bd]=COL[x.s];return `<div style="display:flex;gap:12px"><div style="display:flex;flex-direction:column;align-items:center"><div style="width:36px;height:36px;border-radius:50%;background:${bg};border:1.5px solid ${bd};display:flex;align-items:center;justify-content:center;${x.s==='cur'?'box-shadow:0 0 0 4px #eff6ff':''}">${ico(x.s==='bad'?'x':x.k,fg)}</div>${i<S.length-1?`<div style="width:3px;flex:1;min-height:22px;background:${x.s==='done'?'#86efac':'#e2e8f0'}"></div>`:''}</div><div style="padding-bottom:14px"><div class="font-bold text-sm">${x.t}</div><div class="text-xs" style="color:${x.s==='bad'?'#b91c1c':x.s==='cur'?'#1d4ed8':x.s==='done'?'#15803d':'#94a3b8'}">${x.d||(x.s==='wait'?'Waiting':'')}</div></div></div>`;}).join('');
+      const items=(r.items||[]).map(i=>`<div class="text-xs py-1 border-t">${esc(i.material)}: <b>${i.qty}</b> ${esc(i.unit)}${i.ofQty&&i.ofQty!==i.qty?' of '+i.ofQty:''} · ${IS[i.state]}${i.ofQty&&i.state==='pending'?' (balance)':''}</div>`).join('');
+      return `<details class="rounded-xl border p-3" ${openSet.has(r.id)?'open':''} ontoggle="rqTog('${r.id}',this.open)"><summary style="cursor:pointer"><b>${esc(r.no)}</b> · ${esc(r.prjNo)} <span style="margin-left:6px">${marsPill(c,chip(r)[0])}</span><div class="text-xs text-muted">${esc(r.requestedBy)} · ${d8(r.createdAt)}</div></summary><div style="margin-top:12px">${route}</div><div class="mt-2">${items}</div><button class="btn btn-secondary mt-2" onclick="rqPdf('${r.id}')">PDF</button></details>`;
+    }).join('')||'<div class="text-xs text-muted">No requisitions found.</div>';
+  }
+  window.rqRenderTrack=renderTrack;
+  window.rqPdf=function(id){
+    const r=reqs.find(x=>x.id===id);if(!r||!window.marsPrintDoc)return;
+    const pj=(typeof projectDatabase!=='undefined'?projectDatabase.find(x=>x.prjNo===r.prjNo):null)||{};
+    const g=[],map={};
+    (r.items||[]).forEach(i=>{const k=String(i.id).split('_')[0];if(!map[k]){map[k]={material:i.material,unit:i.unit,qty:0,bal:i.bal,reqDate:i.reqDate,loc:i.loc,remark:i.remark,recv:0,bought:0,pend:0,canc:0};g.push(map[k]);}
+      const o=map[k];o.qty+=i.qty;if(i.state==='received')o.recv+=(i.receivedQty??i.qty);if(i.state==='purchased'||i.state==='received')o.bought+=i.qty;if(i.state==='pending')o.pend+=i.qty;if(i.state==='cancelled')o.canc+=i.qty;});
+    const num=v=>Math.round(v*100)/100;
+    const rows=g.map((o,k)=>{const rm=[o.remark,o.bought?'Bought '+num(o.bought):'',o.pend&&o.bought?'Balance '+num(o.pend):'',o.canc?'Cancelled '+num(o.canc):''].filter(Boolean).join(' | ');
+      return `<tr><td class="c">${k+1}</td><td>${esc(o.material)}</td><td class="c">${esc(o.unit)}</td><td class="c">${num(o.qty)}</td><td class="c">${o.bal===undefined||o.bal===''?'-':esc(o.bal)}</td><td class="c">${fdate(o.reqDate)}</td><td>${esc(o.loc||'')}</td><td class="c">${o.recv?num(o.recv):''}</td><td>${esc(rm)}</td></tr>`;}).join('');
+    const pad=Math.max(0,12-g.length);let blank='';for(let i=0;i<pad;i++)blank+='<tr>'+'<td>&nbsp;</td>'.repeat(9)+'</tr>';
+    const sub=lastH(r,'Submitted'),fw=lastH(r,'Checked and forwarded'),ap=lastH(r,'Approved'),po=lastH(r,'Created');
+    const sg=(t,sub2,h)=>`<div class="sg"><div class="nm">${h?esc(h.by)+'<br>'+d8(h.at):'&nbsp;<br>&nbsp;'}</div><div class="ln"></div><b>${t}</b><div class="sm">${sub2}</div></div>`;
+    window.marsPrintDoc(`<html><head><title>${esc(r.no)}</title><style>@page{size:A4 landscape;margin:12mm}body{font-family:Arial,sans-serif;font-size:12px;color:#111}h1{margin:0;text-align:center;font-size:20px}.t{text-align:center;font-weight:bold;text-decoration:underline;margin:6px 0 10px;font-size:15px}.top{display:flex;justify-content:space-between}table{width:100%;border-collapse:collapse;margin-top:8px}td,th{border:1px solid #222;padding:5px 4px;height:20px}th{text-align:center}.c{text-align:center}.sgs{display:flex;justify-content:space-between;margin-top:34px}.sg{width:23%;text-align:center}.ln{border-top:1px solid #222;margin-top:2px}.nm{font-size:11px;height:30px}.sm{font-size:11px}</style></head><body>
+      <h1>MARS STRUCTURE LIMITED</h1><div class="t">MATERIALS PURCHASE REQUISITION (MPR)</div>
+      <div class="top"><div><b>Project Name:</b> ${esc(r.prjNo)}<br><b>ID:</b> ${esc(pj.id||'-')}</div><div style="text-align:right"><b>Date:</b> ${d8(r.createdAt)}<br><b>MPR No:</b> ${esc(r.no)}</div></div>
+      <table><tr><th>Sl. No</th><th>Material Name</th><th>Unit</th><th>Required Quantity</th><th>Present Balance</th><th>Required Date</th><th>Location to be Used</th><th>Cumulative Received</th><th>Remarks</th></tr>${rows}${blank}</table>
+      <div class="sgs">${sg('Prepared By','Site Engineer / Project Engineer',sub)}${sg('Checked By','Deputy Project Manager / Project Manager',fw)}${sg('Approved By','Executive Director',ap)}${sg('Purchase Ordered By','Procurement',po)}</div></body></html>`);
+  };
+  window.rqPanelRefresh=()=>{if(window._adminModalTab==='engineers'&&document.querySelector('#modalRoot .modal-overlay'))renderAdminSettingsModal('engineers');};
+  window.engCtl=(e,i)=>`<div class="flex flex-wrap items-center gap-2 mt-2"><select class="field" style="max-width:150px;padding:4px 8px" onchange="rqSetRole(${i},this.value)">${Object.keys(ROLES).map(k=>`<option value="${k}"${(e.role||'site')===k?' selected':''}>${ROLES[k]}</option>`).join('')}</select><button class="btn btn-secondary" onclick="rqSetPin(${i})">${e.pinHash?'Reset PIN':'Set PIN'}</button><button class="btn btn-secondary" onclick="rqToggle(${i})">${e.disabled?'Enable ID':'Disable ID'}</button>${e.disabled?'<b style="color:#dc2626">Disabled</b>':''}${e.pinHash?'':'<span class="text-muted">No PIN</span>'}</div>`;
+  window.marsReqs=()=>reqs;
   window.rqRender=()=>render(false);
   window.addEventListener('load',()=>{start();let k='';setInterval(()=>{const n=role()+'|'+myPrj().join(',');if(n!==k){k=n;render(n!=='site|');}},1000);});
 })();
@@ -4125,7 +4280,21 @@ async function deleteEntryFromFirebase(firebaseId){
   const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
   const ROLES={site:'Site Engineer',dpm:'DPM',ed:'Executive Director',proc:'Procurement'};
-  let nidData='',sigData='',sigDirty=false;
+  let nidData='',sigData='';
+  const LIM={nid:{minW:600,minH:380,maxW:3000,maxH:2000,minKB:50,maxKB:2048,name:'NID photo'},sig:{minW:250,minH:60,maxW:350,maxH:100,minKB:5,maxKB:100,name:'Signature'}};
+  function checkImg(f,L){
+    return new Promise(res=>{
+      if(!['image/jpeg','image/png'].includes(f.type))return res({msg:L.name+' must be a JPG or PNG file.'});
+      const kb=f.size/1024;
+      if(kb<L.minKB||kb>L.maxKB)return res({msg:L.name+' file size must be '+L.minKB+' KB to '+L.maxKB+' KB (yours: '+Math.round(kb)+' KB).'});
+      const im=new Image();
+      im.onload=()=>{const w=im.naturalWidth,h=im.naturalHeight;
+        if(w<L.minW||h<L.minH||w>L.maxW||h>L.maxH)return res({msg:L.name+' size must be '+L.minW+'×'+L.minH+' to '+L.maxW+'×'+L.maxH+' px (yours: '+w+'×'+h+').'});
+        res({ok:true,im});};
+      im.onerror=()=>res({msg:L.name+' could not be read.'});
+      im.src=URL.createObjectURL(f);
+    });
+  }
   function modal(){
     let m=document.getElementById('idReg');if(m){m.style.display='flex';return;}
     m=document.createElement('div');m.id='idReg';
@@ -4137,14 +4306,12 @@ async function deleteEntryFromFirebase(firebaseId){
       <div id="rgBody" class="space-y-3" style="display:none">
         <div><label class="field-label">Full Name</label><input id="rgName" class="field"></div>
         <div><label class="field-label">Mobile</label><input id="rgMob" type="tel" class="field"></div>
-        <div><label class="field-label">Designation</label><select id="rgRole" class="field">${Object.keys(ROLES).map(k=>`<option value="${k}">${ROLES[k]}</option>`).join('')}</select></div>
-        <div><label class="field-label">Project</label><select id="rgPrj" class="field">${opt(projectDatabase.map(p=>p.prjNo))}</select></div>
         <div><label class="field-label">NID Number</label><input id="rgNid" inputmode="numeric" class="field"></div>
-        <div><label class="field-label">NID Card Photo</label><input id="rgPhoto" type="file" accept="image/*" class="field"></div>
+        <div><label class="field-label">NID Card Photo</label><input id="rgPhoto" type="file" accept="image/jpeg,image/png" class="field"><div class="text-xs text-muted mt-1">Only the NID card photo. JPG/PNG, 600×380 to 3000×2000 px, 50 KB to 2 MB.</div></div>
         <div><label class="field-label">District</label><select id="rgDist" class="field"><option value="">Select district</option>${opt(Object.keys(GEO).sort())}</select></div>
         <div><label class="field-label">Upazila</label><select id="rgUpa" class="field"><option value="">Select district first</option></select><input id="rgUpaO" class="field mt-2 hidden" placeholder="Type upazila name"></div>
         <div><label class="field-label">Village / Area</label><input id="rgVil" class="field"></div>
-        <div><label class="field-label">Signature (draw below)</label><canvas id="rgSig" width="440" height="140" style="width:100%;height:140px;border:1px solid #cbd5e1;border-radius:12px;touch-action:none;background:#fff"></canvas><button type="button" class="btn btn-secondary mt-1" id="rgClr">Clear</button></div>
+        <div><label class="field-label">Signature Image</label><input id="rgSigF" type="file" accept="image/jpeg,image/png" class="field"><div class="text-xs text-muted mt-1">Sign on white paper, then photo/scan and crop. JPG/PNG, 250×60 to 350×100 px (best 300×80), 5 KB to 100 KB.</div><img id="rgSigPrev" style="display:none;margin-top:6px;border:1px solid #cbd5e1;border-radius:8px;max-width:100%"></div>
       </div>
       <div id="rgBtns" class="flex gap-2 mt-4" style="display:none"><button class="btn btn-primary" id="rgSend">Submit Application</button></div><button class="btn btn-secondary mt-3" id="rgClose">Close</button></div>`;
     document.body.appendChild(m);
@@ -4152,27 +4319,30 @@ async function deleteEntryFromFirebase(firebaseId){
     $('rgClose').onclick=()=>m.style.display='none';
     $('rgDist').onchange=()=>{const u=GEO[$('rgDist').value]||[];$('rgUpa').innerHTML='<option value="">Select upazila</option>'+opt(u)+'<option value="__o">Other (type manually)</option>';$('rgUpaO').classList.add('hidden');};
     $('rgUpa').onchange=()=>$('rgUpaO').classList.toggle('hidden',$('rgUpa').value!=='__o');
-    $('rgPhoto').onchange=e=>{const f=e.target.files[0];if(!f)return;const im=new Image();im.onload=()=>{const sc=Math.min(1,800/im.width),c=document.createElement('canvas');c.width=im.width*sc;c.height=im.height*sc;c.getContext('2d').drawImage(im,0,0,c.width,c.height);nidData=c.toDataURL('image/jpeg',.6);};im.src=URL.createObjectURL(f);};
-    const cv=$('rgSig'),cx=cv.getContext('2d');cx.lineWidth=2.5;cx.lineCap='round';let dr=false;
-    const pt=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)*cv.width/r.width,(e.clientY-r.top)*cv.height/r.height];};
-    cv.onpointerdown=e=>{dr=true;const[x,y]=pt(e);cx.beginPath();cx.moveTo(x,y);cv.setPointerCapture(e.pointerId);};
-    cv.onpointermove=e=>{if(!dr)return;const[x,y]=pt(e);cx.lineTo(x,y);cx.stroke();sigDirty=true;};
-    cv.onpointerup=()=>dr=false;
-    $('rgClr').onclick=()=>{cx.clearRect(0,0,cv.width,cv.height);sigDirty=false;};
+    $('rgPhoto').onchange=async e=>{const f=e.target.files[0];nidData='';if(!f)return;
+      const r=await checkImg(f,LIM.nid);
+      if(!r.ok){e.target.value='';showToast(r.msg,'error');return;}
+      const sc=Math.min(1,1000/r.im.naturalWidth),c=document.createElement('canvas');c.width=r.im.naturalWidth*sc;c.height=r.im.naturalHeight*sc;
+      c.getContext('2d').drawImage(r.im,0,0,c.width,c.height);nidData=c.toDataURL('image/jpeg',.7);};
+    $('rgSigF').onchange=async e=>{const f=e.target.files[0];sigData='';$('rgSigPrev').style.display='none';if(!f)return;
+      const r=await checkImg(f,LIM.sig);
+      if(!r.ok){e.target.value='';showToast(r.msg,'error');return;}
+      const fr=new FileReader();fr.onload=()=>{sigData=fr.result;$('rgSigPrev').src=sigData;$('rgSigPrev').style.display='block';};fr.readAsDataURL(f);};
     const gate=async()=>{
       const u=firebase.auth().currentUser;
-      if(!u||!u.email){
-        $('rgGate').innerHTML='<p class="text-sm mb-3">First sign in with your Gmail account. Open this page in Chrome (not inside WhatsApp or Facebook).</p><button class="btn btn-primary" id="rgG">Sign in with Google</button>';
+      if(!u||!u.email||!u.emailVerified){
+        $('rgGate').innerHTML='<p class="text-sm mb-3">First sign in with your Gmail. Open this page in Chrome (not inside WhatsApp or Facebook).</p><div class="flex flex-wrap gap-2"><button class="btn btn-primary" id="rgG">Sign in with Google</button><button class="btn btn-secondary" id="rgE">Use email &amp; password</button></div>';
         $('rgG').onclick=async()=>{try{await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider());gate();}catch(e){console.error(e);showToast('Google sign-in failed: '+(e.code||e.message),'error');}};
+        $('rgE').onclick=()=>{m.remove();window.marsAuthOpen('create');};
         return;
       }
       $('rgGate').innerHTML='<div class="text-sm">Signed in as <b>'+esc(u.email)+'</b></div>';
       try{
         const q=await fb().collection('engineer_applications').where('email','==',u.email).get();
         const mine=q.docs.map(d=>d.data()).sort((a,b)=>b.createdAt-a.createdAt)[0];
-        if(mine&&mine.status==='pending'){$('rgGate').innerHTML+='<p class="text-sm mt-2">🟡 Your application is pending. Admin will approve it soon. Open this page again later to see your ID.</p>';return;}
-        if(mine&&mine.status==='approved'){$('rgGate').innerHTML+='<p class="text-sm mt-2">🟢 Approved. Your Engineer ID: <b>'+esc(mine.assignedId)+'</b></p>';return;}
-        if(mine&&mine.status==='rejected')$('rgGate').innerHTML+='<p class="text-sm mt-2">🔴 Your last application was rejected. You can apply again.</p>';
+        if(mine&&mine.status==='pending'){$('rgGate').innerHTML+='<p class="text-sm mt-2">'+marsPill('pending','Pending')+' Your application is pending. Admin will approve it soon. Open this page again later to see your ID.</p>';return;}
+        if(mine&&mine.status==='approved'){$('rgGate').innerHTML+='<p class="text-sm mt-2">'+marsPill('approved','Approved')+(mine.assignedId?' Your Engineer ID: <b>'+esc(mine.assignedId)+'</b>':' Your account is active. Sign in with your email and password.')+'</p>';return;}
+        if(mine&&mine.status==='rejected')$('rgGate').innerHTML+='<p class="text-sm mt-2">'+marsPill('rejected','Rejected')+' Your last application was rejected. You can apply again.</p>';
       }catch(e){console.error(e);}
       if(!$('rgName').value)$('rgName').value=u.displayName||'';
       $('rgBody').style.display='';$('rgBtns').style.display='flex';
@@ -4180,12 +4350,12 @@ async function deleteEntryFromFirebase(firebaseId){
     gate();
     $('rgSend').onclick=async()=>{
       const upa=$('rgUpa').value==='__o'?$('rgUpaO').value.trim():$('rgUpa').value;
-      const d={name:$('rgName').value.trim(),mobile:$('rgMob').value.trim(),role:$('rgRole').value,prjNo:$('rgPrj').value,nid:$('rgNid').value.trim(),district:$('rgDist').value,upazila:upa,village:$('rgVil').value.trim()};
-      if(Object.values(d).some(v=>!v)||!nidData||!sigDirty){showToast('Fill every field, add NID photo and signature.','error');return;}
+      const d={name:$('rgName').value.trim(),mobile:$('rgMob').value.trim(),nid:$('rgNid').value.trim(),district:$('rgDist').value,upazila:upa,village:$('rgVil').value.trim()};
+      if(Object.values(d).some(v=>!v)||!nidData||!sigData){showToast('Fill every field and add a valid NID photo and signature image.','error');return;}
       try{
         const u=firebase.auth().currentUser;
-        await fb().collection('engineer_applications').add({...d,email:u.email,nidPhoto:nidData,signature:cv.toDataURL('image/png'),status:'pending',createdAt:Date.now()});
-        m.remove();nidData='';sigDirty=false;showToast('Application submitted. After approval, sign in with the same Gmail to see your ID.');
+        await fb().collection('engineer_applications').add({...d,email:u.email,nidPhoto:nidData,signature:sigData,status:'pending',createdAt:Date.now()});
+        m.remove();nidData='';sigData='';showToast('Application submitted. After approval, sign in with the same Gmail to see your ID.');
       }catch(e){console.error(e);showToast('Submit failed: '+(e.code||e.message),'error');}
     };
   }
@@ -4193,34 +4363,44 @@ async function deleteEntryFromFirebase(firebaseId){
     const st=document.getElementById('engineerIdStep');if(!st)return setTimeout(addBtn,800);
     if(document.getElementById('idRegBtn'))return;
     const b=document.createElement('button');b.id='idRegBtn';b.type='button';b.textContent='Apply for Engineer ID';
-    b.style.cssText='margin-top:12px;background:none;border:none;color:inherit;text-decoration:underline;font-size:13px;cursor:pointer;width:100%';
+    b.style.cssText='display:block;position:relative;z-index:2;margin:14px auto 22px;padding:8px 12px;background:none;border:none;color:#bfdbfe;text-decoration:underline;font-size:14px;cursor:pointer;width:100%';
     b.onclick=modal;st.appendChild(b);
   }
   /* ---- admin review ---- */
   let apps=[];
+  window.marsApplyOpen=function(){modal();};
+  window.marsRenderApps=()=>{const bx=document.getElementById('adminAppsBox');if(bx)bx.innerHTML=window._appsHtml||'<div class="text-xs text-muted">No applications yet.</div>';};
+  window.marsPendingApps=()=>apps.filter(a=>a.status==='pending').length;
+  window.marsApps=()=>apps;
   window.idDecide=async function(id,ok){
     const a=apps.find(x=>x.id===id);if(!isAdmin||!a||a.status!=='pending')return;
-    let nid='';
+    let nid='',rl='',pj='';
     if(ok){
-      const used=new Set(engineerDatabase.map(e=>e.id));
-      do{nid='ENG'+Math.floor(1000+Math.random()*9000);}while(used.has(nid));
-      engineerDatabase.push({id:nid,name:a.name,projects:[a.prjNo],role:a.role});
-      saveEngineerDatabase(engineerDatabase);
+      rl=document.getElementById('idRole_'+id).value;pj=document.getElementById('idPrj_'+id).value;
+      if(rl==='site'&&!pj){showToast('Select a project for a Site Engineer.','error');return;}
+      try{await fb().collection('users').doc(String(a.email).toLowerCase()).set({email:String(a.email).toLowerCase(),name:a.name,role:rl,projects:pj?[pj]:[],disabled:false,createdAt:Date.now()},{merge:true});}catch(e){showToast('Could not create the account: '+(e.code||e.message),'error');return;}
     }
-    try{await fb().collection('engineer_applications').doc(id).update({status:ok?'approved':'rejected',assignedId:nid,decidedAt:Date.now()});showToast(ok?'Approved. Engineer ID: '+nid:'Rejected.');}
+    if(!ok&&!confirm('Reject this application? All personal data (NID, photo, signature, address) will be erased.'))return;
+    try{
+      const ref=fb().collection('engineer_applications').doc(id);
+      if(ok)await ref.update({status:'approved',assignedId:nid,role:rl,prjNo:pj,decidedAt:Date.now(),pinHash:firebase.firestore.FieldValue.delete(),pinSalt:firebase.firestore.FieldValue.delete()});
+      else await ref.set({email:a.email,name:a.name,status:'rejected',createdAt:a.createdAt,decidedAt:Date.now()});
+      showToast(ok?'Approved. '+a.email+' can now sign in.':'Rejected and personal data erased.');}
     catch(e){showToast('Failed — check Rules/connection.','error');}
   };
   function render(){
-    if(!document.getElementById('idList'))return;
     const pend=apps.filter(a=>a.status==='pending').length;
     idBadge.textContent=pend;idBadge.classList.toggle('hidden',!pend);
-    idList.innerHTML=apps.map(a=>`<div class="rounded-xl border p-3 text-sm"><b>${esc(a.name)}</b> · ${esc(ROLES[a.role])} · ${esc(a.prjNo)}<div class="text-xs text-muted">${esc(a.email||'')} · ${esc(a.mobile)} · NID ${esc(a.nid)}<br>${esc(a.village)}, ${esc(a.upazila)}, ${esc(a.district)}<br>${a.status==='pending'?'🟡 Pending':a.status==='approved'?'🟢 Approved — ID '+esc(a.assignedId):'🔴 Rejected'} · ${new Date(a.createdAt).toLocaleString()}</div><div class="flex gap-2 mt-2"><img src="${a.nidPhoto}" style="height:90px;border-radius:8px"><img src="${a.signature}" style="height:90px;border:1px solid #e2e8f0;border-radius:8px;background:#fff"></div>${a.status==='pending'?`<div class="mt-2 flex gap-2"><button class="btn btn-primary" onclick="idDecide('${a.id}',true)">Approve &amp; create ID</button><button class="btn btn-secondary" onclick="idDecide('${a.id}',false)">Reject</button></div>`:''}</div>`).join('')||'<div class="text-xs text-muted">No applications yet.</div>';
+    const roleOpts=Object.keys(ROLES).map(k=>`<option value="${k}">${ROLES[k]}</option>`).join(''),prjOpts='<option value="">No project (non-site roles)</option>'+projectDatabase.map(p=>`<option>${esc(p.prjNo)}</option>`).join('');
+    const html=apps.filter(a=>a.status!=='rejected').map(a=>`<div class="rounded-xl border p-3 text-sm"><b>${esc(a.name)}</b> · ${a.role?esc(ROLES[a.role])+' · '+esc(a.prjNo||'All projects'):'New applicant'}<div class="text-xs text-muted">${esc(a.email||'')} · ${esc(a.mobile)} · NID ${esc(a.nid)}<br>${esc(a.village)}, ${esc(a.upazila)}, ${esc(a.district)}<br>${a.status==='pending'?marsPill('pending','Pending'):a.status==='approved'?marsPill('approved','Approved'+(a.assignedId?' · ID '+esc(a.assignedId):'')):marsPill('rejected','Rejected')} · ${new Date(a.createdAt).toLocaleString()}</div><div class="flex gap-2 mt-2"><img src="${a.nidPhoto}" style="height:90px;border-radius:8px"><img src="${a.signature}" style="height:90px;border:1px solid #e2e8f0;border-radius:8px;background:#fff"></div>${a.status==='pending'?`<div class="mt-2 grid grid-cols-2 gap-2"><select id="idRole_${a.id}" class="field">${roleOpts}</select><select id="idPrj_${a.id}" class="field">${prjOpts}</select></div><div class="mt-2 flex gap-2"><button class="btn btn-primary" onclick="idDecide('${a.id}',true)">Approve &amp; create ID</button><button class="btn btn-secondary" onclick="idDecide('${a.id}',false)">Reject</button></div>`:''}</div>`).join('')||'<div class="text-xs text-muted">No applications yet.</div>';
+    window._appsHtml=html;const bx=document.getElementById('adminAppsBox');if(bx)bx.innerHTML=html;
+    const b2=document.getElementById('idBadge2');if(b2){b2.textContent=pend;b2.classList.toggle('hidden',!pend);}
   }
   function start(){
     if(!fb())return setTimeout(start,800);
     let on=false;
     setInterval(()=>{if(isAdmin&&!on){on=true;
-      fb().collection('engineer_applications').orderBy('createdAt','desc').onSnapshot(sn=>{const was=apps.length;apps=sn.docs.map(d=>({id:d.id,...d.data()}));render();if(was&&apps.length>was&&window.marsRing){window.marsRing();showToast('🔔 New Engineer ID application');}},e=>console.error('apps',e));}},1000);
+      fb().collection('engineer_applications').orderBy('createdAt','desc').onSnapshot(sn=>{const was=apps.length;apps=sn.docs.map(d=>({id:d.id,...d.data()}));render();if(was&&apps.length>was&&window.marsRing){window.marsRing();showToast('New Engineer ID application');}},e=>console.error('apps',e));}},1000);
   }
   window.addEventListener('load',()=>{addBtn();start();});
 })();
@@ -4259,10 +4439,16 @@ async function deleteEntryFromFirebase(firebaseId){
   const role=()=>isAdmin?'admin':(window.currentEngineerRole||'site');
   const money=n=>Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
   let pos=[],reqSnap={};
+  function printDoc(html){
+    const f=document.createElement('iframe');f.style.cssText='position:fixed;width:0;height:0;border:0';document.body.appendChild(f);
+    f.contentDocument.open();f.contentDocument.write(html);f.contentDocument.close();
+    setTimeout(()=>{f.contentWindow.focus();f.contentWindow.print();setTimeout(()=>f.remove(),60000);},300);
+  }
+  window.marsPrintDoc=printDoc;window.marsPOs=()=>pos;
   window.poCardHtml=function(r){
     reqSnap[r.id]=r;
     let h='';
-    pos.filter(o=>o.requisitionId===r.id).forEach(o=>{h+=`<div class="flex justify-between items-center gap-2 py-1 border-t text-sm"><span>📄 <b>${esc(o.no)}</b> · ${esc(o.supplier.name)}<br><span class="text-xs text-muted">Tk ${money(o.total)}</span></span><button class="btn btn-secondary" onclick="poPrint('${o.id}')">Print</button></div>`;});
+    pos.filter(o=>o.requisitionId===r.id).forEach(o=>{h+=`<div class="flex justify-between items-center gap-2 py-1 border-t text-sm"><span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg> <b>${esc(o.no)}</b> · ${esc(o.supplier.name)}<br><span class="text-xs text-muted">Tk ${money(o.total)}</span></span><span class="flex gap-2"><button class="btn btn-secondary" onclick="poPrint('${o.id}')">Print</button>${role()==='proc'?`<button class="btn btn-secondary" onclick="poEdit('${o.id}')">Edit</button>`:''}</span></div>`;});
     if(role()==='proc'&&r.stage==='procurement'&&(r.items||[]).some(i=>i.state==='pending'&&!i.poNo))h+=`<button class="btn btn-primary mt-2" onclick="poOpen('${r.id}')">Create Purchase Order</button>`;
     return h;
   };
@@ -4320,21 +4506,429 @@ async function deleteEntryFromFirebase(firebaseId){
     const rows=o.items.map((i,k)=>`<tr><td>${k+1}</td><td>${esc(i.material)}</td><td>${esc(i.unit)}</td><td class="r">${i.qty}</td><td class="r">${money(i.rate)}</td><td class="r">${money(i.amount)}</td></tr>`).join('');
     const html=`<html><head><title>${esc(o.no)}</title><style>body{font-family:Arial,sans-serif;font-size:13px;margin:24px;color:#111}h1{margin:0;font-size:20px}h2{margin:2px 0 14px;font-size:15px}table{width:100%;border-collapse:collapse;margin-top:12px}td,th{border:1px solid #444;padding:6px}th{background:#eee}.r{text-align:right}.sg{display:flex;justify-content:space-between;margin-top:70px}.sg div{border-top:1px solid #444;width:30%;text-align:center;padding-top:4px}</style></head><body>
       <h1>MARS STRUCTURE LIMITED</h1><h2>PURCHASE ORDER</h2>
-      <table><tr><td><b>PO No:</b> ${esc(o.no)}</td><td><b>Date:</b> ${new Date(o.createdAt).toLocaleDateString('en-GB')}</td></tr>
+      <table><tr><td><b>PO No:</b> ${esc(o.no)}${(o.edits||[]).length?' (Revised '+o.edits.length+'×)':''}</td><td><b>Date:</b> ${new Date(o.createdAt).toLocaleDateString('en-GB')}</td></tr>
       <tr><td><b>Project:</b> ${esc(o.prjNo)}</td><td><b>Requisition:</b> ${esc(o.reqNo)}</td></tr>
       <tr><td colspan="2"><b>Supplier:</b> ${esc(o.supplier.name)}<br>${esc(o.supplier.address)} ${esc(o.supplier.phone)}</td></tr>
       <tr><td><b>Delivery Date:</b> ${esc(o.deliveryDate)}</td><td><b>Terms:</b> ${esc(o.terms||'-')}</td></tr></table>
       <table><tr><th>SL</th><th>Material</th><th>Unit</th><th>Qty</th><th>Rate (Tk)</th><th>Amount (Tk)</th></tr>${rows}<tr><td colspan="5" class="r"><b>Total</b></td><td class="r"><b>${money(o.total)}</b></td></tr></table>
       <div class="sg"><div>Prepared by<br>${esc(o.createdBy)}</div><div>Procurement</div><div>Executive Director</div></div></body></html>`;
-    const f=document.createElement('iframe');f.style.cssText='position:fixed;width:0;height:0;border:0';document.body.appendChild(f);
-    f.contentDocument.open();f.contentDocument.write(html);f.contentDocument.close();
-    setTimeout(()=>{f.contentWindow.focus();f.contentWindow.print();setTimeout(()=>f.remove(),60000);},300);
+    printDoc(html);
   };
+
+  /* ---- PO page, edit, report ---- */
+  const mineP=()=>window.currentEngineerAllowedProjects||[];
+  const visible=()=>pos.filter(o=>role()!=='site'||mineP().includes(o.prjNo));
+  const filtered=()=>{const pj=document.getElementById('poFPrj').value,q=document.getElementById('poFQ').value.trim().toLowerCase();return visible().filter(o=>(!pj||o.prjNo===pj)&&(!q||(o.no+' '+o.reqNo+' '+o.supplier.name).toLowerCase().includes(q)));};
+  window.poRenderPage=function(){
+    const sel=document.getElementById('poFPrj');if(!sel)return;
+    if(sel.options.length<=1&&typeof projectDatabase!=='undefined')projectDatabase.forEach(p=>sel.add(new Option(p.prjNo,p.prjNo)));
+    const L=filtered();
+    document.getElementById('poSum').textContent=L.length+' PO · Tk '+money(L.reduce((a,o)=>a+o.total,0));
+    document.getElementById('poPageList').innerHTML=L.map(o=>{const e=o.edits||[],le=e[e.length-1];
+      return `<div class="rounded-xl border p-3 text-sm"><b>${esc(o.no)}</b> · ${esc(o.prjNo)}<div class="text-xs text-muted">${esc(o.reqNo)} · ${esc(o.supplier.name)} · ${new Date(o.createdAt).toLocaleDateString('en-GB')}</div><div class="font-bold">Tk ${money(o.total)}</div>${le?`<div class="text-xs text-muted"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg> Edited ${e.length}× · last by ${esc(le.by)} · ${new Date(le.at).toLocaleString()}</div>`:''}<div class="flex gap-2 mt-2"><button class="btn btn-secondary" onclick="poPrint('${o.id}')">Print</button>${role()==='proc'?`<button class="btn btn-secondary" onclick="poEdit('${o.id}')">Edit</button>`:''}</div></div>`;}).join('')||'<div class="text-xs text-muted">No purchase orders.</div>';
+  };
+  window.poReport=function(){
+    const L=filtered();if(!L.length){showToast('No purchase orders to print.','error');return;}
+    const rows=L.map((o,k)=>`<tr><td>${k+1}</td><td>${esc(o.no)}</td><td>${new Date(o.createdAt).toLocaleDateString('en-GB')}</td><td>${esc(o.prjNo)}</td><td>${esc(o.reqNo)}</td><td>${esc(o.supplier.name)}</td><td style="text-align:right">${money(o.total)}</td></tr>`).join('');
+    printDoc(`<html><head><title>PO Report</title><style>body{font-family:Arial;font-size:12px;margin:20px}table{width:100%;border-collapse:collapse;margin-top:10px}td,th{border:1px solid #444;padding:5px}th{background:#eee}</style></head><body><h2 style="margin:0">MARS STRUCTURE LIMITED</h2><div>Purchase Order Report · ${new Date().toLocaleDateString('en-GB')}</div><table><tr><th>SL</th><th>PO No</th><th>Date</th><th>Project</th><th>Requisition</th><th>Supplier</th><th>Total (Tk)</th></tr>${rows}<tr><td colspan="6" style="text-align:right"><b>Grand Total</b></td><td style="text-align:right"><b>${money(L.reduce((a,o)=>a+o.total,0))}</b></td></tr></table></body></html>`);
+  };
+  window.poEdit=function(id){
+    const o=pos.find(x=>x.id===id);if(!o||role()!=='proc')return;
+    const m=document.createElement('div');
+    m.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:12px';
+    m.innerHTML=`<div class="card p-5" style="background:#fff;max-width:480px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Edit ${esc(o.no)}</h3><div class="text-xs text-muted mb-3">Item and quantity cannot change. Every edit is recorded.</div>
+      <div class="space-y-3">
+        <div><label class="field-label">Supplier Name</label><input id="peSup" class="field" value="${esc(o.supplier.name)}"></div>
+        <div><label class="field-label">Supplier Phone</label><input id="pePh" class="field" value="${esc(o.supplier.phone)}"></div>
+        <div><label class="field-label">Supplier Address</label><input id="peAd" class="field" value="${esc(o.supplier.address)}"></div>
+        <div><label class="field-label">Delivery Date</label><input id="peDt" type="date" class="field" value="${esc(o.deliveryDate)}"></div>
+        <div><label class="field-label">Terms</label><input id="peTm" class="field" value="${esc(o.terms)}"></div>
+        ${o.items.map((i,k)=>`<div class="grid grid-cols-6 gap-2 items-center text-sm"><span class="col-span-3">${esc(i.material)}<br><span class="text-xs text-muted">${i.qty} ${esc(i.unit)}</span></span><input class="field col-span-3 pe-r" data-k="${k}" type="number" step="0.01" value="${i.rate}"></div>`).join('')}
+      </div><div class="flex gap-2 mt-4"><button class="btn btn-primary" id="peSave">Save changes</button><button class="btn btn-secondary" id="peClose">Close</button></div></div>`;
+    document.body.appendChild(m);
+    const q=x=>m.querySelector(x);q('#peClose').onclick=()=>m.remove();
+    q('#peSave').onclick=async()=>{
+      const rates=[...m.querySelectorAll('.pe-r')].map(x=>parseFloat(x.value)||0);
+      if(!q('#peSup').value.trim()||!q('#peDt').value||rates.some(r=>r<=0)){showToast('Supplier, date and all rates are required.','error');return;}
+      const by=window.currentEngineerName||'Admin',db=fb(),ref=db.collection('purchase_orders').doc(id);
+      try{
+        await db.runTransaction(async tx=>{
+          const d=await tx.get(ref),c=d.data(),ch=[];
+          const sup={name:q('#peSup').value.trim(),phone:q('#pePh').value.trim(),address:q('#peAd').value.trim()};
+          if(sup.name!==c.supplier.name)ch.push('Supplier '+c.supplier.name+' → '+sup.name);
+          if(sup.phone!==c.supplier.phone||sup.address!==c.supplier.address)ch.push('Supplier contact');
+          if(q('#peDt').value!==c.deliveryDate)ch.push('Delivery '+c.deliveryDate+' → '+q('#peDt').value);
+          if(q('#peTm').value.trim()!==c.terms)ch.push('Terms');
+          const items=c.items.map((i,k)=>{if(i.rate!==rates[k])ch.push(i.material+' rate '+i.rate+' → '+rates[k]);return{...i,rate:rates[k],amount:Math.round(i.qty*rates[k]*100)/100};});
+          if(!ch.length)throw new Error('No changes made.');
+          const total=Math.round(items.reduce((a,x)=>a+x.amount,0)*100)/100;
+          tx.update(ref,{supplier:sup,deliveryDate:q('#peDt').value,terms:q('#peTm').value.trim(),items,total,edits:(c.edits||[]).concat([{by,at:Date.now(),note:ch.join('; ')}])});
+        });
+        m.remove();showToast('PO updated and edit recorded.');
+      }catch(e){showToast(e.message==='No changes made.'?e.message:'Failed: '+(e.code||e.message),'error');}
+    };
+  };
+  window.addEventListener('load',()=>{let k='';setInterval(()=>{const n=role()+'|'+mineP().join(',');if(n!==k){k=n;poRenderPage();}},1000);});
   function start(){
     if(!fb())return setTimeout(start,800);
-    fb().collection('purchase_orders').orderBy('createdAt','desc').onSnapshot(sn=>{pos=sn.docs.map(d=>({id:d.id,...d.data()}));if(window.rqRender)window.rqRender();},e=>console.error('purchase_orders',e));
+    fb().collection('purchase_orders').orderBy('createdAt','desc').onSnapshot(sn=>{pos=sn.docs.map(d=>({id:d.id,...d.data()}));if(window.rqRender)window.rqRender();poRenderPage();},e=>console.error('purchase_orders',e));
   }
   window.addEventListener('load',start);
+})();
+</script>
+<script>
+/* ============ ENGINEER PIN ============ */
+(function(){
+  const hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+  window.marsNewSalt=()=>hex(crypto.getRandomValues(new Uint8Array(16)));
+  window.marsHashPin=async(pin,saltHex)=>{
+    const salt=Uint8Array.from(saltHex.match(/../g).map(h=>parseInt(h,16)));
+    const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(pin),'PBKDF2',false,['deriveBits']);
+    return hex(await crypto.subtle.deriveBits({name:'PBKDF2',salt,iterations:150000,hash:'SHA-256'},k,256));
+  };
+  window.marsCheckPin=async(eng,pin)=>{
+    const key='mars_pf_'+String(eng.id).toLowerCase();let st={};
+    try{st=JSON.parse(localStorage.getItem(key)||'{}');}catch(e){}
+    if(st.until>Date.now()){window.marsPinMsg='TOO MANY TRIES — WAIT '+Math.ceil((st.until-Date.now())/60000)+' MIN';return false;}
+    if(/^\d{6}$/.test(pin)&&(await window.marsHashPin(pin,eng.pinSalt))===eng.pinHash){localStorage.removeItem(key);return true;}
+    const n=(st.n||0)+1;localStorage.setItem(key,JSON.stringify({n:n>=5?0:n,until:n>=5?Date.now()+300000:0}));
+    window.marsPinMsg=n>=5?'TOO MANY TRIES — WAIT 5 MIN':'WRONG ID OR PIN';return false;
+  };
+  function inject(){
+    const id=document.getElementById('engId');if(!id)return setTimeout(inject,500);
+    if(document.getElementById('engPin'))return;
+    const lab=document.createElement('label');lab.className=(id.previousElementSibling&&id.previousElementSibling.className)||'';lab.textContent='PIN';lab.style.display='block';lab.style.marginTop='10px';
+    const inp=document.createElement('input');inp.id='engPin';inp.type='password';inp.inputMode='numeric';inp.maxLength=6;inp.autocomplete='off';inp.placeholder='6-digit PIN';inp.className=id.className;
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter'){const b=document.getElementById('engEnter');if(b)b.click();}});
+    id.insertAdjacentElement('afterend',inp);inp.insertAdjacentElement('beforebegin',lab);
+  }
+  window.addEventListener('load',inject);
+})();
+</script>
+<script>
+/* ================= DASHBOARD ================= */
+(function(){
+  const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  const role=()=>isAdmin?'admin':(window.currentEngineerRole||'site');
+  const mine=()=>window.currentEngineerAllowedProjects||[];
+  const H=3600000,STUCK=24*H;
+  const age=ms=>{const h=Math.floor(ms/H);return h>=24?Math.floor(h/24)+'d '+(h%24)+'h':h+'h';};
+  const money=n=>Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:0});
+  const ic=(d,c,z)=>'<svg viewBox="0 0 24 24" width="'+(z||22)+'" height="'+(z||22)+'" fill="none" stroke="'+c+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg>';
+  const P={
+    list:'<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/>',
+    user:'<path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M17 11l2 2 4-4"/>',
+    shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>',
+    cart:'<path d="M6 6h15l-1.5 9h-12zM6 6L5 3H2"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/>',
+    truck:'<path d="M1 3h15v13H1zM16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>',
+    swap:'<path d="M17 3l4 4-4 4M21 7H8M7 21l-4-4 4-4M3 17h13"/>',
+    money:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/>',
+    warn:'<path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
+    ok:'<circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/>',
+    id:'<rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M13 10h5M13 14h5"/>'
+  };
+  const tile=(k,n,label,c)=>`<div style="border:1px solid #e2e8f0;border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center;background:#fff"><div style="width:40px;height:40px;border-radius:12px;background:${c}1a;display:flex;align-items:center;justify-content:center;flex:none">${ic(P[k],c)}</div><div><div style="font-size:22px;font-weight:800;line-height:1">${n}</div><div class="text-xs text-muted">${label}</div></div></div>`;
+  const LBL={dpm:'DPM',ed:'Executive Director',procurement:'Procurement',delivery:'Site Engineer (delivery)'};
+  const lastAt=r=>{const h=r.history||[];return (h.length?h[h.length-1].at:r.createdAt)||r.createdAt;};
+  function render(){
+    const box=document.getElementById('dashBox');if(!box)return;
+    const rl=role(),site=rl==='site',now=Date.now();
+    const inScope=p=>!site||mine().includes(p);
+    const R=(window.marsReqs?marsReqs():[]).filter(r=>inScope(r.prjNo));
+    const T=(window.marsTransfers?marsTransfers():[]).filter(t=>inScope(t.fromPrj)||inScope(t.toPrj));
+    const PO=(window.marsPOs?marsPOs():[]).filter(o=>inScope(o.prjNo));
+    const open=R.filter(r=>r.stage!=='closed'&&r.stage!=='rejected');
+    const by=s=>open.filter(r=>r.stage===s).length;
+    const pt=T.filter(t=>t.status==='pending');
+    const mo=new Date();const poMonth=PO.filter(o=>{const d=new Date(o.createdAt);return d.getMonth()===mo.getMonth()&&d.getFullYear()===mo.getFullYear();}).reduce((a,o)=>a+(o.total||0),0);
+    const tiles=tile('list',open.length,'Open requisitions','#2563eb')+tile('user',by('dpm'),'Pending at DPM','#d97706')+tile('shield',by('ed'),'Pending at Executive Director','#d97706')+tile('cart',by('procurement'),'With Procurement','#2563eb')+tile('truck',by('delivery'),'Awaiting delivery','#7c3aed')+tile('swap',pt.length,'Pending transfers','#0891b2')+tile('money','Tk '+money(poMonth),'PO value this month','#16a34a');
+
+    // my tasks
+    const tasks=[];
+    const add=(k,txt,page)=>tasks.push(`<div onclick="${page}" style="cursor:pointer;display:flex;gap:10px;align-items:center;padding:10px;border:1px solid #bfdbfe;background:#eff6ff;border-radius:12px">${ic(P[k],'#2563eb',20)}<div class="text-sm font-bold">${txt}</div></div>`);
+    if(rl==='dpm'&&by('dpm'))add('user',by('dpm')+' requisition(s) waiting for your check',"showPage('requisition')");
+    if(rl==='ed'&&by('ed'))add('shield',by('ed')+' requisition(s) waiting for your approval',"showPage('requisition')");
+    if(rl==='proc'){const n=open.filter(r=>r.stage==='procurement'&&(r.items||[]).some(i=>i.state==='pending')).length;if(n)add('cart',n+' requisition(s) waiting for purchase',"showPage('requisition')");}
+    if(site){const n=R.reduce((a,r)=>a+(r.items||[]).filter(i=>i.state==='purchased').length,0);if(n)add('truck',n+' item(s) waiting for your delivery confirmation',"showPage('requisition')");
+      const m=pt.filter(t=>mine().includes(t.toPrj)).length;if(m)add('swap',m+' transfer request(s) waiting for your approval',"showPage('transfers')");}
+    if(rl==='admin'){const n=window.marsPendingApps?marsPendingApps():0;if(n)add('id',n+' Engineer ID application(s) waiting',"openAdminSettings('apps')");if(pt.length)add('swap',pt.length+' transfer(s) pending',"showPage('transfers')");
+      const lb=+localStorage.getItem('mars_last_backup')||0;if(!lb||now-lb>7*24*H)add('warn',lb?'Last backup was '+age(now-lb)+' ago. Download a new one.':'No backup downloaded yet. Download one now.',"openAdminSettings('backup')");}
+    const taskHtml=tasks.join('')||`<div class="text-xs text-muted" style="display:flex;gap:6px;align-items:center">${ic(P.ok,'#16a34a',18)} Nothing is waiting for you.</div>`;
+
+    // stuck
+    const stuck=[];
+    open.forEach(r=>{const a=now-lastAt(r);if(a>STUCK&&!(r.stage==='procurement'&&!(r.items||[]).some(i=>i.state==='pending')))stuck.push({a,t:esc(r.no)+' · '+esc(r.prjNo),s:'Waiting '+age(a)+' at '+LBL[r.stage],pg:"showPage('track')"});});
+    pt.forEach(t=>{const a=now-t.createdAt;if(a>STUCK)stuck.push({a,t:esc(t.fromPrj)+' → '+esc(t.toPrj)+' · '+esc(t.material)+' '+t.qty,s:'Transfer waiting '+age(a)+' for '+esc(t.toPrj)+' to approve',pg:"showPage('transfers')"});});
+    stuck.sort((x,y)=>y.a-x.a);
+    const stuckHtml=stuck.slice(0,10).map(x=>{const red=x.a>72*H;return `<div onclick="${x.pg}" style="cursor:pointer;display:flex;gap:10px;align-items:center;padding:10px;border:1px solid ${red?'#fecaca':'#fde68a'};background:${red?'#fef2f2':'#fffbeb'};border-radius:12px">${ic(P.warn,red?'#dc2626':'#d97706',20)}<div><div class="text-sm font-bold">${x.t}</div><div class="text-xs" style="color:${red?'#dc2626':'#b45309'}">${x.s}</div></div></div>`;}).join('')||`<div class="text-xs text-muted" style="display:flex;gap:6px;align-items:center">${ic(P.ok,'#16a34a',18)} No delays. Everything is moving.</div>`;
+
+    // per project
+    const rows=(typeof projectDatabase!=='undefined'?projectDatabase:[]).filter(p=>inScope(p.prjNo)).map(p=>({n:p.prjNo,o:open.filter(r=>r.prjNo===p.prjNo).length,d:open.filter(r=>r.prjNo===p.prjNo&&r.stage==='delivery').length,t:pt.filter(x=>x.fromPrj===p.prjNo||x.toPrj===p.prjNo).length,v:PO.filter(o=>o.prjNo===p.prjNo).reduce((a,o)=>a+(o.total||0),0)})).filter(x=>x.o||x.t||x.v);
+    const prj=rows.map(x=>`<div style="display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid #e2e8f0;font-size:13px"><b>${esc(x.n)}</b><span class="text-muted">${x.o} open req · ${x.d} awaiting delivery · ${x.t} transfer · Tk ${money(x.v)}</span></div>`).join('')||'<div class="text-xs text-muted">No activity yet.</div>';
+
+    box.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px">${tiles}</div>
+      <div class="text-xs font-extrabold text-navy mt-5 mb-2">Needs your action</div><div class="space-y-2">${taskHtml}</div>
+      <div class="text-xs font-extrabold text-navy mt-5 mb-2">Delayed over 24 hours${stuck.length?' ('+stuck.length+')':''}</div><div class="space-y-2">${stuckHtml}</div>
+      <div class="text-xs font-extrabold text-navy mt-5 mb-1">By project</div>${prj}`;
+  }
+  window.dashRender=render;
+  window.addEventListener('load',()=>setInterval(()=>{const sec=document.getElementById('dashSection');if(sec&&sec.offsetParent!==null)render();},1000));
+})();
+</script>
+<script>
+/* ============ ACTIVITY LOG + EXCEL REPORT ============ */
+(function(){
+  const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  const role=()=>isAdmin?'admin':(window.currentEngineerRole||'site');
+  const mine=()=>window.currentEngineerAllowedProjects||[];
+  const RL={site:'Site Engineer',dpm:'DPM',ed:'Executive Director',proc:'Procurement'};
+  const STG={dpm:'With DPM',ed:'With Executive Director',procurement:'With Procurement',delivery:'Awaiting delivery',closed:'Closed',rejected:'Rejected'};
+  const ITS={pending:'Pending',cancelled:'Cancelled',purchased:'Purchased (awaiting delivery)',received:'Received'};
+  const pad=n=>String(n).padStart(2,'0');
+  const dt=t=>{if(!t)return '';const d=new Date(t);return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+' '+pad(d.getHours())+':'+pad(d.getMinutes());};
+  const inScope=p=>role()!=='site'||mine().includes(p);
+  const get=n=>window[n]?window[n]():[];
+  const money=n=>Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2});
+  const ym=t=>{const d=new Date(t);return d.getFullYear()+'-'+pad(d.getMonth()+1);};
+  const inMonth=t=>!window._expMonth||ym(t)===window._expMonth;
+  window.marsSetMonth=v=>{window._expMonth=v||'';document.querySelectorAll('.exp-month').forEach(e=>{e.value=window._expMonth;});const b=document.getElementById('logList');if(b)b.innerHTML=listHtml();};
+
+  function buildLog(){
+    const L=[];
+    get('marsReqs').forEach(r=>(r.history||[]).forEach(h=>L.push({at:h.at,type:'Requisition',ref:r.no,prj:r.prjNo,action:h.action,by:h.by})));
+    get('marsTransfers').forEach(t=>{
+      L.push({at:t.createdAt,type:'Transfer',ref:t.fromPrj+' → '+t.toPrj,prj:t.fromPrj+' → '+t.toPrj,action:'Requested '+t.material+' '+t.qty+' '+(t.unit||''),by:t.requestedBy});
+      if(t.decidedAt)L.push({at:t.decidedAt,type:'Transfer',ref:t.fromPrj+' → '+t.toPrj,prj:t.fromPrj+' → '+t.toPrj,action:(t.status==='approved'?'Approved':'Rejected')+' '+t.material+' '+t.qty,by:t.decidedBy});
+    });
+    get('marsPOs').forEach(o=>{
+      L.push({at:o.createdAt,type:'Purchase Order',ref:o.no,prj:o.prjNo,action:'Created · Tk '+money(o.total)+' · '+o.supplier.name,by:o.createdBy});
+      (o.edits||[]).forEach(e=>L.push({at:e.at,type:'Purchase Order',ref:o.no,prj:o.prjNo,action:'Edited: '+e.note,by:e.by}));
+    });
+    if(isAdmin)get('marsApps').forEach(a=>{
+      L.push({at:a.createdAt,type:'ID Application',ref:a.email||'',prj:'',action:'Applied: '+(a.name||''),by:a.name||''});
+      if(a.decidedAt)L.push({at:a.decidedAt,type:'ID Application',ref:a.email||'',prj:a.prjNo||'',action:a.status==='approved'?'Approved as '+(RL[a.role]||a.role)+' · ID '+a.assignedId:'Rejected (data erased)',by:'Admin'});
+    });
+    return L.filter(x=>role()!=='site'||!x.prj||x.prj.split(' → ').some(inScope)).sort((a,b)=>b.at-a.at);
+  }
+  const F=window._logF=window._logF||{type:'',prj:'',q:''};
+  function listHtml(){
+    const q=F.q.toLowerCase();
+    const L=buildLog().filter(x=>(!F.type||x.type===F.type)&&(!F.prj||String(x.prj).includes(F.prj))&&(!q||(x.ref+' '+x.action+' '+x.by).toLowerCase().includes(q))&&inMonth(x.at));
+    const rows=L.slice(0,200).map(x=>`<div style="padding:9px 0;border-top:1px solid #e2e8f0"><div class="text-xs text-muted">${dt(x.at)} · ${window.marsPill?marsPill('neutral',esc(x.type)):esc(x.type)}</div><div class="text-sm"><b>${esc(x.ref)}</b> ${esc(x.action)}</div><div class="text-xs text-muted">by ${esc(x.by||'-')}${x.prj&&x.type!=='Transfer'?' · '+esc(x.prj):''}</div></div>`).join('');
+    return `<div class="text-xs text-muted mb-1">${L.length} record(s)${L.length>200?' — showing the latest 200. Download Excel for all.':''}</div>`+(rows||'<div class="text-xs text-muted py-4">No activity found.</div>');
+  }
+  window.logSet=(k,v)=>{F[k]=v;const b=document.getElementById('logList');if(b)b.innerHTML=listHtml();};
+  window.marsRenderLog=function(){
+    const box=document.getElementById('adminLogBox');if(!box)return;
+    const types=['','Requisition','Transfer','Purchase Order','ID Application'],prj=(typeof projectDatabase!=='undefined'?projectDatabase:[]).map(p=>p.prjNo);
+    box.innerHTML=`<div class="text-xs text-muted mb-3">Every Approve, Cancel, Purchase, Receive, Edit and ID action with who did it and when.</div>
+      <div class="grid grid-cols-2 gap-2 mb-2"><select class="field" onchange="logSet('type',this.value)">${types.map(t=>`<option value="${t}"${F.type===t?' selected':''}>${t||'All types'}</option>`).join('')}</select>
+      <select class="field" onchange="logSet('prj',this.value)"><option value="">All projects</option>${prj.map(p=>`<option${F.prj===p?' selected':''}>${esc(p)}</option>`).join('')}</select></div>
+      <div class="flex flex-wrap gap-2 mb-3"><input class="field" placeholder="Search name, REQ, PO…" value="${esc(F.q)}" oninput="logSet('q',this.value)"><input type="month" class="field exp-month" value="${window._expMonth||''}" style="max-width:160px" onchange="marsSetMonth(this.value)"><button class="btn btn-primary" onclick="marsExport()">Excel</button></div>
+      <div id="logList" style="max-height:55vh;overflow:auto">${listHtml()}</div>`;
+  };
+
+  window.marsExport=function(){
+    if(!window.XLSX){showToast('Excel library could not load. Check the internet connection.','error');return;}
+    const wb=XLSX.utils.book_new();
+    const sheet=(name,head,rows,w)=>{const ws=XLSX.utils.aoa_to_sheet([head].concat(rows.length?rows:[['No data']]));ws['!cols']=(w||head.map(()=>14)).map(x=>({wch:x}));XLSX.utils.book_append_sheet(wb,ws,name);};
+    const R=get('marsReqs').filter(r=>inScope(r.prjNo)&&inMonth(r.createdAt));
+    sheet('Requisitions',['REQ No','Date','Project','Requested By','Requisition Status','Material','Unit','Qty','Original Qty','Present Balance','Required Date','Location','Remarks','Item Status','PO No','Received Qty'],
+      R.flatMap(r=>(r.items||[]).map(i=>[r.no,dt(r.createdAt),r.prjNo,r.requestedBy,STG[r.stage]||r.stage,i.material,i.unit,i.qty,i.ofQty||i.qty,i.bal??'',i.reqDate||'',i.loc||'',i.remark||'',ITS[i.state]||i.state,i.poNo||'',i.state==='received'?(i.receivedQty??i.qty):''])),
+      [16,17,12,18,22,28,8,9,12,13,13,20,24,26,16,12]);
+    const PO=get('marsPOs').filter(o=>inScope(o.prjNo)&&inMonth(o.createdAt));
+    sheet('Purchase Orders',['PO No','Date','Project','REQ No','Supplier','Phone','Delivery Date','Terms','Material','Unit','Qty','Rate','Amount','PO Total','Edits'],
+      PO.flatMap(o=>o.items.map(i=>[o.no,dt(o.createdAt),o.prjNo,o.reqNo,o.supplier.name,o.supplier.phone||'',o.deliveryDate||'',o.terms||'',i.material,i.unit,i.qty,i.rate,i.amount,o.total,(o.edits||[]).length])),
+      [18,17,12,16,24,14,13,18,28,8,9,10,12,12,7]);
+    const T=get('marsTransfers').filter(t=>(inScope(t.fromPrj)||inScope(t.toPrj))&&inMonth(t.createdAt));
+    sheet('Transfers',['Date','From','To','Material','Qty','Unit','Status','Requested By','Decided By','Decided At'],
+      T.map(t=>[dt(t.createdAt),t.fromPrj,t.toPrj,t.material,t.qty,t.unit||'',t.status,t.requestedBy||'',t.decidedBy||'',dt(t.decidedAt)]),
+      [17,12,12,28,9,8,10,18,18,17]);
+    if(isAdmin){const L=buildLog().filter(x=>inMonth(x.at));sheet('Activity Log',['Time','Type','Reference','Project','Action','By'],L.map(x=>[dt(x.at),x.type,x.ref,x.prj,x.action,x.by]),[17,16,22,22,60,20]);}
+    const n=new Date();XLSX.writeFile(wb,'MARS_Report_'+(window._expMonth||(n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())))+'.xlsx');
+    showToast('Excel report downloaded'+(window._expMonth?' for '+window._expMonth:'')+'.');
+  };
+})();
+</script>
+<script>
+/* ================= BACKUP ================= */
+(function(){
+  const pad=n=>String(n).padStart(2,'0');
+  window.marsRenderBackup=function(){
+    const box=document.getElementById('adminBackupBox');if(!box)return;
+    const lb=+localStorage.getItem('mars_last_backup')||0;
+    box.innerHTML=`<div class="text-sm mb-2">Download a full copy of your data (stock entries, requisitions, transfers, purchase orders, counters, catalog, settings) as one file.</div>
+      <div class="text-xs text-muted mb-3">Last backup on this device: <b>${lb?new Date(lb).toLocaleString():'never'}</b>. Make one at least once a week and keep the file somewhere safe (Google Drive or email to yourself).</div>
+      <button class="btn btn-primary" onclick="marsBackup()">Download backup</button>
+      <div class="text-xs mt-3" style="color:#b45309">The file contains Engineer IDs and coded PINs, so keep it private. Engineer ID applications (NID, photos, signatures) are not included on purpose.</div>`;
+  };
+  window.marsBackup=async function(){
+    const db=window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
+    if(!db){showToast('Not connected to the database.','error');return;}
+    const names=[FIREBASE_COLLECTION,'requisitions','transfers','purchase_orders','counters','stock_checks','catalog','config'];
+    const out={app:'MARS Stock Ledger',exportedAt:new Date().toISOString(),collections:{}};
+    try{
+      for(const n of names){const sn=await db.collection(n).get();out.collections[n]=sn.docs.map(d=>({id:d.id,data:d.data()}));}
+      const blob=new Blob([JSON.stringify(out)],{type:'application/json'}),a=document.createElement('a'),d=new Date();
+      a.href=URL.createObjectURL(blob);a.download='MARS_Backup_'+d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'.json';
+      document.body.appendChild(a);a.click();a.remove();
+      localStorage.setItem('mars_last_backup',String(Date.now()));
+      showToast('Backup downloaded ('+Object.values(out.collections).reduce((x,c)=>x+c.length,0)+' records).');
+      marsRenderBackup();
+    }catch(e){console.error(e);showToast('Backup failed: '+(e.code||e.message),'error');}
+  };
+})();
+</script>
+<script>
+/* ============ EMAIL ACCOUNTS: SIGN IN, PROFILE, PASSWORD, ADMIN ACCOUNTS ============ */
+(function(){
+  const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
+  const A=()=>firebase.auth();
+  const RL={site:'Site Engineer',dpm:'DPM',ed:'Executive Director',proc:'Procurement'};
+  const out=()=>A().signOut().catch(()=>{});
+  const errMsg=e=>{const c=(e&&e.code)||'';
+    if(/invalid-credential|wrong-password|user-not-found/.test(c))return 'Wrong email or password.';
+    if(/email-already-in-use/.test(c))return 'This email already has an account. Sign in instead.';
+    if(/weak-password/.test(c))return 'Password is too weak (at least 6 characters).';
+    if(/invalid-email/.test(c))return 'Enter a valid email address.';
+    if(/too-many-requests/.test(c))return 'Too many attempts. Try again later.';
+    if(/popup-closed|cancelled-popup/.test(c))return 'Sign-in was cancelled.';
+    if(/unauthorized-domain/.test(c))return 'This website address is not authorised in Firebase.';
+    return 'Error: '+(c||(e&&e.message)||'unknown');};
+  const shell=(id,inner)=>{const o=document.getElementById(id);if(o)o.remove();const m=document.createElement('div');m.id=id;
+    m.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:12px';
+    m.innerHTML='<div class="card p-5" style="background:#fff;max-width:440px;width:100%;margin:auto">'+inner+'</div>';document.body.appendChild(m);return m;};
+
+  /* ---- sign in / create account / forgot ---- */
+  window.marsAuthOpen=function(tab){
+    let cur=tab||'in',msg='',ok=false;
+    const draw=()=>{
+      const m=shell('authModal',`<h3 class="text-lg font-extrabold text-navy mb-3">${cur==='in'?'Sign in':cur==='create'?'Create account':'Reset password'}</h3>
+        <div class="space-y-3">
+          <div><label class="field-label">Email (Gmail)</label><input id="auEmail" type="email" autocomplete="email" class="field"></div>
+          ${cur!=='forgot'?`<div><label class="field-label">Password</label><input id="auPw" type="password" autocomplete="${cur==='in'?'current-password':'new-password'}" class="field"></div>`:''}
+          ${cur==='create'?`<div><label class="field-label">Confirm password</label><input id="auPw2" type="password" autocomplete="new-password" class="field"></div>`:''}
+        </div>
+        <div id="auMsg" class="text-sm mt-3" style="color:${ok?'#15803d':'#b91c1c'}">${esc(msg)}</div>
+        <div class="flex flex-wrap gap-2 mt-3"><button class="btn btn-primary" id="auGo">${cur==='in'?'Sign in':cur==='create'?'Create account':'Send reset link'}</button>${cur!=='forgot'?'<button class="btn btn-secondary" id="auG">Continue with Google</button>':''}</div>
+        <div class="text-xs mt-4" style="display:flex;flex-wrap:wrap;gap:14px">
+          ${cur!=='in'?'<a href="javascript:void(0)" id="auIn" style="text-decoration:underline">Sign in</a>':''}${cur!=='create'?'<a href="javascript:void(0)" id="auCr" style="text-decoration:underline">Create account</a>':''}${cur!=='forgot'?'<a href="javascript:void(0)" id="auFg" style="text-decoration:underline">Forgot password?</a>':''}<a href="javascript:void(0)" id="auCl" style="text-decoration:underline">Close</a></div>`);
+      const $=i=>m.querySelector('#'+i),sw=t=>()=>{cur=t;msg='';ok=false;draw();};
+      if($('auIn'))$('auIn').onclick=sw('in');if($('auCr'))$('auCr').onclick=sw('create');if($('auFg'))$('auFg').onclick=sw('forgot');$('auCl').onclick=()=>m.remove();
+      const say=(t,g)=>{msg=t;ok=!!g;const e=$('auMsg');e.textContent=t;e.style.color=g?'#15803d':'#b91c1c';};
+      if($('auG'))$('auG').onclick=async()=>{try{const c=await A().signInWithPopup(new firebase.auth.GoogleAuthProvider());m.remove();afterLogin(c.user);}catch(e){say(errMsg(e));}};
+      $('auGo').onclick=async()=>{
+        const em=$('auEmail').value.trim().toLowerCase(),pw=$('auPw')?$('auPw').value:'';
+        if(!em){say('Enter your email.');return;}
+        $('auGo').disabled=true;
+        try{
+          if(cur==='forgot'){await A().sendPasswordResetEmail(em);say('Reset link sent. Check your inbox and spam folder.',true);}
+          else if(cur==='create'){
+            if(pw.length<6){say('Password must be at least 6 characters.');}
+            else if(pw!==$('auPw2').value){say('The two passwords do not match.');}
+            else{const c=await A().createUserWithEmailAndPassword(em,pw);await c.user.sendEmailVerification();await out();cur='in';ok=true;msg='Account created. We sent a verification link to '+em+'. Open it, then sign in here.';draw();return;}
+          }else{
+            const c=await A().signInWithEmailAndPassword(em,pw);
+            if(!c.user.emailVerified){await c.user.sendEmailVerification().catch(()=>{});await out();say('Please verify your email first. We sent the link again. Check inbox and spam, then sign in.');}
+            else{m.remove();afterLogin(c.user);return;}
+          }
+        }catch(e){say(errMsg(e));}
+        const g=$('auGo');if(g)g.disabled=false;
+      };
+    };
+    draw();
+  };
+
+  async function afterLogin(u){
+    try{
+      const email=String(u.email||'').toLowerCase();
+      const snap=await fb().collection('users').doc(email).get();
+      if(!snap.exists){showToast('Your account is not approved yet. Please complete the application.');window.marsApplyOpen&&window.marsApplyOpen();return;}
+      const d=snap.data();
+      if(d.disabled){await out();showToast('This account is disabled. Contact Admin.','error');return;}
+      const eng={id:d.engineerId||email,name:d.name||email,projects:d.projects||[],role:d.role||'site'};
+      const match=projectDatabase.find(p=>eng.projects.includes(p.prjNo))||projectDatabase[0];
+      window._emailSession=email;
+      window.marsEnterProject(match,eng);
+    }catch(e){console.error(e);showToast('Could not sign in: '+(e.code||e.message),'error');}
+  }
+
+  /* ---- login card button ---- */
+  function addBtn(){
+    const st=document.getElementById('engineerIdStep');if(!st)return setTimeout(addBtn,800);
+    if(document.getElementById('emailSignBtn'))return;
+    const b=document.createElement('button');b.id='emailSignBtn';b.type='button';b.textContent='Sign in with Email';
+    b.style.cssText='display:block;width:100%;margin:10px 0 0;padding:11px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.55);background:rgba(255,255,255,.12);color:#fff;font-weight:700;font-size:14px;cursor:pointer';
+    b.onclick=()=>marsAuthOpen('in');
+    const ap=document.getElementById('idRegBtn');ap?st.insertBefore(b,ap):st.appendChild(b);
+  }
+  window.addEventListener('load',()=>{addBtn();setTimeout(addBtn,2000);
+    setInterval(()=>{const n=document.getElementById('acctNav');if(!n)return;const u=A().currentUser;n.style.display=(window.currentAccessRole==='engineer'&&window._emailSession&&u&&!u.isAnonymous)?'':'none';},1000);});
+
+  /* ---- profile / password / logout ---- */
+  window.marsProfile=function(){
+    const u=A().currentUser;
+    const m=shell('profModal',`<h3 class="text-lg font-extrabold text-navy mb-3">Profile</h3>
+      <div class="text-sm space-y-2"><div><span class="text-muted">Name</span><br><b>${esc(window.currentEngineerName||'')}</b></div><div><span class="text-muted">Email</span><br><b>${esc(u&&u.email||'')}</b></div><div><span class="text-muted">Role</span><br><b>${esc(RL[window.currentEngineerRole]||window.currentEngineerRole||'')}</b></div><div><span class="text-muted">Projects</span><br><b>${esc((window.currentEngineerAllowedProjects||[]).join(', ')||'All')}</b></div></div>
+      <button class="btn btn-secondary mt-4" id="pfC">Close</button>`);
+    m.querySelector('#pfC').onclick=()=>m.remove();
+  };
+  window.marsChangePw=function(){
+    const u=A().currentUser;if(!u)return;
+    if(!u.providerData.some(p=>p.providerId==='password')){showToast('You sign in with Google, so your password is managed by Google.','error');return;}
+    const m=shell('pwModal',`<h3 class="text-lg font-extrabold text-navy mb-3">Change Password</h3>
+      <div class="space-y-3"><div><label class="field-label">Current password</label><input id="pwOld" type="password" class="field" autocomplete="current-password"></div><div><label class="field-label">New password</label><input id="pwNew" type="password" class="field" autocomplete="new-password"></div><div><label class="field-label">Confirm new password</label><input id="pwNew2" type="password" class="field" autocomplete="new-password"></div></div>
+      <div id="pwMsg" class="text-sm mt-3" style="color:#b91c1c"></div>
+      <div class="flex gap-2 mt-3"><button class="btn btn-primary" id="pwGo">Update password</button><button class="btn btn-secondary" id="pwC">Close</button></div>`);
+    const $=i=>m.querySelector('#'+i),say=(t,g)=>{$('pwMsg').textContent=t;$('pwMsg').style.color=g?'#15803d':'#b91c1c';};
+    $('pwC').onclick=()=>m.remove();
+    $('pwGo').onclick=async()=>{
+      const o=$('pwOld').value,n=$('pwNew').value;
+      if(n.length<6){say('New password must be at least 6 characters.');return;}
+      if(n!==$('pwNew2').value){say('The new passwords do not match.');return;}
+      $('pwGo').disabled=true;
+      try{await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email,o));await u.updatePassword(n);say('Password updated.',true);showToast('Password updated.');setTimeout(()=>m.remove(),1200);}
+      catch(e){say(errMsg(e));$('pwGo').disabled=false;}
+    };
+  };
+  window.marsLogout=function(){
+    if(!confirm('Log out of your account?'))return;
+    out().finally(()=>location.reload());
+  };
+
+  /* ---- admin: Accounts tab ---- */
+  let users=[];
+  window.marsRenderUsers=async function(){
+    const box=document.getElementById('adminUsersBox');if(!box)return;
+    box.innerHTML='<div class="text-xs text-muted">Loading accounts…</div>';
+    try{
+      const sn=await fb().collection('users').get();
+      users=sn.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+      box.innerHTML=`<div class="text-xs text-muted mb-3">People who sign in with email and password. Their Role and Projects are set here by email address.</div>
+        <button class="btn btn-primary mb-3" onclick="marsUserEdit(null)">Add account by email</button>
+        <div class="space-y-2">${users.map((u,i)=>`<div class="rounded-xl border p-3 text-sm"><b>${esc(u.name||'')}</b>${u.disabled?' <b style="color:#b91c1c">· Disabled</b>':''}<div class="text-xs text-muted">${esc(u.email||u.id)}<br>${esc(RL[u.role]||u.role)} · ${esc((u.projects||[]).join(', ')||'All projects')}</div><div class="flex gap-2 mt-2"><button class="btn btn-secondary" onclick="marsUserEdit(${i})">Edit</button><button class="btn btn-secondary" onclick="marsUserToggle(${i})">${u.disabled?'Enable':'Disable'}</button></div></div>`).join('')||'<div class="text-xs text-muted">No accounts yet. Approve an application or add one by email.</div>'}</div>`;
+    }catch(e){box.innerHTML='<div class="text-xs" style="color:#b91c1c">Could not load accounts: '+esc(e.code||e.message)+'. Add the users rules block in Firestore.</div>';}
+  };
+  window.marsUserToggle=async i=>{const u=users[i];if(!confirm((u.disabled?'Enable ':'Disable ')+u.email+'?'))return;
+    try{await fb().collection('users').doc(u.id).update({disabled:!u.disabled});showToast(u.disabled?'Account enabled.':'Account disabled.');marsRenderUsers();}catch(e){showToast('Failed: '+(e.code||e.message),'error');}};
+  window.marsUserEdit=function(i){
+    const u=i===null?{role:'site',projects:[]}:users[i],prj=(typeof projectDatabase!=='undefined'?projectDatabase:[]).map(p=>p.prjNo);
+    const m=shell('userModal',`<h3 class="text-lg font-extrabold text-navy mb-3">${i===null?'Add account':'Edit account'}</h3>
+      <div class="space-y-3"><div><label class="field-label">Email</label><input id="ueEm" type="email" class="field" value="${esc(u.email||'')}" ${i===null?'':'disabled'}></div>
+      <div><label class="field-label">Name</label><input id="ueNm" class="field" value="${esc(u.name||'')}"></div>
+      <div><label class="field-label">Role</label><select id="ueRl" class="field">${Object.keys(RL).map(k=>`<option value="${k}"${u.role===k?' selected':''}>${RL[k]}</option>`).join('')}</select></div>
+      <div><label class="field-label">Projects</label><div style="max-height:180px;overflow:auto;border:1px solid #cbd5e1;border-radius:12px;padding:8px">${prj.map(p=>`<label style="display:block;font-size:13px;padding:3px 0"><input type="checkbox" class="ue-p" value="${esc(p)}"${(u.projects||[]).includes(p)?' checked':''}> ${esc(p)}</label>`).join('')}</div><div class="text-xs text-muted mt-1">Site Engineers need at least one project. DPM, ED and Procurement can be left empty.</div></div></div>
+      <div class="flex gap-2 mt-4"><button class="btn btn-primary" id="ueSv">Save</button><button class="btn btn-secondary" id="ueCl">Close</button></div>`);
+    const $=id=>m.querySelector('#'+id);$('ueCl').onclick=()=>m.remove();
+    $('ueSv').onclick=async()=>{
+      const em=$('ueEm').value.trim().toLowerCase(),nm=$('ueNm').value.trim(),rl=$('ueRl').value,pj=[...m.querySelectorAll('.ue-p:checked')].map(x=>x.value);
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)||!nm){showToast('Enter a valid email and name.','error');return;}
+      if(rl==='site'&&!pj.length){showToast('Select at least one project for a Site Engineer.','error');return;}
+      try{await fb().collection('users').doc(em).set({email:em,name:nm,role:rl,projects:pj,disabled:!!u.disabled,updatedAt:Date.now(),...(i===null?{createdAt:Date.now()}:{})},{merge:true});m.remove();showToast('Account saved.');marsRenderUsers();}
+      catch(e){showToast('Failed: '+(e.code||e.message),'error');}
+    };
+  };
 })();
 </script>
 </body>
