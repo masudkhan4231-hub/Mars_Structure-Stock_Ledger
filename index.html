@@ -791,6 +791,7 @@ window.marsPill=function(kind,text){
         <a href="javascript:void(0)" class="nav-item" onclick="marsLogout()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg> Logout</a></div>
         <a href="javascript:void(0)" class="nav-item" data-page="dashboard" onclick="showPage('dashboard')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Dashboard</a>
         <a href="javascript:void(0)" class="nav-item" data-page="transfers" onclick="showPage('transfers')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h13l-3-3M17 17H4l3 3"/></svg> Transfers <span id="trBadge" class="hidden" style="background:#dc2626;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;margin-left:6px">0</span></a>
+        <a href="javascript:void(0)" class="nav-item" data-page="suppliers" onclick="showPage('suppliers')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l1-5h16l1 5M3 9v11h18V9M3 9h18M9 20v-6h6v6"/></svg> Suppliers</a>
         <a href="javascript:void(0)" class="nav-item" data-page="purchaseorders" onclick="showPage('purchaseorders')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg> Purchase Orders</a>
         <a href="javascript:void(0)" class="nav-item" data-page="track" onclick="showPage('track')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg> Track Requisition</a>
         <a href="javascript:void(0)" class="nav-item" data-page="requisition" onclick="showPage('requisition')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/></svg> Requisition <span id="rqBadge" class="hidden" style="background:#dc2626;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;margin-left:6px">0</span></a>
@@ -1066,6 +1067,12 @@ window.marsPill=function(kind,text){
             <div class="flex gap-2 mt-3"><button class="btn btn-secondary" onclick="rqAddRow()">+ Add item</button><button class="btn btn-primary" onclick="rqSubmit()">Submit Requisition</button></div>
           </div>
           <div id="rqList" class="space-y-3"></div>
+        </section>
+
+        <section id="supSection" class="card p-5 md:p-6 page-section page-hidden" data-page="suppliers">
+          <h2 class="text-lg font-extrabold text-navy mb-1">Suppliers &amp; Price History</h2>
+          <p class="text-xs text-muted mb-3">Supplier directory and what each material cost in earlier purchase orders. New suppliers typed in a PO are added here automatically.</p>
+          <div id="supBox"></div>
         </section>
 
         <section id="poSection" class="card p-5 md:p-6 page-section page-hidden" data-page="purchaseorders">
@@ -3001,7 +3008,7 @@ function renderFullDashboard(){
   const avEl=document.getElementById('engineerAvatars');
   if(avEl) avEl.innerHTML=recentEngineers.map((n,i)=>`<div class="av" style="background:${avColors[i%avColors.length]}" title="${escapeHtml(n)}">${escapeHtml((n||'?').trim().charAt(0).toUpperCase())}</div>`).join('')||'<div class="av" style="background:#e2e7ee;color:#64748b">—</div>';
   {const el=document.getElementById('metaProjectsCount');if(el)el.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21.4 11.1l-9.2 9.2a5.5 5.5 0 01-7.8-7.8l9.2-9.2a3.7 3.7 0 015.2 5.2l-9.2 9.2a1.8 1.8 0 01-2.6-2.6l8.5-8.5"/></svg> '+projectSet.size;}
-  setTxt('metaMaterialsCount', '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> '+materialSet.size);
+  {const el=document.getElementById('metaMaterialsCount');if(el)el.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> '+materialSet.size;}
 
   // --- transferred, last 7 days ---
   const trWeekVals=d7.map(d=>byDate[d]?byDate[d].tr:0);
@@ -4079,15 +4086,15 @@ async function deleteEntryFromFirebase(firebaseId){
 (function(){
   const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-  const role=()=>isAdmin?'admin':(window.currentEngineerRole||'site');
+  const role=()=>isAdmin?'admin':((window.currentEngineerRole==='store')?'site':(window.currentEngineerRole||'site'));
   const who=()=>window.currentEngineerName||'Admin';
   const myPrj=()=>window.currentEngineerAllowedProjects||[];
   const STAGE={delivery:marsPill('delivery','Awaiting delivery'),dpm:marsPill('pending','With DPM'),ed:marsPill('pending','With Executive Director'),procurement:marsPill('progress','With Procurement'),closed:marsPill('approved','Closed'),rejected:marsPill('rejected','Rejected')};
-  const ROLES={site:'Site Engineer',dpm:'DPM',ed:'Executive Director',proc:'Procurement'};
+  const ROLES={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement',acct:'Accounts',viewer:'Management (view only)'};
   let reqs=[],lastCount=0;
   const pending=r=>(r.items||[]).filter(i=>i.state==='pending');
   const actionable=r=>(role()==='site'&&myPrj().includes(r.prjNo)&&(r.items||[]).some(i=>i.state==='purchased'))||(role()==='dpm'&&r.stage==='dpm')||(role()==='ed'&&r.stage==='ed')||(role()==='proc'&&r.stage==='procurement'&&pending(r).length>0);
-  const hist=(r,a)=>(r.history||[]).concat([{by:who(),role:role(),action:a,at:Date.now()}]);
+  const hist=(r,a,note)=>(r.history||[]).concat([Object.assign({by:who(),role:role(),action:a,at:Date.now()},note?{note}:{})]);
   async function mut(id,fn){
     const db=fb(),ref=db.collection('requisitions').doc(id);
     try{await db.runTransaction(async tx=>{const d=await tx.get(ref);const x=await fn(Object.assign({},d.data(),{id}),tx,db);if(!x)throw new Error('blocked');const lg=x.ledger;delete x.ledger;(lg||[]).forEach(en=>tx.set(db.collection(FIREBASE_COLLECTION).doc(en.id),en.data));tx.update(ref,x);});showToast('Done.');}
@@ -4110,14 +4117,27 @@ async function deleteEntryFromFirebase(firebaseId){
       rqRows.innerHTML='';rqAddRow();showToast('Requisition sent to DPM.');
     }catch(e){showToast('Send failed — allow the requisitions and counters collections in Firestore Rules.','error');}
   };
-  window.rqCancelItem=(id,iid)=>mut(id,r=>{
-    if(role()!=='dpm'||r.stage!=='dpm')return null;
-    const items=r.items.map(i=>i.id===iid&&i.state==='pending'?{...i,state:'cancelled',by:who()}:i);
-    const left=items.some(i=>i.state==='pending');
-    return{items,stage:left?'dpm':'closed',history:hist(r,'Cancelled item '+iid)};
-  });
+  function askReason(title,cb){
+    const o=document.getElementById('reasonModal');if(o)o.remove();
+    const m=document.createElement('div');m.id='reasonModal';
+    m.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:12px';
+    m.innerHTML='<div class="card p-5" style="background:#fff;max-width:440px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">'+esc(title)+'</h3><div class="text-xs text-muted mb-3">A reason is required. It is saved in the record and shown to everyone who can see this requisition.</div><textarea id="rsTxt" class="field" rows="3" placeholder="Write the reason (at least 5 characters)"></textarea><div id="rsMsg" class="text-xs mt-2" style="color:#b91c1c"></div><div class="flex gap-2 mt-3"><button class="btn btn-primary" id="rsOk">Confirm</button><button class="btn btn-secondary" id="rsNo">Close</button></div></div>';
+    document.body.appendChild(m);
+    m.querySelector('#rsNo').onclick=()=>m.remove();
+    m.querySelector('#rsOk').onclick=()=>{const v=m.querySelector('#rsTxt').value.trim();if(v.length<5){m.querySelector('#rsMsg').textContent='Please write a reason of at least 5 characters.';return;}m.remove();cb(v);};
+  }
+  window.rqCancelItem=(id,iid)=>{
+    const r0=reqs.find(x=>x.id===id),it=r0&&r0.items.find(i=>i.id===iid);if(!it)return;
+    askReason('Cancel '+it.material+' ('+it.qty+' '+it.unit+')',reason=>mut(id,r=>{
+      if(role()!=='dpm'||r.stage!=='dpm')return null;
+      const items=r.items.map(i=>i.id===iid&&i.state==='pending'?{...i,state:'cancelled',cancelReason:reason,by:who()}:i);
+      const left=items.some(i=>i.state==='pending');
+      return{items,stage:left?'dpm':'closed',history:hist(r,'Cancelled '+it.material+' ('+it.qty+' '+it.unit+')',reason)};
+    }));
+  };
   window.rqForward=id=>mut(id,r=>role()==='dpm'&&r.stage==='dpm'&&pending(r).length?{stage:'ed',history:hist(r,'Checked and forwarded to ED')}:null);
-  window.rqEd=(id,ok)=>mut(id,r=>role()==='ed'&&r.stage==='ed'?{stage:ok?'procurement':'rejected',history:hist(r,ok?'Approved':'Rejected')}:null);
+  const doEd=(id,ok,reason)=>mut(id,r=>role()==='ed'&&r.stage==='ed'?{stage:ok?'procurement':'rejected',history:hist(r,ok?'Approved':'Rejected',reason)}:null);
+  window.rqEd=(id,ok)=>ok?doEd(id,true):askReason('Reject this requisition',reason=>doEd(id,false,reason));
   window.rqPurchase=id=>{
     const sel={};
     document.querySelectorAll('.rq-chk[data-r="'+id+'"]:checked').forEach(c=>{const inp=document.querySelector('.rq-pq[data-r="'+id+'"][data-i="'+c.dataset.i+'"]');sel[c.dataset.i]=parseFloat(inp&&inp.value)||0;});
@@ -4162,7 +4182,7 @@ async function deleteEntryFromFirebase(firebaseId){
       if(rl==='dpm'&&r.stage==='dpm'&&i.state==='pending')act=`<button class="btn btn-secondary" onclick="rqCancelItem('${r.id}','${i.id}')">Cancel item</button>`;
       if(rl==='proc'&&r.stage==='procurement'&&i.state==='pending')act=`<span class="flex items-center gap-1"><input type="number" step="0.01" class="field rq-pq" style="width:78px;padding:4px 6px" data-r="${r.id}" data-i="${i.id}" value="${i.qty}"><label class="text-xs"><input type="checkbox" class="rq-chk" data-r="${r.id}" data-i="${i.id}"> Bought</label></span>`;
       if((rl==='admin'||(rl==='site'&&myPrj().includes(r.prjNo)))&&i.state==='purchased')act=`<button class="btn btn-primary" onclick="rqReceive('${r.id}','${i.id}')">Confirm received</button>`;
-      return `<div class="flex justify-between items-center gap-2 py-1 border-t text-sm"><span>${esc(i.material)}: <b>${i.qty}</b> ${esc(i.unit)}${i.ofQty&&i.ofQty!==i.qty?' <span class="text-xs text-muted">of '+i.ofQty+'</span>':''}<br><span class="text-xs text-muted">${IS[i.state]}${i.ofQty&&i.state==='pending'?' (balance)':''}${i.poNo?' · '+i.poNo:''}</span></span>${act}</div>`;
+      return `<div class="flex justify-between items-center gap-2 py-1 border-t text-sm"><span>${esc(i.material)}: <b>${i.qty}</b> ${esc(i.unit)}${i.ofQty&&i.ofQty!==i.qty?' <span class="text-xs text-muted">of '+i.ofQty+'</span>':''}<br><span class="text-xs text-muted">${IS[i.state]}${i.ofQty&&i.state==='pending'?' (balance)':''}${i.poNo&&role()!=='site'?' · '+i.poNo:''}</span>${i.state==='cancelled'&&i.cancelReason?'<br><span class="text-xs" style="color:#b91c1c">Reason: '+esc(i.cancelReason)+'</span>':''}</span>${act}</div>`;
     }).join('');
     let foot='';
     if(rl==='dpm'&&r.stage==='dpm')foot=`<button class="btn btn-primary mt-2" onclick="rqForward('${r.id}')">Forward to Executive Director</button>`;
@@ -4215,7 +4235,7 @@ async function deleteEntryFromFirebase(firebaseId){
     const S=[];
     S.push({k:'send',t:'Submitted by Site Engineer',s:'done',d:esc(r.requestedBy)+' · '+d8(r.createdAt)});
     S.push(allCanc?{k:'dpm',t:'DPM check',s:'bad',d:'All items cancelled'}:st==='dpm'?{k:'dpm',t:'DPM check',s:'cur',d:'Pending at DPM'}:{k:'dpm',t:'DPM check',s:'done',d:'Approved · '+who2(fw)+(canc?' · '+canc+' item(s) cancelled':'')});
-    S.push(allCanc?{k:'ed',t:'Executive Director',s:'wait',d:''}:st==='rejected'?{k:'ed',t:'Executive Director',s:'bad',d:'Rejected · '+who2(rj)}:st==='dpm'?{k:'ed',t:'Executive Director',s:'wait',d:''}:st==='ed'?{k:'ed',t:'Executive Director',s:'cur',d:'Pending at Executive Director'}:{k:'ed',t:'Executive Director',s:'done',d:'Approved · '+who2(ap)});
+    S.push(allCanc?{k:'ed',t:'Executive Director',s:'wait',d:''}:st==='rejected'?{k:'ed',t:'Executive Director',s:'bad',d:'Rejected · '+who2(rj)+(rj&&rj.note?' · Reason: '+esc(rj.note):'')}:st==='dpm'?{k:'ed',t:'Executive Director',s:'wait',d:''}:st==='ed'?{k:'ed',t:'Executive Director',s:'cur',d:'Pending at Executive Director'}:{k:'ed',t:'Executive Director',s:'done',d:'Approved · '+who2(ap)});
     const pr=allCanc||st==='rejected'||!after(3)&&st!=='procurement';
     S.push(pr&&st!=='procurement'?{k:'cart',t:'Procurement',s:'wait',d:''}:st==='procurement'?{k:'cart',t:'Procurement',s:'cur',d:'Purchasing in progress'+(pos.length?' · '+esc(pos.join(', ')):'')}:{k:'cart',t:'Procurement',s:'done',d:pos.length?esc(pos.join(', ')):'Processed'});
     const dead=allCanc||st==='rejected'||st==='dpm'||st==='ed';
@@ -4243,7 +4263,7 @@ async function deleteEntryFromFirebase(firebaseId){
     box.innerHTML=L.map(r=>{
       const[lab,c]=chip(r),S=steps(r);
       const route=S.map((x,i)=>{const[bg,fg,bd]=COL[x.s];return `<div style="display:flex;gap:12px"><div style="display:flex;flex-direction:column;align-items:center"><div style="width:36px;height:36px;border-radius:50%;background:${bg};border:1.5px solid ${bd};display:flex;align-items:center;justify-content:center;${x.s==='cur'?'box-shadow:0 0 0 4px #eff6ff':''}">${ico(x.s==='bad'?'x':x.k,fg)}</div>${i<S.length-1?`<div style="width:3px;flex:1;min-height:22px;background:${x.s==='done'?'#86efac':'#e2e8f0'}"></div>`:''}</div><div style="padding-bottom:14px"><div class="font-bold text-sm">${x.t}</div><div class="text-xs" style="color:${x.s==='bad'?'#b91c1c':x.s==='cur'?'#1d4ed8':x.s==='done'?'#15803d':'#94a3b8'}">${x.d||(x.s==='wait'?'Waiting':'')}</div></div></div>`;}).join('');
-      const items=(r.items||[]).map(i=>`<div class="text-xs py-1 border-t">${esc(i.material)}: <b>${i.qty}</b> ${esc(i.unit)}${i.ofQty&&i.ofQty!==i.qty?' of '+i.ofQty:''} · ${IS[i.state]}${i.ofQty&&i.state==='pending'?' (balance)':''}</div>`).join('');
+      const items=(r.items||[]).map(i=>`<div class="text-xs py-1 border-t">${esc(i.material)}: <b>${i.qty}</b> ${esc(i.unit)}${i.ofQty&&i.ofQty!==i.qty?' of '+i.ofQty:''} · ${IS[i.state]}${i.ofQty&&i.state==='pending'?' (balance)':''}${i.state==='cancelled'&&i.cancelReason?'<div style="color:#b91c1c">Reason: '+esc(i.cancelReason)+'</div>':''}</div>`).join('');
       return `<details class="rounded-xl border p-3" ${openSet.has(r.id)?'open':''} ontoggle="rqTog('${r.id}',this.open)"><summary style="cursor:pointer"><b>${esc(r.no)}</b> · ${esc(r.prjNo)} <span style="margin-left:6px">${marsPill(c,chip(r)[0])}</span><div class="text-xs text-muted">${esc(r.requestedBy)} · ${d8(r.createdAt)}</div></summary><div style="margin-top:12px">${route}</div><div class="mt-2">${items}</div><button class="btn btn-secondary mt-2" onclick="rqPdf('${r.id}')">PDF</button></details>`;
     }).join('')||'<div class="text-xs text-muted">No requisitions found.</div>';
   }
@@ -4252,19 +4272,19 @@ async function deleteEntryFromFirebase(firebaseId){
     const r=reqs.find(x=>x.id===id);if(!r||!window.marsPrintDoc)return;
     const pj=(typeof projectDatabase!=='undefined'?projectDatabase.find(x=>x.prjNo===r.prjNo):null)||{};
     const g=[],map={};
-    (r.items||[]).forEach(i=>{const k=String(i.id).split('_')[0];if(!map[k]){map[k]={material:i.material,unit:i.unit,qty:0,bal:i.bal,reqDate:i.reqDate,loc:i.loc,remark:i.remark,recv:0,bought:0,pend:0,canc:0};g.push(map[k]);}
-      const o=map[k];o.qty+=i.qty;if(i.state==='received')o.recv+=(i.receivedQty??i.qty);if(i.state==='purchased'||i.state==='received')o.bought+=i.qty;if(i.state==='pending')o.pend+=i.qty;if(i.state==='cancelled')o.canc+=i.qty;});
+    (r.items||[]).forEach(i=>{const k=String(i.id).split('_')[0];if(!map[k]){map[k]={material:i.material,unit:i.unit,qty:0,bal:i.bal,reqDate:i.reqDate,loc:i.loc,remark:i.remark,recv:0,bought:0,pend:0,canc:0,rs:[]};g.push(map[k]);}
+      const o=map[k];o.qty+=i.qty;if(i.state==='received')o.recv+=(i.receivedQty??i.qty);if(i.state==='purchased'||i.state==='received')o.bought+=i.qty;if(i.state==='pending')o.pend+=i.qty;if(i.state==='cancelled'){o.canc+=i.qty;if(i.cancelReason)o.rs.push(i.cancelReason);}});
     const num=v=>Math.round(v*100)/100;
-    const rows=g.map((o,k)=>{const rm=[o.remark,o.bought?'Bought '+num(o.bought):'',o.pend&&o.bought?'Balance '+num(o.pend):'',o.canc?'Cancelled '+num(o.canc):''].filter(Boolean).join(' | ');
+    const rows=g.map((o,k)=>{const rm=[o.remark,o.bought?'Bought '+num(o.bought):'',o.pend&&o.bought?'Balance '+num(o.pend):'',o.canc?'Cancelled '+num(o.canc)+(o.rs.length?' ('+o.rs.join('; ')+')':''):''].filter(Boolean).join(' | ');
       return `<tr><td class="c">${k+1}</td><td>${esc(o.material)}</td><td class="c">${esc(o.unit)}</td><td class="c">${num(o.qty)}</td><td class="c">${o.bal===undefined||o.bal===''?'-':esc(o.bal)}</td><td class="c">${fdate(o.reqDate)}</td><td>${esc(o.loc||'')}</td><td class="c">${o.recv?num(o.recv):''}</td><td>${esc(rm)}</td></tr>`;}).join('');
     const pad=Math.max(0,12-g.length);let blank='';for(let i=0;i<pad;i++)blank+='<tr>'+'<td>&nbsp;</td>'.repeat(9)+'</tr>';
-    const sub=lastH(r,'Submitted'),fw=lastH(r,'Checked and forwarded'),ap=lastH(r,'Approved'),po=lastH(r,'Created');
+    const rjn=lastH(r,'Rejected'),sub=lastH(r,'Submitted'),fw=lastH(r,'Checked and forwarded'),ap=lastH(r,'Approved'),po=lastH(r,'Created');
     const sg=(t,sub2,h)=>`<div class="sg"><div class="nm">${h?esc(h.by)+'<br>'+d8(h.at):'&nbsp;<br>&nbsp;'}</div><div class="ln"></div><b>${t}</b><div class="sm">${sub2}</div></div>`;
     window.marsPrintDoc(`<html><head><title>${esc(r.no)}</title><style>@page{size:A4 landscape;margin:12mm}body{font-family:Arial,sans-serif;font-size:12px;color:#111}h1{margin:0;text-align:center;font-size:20px}.t{text-align:center;font-weight:bold;text-decoration:underline;margin:6px 0 10px;font-size:15px}.top{display:flex;justify-content:space-between}table{width:100%;border-collapse:collapse;margin-top:8px}td,th{border:1px solid #222;padding:5px 4px;height:20px}th{text-align:center}.c{text-align:center}.sgs{display:flex;justify-content:space-between;margin-top:34px}.sg{width:23%;text-align:center}.ln{border-top:1px solid #222;margin-top:2px}.nm{font-size:11px;height:30px}.sm{font-size:11px}</style></head><body>
       <h1>MARS STRUCTURE LIMITED</h1><div class="t">MATERIALS PURCHASE REQUISITION (MPR)</div>
       <div class="top"><div><b>Project Name:</b> ${esc(r.prjNo)}<br><b>ID:</b> ${esc(pj.id||'-')}</div><div style="text-align:right"><b>Date:</b> ${d8(r.createdAt)}<br><b>MPR No:</b> ${esc(r.no)}</div></div>
       <table><tr><th>Sl. No</th><th>Material Name</th><th>Unit</th><th>Required Quantity</th><th>Present Balance</th><th>Required Date</th><th>Location to be Used</th><th>Cumulative Received</th><th>Remarks</th></tr>${rows}${blank}</table>
-      <div class="sgs">${sg('Prepared By','Site Engineer / Project Engineer',sub)}${sg('Checked By','Deputy Project Manager / Project Manager',fw)}${sg('Approved By','Executive Director',ap)}${sg('Purchase Ordered By','Procurement',po)}</div></body></html>`);
+      ${rjn&&rjn.note?'<div style="margin-top:8px"><b>Rejected by Executive Director:</b> '+esc(rjn.note)+'</div>':''}<div class="sgs">${sg('Prepared By','Site Engineer / Project Engineer',sub)}${sg('Checked By','Deputy Project Manager / Project Manager',fw)}${sg('Approved By','Executive Director',ap)}${sg('Purchase Ordered By','Procurement',po)}</div></body></html>`);
   };
   window.rqPanelRefresh=()=>{if(window._adminModalTab==='engineers'&&document.querySelector('#modalRoot .modal-overlay'))renderAdminSettingsModal('engineers');};
   window.engCtl=(e,i)=>`<div class="flex flex-wrap items-center gap-2 mt-2"><select class="field" style="max-width:150px;padding:4px 8px" onchange="rqSetRole(${i},this.value)">${Object.keys(ROLES).map(k=>`<option value="${k}"${(e.role||'site')===k?' selected':''}>${ROLES[k]}</option>`).join('')}</select><button class="btn btn-secondary" onclick="rqSetPin(${i})">${e.pinHash?'Reset PIN':'Set PIN'}</button><button class="btn btn-secondary" onclick="rqToggle(${i})">${e.disabled?'Enable ID':'Disable ID'}</button>${e.disabled?'<b style="color:#dc2626">Disabled</b>':''}${e.pinHash?'':'<span class="text-muted">No PIN</span>'}</div>`;
@@ -4279,7 +4299,7 @@ async function deleteEntryFromFirebase(firebaseId){
   const GEO={};"Dhaka:Dhamrai,Dohar,Keraniganj,Nawabganj,Savar,Dhaka Metropolitan|Gazipur:Gazipur Sadar,Kaliakair,Kaliganj,Kapasia,Sreepur|Narayanganj:Araihazar,Bandar,Narayanganj Sadar,Rupganj,Sonargaon|Narsingdi:Belabo,Monohardi,Narsingdi Sadar,Palash,Raipura,Shibpur|Manikganj:Daulatpur,Ghior,Harirampur,Manikganj Sadar,Saturia,Shivalaya,Singair|Munshiganj:Gazaria,Lohajang,Munshiganj Sadar,Sirajdikhan,Sreenagar,Tongibari|Faridpur:Alfadanga,Bhanga,Boalmari,Charbhadrasan,Faridpur Sadar,Madhukhali,Nagarkanda,Sadarpur,Saltha|Gopalganj:Gopalganj Sadar,Kashiani,Kotalipara,Muksudpur,Tungipara|Madaripur:Kalkini,Madaripur Sadar,Rajoir,Shibchar|Rajbari:Baliakandi,Goalanda,Kalukhali,Pangsha,Rajbari Sadar|Shariatpur:Bhedarganj,Damudya,Gosairhat,Naria,Shariatpur Sadar,Zajira|Kishoreganj:Austagram,Bajitpur,Bhairab,Hossainpur,Itna,Karimganj,Katiadi,Kishoreganj Sadar,Kuliarchar,Mithamain,Nikli,Pakundia,Tarail|Tangail:Basail,Bhuapur,Delduar,Dhanbari,Ghatail,Gopalpur,Kalihati,Madhupur,Mirzapur,Nagarpur,Sakhipur,Tangail Sadar|Chattogram:Anwara,Banshkhali,Boalkhali,Chandanaish,Fatikchhari,Hathazari,Karnaphuli,Lohagara,Mirsharai,Patiya,Rangunia,Raozan,Sandwip,Satkania,Sitakunda|Cox's Bazar:Chakaria,Cox's Bazar Sadar,Eidgaon,Kutubdia,Maheshkhali,Pekua,Ramu,Teknaf,Ukhia|Cumilla:Barura,Brahmanpara,Burichang,Chandina,Chauddagram,Daudkandi,Debidwar,Homna,Laksam,Lalmai,Meghna,Monohargonj,Muradnagar,Nangalkot,Cumilla Adarsha Sadar,Cumilla Sadar Dakshin,Titas|Brahmanbaria:Akhaura,Ashuganj,Bancharampur,Bijoynagar,Brahmanbaria Sadar,Kasba,Nabinagar,Nasirnagar,Sarail|Chandpur:Chandpur Sadar,Faridganj,Haimchar,Haziganj,Kachua,Matlab Dakshin,Matlab Uttar,Shahrasti|Feni:Chhagalnaiya,Daganbhuiyan,Feni Sadar,Fulgazi,Parshuram,Sonagazi|Lakshmipur:Kamalnagar,Lakshmipur Sadar,Raipur,Ramganj,Ramgati|Noakhali:Begumganj,Chatkhil,Companiganj,Hatiya,Kabirhat,Noakhali Sadar,Senbagh,Sonaimuri,Subarnachar|Khagrachhari:Dighinala,Guimara,Khagrachhari Sadar,Lakshmichhari,Mahalchhari,Manikchhari,Matiranga,Panchhari,Ramgarh|Rangamati:Baghaichhari,Barkal,Belaichhari,Juraichhari,Kaptai,Kawkhali,Langadu,Naniarchar,Rajasthali,Rangamati Sadar|Bandarban:Alikadam,Bandarban Sadar,Lama,Naikhongchhari,Rowangchhari,Ruma,Thanchi|Rajshahi:Bagha,Bagmara,Charghat,Durgapur,Godagari,Mohanpur,Paba,Puthia,Tanore|Bogura:Adamdighi,Bogura Sadar,Dhunat,Dhupchanchia,Gabtali,Kahaloo,Nandigram,Sariakandi,Shajahanpur,Sherpur,Shibganj,Sonatala|Chapainawabganj:Bholahat,Gomastapur,Nachole,Nawabganj Sadar,Shibganj|Joypurhat:Akkelpur,Joypurhat Sadar,Kalai,Khetlal,Panchbibi|Naogaon:Atrai,Badalgachhi,Dhamoirhat,Mahadebpur,Manda,Naogaon Sadar,Niamatpur,Patnitala,Porsha,Raninagar,Sapahar|Natore:Bagatipara,Baraigram,Gurudaspur,Lalpur,Naldanga,Natore Sadar,Singra|Pabna:Atgharia,Bera,Bhangura,Chatmohar,Faridpur,Ishwardi,Pabna Sadar,Santhia,Sujanagar|Sirajganj:Belkuchi,Chauhali,Kamarkhanda,Kazipur,Raiganj,Shahjadpur,Sirajganj Sadar,Tarash,Ullahpara|Khulna:Batiaghata,Dacope,Dighalia,Dumuria,Koyra,Paikgachha,Phultala,Rupsha,Terokhada|Bagerhat:Bagerhat Sadar,Chitalmari,Fakirhat,Kachua,Mollahat,Mongla,Morrelganj,Rampal,Sarankhola|Chuadanga:Alamdanga,Chuadanga Sadar,Damurhuda,Jibannagar|Jashore:Abhaynagar,Bagherpara,Chaugachha,Jashore Sadar,Jhikargachha,Keshabpur,Manirampur,Sharsha|Jhenaidah:Harinakunda,Jhenaidah Sadar,Kaliganj,Kotchandpur,Maheshpur,Shailkupa|Kushtia:Bheramara,Daulatpur,Khoksa,Kumarkhali,Kushtia Sadar,Mirpur|Magura:Magura Sadar,Mohammadpur,Shalikha,Sreepur|Meherpur:Gangni,Meherpur Sadar,Mujibnagar|Narail:Kalia,Lohagara,Narail Sadar,Naragati|Satkhira:Assasuni,Debhata,Kalaroa,Kaliganj,Satkhira Sadar,Shyamnagar,Tala|Barishal:Agailjhara,Babuganj,Bakerganj,Banaripara,Barishal Sadar,Gaurnadi,Hizla,Mehendiganj,Muladi,Wazirpur|Barguna:Amtali,Bamna,Barguna Sadar,Betagi,Patharghata,Taltali|Bhola:Bhola Sadar,Burhanuddin,Char Fasson,Daulatkhan,Lalmohan,Manpura,Tazumuddin|Jhalokati:Jhalokati Sadar,Kathalia,Nalchity,Rajapur|Patuakhali:Bauphal,Dashmina,Dumki,Galachipa,Kalapara,Mirzaganj,Patuakhali Sadar,Rangabali|Pirojpur:Bhandaria,Kawkhali,Mathbaria,Nazirpur,Nesarabad,Pirojpur Sadar,Zianagar|Sylhet:Balaganj,Beanibazar,Bishwanath,Companiganj,Dakshin Surma,Fenchuganj,Golapganj,Gowainghat,Jaintiapur,Kanaighat,Osmani Nagar,Sylhet Sadar,Zakiganj|Habiganj:Ajmiriganj,Bahubal,Baniachong,Chunarughat,Habiganj Sadar,Lakhai,Madhabpur,Nabiganj,Shayestaganj|Moulvibazar:Barlekha,Juri,Kamalganj,Kulaura,Moulvibazar Sadar,Rajnagar,Sreemangal|Sunamganj:Bishwamvarpur,Chhatak,Dakshin Sunamganj,Derai,Dharampasha,Dowarabazar,Jagannathpur,Jamalganj,Sullah,Sunamganj Sadar,Tahirpur|Rangpur:Badarganj,Gangachara,Kaunia,Mithapukur,Pirgachha,Pirganj,Rangpur Sadar,Taraganj|Dinajpur:Birampur,Birganj,Biral,Bochaganj,Chirirbandar,Dinajpur Sadar,Ghoraghat,Hakimpur,Kaharole,Khansama,Nawabganj,Parbatipur,Phulbari|Gaibandha:Fulchhari,Gaibandha Sadar,Gobindaganj,Palashbari,Sadullapur,Saghata,Sundarganj|Kurigram:Bhurungamari,Char Rajibpur,Chilmari,Kurigram Sadar,Nageshwari,Phulbari,Rajarhat,Raomari,Ulipur|Lalmonirhat:Aditmari,Hatibandha,Kaliganj,Lalmonirhat Sadar,Patgram|Nilphamari:Dimla,Domar,Jaldhaka,Kishoreganj,Nilphamari Sadar,Saidpur|Panchagarh:Atwari,Boda,Debiganj,Panchagarh Sadar,Tetulia|Thakurgaon:Baliadangi,Haripur,Pirganj,Ranisankail,Thakurgaon Sadar|Mymensingh:Bhaluka,Dhobaura,Fulbaria,Gaffargaon,Gauripur,Haluaghat,Ishwarganj,Muktagachha,Mymensingh Sadar,Nandail,Phulpur,Tarakanda,Trishal|Jamalpur:Bakshiganj,Dewanganj,Islampur,Jamalpur Sadar,Madarganj,Melandaha,Sarishabari|Netrokona:Atpara,Barhatta,Durgapur,Kalmakanda,Kendua,Khaliajuri,Madan,Mohanganj,Netrokona Sadar,Purbadhala|Sherpur:Jhenaigati,Nakla,Nalitabari,Sherpur Sadar,Sreebardi".split('|').forEach(x=>{const[a,b]=x.split(':');GEO[a]=b.split(',');});
   const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-  const ROLES={site:'Site Engineer',dpm:'DPM',ed:'Executive Director',proc:'Procurement'};
+  const ROLES={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement',acct:'Accounts',viewer:'Management (view only)'};
   let nidData='',sigData='';
   const LIM={nid:{minW:600,minH:380,maxW:3000,maxH:2000,minKB:50,maxKB:2048,name:'NID photo'},sig:{minW:250,minH:60,maxW:350,maxH:100,minKB:5,maxKB:100,name:'Signature'}};
   function checkImg(f,L){
@@ -4377,7 +4397,7 @@ async function deleteEntryFromFirebase(firebaseId){
     let nid='',rl='',pj='';
     if(ok){
       rl=document.getElementById('idRole_'+id).value;pj=document.getElementById('idPrj_'+id).value;
-      if(rl==='site'&&!pj){showToast('Select a project for a Site Engineer.','error');return;}
+      if((rl==='site'||rl==='store')&&!pj){showToast('Select a project for this role.','error');return;}
       try{await fb().collection('users').doc(String(a.email).toLowerCase()).set({email:String(a.email).toLowerCase(),name:a.name,role:rl,projects:pj?[pj]:[],disabled:false,createdAt:Date.now()},{merge:true});}catch(e){showToast('Could not create the account: '+(e.code||e.message),'error');return;}
     }
     if(!ok&&!confirm('Reject this application? All personal data (NID, photo, signature, address) will be erased.'))return;
@@ -4392,7 +4412,7 @@ async function deleteEntryFromFirebase(firebaseId){
     const pend=apps.filter(a=>a.status==='pending').length;
     idBadge.textContent=pend;idBadge.classList.toggle('hidden',!pend);
     const roleOpts=Object.keys(ROLES).map(k=>`<option value="${k}">${ROLES[k]}</option>`).join(''),prjOpts='<option value="">No project (non-site roles)</option>'+projectDatabase.map(p=>`<option>${esc(p.prjNo)}</option>`).join('');
-    const html=apps.filter(a=>a.status!=='rejected').map(a=>`<div class="rounded-xl border p-3 text-sm"><b>${esc(a.name)}</b> · ${a.role?esc(ROLES[a.role])+' · '+esc(a.prjNo||'All projects'):'New applicant'}<div class="text-xs text-muted">${esc(a.email||'')} · ${esc(a.mobile)} · NID ${esc(a.nid)}<br>${esc(a.village)}, ${esc(a.upazila)}, ${esc(a.district)}<br>${a.status==='pending'?marsPill('pending','Pending'):a.status==='approved'?marsPill('approved','Approved'+(a.assignedId?' · ID '+esc(a.assignedId):'')):marsPill('rejected','Rejected')} · ${new Date(a.createdAt).toLocaleString()}</div><div class="flex gap-2 mt-2"><img src="${a.nidPhoto}" style="height:90px;border-radius:8px"><img src="${a.signature}" style="height:90px;border:1px solid #e2e8f0;border-radius:8px;background:#fff"></div>${a.status==='pending'?`<div class="mt-2 grid grid-cols-2 gap-2"><select id="idRole_${a.id}" class="field">${roleOpts}</select><select id="idPrj_${a.id}" class="field">${prjOpts}</select></div><div class="mt-2 flex gap-2"><button class="btn btn-primary" onclick="idDecide('${a.id}',true)">Approve &amp; create ID</button><button class="btn btn-secondary" onclick="idDecide('${a.id}',false)">Reject</button></div>`:''}</div>`).join('')||'<div class="text-xs text-muted">No applications yet.</div>';
+    const html=apps.filter(a=>a.status!=='rejected'&&a.status!=='deleted').map(a=>`<div class="rounded-xl border p-3 text-sm"><b>${esc(a.name)}</b> · ${a.role?esc(ROLES[a.role])+' · '+esc(a.prjNo||'All projects'):'New applicant'}<div class="text-xs text-muted">${esc(a.email||'')} · ${esc(a.mobile)} · NID ${esc(a.nid)}<br>${esc(a.village)}, ${esc(a.upazila)}, ${esc(a.district)}<br>${a.status==='pending'?marsPill('pending','Pending'):a.status==='approved'?marsPill('approved','Approved'+(a.assignedId?' · ID '+esc(a.assignedId):'')):marsPill('rejected','Rejected')} · ${new Date(a.createdAt).toLocaleString()}</div><div class="flex gap-2 mt-2"><img src="${a.nidPhoto}" style="height:90px;border-radius:8px"><img src="${a.signature}" style="height:90px;border:1px solid #e2e8f0;border-radius:8px;background:#fff"></div>${a.status==='pending'?`<div class="mt-2 grid grid-cols-2 gap-2"><select id="idRole_${a.id}" class="field">${roleOpts}</select><select id="idPrj_${a.id}" class="field">${prjOpts}</select></div><div class="mt-2 flex gap-2"><button class="btn btn-primary" onclick="idDecide('${a.id}',true)">Approve &amp; create ID</button><button class="btn btn-secondary" onclick="idDecide('${a.id}',false)">Reject</button></div>`:''}</div>`).join('')||'<div class="text-xs text-muted">No applications yet.</div>';
     window._appsHtml=html;const bx=document.getElementById('adminAppsBox');if(bx)bx.innerHTML=html;
     const b2=document.getElementById('idBadge2');if(b2){b2.textContent=pend;b2.classList.toggle('hidden',!pend);}
   }
@@ -4410,7 +4430,7 @@ async function deleteEntryFromFirebase(firebaseId){
 (function(){
   const VAPID_KEY='PASTE_VAPID_KEY_HERE';
   if(VAPID_KEY.startsWith('PASTE'))window.addEventListener('load',()=>{const n=document.getElementById('pushNav');if(n)n.style.display='none';});
-  const role=()=>isAdmin?'admin':(window.currentEngineerRole||'site');
+  const role=()=>isAdmin?'admin':((window.currentEngineerRole==='store')?'site':(window.currentEngineerRole||'site'));
   async function register(){
     if(!('Notification' in window)||!firebase.messaging.isSupported()||VAPID_KEY.startsWith('PASTE'))return false;
     const reg=await navigator.serviceWorker.register('./firebase-messaging-sw.js');
@@ -4436,7 +4456,7 @@ async function deleteEntryFromFirebase(firebaseId){
 (function(){
   const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-  const role=()=>isAdmin?'admin':(window.currentEngineerRole||'site');
+  const role=()=>isAdmin?'admin':((window.currentEngineerRole==='store')?'site':(window.currentEngineerRole||'site'));
   const money=n=>Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
   let pos=[],reqSnap={};
   function printDoc(html){
@@ -4444,9 +4464,10 @@ async function deleteEntryFromFirebase(firebaseId){
     f.contentDocument.open();f.contentDocument.write(html);f.contentDocument.close();
     setTimeout(()=>{f.contentWindow.focus();f.contentWindow.print();setTimeout(()=>f.remove(),60000);},300);
   }
-  window.marsPrintDoc=printDoc;window.marsPOs=()=>pos;
+  window.marsPrintDoc=printDoc;window.marsPOs=()=>role()==='site'?[]:pos;
   window.poCardHtml=function(r){
     reqSnap[r.id]=r;
+    if(role()==='site')return '';
     let h='';
     pos.filter(o=>o.requisitionId===r.id).forEach(o=>{h+=`<div class="flex justify-between items-center gap-2 py-1 border-t text-sm"><span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg> <b>${esc(o.no)}</b> · ${esc(o.supplier.name)}<br><span class="text-xs text-muted">Tk ${money(o.total)}</span></span><span class="flex gap-2"><button class="btn btn-secondary" onclick="poPrint('${o.id}')">Print</button>${role()==='proc'?`<button class="btn btn-secondary" onclick="poEdit('${o.id}')">Edit</button>`:''}</span></div>`;});
     if(role()==='proc'&&r.stage==='procurement'&&(r.items||[]).some(i=>i.state==='pending'&&!i.poNo))h+=`<button class="btn btn-primary mt-2" onclick="poOpen('${r.id}')">Create Purchase Order</button>`;
@@ -4459,13 +4480,13 @@ async function deleteEntryFromFirebase(firebaseId){
     m.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:12px';
     m.innerHTML=`<div class="card p-5" style="background:#fff;max-width:480px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Purchase Order</h3><div class="text-xs text-muted mb-3">${esc(r.no)} · ${esc(r.prjNo)}</div>
       <div class="space-y-3">
-        <div><label class="field-label">Supplier Name</label><input id="poSup" class="field"></div>
+        <div><label class="field-label">Supplier Name</label><input id="poSup" class="field" list="supNameList" autocomplete="off" placeholder="Pick from list or type a new supplier"><datalist id="supNameList">${(window.marsSuppliers?marsSuppliers():[]).map(x=>`<option value="${esc(x.name)}">`).join('')}</datalist></div>
         <div><label class="field-label">Supplier Phone</label><input id="poPh" type="tel" class="field"></div>
         <div><label class="field-label">Supplier Address</label><input id="poAd" class="field"></div>
         <div><label class="field-label">Delivery Date</label><input id="poDt" type="date" class="field"></div>
         <div><label class="field-label">Payment / Other Terms</label><input id="poTm" class="field" placeholder="Optional"></div>
         <div class="text-xs font-extrabold text-navy">Items (untick to leave out)</div>
-        ${its.map(i=>`<div class="grid grid-cols-6 gap-2 items-center text-sm"><label class="col-span-3"><input type="checkbox" class="po-c" data-i="${i.id}" checked> ${esc(i.material)}<br><span class="text-xs text-muted">${i.qty} ${esc(i.unit)}</span></label><input class="field col-span-3 po-r" data-i="${i.id}" data-q="${i.qty}" type="number" step="0.01" placeholder="Rate / unit"></div>`).join('')}
+        ${its.map(i=>`<div class="grid grid-cols-6 gap-2 items-center text-sm"><label class="col-span-3"><input type="checkbox" class="po-c" data-i="${i.id}" checked> ${esc(i.material)}<br><span class="text-xs text-muted">${i.qty} ${esc(i.unit)}</span></label><input class="field col-span-3 po-r" data-i="${i.id}" data-q="${i.qty}" type="number" step="0.01" placeholder="Rate / unit"><div class="col-span-6 text-xs text-muted">${window.marsRateHint?marsRateHint(i.material):''}</div></div>`).join('')}
         <div class="font-bold text-sm">Total: Tk <span id="poTot">0.00</span></div>
       </div>
       <div class="flex gap-2 mt-4"><button class="btn btn-primary" id="poSend">Create Purchase Order</button><button class="btn btn-secondary" id="poClose">Close</button></div></div>`;
@@ -4474,6 +4495,7 @@ async function deleteEntryFromFirebase(firebaseId){
     m.addEventListener('input',calc);m.addEventListener('change',calc);
     m.querySelector('#poClose').onclick=()=>m.remove();
     m.querySelector('#poSend').onclick=()=>poSubmit(rid,m);
+    m.querySelector('#poSup').addEventListener('change',()=>{const f=window.marsFindSupplier&&marsFindSupplier(m.querySelector('#poSup').value);if(f){if(!m.querySelector('#poPh').value)m.querySelector('#poPh').value=f.phone||'';if(!m.querySelector('#poAd').value)m.querySelector('#poAd').value=f.address||'';}});
   };
   async function poSubmit(rid,m){
     const g=id=>m.querySelector(id).value.trim();
@@ -4498,7 +4520,7 @@ async function deleteEntryFromFirebase(firebaseId){
         tx.set(db.collection('purchase_orders').doc(),{no:pno,requisitionId:rid,reqNo:r.no,prjNo:r.prjNo,supplier:{name:g('#poSup'),phone:g('#poPh'),address:g('#poAd')},deliveryDate:g('#poDt'),terms:g('#poTm'),items,total,createdBy:by,createdAt:Date.now()});
         tx.update(rref,{items:r.items.map(i=>sel.includes(i)?{...i,poNo:pno}:i),history:(r.history||[]).concat([{by,role:'proc',action:'Created '+pno,at:Date.now()}])});
       });
-      m.remove();showToast('Purchase Order '+pno+' created.');
+      if(window.marsEnsureSupplier)marsEnsureSupplier({name:g('#poSup'),phone:g('#poPh'),address:g('#poAd')});m.remove();showToast('Purchase Order '+pno+' created.');
     }catch(e){console.error(e);showToast('Failed: '+(e.code||e.message),'error');}
   }
   window.poPrint=function(id){
@@ -4517,7 +4539,7 @@ async function deleteEntryFromFirebase(firebaseId){
 
   /* ---- PO page, edit, report ---- */
   const mineP=()=>window.currentEngineerAllowedProjects||[];
-  const visible=()=>pos.filter(o=>role()!=='site'||mineP().includes(o.prjNo));
+  const visible=()=>role()==='site'?[]:pos;
   const filtered=()=>{const pj=document.getElementById('poFPrj').value,q=document.getElementById('poFQ').value.trim().toLowerCase();return visible().filter(o=>(!pj||o.prjNo===pj)&&(!q||(o.no+' '+o.reqNo+' '+o.supplier.name).toLowerCase().includes(q)));};
   window.poRenderPage=function(){
     const sel=document.getElementById('poFPrj');if(!sel)return;
@@ -4568,10 +4590,10 @@ async function deleteEntryFromFirebase(firebaseId){
       }catch(e){showToast(e.message==='No changes made.'?e.message:'Failed: '+(e.code||e.message),'error');}
     };
   };
-  window.addEventListener('load',()=>{let k='';setInterval(()=>{const n=role()+'|'+mineP().join(',');if(n!==k){k=n;poRenderPage();}},1000);});
+  window.addEventListener('load',()=>{let k='';setInterval(()=>{const n=role()+'|'+mineP().join(',');if(n!==k){k=n;poRenderPage();}document.querySelectorAll('[data-page="purchaseorders"]').forEach(e=>{e.style.display=role()==='site'?'none':'';});},1000);});
   function start(){
     if(!fb())return setTimeout(start,800);
-    fb().collection('purchase_orders').orderBy('createdAt','desc').onSnapshot(sn=>{pos=sn.docs.map(d=>({id:d.id,...d.data()}));if(window.rqRender)window.rqRender();poRenderPage();},e=>console.error('purchase_orders',e));
+    fb().collection('purchase_orders').orderBy('createdAt','desc').onSnapshot(sn=>{pos=sn.docs.map(d=>({id:d.id,...d.data()}));if(window.rqRender)window.rqRender();poRenderPage();if(window.supBody)supBody();},e=>console.error('purchase_orders',e));
   }
   window.addEventListener('load',start);
 })();
@@ -4609,7 +4631,7 @@ async function deleteEntryFromFirebase(firebaseId){
 /* ================= DASHBOARD ================= */
 (function(){
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-  const role=()=>isAdmin?'admin':(window.currentEngineerRole||'site');
+  const role=()=>isAdmin?'admin':((window.currentEngineerRole==='store')?'site':(window.currentEngineerRole||'site'));
   const mine=()=>window.currentEngineerAllowedProjects||[];
   const H=3600000,STUCK=24*H;
   const age=ms=>{const h=Math.floor(ms/H);return h>=24?Math.floor(h/24)+'d '+(h%24)+'h':h+'h';};
@@ -4641,7 +4663,7 @@ async function deleteEntryFromFirebase(firebaseId){
     const by=s=>open.filter(r=>r.stage===s).length;
     const pt=T.filter(t=>t.status==='pending');
     const mo=new Date();const poMonth=PO.filter(o=>{const d=new Date(o.createdAt);return d.getMonth()===mo.getMonth()&&d.getFullYear()===mo.getFullYear();}).reduce((a,o)=>a+(o.total||0),0);
-    const tiles=tile('list',open.length,'Open requisitions','#2563eb')+tile('user',by('dpm'),'Pending at DPM','#d97706')+tile('shield',by('ed'),'Pending at Executive Director','#d97706')+tile('cart',by('procurement'),'With Procurement','#2563eb')+tile('truck',by('delivery'),'Awaiting delivery','#7c3aed')+tile('swap',pt.length,'Pending transfers','#0891b2')+tile('money','Tk '+money(poMonth),'PO value this month','#16a34a');
+    const tiles=tile('list',open.length,'Open requisitions','#2563eb')+tile('user',by('dpm'),'Pending at DPM','#d97706')+tile('shield',by('ed'),'Pending at Executive Director','#d97706')+tile('cart',by('procurement'),'With Procurement','#2563eb')+tile('truck',by('delivery'),'Awaiting delivery','#7c3aed')+tile('swap',pt.length,'Pending transfers','#0891b2')+(site?'':tile('money','Tk '+money(poMonth),'PO value this month','#16a34a'));
 
     // my tasks
     const tasks=[];
@@ -4664,7 +4686,7 @@ async function deleteEntryFromFirebase(firebaseId){
 
     // per project
     const rows=(typeof projectDatabase!=='undefined'?projectDatabase:[]).filter(p=>inScope(p.prjNo)).map(p=>({n:p.prjNo,o:open.filter(r=>r.prjNo===p.prjNo).length,d:open.filter(r=>r.prjNo===p.prjNo&&r.stage==='delivery').length,t:pt.filter(x=>x.fromPrj===p.prjNo||x.toPrj===p.prjNo).length,v:PO.filter(o=>o.prjNo===p.prjNo).reduce((a,o)=>a+(o.total||0),0)})).filter(x=>x.o||x.t||x.v);
-    const prj=rows.map(x=>`<div style="display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid #e2e8f0;font-size:13px"><b>${esc(x.n)}</b><span class="text-muted">${x.o} open req · ${x.d} awaiting delivery · ${x.t} transfer · Tk ${money(x.v)}</span></div>`).join('')||'<div class="text-xs text-muted">No activity yet.</div>';
+    const prj=rows.map(x=>`<div style="display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid #e2e8f0;font-size:13px"><b>${esc(x.n)}</b><span class="text-muted">${x.o} open req · ${x.d} awaiting delivery · ${x.t} transfer ${site?'':' · Tk '+money(x.v)}</span></div>`).join('')||'<div class="text-xs text-muted">No activity yet.</div>';
 
     box.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px">${tiles}</div>
       <div class="text-xs font-extrabold text-navy mt-5 mb-2">Needs your action</div><div class="space-y-2">${taskHtml}</div>
@@ -4679,9 +4701,9 @@ async function deleteEntryFromFirebase(firebaseId){
 /* ============ ACTIVITY LOG + EXCEL REPORT ============ */
 (function(){
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-  const role=()=>isAdmin?'admin':(window.currentEngineerRole||'site');
+  const role=()=>isAdmin?'admin':((window.currentEngineerRole==='store')?'site':(window.currentEngineerRole||'site'));
   const mine=()=>window.currentEngineerAllowedProjects||[];
-  const RL={site:'Site Engineer',dpm:'DPM',ed:'Executive Director',proc:'Procurement'};
+  const RL={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement',acct:'Accounts',viewer:'Management (view only)'};
   const STG={dpm:'With DPM',ed:'With Executive Director',procurement:'With Procurement',delivery:'Awaiting delivery',closed:'Closed',rejected:'Rejected'};
   const ITS={pending:'Pending',cancelled:'Cancelled',purchased:'Purchased (awaiting delivery)',received:'Received'};
   const pad=n=>String(n).padStart(2,'0');
@@ -4695,7 +4717,7 @@ async function deleteEntryFromFirebase(firebaseId){
 
   function buildLog(){
     const L=[];
-    get('marsReqs').forEach(r=>(r.history||[]).forEach(h=>L.push({at:h.at,type:'Requisition',ref:r.no,prj:r.prjNo,action:h.action,by:h.by})));
+    get('marsReqs').forEach(r=>(r.history||[]).forEach(h=>L.push({at:h.at,type:'Requisition',ref:r.no,prj:r.prjNo,action:h.action+(h.note?' — '+h.note:''),by:h.by})));
     get('marsTransfers').forEach(t=>{
       L.push({at:t.createdAt,type:'Transfer',ref:t.fromPrj+' → '+t.toPrj,prj:t.fromPrj+' → '+t.toPrj,action:'Requested '+t.material+' '+t.qty+' '+(t.unit||''),by:t.requestedBy});
       if(t.decidedAt)L.push({at:t.decidedAt,type:'Transfer',ref:t.fromPrj+' → '+t.toPrj,prj:t.fromPrj+' → '+t.toPrj,action:(t.status==='approved'?'Approved':'Rejected')+' '+t.material+' '+t.qty,by:t.decidedBy});
@@ -4706,7 +4728,7 @@ async function deleteEntryFromFirebase(firebaseId){
     });
     if(isAdmin)get('marsApps').forEach(a=>{
       L.push({at:a.createdAt,type:'ID Application',ref:a.email||'',prj:'',action:'Applied: '+(a.name||''),by:a.name||''});
-      if(a.decidedAt)L.push({at:a.decidedAt,type:'ID Application',ref:a.email||'',prj:a.prjNo||'',action:a.status==='approved'?'Approved as '+(RL[a.role]||a.role)+' · ID '+a.assignedId:'Rejected (data erased)',by:'Admin'});
+      if(a.decidedAt)L.push({at:a.decidedAt,type:'ID Application',ref:a.email||'',prj:a.prjNo||'',action:a.status==='approved'?'Approved as '+(RL[a.role]||a.role)+(a.assignedId?' · ID '+a.assignedId:''):a.status==='deleted'?'Account deleted (data erased)':'Rejected (data erased)',by:'Admin'});
     });
     return L.filter(x=>role()!=='site'||!x.prj||x.prj.split(' → ').some(inScope)).sort((a,b)=>b.at-a.at);
   }
@@ -4733,13 +4755,14 @@ async function deleteEntryFromFirebase(firebaseId){
     const wb=XLSX.utils.book_new();
     const sheet=(name,head,rows,w)=>{const ws=XLSX.utils.aoa_to_sheet([head].concat(rows.length?rows:[['No data']]));ws['!cols']=(w||head.map(()=>14)).map(x=>({wch:x}));XLSX.utils.book_append_sheet(wb,ws,name);};
     const R=get('marsReqs').filter(r=>inScope(r.prjNo)&&inMonth(r.createdAt));
-    sheet('Requisitions',['REQ No','Date','Project','Requested By','Requisition Status','Material','Unit','Qty','Original Qty','Present Balance','Required Date','Location','Remarks','Item Status','PO No','Received Qty'],
-      R.flatMap(r=>(r.items||[]).map(i=>[r.no,dt(r.createdAt),r.prjNo,r.requestedBy,STG[r.stage]||r.stage,i.material,i.unit,i.qty,i.ofQty||i.qty,i.bal??'',i.reqDate||'',i.loc||'',i.remark||'',ITS[i.state]||i.state,i.poNo||'',i.state==='received'?(i.receivedQty??i.qty):''])),
-      [16,17,12,18,22,28,8,9,12,13,13,20,24,26,16,12]);
+    sheet('Requisitions',['REQ No','Date','Project','Requested By','Requisition Status','Material','Unit','Qty','Original Qty','Present Balance','Required Date','Location','Remarks','Item Status','PO No','Received Qty','Cancel / Reject Reason'],
+      R.flatMap(r=>(r.items||[]).map(i=>[r.no,dt(r.createdAt),r.prjNo,r.requestedBy,STG[r.stage]||r.stage,i.material,i.unit,i.qty,i.ofQty||i.qty,i.bal??'',i.reqDate||'',i.loc||'',i.remark||'',ITS[i.state]||i.state,i.poNo||'',i.state==='received'?(i.receivedQty??i.qty):'',i.cancelReason||(r.stage==='rejected'?((r.history||[]).filter(h=>h.action==='Rejected').pop()||{}).note||'':'')])),
+      [16,17,12,18,22,28,8,9,12,13,13,20,24,26,16,12,34]);
     const PO=get('marsPOs').filter(o=>inScope(o.prjNo)&&inMonth(o.createdAt));
     sheet('Purchase Orders',['PO No','Date','Project','REQ No','Supplier','Phone','Delivery Date','Terms','Material','Unit','Qty','Rate','Amount','PO Total','Edits'],
       PO.flatMap(o=>o.items.map(i=>[o.no,dt(o.createdAt),o.prjNo,o.reqNo,o.supplier.name,o.supplier.phone||'',o.deliveryDate||'',o.terms||'',i.material,i.unit,i.qty,i.rate,i.amount,o.total,(o.edits||[]).length])),
       [18,17,12,16,24,14,13,18,28,8,9,10,12,12,7]);
+    if(role()!=='site'&&window.marsSuppliers)sheet('Suppliers',['Supplier','Phone','Address','Notes','PO Count','PO Total'],get('marsSuppliers').map(x=>{const o=get('marsPOs').filter(p=>String(p.supplier.name).toLowerCase()===String(x.name).toLowerCase());return[x.name,x.phone||'',x.address||'',x.notes||'',o.length,o.reduce((a,p)=>a+(p.total||0),0)];}),[26,16,34,30,10,14]);
     const T=get('marsTransfers').filter(t=>(inScope(t.fromPrj)||inScope(t.toPrj))&&inMonth(t.createdAt));
     sheet('Transfers',['Date','From','To','Material','Qty','Unit','Status','Requested By','Decided By','Decided At'],
       T.map(t=>[dt(t.createdAt),t.fromPrj,t.toPrj,t.material,t.qty,t.unit||'',t.status,t.requestedBy||'',t.decidedBy||'',dt(t.decidedAt)]),
@@ -4785,7 +4808,7 @@ async function deleteEntryFromFirebase(firebaseId){
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
   const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
   const A=()=>firebase.auth();
-  const RL={site:'Site Engineer',dpm:'DPM',ed:'Executive Director',proc:'Procurement'};
+  const RL={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement',acct:'Accounts',viewer:'Management (view only)'};
   const out=()=>A().signOut().catch(()=>{});
   const errMsg=e=>{const c=(e&&e.code)||'';
     if(/invalid-credential|wrong-password|user-not-found/.test(c))return 'Wrong email or password.';
@@ -4840,15 +4863,16 @@ async function deleteEntryFromFirebase(firebaseId){
     draw();
   };
 
-  async function afterLogin(u){
+  async function afterLogin(u,silent){
     try{
       const email=String(u.email||'').toLowerCase();
       const snap=await fb().collection('users').doc(email).get();
-      if(!snap.exists){showToast('Your account is not approved yet. Please complete the application.');window.marsApplyOpen&&window.marsApplyOpen();return;}
+      if(!snap.exists){if(!silent){showToast('Your account is not approved yet. Please complete the application.');window.marsApplyOpen&&window.marsApplyOpen();}return;}
       const d=snap.data();
       if(d.disabled){await out();showToast('This account is disabled. Contact Admin.','error');return;}
       const eng={id:d.engineerId||email,name:d.name||email,projects:d.projects||[],role:d.role||'site'};
       const match=projectDatabase.find(p=>eng.projects.includes(p.prjNo))||projectDatabase[0];
+      if(!silent&&window._legacyOff){location.reload();return;}
       window._emailSession=email;
       window.marsEnterProject(match,eng);
     }catch(e){console.error(e);showToast('Could not sign in: '+(e.code||e.message),'error');}
@@ -4863,7 +4887,21 @@ async function deleteEntryFromFirebase(firebaseId){
     b.onclick=()=>marsAuthOpen('in');
     const ap=document.getElementById('idRegBtn');ap?st.insertBefore(b,ap):st.appendChild(b);
   }
-  window.addEventListener('load',()=>{addBtn();setTimeout(addBtn,2000);
+  function applySwitch(){
+    fb().collection('config').doc('settings').get().then(st=>{
+      window._legacyOff=!!(st.exists&&st.data().legacyLoginOff);
+      if(window._legacyOff)['engId','engPin','engEnter'].forEach(id=>{const e=document.getElementById(id);if(e){e.style.display='none';if(e.previousElementSibling&&e.previousElementSibling.tagName==='LABEL')e.previousElementSibling.style.display='none';}});
+    }).catch(()=>{});
+  }
+  let resumed=false;
+  window.addEventListener('load',()=>{
+    setTimeout(()=>{if(fb())applySwitch();},1200);setTimeout(()=>{if(fb())applySwitch();},3500);
+    A().onAuthStateChanged(async u=>{
+      if(!u||u.isAnonymous||!u.email||!u.emailVerified||resumed||window.currentAccessRole)return;
+      try{const ad=await fb().collection('admins').doc(u.uid).get();if(ad.exists)return;}catch(e){}
+      resumed=true;await afterLogin(u,true);
+    });
+    addBtn();setTimeout(addBtn,2000);
     setInterval(()=>{const n=document.getElementById('acctNav');if(!n)return;const u=A().currentUser;n.style.display=(window.currentAccessRole==='engineer'&&window._emailSession&&u&&!u.isAnonymous)?'':'none';},1000);});
 
   /* ---- profile / password / logout ---- */
@@ -4905,30 +4943,152 @@ async function deleteEntryFromFirebase(firebaseId){
     try{
       const sn=await fb().collection('users').get();
       users=sn.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(a.name).localeCompare(String(b.name)));
-      box.innerHTML=`<div class="text-xs text-muted mb-3">People who sign in with email and password. Their Role and Projects are set here by email address.</div>
+      let off=false;try{const st=await fb().collection('config').doc('settings').get();off=!!(st.exists&&st.data().legacyLoginOff);}catch(e){}
+      window._legacyOff=off;
+      box.innerHTML=`<div class="rounded-xl border p-3 mb-3 text-sm"><b>Engineer ID &amp; PIN login: ${off?'OFF':'ON'}</b><div class="text-xs text-muted mt-1">${off?'Everyone must sign in with email and password.':'Old ID and PIN login still works. Turn it OFF only after every engineer has an email account.'}</div><button class="btn btn-secondary mt-2" onclick="marsLegacyToggle()">${off?'Turn ON again':'Turn OFF'}</button></div>
+        <div class="text-xs text-muted mb-3">People who sign in with email and password. Their Role and Projects are set here by email address.</div>
         <button class="btn btn-primary mb-3" onclick="marsUserEdit(null)">Add account by email</button>
-        <div class="space-y-2">${users.map((u,i)=>`<div class="rounded-xl border p-3 text-sm"><b>${esc(u.name||'')}</b>${u.disabled?' <b style="color:#b91c1c">· Disabled</b>':''}<div class="text-xs text-muted">${esc(u.email||u.id)}<br>${esc(RL[u.role]||u.role)} · ${esc((u.projects||[]).join(', ')||'All projects')}</div><div class="flex gap-2 mt-2"><button class="btn btn-secondary" onclick="marsUserEdit(${i})">Edit</button><button class="btn btn-secondary" onclick="marsUserToggle(${i})">${u.disabled?'Enable':'Disable'}</button></div></div>`).join('')||'<div class="text-xs text-muted">No accounts yet. Approve an application or add one by email.</div>'}</div>`;
+        <div class="space-y-2">${users.map((u,i)=>`<div class="rounded-xl border p-3 text-sm"><b>${esc(u.name||'')}</b>${u.disabled?' <b style="color:#b91c1c">· Disabled</b>':''}<div class="text-xs text-muted">${esc(u.email||u.id)}<br>${esc(RL[u.role]||u.role)} · ${esc((u.projects||[]).join(', ')||'All projects')}</div><div class="flex gap-2 mt-2"><button class="btn btn-secondary" onclick="marsUserEdit(${i})">Edit</button><button class="btn btn-secondary" onclick="marsUserToggle(${i})">${u.disabled?'Enable':'Disable'}</button><button class="btn btn-secondary" style="color:#b91c1c" onclick="marsUserDelete(${i})">Delete</button></div></div>`).join('')||'<div class="text-xs text-muted">No accounts yet. Approve an application or add one by email.</div>'}</div>`;
     }catch(e){box.innerHTML='<div class="text-xs" style="color:#b91c1c">Could not load accounts: '+esc(e.code||e.message)+'. Add the users rules block in Firestore.</div>';}
+  };
+  window.marsLegacyToggle=async()=>{
+    const off=!window._legacyOff;
+    if(!confirm(off?'Turn OFF the old Engineer ID and PIN login?\n\nEvery engineer must then sign in with email and password. Make sure each one already has an account in this list.':'Turn the old Engineer ID and PIN login back ON?'))return;
+    try{await fb().collection('config').doc('settings').set({legacyLoginOff:off},{merge:true});showToast(off?'ID and PIN login is now OFF.':'ID and PIN login is ON again.');marsRenderUsers();}
+    catch(e){showToast('Failed: '+(e.code||e.message),'error');}
   };
   window.marsUserToggle=async i=>{const u=users[i];if(!confirm((u.disabled?'Enable ':'Disable ')+u.email+'?'))return;
     try{await fb().collection('users').doc(u.id).update({disabled:!u.disabled});showToast(u.disabled?'Account enabled.':'Account disabled.');marsRenderUsers();}catch(e){showToast('Failed: '+(e.code||e.message),'error');}};
+  window.marsUserDelete=async i=>{
+    const u=users[i],em=String(u.email||u.id).toLowerCase();
+    if(!confirm('Delete '+em+'?\n\nThis person loses access. The personal data in their application (NID, photo, signature, address) will be erased. Past requisitions, transfers and other records stay.'))return;
+    try{
+      await fb().collection('users').doc(u.id).delete();
+      const sn=await fb().collection('engineer_applications').where('email','==',em).get();
+      await Promise.all(sn.docs.map(d=>{const a=d.data();return d.ref.set({email:a.email,name:a.name||'',status:'deleted',createdAt:a.createdAt||0,decidedAt:Date.now()});}));
+      showToast('Account deleted and personal data erased.');marsRenderUsers();
+    }catch(e){showToast('Failed: '+(e.code||e.message),'error');}
+  };
   window.marsUserEdit=function(i){
     const u=i===null?{role:'site',projects:[]}:users[i],prj=(typeof projectDatabase!=='undefined'?projectDatabase:[]).map(p=>p.prjNo);
     const m=shell('userModal',`<h3 class="text-lg font-extrabold text-navy mb-3">${i===null?'Add account':'Edit account'}</h3>
       <div class="space-y-3"><div><label class="field-label">Email</label><input id="ueEm" type="email" class="field" value="${esc(u.email||'')}" ${i===null?'':'disabled'}></div>
       <div><label class="field-label">Name</label><input id="ueNm" class="field" value="${esc(u.name||'')}"></div>
       <div><label class="field-label">Role</label><select id="ueRl" class="field">${Object.keys(RL).map(k=>`<option value="${k}"${u.role===k?' selected':''}>${RL[k]}</option>`).join('')}</select></div>
-      <div><label class="field-label">Projects</label><div style="max-height:180px;overflow:auto;border:1px solid #cbd5e1;border-radius:12px;padding:8px">${prj.map(p=>`<label style="display:block;font-size:13px;padding:3px 0"><input type="checkbox" class="ue-p" value="${esc(p)}"${(u.projects||[]).includes(p)?' checked':''}> ${esc(p)}</label>`).join('')}</div><div class="text-xs text-muted mt-1">Site Engineers need at least one project. DPM, ED and Procurement can be left empty.</div></div></div>
+      <div><label class="field-label">Projects</label><div style="max-height:180px;overflow:auto;border:1px solid #cbd5e1;border-radius:12px;padding:8px">${prj.map(p=>`<label style="display:block;font-size:13px;padding:3px 0"><input type="checkbox" class="ue-p" value="${esc(p)}"${(u.projects||[]).includes(p)?' checked':''}> ${esc(p)}</label>`).join('')}</div><div class="text-xs text-muted mt-1">Site Engineers and Store Keepers need at least one project. Other roles can be left empty.</div></div></div>
       <div class="flex gap-2 mt-4"><button class="btn btn-primary" id="ueSv">Save</button><button class="btn btn-secondary" id="ueCl">Close</button></div>`);
     const $=id=>m.querySelector('#'+id);$('ueCl').onclick=()=>m.remove();
     $('ueSv').onclick=async()=>{
       const em=$('ueEm').value.trim().toLowerCase(),nm=$('ueNm').value.trim(),rl=$('ueRl').value,pj=[...m.querySelectorAll('.ue-p:checked')].map(x=>x.value);
       if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)||!nm){showToast('Enter a valid email and name.','error');return;}
-      if(rl==='site'&&!pj.length){showToast('Select at least one project for a Site Engineer.','error');return;}
+      if((rl==='site'||rl==='store')&&!pj.length){showToast('Select at least one project for this role.','error');return;}
       try{await fb().collection('users').doc(em).set({email:em,name:nm,role:rl,projects:pj,disabled:!!u.disabled,updatedAt:Date.now(),...(i===null?{createdAt:Date.now()}:{})},{merge:true});m.remove();showToast('Account saved.');marsRenderUsers();}
       catch(e){showToast('Failed: '+(e.code||e.message),'error');}
     };
   };
+})();
+</script>
+<script>
+/* ================= SUPPLIERS & PRICE HISTORY ================= */
+(function(){
+  const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
+  const role=()=>isAdmin?'admin':((window.currentEngineerRole==='store')?'site':(window.currentEngineerRole||'site'));
+  const canEdit=()=>role()==='proc'||role()==='admin';
+  const money=n=>Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2});
+  const d8=t=>new Date(t).toLocaleDateString('en-GB');
+  const key=n=>String(n||'').trim().toLowerCase();
+  let sups=[],tab='list',sq='',mq='',started=false,retryAt=0;
+  window.marsSuppliers=()=>sups;
+  window.marsFindSupplier=n=>sups.find(x=>key(x.name)===key(n));
+  const POs=()=>window.marsPOs?marsPOs():[];
+  function lines(){const out=[];POs().forEach(o=>(o.items||[]).forEach(i=>out.push({at:o.createdAt,supplier:o.supplier.name,material:i.material,unit:i.unit,rate:i.rate,qty:i.qty,po:o.no,prj:o.prjNo})));return out.sort((a,b)=>b.at-a.at);}
+  window.marsRateHint=function(mat){
+    const L=lines().filter(x=>key(x.material)===key(mat));
+    if(!L.length)return 'No earlier purchase of this material';
+    const lo=L.reduce((a,b)=>b.rate<a.rate?b:a);
+    return 'Last Tk '+money(L[0].rate)+' ('+esc(L[0].supplier)+', '+d8(L[0].at)+') · Lowest Tk '+money(lo.rate)+' ('+esc(lo.supplier)+')';
+  };
+  window.marsEnsureSupplier=async function(s){
+    try{if(!s.name||window.marsFindSupplier(s.name))return;await fb().collection('suppliers').add({name:s.name.trim(),phone:s.phone||'',address:s.address||'',notes:'',createdAt:Date.now(),createdBy:window.currentEngineerName||'Admin'});}catch(e){console.error('supplier',e);}
+  };
+  function spark(L){
+    const a=L.slice().reverse();if(a.length<2)return '';
+    const W=300,H=70,P=8,mn=Math.min(...a.map(x=>x.rate)),mx=Math.max(...a.map(x=>x.rate)),rg=(mx-mn)||1;
+    const pts=a.map((x,i)=>[P+i*(W-2*P)/(a.length-1),H-P-(x.rate-mn)/rg*(H-2*P)]);
+    return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:70px"><polyline fill="none" stroke="#2563eb" stroke-width="2" points="${pts.map(q=>q.join(',')).join(' ')}"/>${pts.map(q=>`<circle cx="${q[0]}" cy="${q[1]}" r="3" fill="#2563eb"/>`).join('')}</svg>`;
+  }
+  function stats(name){const o=POs().filter(x=>key(x.supplier.name)===key(name));return{n:o.length,total:o.reduce((a,x)=>a+(x.total||0),0),last:o.length?Math.max(...o.map(x=>x.createdAt)):0};}
+  function listHtml(){
+    const q=key(sq),L=lines();
+    return sups.filter(x=>!q||key(x.name+' '+x.phone+' '+x.address).includes(q)).map((x,i)=>{
+      const st=stats(x.name),mine=L.filter(l=>key(l.supplier)===key(x.name)),seen={},top=[];
+      mine.forEach(l=>{if(!seen[key(l.material)]){seen[key(l.material)]=1;top.push(l);}});
+      return `<div class="rounded-xl border p-3 text-sm"><b>${esc(x.name)}</b><div class="text-xs text-muted">${esc(x.phone||'-')}${x.address?' · '+esc(x.address):''}${x.notes?'<br>'+esc(x.notes):''}</div><div class="text-xs mt-1"><b>${st.n}</b> PO · Tk <b>${money(st.total)}</b>${st.last?' · last '+d8(st.last):''}</div>${top.length?'<div class="text-xs text-muted mt-1">'+top.slice(0,5).map(l=>esc(l.material)+' Tk '+money(l.rate)).join(' · ')+'</div>':''}${canEdit()?`<button class="btn btn-secondary mt-2" onclick="supEdit('${x.id}')">Edit</button>`:''}</div>`;
+    }).join('')||'<div class="text-xs text-muted">No suppliers yet.'+(canEdit()?' Add one, or create a Purchase Order and the supplier is added automatically.':'')+'</div>';
+  }
+  function priceHtml(){
+    const all=lines(),q=key(mq);
+    if(!q){
+      const seen={},top=[];all.forEach(l=>{if(!seen[key(l.material)]){seen[key(l.material)]=1;top.push(l);}});
+      return '<div class="text-xs text-muted mb-2">Recently purchased materials. Tap one to see its price history.</div>'+(top.slice(0,20).map(l=>`<div class="rounded-xl border p-2 text-sm" style="cursor:pointer;margin-bottom:6px" onclick="matSet(this.dataset.m)" data-m="${esc(l.material)}"><b>${esc(l.material)}</b> <span class="text-xs text-muted">Tk ${money(l.rate)} / ${esc(l.unit)} · ${esc(l.supplier)} · ${d8(l.at)}</span></div>`).join('')||'<div class="text-xs text-muted">No purchase orders yet.</div>');
+    }
+    const L=all.filter(l=>key(l.material).includes(q));
+    if(!L.length)return '<div class="text-xs text-muted">No purchase found for this material.</div>';
+    const lo=L.reduce((a,b)=>b.rate<a.rate?b:a),hi=L.reduce((a,b)=>b.rate>a.rate?b:a),avg=L.reduce((a,b)=>a+b.rate,0)/L.length;
+    const tile=(t,v,sub)=>`<div style="border:1px solid #e2e8f0;border-radius:12px;padding:10px"><div class="text-xs text-muted">${t}</div><div style="font-weight:800;font-size:16px">Tk ${money(v)}</div><div class="text-xs text-muted">${sub}</div></div>`;
+    const bySup={};L.forEach(l=>{if(!bySup[key(l.supplier)])bySup[key(l.supplier)]=l;});
+    const cmp=Object.values(bySup).sort((a,b)=>a.rate-b.rate);
+    return `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">${tile('Last rate',L[0].rate,esc(L[0].supplier)+' · '+d8(L[0].at))}${tile('Lowest',lo.rate,esc(lo.supplier))}${tile('Highest',hi.rate,esc(hi.supplier))}${tile('Average',avg,L.length+' purchase(s)')}</div>
+      <div class="mt-3">${spark(L)}</div>
+      <div class="text-xs font-extrabold text-navy mt-3 mb-1">Supplier comparison (latest rate)</div>${cmp.map((l,i)=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid #e2e8f0;font-size:13px"><span>${esc(l.supplier)}${i===0&&cmp.length>1?' '+(window.marsPill?marsPill('approved','Cheapest'):''):''}</span><b>Tk ${money(l.rate)} / ${esc(l.unit)}</b></div>`).join('')}
+      <div class="text-xs font-extrabold text-navy mt-3 mb-1">All purchases</div>${L.slice(0,60).map(l=>`<div style="padding:6px 0;border-top:1px solid #e2e8f0;font-size:13px"><b>Tk ${money(l.rate)}</b> / ${esc(l.unit)} · ${esc(l.supplier)}<div class="text-xs text-muted">${d8(l.at)} · ${l.qty} ${esc(l.unit)} · ${esc(l.po)} · ${esc(l.prj)}</div></div>`).join('')}`;
+  }
+  window.supBody=function(){
+    const b=document.getElementById('supBody');if(!b)return;
+    b.innerHTML=tab==='list'?listHtml():priceHtml();
+    const dl=document.getElementById('matList');if(dl){const m={};lines().forEach(l=>m[l.material]=1);dl.innerHTML=Object.keys(m).map(x=>`<option value="${esc(x)}">`).join('');}
+  };
+  function shell(){
+    const box=document.getElementById('supBox');if(!box)return;
+    box.innerHTML=`<div class="flex gap-2 mb-3"><button class="btn ${tab==='list'?'btn-primary':'btn-secondary'}" onclick="supTab('list')">Suppliers</button><button class="btn ${tab==='price'?'btn-primary':'btn-secondary'}" onclick="supTab('price')">Price history</button></div>`+
+      (tab==='list'?`<div class="flex gap-2 mb-3"><input class="field" placeholder="Search supplier" value="${esc(sq)}" oninput="supQ(this.value)">${canEdit()?'<button class="btn btn-primary" onclick="supEdit(null)">Add supplier</button>':''}</div>`
+        :`<div class="mb-3"><input class="field" list="matList" placeholder="Search material, e.g. Cement" value="${esc(mq)}" oninput="matQ(this.value)"><datalist id="matList"></datalist></div>`)+'<div id="supBody"></div>';
+    box.dataset.ready='1';window.supBody();
+  }
+  window.supTab=t=>{tab=t;shell();};
+  window.supQ=v=>{sq=v;window.supBody();};
+  window.matQ=v=>{mq=v;window.supBody();};
+  window.matSet=v=>{mq=v;shell();};
+  window.supEdit=function(id){
+    const x=id?sups.find(s=>s.id===id):{name:'',phone:'',address:'',notes:''};if(!x||!canEdit())return;
+    const m=document.createElement('div');m.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:12px';
+    m.innerHTML=`<div class="card p-5" style="background:#fff;max-width:440px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-3">${id?'Edit supplier':'Add supplier'}</h3><div class="space-y-3">
+      <div><label class="field-label">Supplier name</label><input id="spN" class="field" value="${esc(x.name)}" ${id?'disabled':''}>${id?'<div class="text-xs text-muted mt-1">The name cannot change, so earlier purchase orders stay linked.</div>':''}</div>
+      <div><label class="field-label">Phone</label><input id="spP" class="field" value="${esc(x.phone)}"></div>
+      <div><label class="field-label">Address</label><input id="spA" class="field" value="${esc(x.address)}"></div>
+      <div><label class="field-label">Notes</label><input id="spT" class="field" value="${esc(x.notes)}" placeholder="e.g. delivers in 2 days, credit 30 days"></div></div>
+      <div class="flex gap-2 mt-4"><button class="btn btn-primary" id="spS">Save</button><button class="btn btn-secondary" id="spC">Close</button></div></div>`;
+    document.body.appendChild(m);const q=i=>m.querySelector('#'+i);q('spC').onclick=()=>m.remove();
+    q('spS').onclick=async()=>{
+      const name=q('spN').value.trim();if(!name){showToast('Enter the supplier name.','error');return;}
+      if(!id&&window.marsFindSupplier(name)){showToast('This supplier already exists.','error');return;}
+      const d={phone:q('spP').value.trim(),address:q('spA').value.trim(),notes:q('spT').value.trim()};
+      try{if(id)await fb().collection('suppliers').doc(id).update(d);else await fb().collection('suppliers').add({name,...d,createdAt:Date.now(),createdBy:window.currentEngineerName||'Admin'});m.remove();showToast('Supplier saved.');}
+      catch(e){showToast('Failed: '+(e.code||e.message),'error');}
+    };
+  };
+  function start(){
+    if(started||Date.now()<retryAt||!fb()||role()==='site')return;started=true;
+    fb().collection('suppliers').orderBy('name').onSnapshot(sn=>{sups=sn.docs.map(d=>({id:d.id,...d.data()}));window.supBody();},e=>{started=false;retryAt=Date.now()+30000;console.error('suppliers',e);});
+  }
+  window.addEventListener('load',()=>setInterval(()=>{
+    document.querySelectorAll('[data-page="suppliers"]').forEach(e=>{e.style.display=role()==='site'?'none':'';});
+    start();
+    const sec=document.getElementById('supSection'),box=document.getElementById('supBox');
+    if(sec&&box&&sec.offsetParent!==null&&box.dataset.ready!=='1')shell();
+    if(sec&&sec.offsetParent===null&&box)box.dataset.ready='';
+  },1000));
 })();
 </script>
 </body>
