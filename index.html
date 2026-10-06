@@ -3197,6 +3197,7 @@ function renderAdminSettingsModal(activeTab){
       </div>
       <div class="flex gap-2 mb-4 flex-wrap">
         <button class="btn ${tab==='apps'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('apps')">ID Applications <b id="idBadge2" class="${(window.marsPendingApps&&marsPendingApps())?'':'hidden'}" style="background:#dc2626;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;margin-left:4px">${window.marsPendingApps?marsPendingApps():0}</b></button>
+        <button class="btn ${tab==='company'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('company')">Company</button>
         <button class="btn ${tab==='users'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('users')">Accounts</button>
         <button class="btn ${tab==='log'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('log')">Activity Log</button>
         <button class="btn ${tab==='backup'?'btn-primary':'btn-secondary'}" onclick="renderAdminSettingsModal('backup')">Backup</button>
@@ -3211,6 +3212,7 @@ function renderAdminSettingsModal(activeTab){
         <div class="text-xs text-muted mb-3">Review each application. Choose the Role and Project, then Approve to create the Engineer ID. Reject erases all personal data.</div>
         <div id="adminAppsBox" class="space-y-3"></div>
       ` : ''}
+      ${tab==='company' ? `<div id="adminCompanyBox"></div>` : ''}
       ${tab==='users' ? `<div id="adminUsersBox"></div>` : ''}
       ${tab==='log' ? `<div id="adminLogBox"></div>` : ''}
       ${tab==='backup' ? `<div id="adminBackupBox"></div>` : ''}
@@ -3331,7 +3333,7 @@ function renderAdminSettingsModal(activeTab){
       ` : ''}
     </div>
   </div>`;
-  document.getElementById('modalRoot').innerHTML = html; if(tab==='apps'&&window.marsRenderApps)marsRenderApps(); if(tab==='log'&&window.marsRenderLog)marsRenderLog(); if(tab==='backup'&&window.marsRenderBackup)marsRenderBackup(); if(tab==='users'&&window.marsRenderUsers)marsRenderUsers();
+  document.getElementById('modalRoot').innerHTML = html; if(tab==='apps'&&window.marsRenderApps)marsRenderApps(); if(tab==='log'&&window.marsRenderLog)marsRenderLog(); if(tab==='backup'&&window.marsRenderBackup)marsRenderBackup(); if(tab==='users'&&window.marsRenderUsers)marsRenderUsers(); if(tab==='company'&&window.marsRenderCompany)marsRenderCompany();
   if (tab === 'materials') { renderMaterialsList(); renderUnitsList(); }
   if (tab === 'access') {
     const box = document.getElementById('currentAdminUidBox');
@@ -4281,7 +4283,7 @@ async function deleteEntryFromFirebase(firebaseId){
     const rjn=lastH(r,'Rejected'),sub=lastH(r,'Submitted'),fw=lastH(r,'Checked and forwarded'),ap=lastH(r,'Approved'),po=lastH(r,'Created');
     const sg=(t,sub2,h)=>`<div class="sg"><div class="nm">${h?esc(h.by)+'<br>'+d8(h.at):'&nbsp;<br>&nbsp;'}</div><div class="ln"></div><b>${t}</b><div class="sm">${sub2}</div></div>`;
     window.marsPrintDoc(`<html><head><title>${esc(r.no)}</title><style>@page{size:A4 landscape;margin:12mm}body{font-family:Arial,sans-serif;font-size:12px;color:#111}h1{margin:0;text-align:center;font-size:20px}.t{text-align:center;font-weight:bold;text-decoration:underline;margin:6px 0 10px;font-size:15px}.top{display:flex;justify-content:space-between}table{width:100%;border-collapse:collapse;margin-top:8px}td,th{border:1px solid #222;padding:5px 4px;height:20px}th{text-align:center}.c{text-align:center}.sgs{display:flex;justify-content:space-between;margin-top:34px}.sg{width:23%;text-align:center}.ln{border-top:1px solid #222;margin-top:2px}.nm{font-size:11px;height:30px}.sm{font-size:11px}</style></head><body>
-      <h1>MARS STRUCTURE LIMITED</h1><div class="t">MATERIALS PURCHASE REQUISITION (MPR)</div>
+      <h1>${esc((window.marsCompany&&marsCompany().name)||'MARS STRUCTURE LIMITED')}</h1>${window.marsCompany&&marsCompany().address?'<div style="text-align:center;font-size:11px">'+esc(marsCompany().address)+'</div>':''}<div class="t">MATERIALS PURCHASE REQUISITION (MPR)</div>
       <div class="top"><div><b>Project Name:</b> ${esc(r.prjNo)}<br><b>ID:</b> ${esc(pj.id||'-')}</div><div style="text-align:right"><b>Date:</b> ${d8(r.createdAt)}<br><b>MPR No:</b> ${esc(r.no)}</div></div>
       <table><tr><th>Sl. No</th><th>Material Name</th><th>Unit</th><th>Required Quantity</th><th>Present Balance</th><th>Required Date</th><th>Location to be Used</th><th>Cumulative Received</th><th>Remarks</th></tr>${rows}${blank}</table>
       ${rjn&&rjn.note?'<div style="margin-top:8px"><b>Rejected by Executive Director:</b> '+esc(rjn.note)+'</div>':''}<div class="sgs">${sg('Prepared By','Site Engineer / Project Engineer',sub)}${sg('Checked By','Deputy Project Manager / Project Manager',fw)}${sg('Approved By','Executive Director',ap)}${sg('Purchase Ordered By','Procurement',po)}</div></body></html>`);
@@ -4458,86 +4460,210 @@ async function deleteEntryFromFirebase(firebaseId){
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
   const role=()=>isAdmin?'admin':((window.currentEngineerRole==='store')?'site':(window.currentEngineerRole||'site'));
   const money=n=>Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const r2=x=>Math.round(x*100)/100;
+  const d8=t=>new Date(t).toLocaleDateString('en-GB');
+  const dLong=v=>{const m=String(v||'').match(/^(\d{4})-(\d\d)-(\d\d)$/);if(!m)return esc(v||'');const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return m[3]+'-'+mn[+m[2]-1]+'-'+m[1];};
   let pos=[],reqSnap={};
+  const DEFAULT_TERMS=['Quality: As per Purchase order.','Payment mode: Payment will be made in favor of "{supplier}" as per agreed terms.','Transportation: Delivery through supplier transports.','Other Cost: Carrying, loading & unloading cost are included with rate.','VAT & TDS: VAT & TDS as per Govt. rules & AIT included with the rate.','Bill: At actual.','Quality/specification: Quality/specification as per mentioned here.','Penalty: Management may impose penalty if material is not delivered within specified time or bad quality.','Special Condition: Management has the right to cancel the purchase order at any time without giving any reasons.'].join('\n');
+  const co=()=>(window.marsCompany?marsCompany():{})||{};
+  function words(n){
+    n=Math.round(n);if(n===0)return 'Zero';
+    const a=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'],b=['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+    const two=x=>x<20?a[x]:b[Math.floor(x/10)]+(x%10?' '+a[x%10]:'');
+    const three=x=>x>=100?a[Math.floor(x/100)]+' Hundred'+(x%100?' '+two(x%100):''):two(x);
+    let o='';const cr=Math.floor(n/10000000);n%=10000000;const lac=Math.floor(n/100000);n%=100000;const th=Math.floor(n/1000);n%=1000;
+    if(cr)o+=words(cr)+' Crore ';if(lac)o+=two(lac)+' Lac ';if(th)o+=two(th)+' Thousand ';if(n)o+=three(n);
+    return o.trim();
+  }
+  const takaWords=v=>{const t=r2(v),i=Math.floor(t),p=Math.round((t-i)*100);return 'Taka '+words(i)+(p?' and '+words(p)+' Paisa':'')+' Only';};
+  let logoCache;
+  function logo(){
+    if(logoCache!==undefined)return logoCache;logoCache='';
+    try{for(const sh of document.styleSheets){let rules;try{rules=sh.cssRules;}catch(e){continue;}for(const r of rules){if(r.selectorText&&r.selectorText.includes('.mars-logo-img')){const m=String(r.style.backgroundImage).match(/url\(["']?(data:[^"')]+)["']?\)/);if(m){logoCache=m[1];return logoCache;}}}}}catch(e){}
+    return logoCache;
+  }
   function printDoc(html){
     const f=document.createElement('iframe');f.style.cssText='position:fixed;width:0;height:0;border:0';document.body.appendChild(f);
     f.contentDocument.open();f.contentDocument.write(html);f.contentDocument.close();
     setTimeout(()=>{f.contentWindow.focus();f.contentWindow.print();setTimeout(()=>f.remove(),60000);},300);
   }
   window.marsPrintDoc=printDoc;window.marsPOs=()=>role()==='site'?[]:pos;
+  const DOC='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg>';
   window.poCardHtml=function(r){
     reqSnap[r.id]=r;
     if(role()==='site')return '';
     let h='';
-    pos.filter(o=>o.requisitionId===r.id).forEach(o=>{h+=`<div class="flex justify-between items-center gap-2 py-1 border-t text-sm"><span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg> <b>${esc(o.no)}</b> · ${esc(o.supplier.name)}<br><span class="text-xs text-muted">Tk ${money(o.total)}</span></span><span class="flex gap-2"><button class="btn btn-secondary" onclick="poPrint('${o.id}')">Print</button>${role()==='proc'?`<button class="btn btn-secondary" onclick="poEdit('${o.id}')">Edit</button>`:''}</span></div>`;});
+    pos.filter(o=>o.requisitionId===r.id).forEach(o=>{h+=`<div class="flex justify-between items-center gap-2 py-1 border-t text-sm"><span>${DOC} <b>${esc(o.no)}</b> · ${esc(o.supplier.name)}<br><span class="text-xs text-muted">Tk ${money(o.total)}</span></span><span class="flex gap-2"><button class="btn btn-secondary" onclick="poPrint('${o.id}')">Print</button>${role()==='proc'?`<button class="btn btn-secondary" onclick="poEdit('${o.id}')">Edit</button>`:''}</span></div>`;});
     if(role()==='proc'&&r.stage==='procurement'&&(r.items||[]).some(i=>i.state==='pending'&&!i.poNo))h+=`<button class="btn btn-primary mt-2" onclick="poOpen('${r.id}')">Create Purchase Order</button>`;
     return h;
   };
+
+  /* ---------- shared form ---------- */
+  function lastProject(prj){const o=pos.filter(x=>x.prjNo===prj&&x.project).sort((a,b)=>b.createdAt-a.createdAt)[0];return o?o.project:{address:'',contact:'',phone:''};}
+  function rowHtml(key,mat,unit,qty,spec,rate,disc,check,hint){
+    return `<div class="rounded-xl border p-2 space-y-2 text-sm"><label>${check?`<input type="checkbox" class="po-c" data-i="${key}" checked> `:''}<b>${esc(mat)}</b> <span class="text-xs text-muted">${qty} ${esc(unit)}</span></label><div class="grid grid-cols-6 gap-2"><input class="field col-span-3 po-s" data-i="${key}" placeholder="Specification (e.g. 10mm)" value="${esc(spec)}"><input class="field col-span-2 po-r" data-i="${key}" data-q="${qty}" type="number" step="0.01" placeholder="Rate" value="${rate}"><input class="field po-d" data-i="${key}" type="number" step="0.01" placeholder="Disc %" value="${disc}"></div>${hint?`<div class="text-xs text-muted">${hint}</div>`:''}</div>`;
+  }
+  function formHtml(title,sub,v,rows,okLabel){
+    const f=(id,l,val,extra)=>`<div><label class="field-label">${l}</label><input id="${id}" class="field" value="${esc(val)}" ${extra||''}></div>`;
+    return `<div class="card p-5" style="background:#fff;max-width:520px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">${title}</h3><div class="text-xs text-muted mb-3">${sub}</div><div class="space-y-3">
+      <div class="text-xs font-extrabold text-navy">Supplier</div>
+      <div><label class="field-label">Supplier name</label><input id="poSup" class="field" value="${esc(v.supplier.name)}" list="supNameList" autocomplete="off" placeholder="Pick from list or type a new supplier"><datalist id="supNameList">${(window.marsSuppliers?marsSuppliers():[]).map(x=>`<option value="${esc(x.name)}">`).join('')}</datalist></div>
+      ${f('poCp','Contact person',v.supplier.contact)}${f('poPh','Phone',v.supplier.phone,'type="tel"')}${f('poAd','Address',v.supplier.address)}
+      <div class="text-xs font-extrabold text-navy">Project (shown on the PO)</div>
+      ${f('pjAd','Project address',v.project.address)}${f('pjCp','Project contact person',v.project.contact)}${f('pjPh','Project contact phone',v.project.phone,'type="tel"')}
+      <div class="text-xs font-extrabold text-navy">Order</div>
+      ${f('poDt','Delivery date',v.deliveryDate,'type="date"')}${f('poMrf','MRF No (optional)',v.mrfNo)}${f('poSubj','Subject',v.subject)}${f('poTm','Payment terms (short)',v.terms)}
+      <div><label class="field-label">Remarks</label><input id="poRem" class="field" value="${esc(v.remarks)}" placeholder="e.g. For 2nd slab casting purpose use."></div>
+      <div class="text-xs font-extrabold text-navy">Items</div>${rows}
+      <div class="text-sm" style="line-height:1.7">Sub total: Tk <b id="poSub">0.00</b><br>Discount: Tk <b id="poDisc">0.00</b><br>Total: Tk <b id="poTot">0.00</b></div>
+      <div><label class="field-label">Advanced / PDC amount</label><input id="poAdv" class="field" type="number" step="0.01" value="${v.advance??''}" placeholder="Defaults to the total"></div>
+      <div><label class="field-label">Supply terms &amp; conditions (one per line)</label><textarea id="poCond" class="field" rows="7">${esc(v.conditions)}</textarea></div>
+      </div><div class="flex gap-2 mt-4"><button class="btn btn-primary" id="poSave">${okLabel}</button><button class="btn btn-secondary" id="poClose">Close</button></div></div>`;
+  }
+  function calc(m,edit){
+    let sub=0,tot=0;
+    m.querySelectorAll('.po-r').forEach(x=>{
+      const k=x.dataset.i,c=m.querySelector('.po-c[data-i="'+k+'"]');if(c&&!c.checked)return;
+      const q=parseFloat(x.dataset.q),rt=parseFloat(x.value)||0,dc=Math.min(100,Math.max(0,parseFloat(m.querySelector('.po-d[data-i="'+k+'"]').value)||0));
+      sub+=q*rt;tot+=q*r2(rt*(1-dc/100));
+    });
+    m.querySelector('#poSub').textContent=money(sub);m.querySelector('#poDisc').textContent=money(sub-tot);m.querySelector('#poTot').textContent=money(tot);
+    const a=m.querySelector('#poAdv');if(!a.dataset.dirty)a.value=r2(tot)||'';
+  }
+  function wire(m,edit){
+    m.addEventListener('input',e=>{if(e.target.id==='poAdv')e.target.dataset.dirty='1';calc(m,edit);});
+    m.addEventListener('change',()=>calc(m,edit));
+    m.querySelector('#poClose').onclick=()=>m.remove();
+    m.querySelector('#poSup').addEventListener('change',()=>{const f=window.marsFindSupplier&&marsFindSupplier(m.querySelector('#poSup').value);if(f){if(!m.querySelector('#poPh').value)m.querySelector('#poPh').value=f.phone||'';if(!m.querySelector('#poAd').value)m.querySelector('#poAd').value=f.address||'';}});
+    calc(m,edit);
+  }
+  function overlay(inner,id){const o=document.getElementById(id);if(o)o.remove();const m=document.createElement('div');m.id=id;m.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:12px';m.innerHTML=inner;document.body.appendChild(m);return m;}
+  function readForm(m){
+    const g=id=>m.querySelector(id).value.trim();
+    const lines=[];
+    m.querySelectorAll('.po-r').forEach(x=>{
+      const k=x.dataset.i,c=m.querySelector('.po-c[data-i="'+k+'"]');if(c&&!c.checked)return;
+      lines.push({key:k,spec:m.querySelector('.po-s[data-i="'+k+'"]').value.trim(),rate:parseFloat(x.value)||0,disc:Math.min(100,Math.max(0,parseFloat(m.querySelector('.po-d[data-i="'+k+'"]').value)||0))});
+    });
+    return{supplier:{name:g('#poSup'),contact:g('#poCp'),phone:g('#poPh'),address:g('#poAd')},project:{address:g('#pjAd'),contact:g('#pjCp'),phone:g('#pjPh')},deliveryDate:g('#poDt'),mrfNo:g('#poMrf'),subject:g('#poSubj'),terms:g('#poTm'),remarks:g('#poRem'),conditions:m.querySelector('#poCond').value.trim(),advance:m.querySelector('#poAdv').value===''?null:parseFloat(m.querySelector('#poAdv').value)||0,lines};
+  }
+  const priced=(i,L)=>{const ra=r2(L.rate*(1-L.disc/100));return{material:i.material,unit:i.unit,qty:i.qty,spec:L.spec,rate:L.rate,disc:L.disc,rateAfter:ra,amount:r2(i.qty*ra)};};
+
+  /* ---------- create ---------- */
   window.poOpen=function(rid){
     const r=reqSnap[rid];if(!r)return;
     const its=r.items.filter(i=>i.state==='pending'&&!i.poNo);
-    const m=document.createElement('div');m.id='poModal';
-    m.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:12px';
-    m.innerHTML=`<div class="card p-5" style="background:#fff;max-width:480px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Purchase Order</h3><div class="text-xs text-muted mb-3">${esc(r.no)} · ${esc(r.prjNo)}</div>
-      <div class="space-y-3">
-        <div><label class="field-label">Supplier Name</label><input id="poSup" class="field" list="supNameList" autocomplete="off" placeholder="Pick from list or type a new supplier"><datalist id="supNameList">${(window.marsSuppliers?marsSuppliers():[]).map(x=>`<option value="${esc(x.name)}">`).join('')}</datalist></div>
-        <div><label class="field-label">Supplier Phone</label><input id="poPh" type="tel" class="field"></div>
-        <div><label class="field-label">Supplier Address</label><input id="poAd" class="field"></div>
-        <div><label class="field-label">Delivery Date</label><input id="poDt" type="date" class="field"></div>
-        <div><label class="field-label">Payment / Other Terms</label><input id="poTm" class="field" placeholder="Optional"></div>
-        <div class="text-xs font-extrabold text-navy">Items (untick to leave out)</div>
-        ${its.map(i=>`<div class="grid grid-cols-6 gap-2 items-center text-sm"><label class="col-span-3"><input type="checkbox" class="po-c" data-i="${i.id}" checked> ${esc(i.material)}<br><span class="text-xs text-muted">${i.qty} ${esc(i.unit)}</span></label><input class="field col-span-3 po-r" data-i="${i.id}" data-q="${i.qty}" type="number" step="0.01" placeholder="Rate / unit"><div class="col-span-6 text-xs text-muted">${window.marsRateHint?marsRateHint(i.material):''}</div></div>`).join('')}
-        <div class="font-bold text-sm">Total: Tk <span id="poTot">0.00</span></div>
-      </div>
-      <div class="flex gap-2 mt-4"><button class="btn btn-primary" id="poSend">Create Purchase Order</button><button class="btn btn-secondary" id="poClose">Close</button></div></div>`;
-    document.body.appendChild(m);
-    const calc=()=>{let t=0;m.querySelectorAll('.po-r').forEach(x=>{const c=m.querySelector('.po-c[data-i="'+x.dataset.i+'"]');if(c.checked)t+=(parseFloat(x.value)||0)*parseFloat(x.dataset.q);});m.querySelector('#poTot').textContent=money(t);};
-    m.addEventListener('input',calc);m.addEventListener('change',calc);
-    m.querySelector('#poClose').onclick=()=>m.remove();
-    m.querySelector('#poSend').onclick=()=>poSubmit(rid,m);
-    m.querySelector('#poSup').addEventListener('change',()=>{const f=window.marsFindSupplier&&marsFindSupplier(m.querySelector('#poSup').value);if(f){if(!m.querySelector('#poPh').value)m.querySelector('#poPh').value=f.phone||'';if(!m.querySelector('#poAd').value)m.querySelector('#poAd').value=f.address||'';}});
+    const mats=[...new Set(its.map(i=>i.material))];
+    const v={supplier:{name:'',contact:'',phone:'',address:''},project:lastProject(r.prjNo),deliveryDate:'',mrfNo:'',subject:'Purchase Order for Supply '+mats.slice(0,3).join(', ')+'.',terms:'',remarks:'',conditions:co().terms||DEFAULT_TERMS,advance:''};
+    const rows=its.map(i=>rowHtml(i.id,i.material,i.unit,i.qty,'','','',true,window.marsRateHint?marsRateHint(i.material):'')).join('');
+    const m=overlay(formHtml('Purchase Order',esc(r.no)+' · '+esc(r.prjNo),v,rows,'Create Purchase Order'),'poModal');
+    wire(m,false);m.querySelector('#poSave').onclick=()=>submit(rid,m);
   };
-  async function poSubmit(rid,m){
-    const g=id=>m.querySelector(id).value.trim();
-    const rates={};m.querySelectorAll('.po-r').forEach(x=>{const c=m.querySelector('.po-c[data-i="'+x.dataset.i+'"]');if(c.checked)rates[x.dataset.i]=parseFloat(x.value)||0;});
-    const ids=Object.keys(rates);
-    if(!g('#poSup')||!g('#poDt')||!ids.length||ids.some(k=>rates[k]<=0)){showToast('Enter supplier, delivery date and a rate for every ticked item.','error');return;}
+  async function submit(rid,m){
+    const f=readForm(m),ids=f.lines.map(l=>l.key);
+    if(!f.supplier.name||!f.deliveryDate||!ids.length||f.lines.some(l=>l.rate<=0)){showToast('Enter supplier, delivery date and a rate for every ticked item.','error');return;}
     const by=window.currentEngineerName||'Admin',db=fb(),rref=db.collection('requisitions').doc(rid);
     try{
       let pno='';
       await db.runTransaction(async tx=>{
         const rs=await tx.get(rref),r=rs.data();
         if(role()!=='proc'||r.stage!=='procurement')throw new Error('Not allowed at this stage.');
-        const dg=(r.prjNo.match(/\d+/)||[''])[0],code='P'+(dg?dg.padStart(2,'0'):r.prjNo.replace(/[^A-Za-z0-9]/g,'').toUpperCase()),yy=String(new Date().getFullYear()).slice(-2);
-        const cref=db.collection('counters').doc('po_'+code+'_'+yy),c=await tx.get(cref);
+        const nw=new Date(),yy=String(nw.getFullYear()).slice(-2),mm=String(nw.getMonth()+1).padStart(2,'0');
+        const cref=db.collection('counters').doc('po_year_'+yy),c=await tx.get(cref);
         const n=(c.exists?c.data().n:0)+1;
         const sel=r.items.filter(i=>ids.includes(i.id)&&i.state==='pending'&&!i.poNo);
         if(!sel.length)throw new Error('Items already have a PO.');
-        pno='PO-'+code+'-'+yy+'-'+String(n).padStart(4,'0');
-        const items=sel.map(i=>({material:i.material,unit:i.unit,qty:i.qty,rate:rates[i.id],amount:Math.round(i.qty*rates[i.id]*100)/100}));
-        const total=Math.round(items.reduce((a,x)=>a+x.amount,0)*100)/100;
+        pno='POR'+yy+'-'+mm+'-'+String(n).padStart(5,'0');
+        const items=sel.map(i=>priced(i,f.lines.find(l=>l.key===i.id)));
+        const subTotal=r2(items.reduce((a,x)=>a+x.qty*x.rate,0)),total=r2(items.reduce((a,x)=>a+x.amount,0));
         tx.set(cref,{n});
-        tx.set(db.collection('purchase_orders').doc(),{no:pno,requisitionId:rid,reqNo:r.no,prjNo:r.prjNo,supplier:{name:g('#poSup'),phone:g('#poPh'),address:g('#poAd')},deliveryDate:g('#poDt'),terms:g('#poTm'),items,total,createdBy:by,createdAt:Date.now()});
+        tx.set(db.collection('purchase_orders').doc(),{no:pno,requisitionId:rid,reqNo:r.no,prjNo:r.prjNo,mrfNo:f.mrfNo,subject:f.subject,supplier:f.supplier,project:f.project,deliveryDate:f.deliveryDate,terms:f.terms,remarks:f.remarks,conditions:f.conditions,items,subTotal,discount:r2(subTotal-total),total,advance:f.advance===null?total:f.advance,createdBy:by,createdAt:Date.now()});
         tx.update(rref,{items:r.items.map(i=>sel.includes(i)?{...i,poNo:pno}:i),history:(r.history||[]).concat([{by,role:'proc',action:'Created '+pno,at:Date.now()}])});
       });
-      if(window.marsEnsureSupplier)marsEnsureSupplier({name:g('#poSup'),phone:g('#poPh'),address:g('#poAd')});m.remove();showToast('Purchase Order '+pno+' created.');
+      if(window.marsEnsureSupplier)marsEnsureSupplier({name:f.supplier.name,phone:f.supplier.phone,address:f.supplier.address});
+      m.remove();showToast('Purchase Order '+pno+' created.');
     }catch(e){console.error(e);showToast('Failed: '+(e.code||e.message),'error');}
   }
+
+  /* ---------- edit ---------- */
+  window.poEdit=function(id){
+    const o=pos.find(x=>x.id===id);if(!o||role()!=='proc')return;
+    const v={supplier:{name:o.supplier.name,contact:o.supplier.contact||'',phone:o.supplier.phone||'',address:o.supplier.address||''},project:o.project||{address:'',contact:'',phone:''},deliveryDate:o.deliveryDate||'',mrfNo:o.mrfNo||'',subject:o.subject||'',terms:o.terms||'',remarks:o.remarks||'',conditions:o.conditions||co().terms||DEFAULT_TERMS,advance:o.advance??o.total};
+    const rows=o.items.map((i,k)=>rowHtml(String(k),i.material,i.unit,i.qty,i.spec||'',i.rate,i.disc||'',false,'')).join('');
+    const m=overlay(formHtml('Edit '+esc(o.no),'Item and quantity cannot change. Every edit is recorded.',v,rows,'Save changes'),'poEditModal');
+    m.querySelector('#poAdv').dataset.dirty='1';wire(m,true);
+    m.querySelector('#poSave').onclick=async()=>{
+      const f=readForm(m);
+      if(!f.supplier.name||!f.deliveryDate||f.lines.some(l=>l.rate<=0)){showToast('Supplier, date and all rates are required.','error');return;}
+      const by=window.currentEngineerName||'Admin',db=fb(),ref=db.collection('purchase_orders').doc(id);
+      try{
+        await db.runTransaction(async tx=>{
+          const d=await tx.get(ref),c=d.data(),ch=[];
+          if(f.supplier.name!==c.supplier.name)ch.push('Supplier '+c.supplier.name+' → '+f.supplier.name);
+          if(f.supplier.phone!==(c.supplier.phone||'')||f.supplier.address!==(c.supplier.address||'')||f.supplier.contact!==(c.supplier.contact||''))ch.push('Supplier contact');
+          const pj=c.project||{address:'',contact:'',phone:''};
+          if(f.project.address!==pj.address||f.project.contact!==pj.contact||f.project.phone!==pj.phone)ch.push('Project details');
+          if(f.deliveryDate!==c.deliveryDate)ch.push('Delivery '+c.deliveryDate+' → '+f.deliveryDate);
+          if(f.mrfNo!==(c.mrfNo||'')||f.subject!==(c.subject||'')||f.remarks!==(c.remarks||'')||f.terms!==(c.terms||''))ch.push('Order details');
+          if(f.conditions!==(c.conditions||''))ch.push('Terms & conditions');
+          const items=c.items.map((i,k)=>{const L=f.lines.find(l=>l.key===String(k)),n=priced(i,L);
+            if(i.rate!==n.rate)ch.push(i.material+' rate '+i.rate+' → '+n.rate);
+            if((i.disc||0)!==n.disc)ch.push(i.material+' discount '+(i.disc||0)+'% → '+n.disc+'%');
+            if((i.spec||'')!==n.spec)ch.push(i.material+' specification');
+            return n;});
+          const subTotal=r2(items.reduce((a,x)=>a+x.qty*x.rate,0)),total=r2(items.reduce((a,x)=>a+x.amount,0)),adv=f.advance===null?total:f.advance;
+          if(adv!==(c.advance??c.total))ch.push('Advance/PDC amount');
+          if(!ch.length)throw new Error('No changes made.');
+          tx.update(ref,{supplier:f.supplier,project:f.project,deliveryDate:f.deliveryDate,mrfNo:f.mrfNo,subject:f.subject,terms:f.terms,remarks:f.remarks,conditions:f.conditions,items,subTotal,discount:r2(subTotal-total),total,advance:adv,edits:(c.edits||[]).concat([{by,at:Date.now(),note:ch.join('; ')}])});
+        });
+        m.remove();showToast('PO updated and edit recorded.');
+      }catch(e){showToast(e.message==='No changes made.'?e.message:'Failed: '+(e.code||e.message),'error');}
+    };
+  };
+
+  /* ---------- print (formal PO letter) ---------- */
   window.poPrint=function(id){
     const o=pos.find(x=>x.id===id);if(!o)return;
-    const rows=o.items.map((i,k)=>`<tr><td>${k+1}</td><td>${esc(i.material)}</td><td>${esc(i.unit)}</td><td class="r">${i.qty}</td><td class="r">${money(i.rate)}</td><td class="r">${money(i.amount)}</td></tr>`).join('');
-    const html=`<html><head><title>${esc(o.no)}</title><style>body{font-family:Arial,sans-serif;font-size:13px;margin:24px;color:#111}h1{margin:0;font-size:20px}h2{margin:2px 0 14px;font-size:15px}table{width:100%;border-collapse:collapse;margin-top:12px}td,th{border:1px solid #444;padding:6px}th{background:#eee}.r{text-align:right}.sg{display:flex;justify-content:space-between;margin-top:70px}.sg div{border-top:1px solid #444;width:30%;text-align:center;padding-top:4px}</style></head><body>
-      <h1>MARS STRUCTURE LIMITED</h1><h2>PURCHASE ORDER</h2>
-      <table><tr><td><b>PO No:</b> ${esc(o.no)}${(o.edits||[]).length?' (Revised '+o.edits.length+'×)':''}</td><td><b>Date:</b> ${new Date(o.createdAt).toLocaleDateString('en-GB')}</td></tr>
-      <tr><td><b>Project:</b> ${esc(o.prjNo)}</td><td><b>Requisition:</b> ${esc(o.reqNo)}</td></tr>
-      <tr><td colspan="2"><b>Supplier:</b> ${esc(o.supplier.name)}<br>${esc(o.supplier.address)} ${esc(o.supplier.phone)}</td></tr>
-      <tr><td><b>Delivery Date:</b> ${esc(o.deliveryDate)}</td><td><b>Terms:</b> ${esc(o.terms||'-')}</td></tr></table>
-      <table><tr><th>SL</th><th>Material</th><th>Unit</th><th>Qty</th><th>Rate (Tk)</th><th>Amount (Tk)</th></tr>${rows}<tr><td colspan="5" class="r"><b>Total</b></td><td class="r"><b>${money(o.total)}</b></td></tr></table>
-      <div class="sg"><div>Prepared by<br>${esc(o.createdBy)}</div><div>Procurement</div><div>Executive Director</div></div></body></html>`;
+    const c=co(),lg=logo(),pj=o.project||{},sp=o.supplier||{};
+    const req=(window.marsReqs?marsReqs():[]).find(x=>x.id===o.requisitionId)||{};
+    const lastH=p=>{const a=(req.history||[]).filter(h=>String(h.action).startsWith(p));return a[a.length-1];};
+    const fw=lastH('Checked and forwarded'),ap=lastH('Approved');
+    const sub=o.subTotal??o.items.reduce((a,x)=>a+x.qty*x.rate,0),disc=o.discount??(sub-o.total),adv=o.advance??o.total;
+    const rows=o.items.map((i,k)=>`<tr><td class="c">${k+1}</td><td>${esc(o.reqNo)}</td><td>${esc(i.material)}</td><td>${esc(i.spec||'')}</td><td class="c">${esc(i.unit)}</td><td class="r">${money(i.qty)}</td><td class="r">${money(i.rate)}</td><td class="c">${i.disc?esc(i.disc):''}</td><td class="r">${money(i.rateAfter??i.rate)}</td><td class="r">${money(i.amount)}</td></tr>`).join('');
+    const conds=String(o.conditions||co().terms||DEFAULT_TERMS).split('\n').map(x=>x.trim().replace(/^\d+[\.\)]\s*/,'')).filter(Boolean).map(x=>x.replace(/\{supplier\}/g,sp.name||''));
+    const meta=(a,b)=>`<tr><td class="k">${a}</td><td class="s">:</td><td>${b}</td></tr>`;
+    const html=`<html><head><title>${esc(o.no)}</title><style>
+      @page{size:A4;margin:12mm}body{font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#111;margin:0}
+      .hd{display:flex;align-items:center;gap:14px;border-bottom:1px solid #999;padding-bottom:8px}.hd img{height:54px}.hd .t{flex:1;text-align:center}.hd h1{margin:0;font-size:20px}.hd .a{font-size:10.5px;line-height:1.5}
+      .ttl{position:relative;text-align:center;margin:14px 0 10px;font-size:17px;font-weight:bold}.ttl .cp{position:absolute;right:0;top:-4px;border:1.5px solid #111;padding:4px 26px;font-size:13px;font-weight:bold}
+      .two{display:flex;gap:16px}.two>table{width:50%;border-collapse:collapse}.two td{padding:2px 3px;vertical-align:top}.k{font-weight:bold;white-space:nowrap;width:1%}.s{width:1%}
+      .subj{margin:12px 0 6px;font-size:13px;font-weight:bold}.subj u{font-weight:bold}
+      table.it{width:100%;border-collapse:collapse;margin-top:8px}table.it th,table.it td{border:1px solid #333;padding:5px 5px}table.it th{background:#f1f1f1;text-align:center}
+      .c{text-align:center}.r{text-align:right}
+      .tot{margin-left:auto;margin-top:4px;border-collapse:collapse}.tot td{padding:3px 6px;font-weight:bold;text-align:right}.tot td:first-child{padding-right:14px}
+      .conds{margin:4px 0 0 18px;padding:0;line-height:1.6}
+      .sg{display:flex;justify-content:space-between;margin-top:60px}.sg div{width:30%;text-align:center}.sg .ln{border-top:1px solid #333;margin-bottom:3px}.sg small{display:block;color:#444}
+    </style></head><body>
+      <div class="hd">${lg?`<img src="${lg}">`:''}<div class="t"><h1>${esc(c.name||'MARS STRUCTURE LIMITED')}</h1><div class="a">${esc(c.address||'')}${c.phone||c.email||c.web?'<br>':''}${c.phone?'Phone: '+esc(c.phone)+' ':''}${c.email?'E-mail: '+esc(c.email)+' ':''}${c.web?'Web: '+esc(c.web):''}</div></div></div>
+      <div class="ttl">Purchase Order<span class="cp">Main Copy</span></div>
+      <div class="two"><table>${meta('P.O. No',esc(o.no)+((o.edits||[]).length?' (Revised '+o.edits.length+')':''))}${meta('Supplier Name','<b>'+esc(sp.name)+'</b>')}${meta('Supplier Address',esc(sp.address||''))}${meta('Contact Person',esc(sp.contact||''))}${meta('Phone Number',esc(sp.phone||''))}${meta('MRF No','<b>'+esc(o.mrfNo||'')+'</b>')}</table>
+      <table>${meta('P.O Date',d8(o.createdAt).replace(/\//g,'-'))}${meta('Project Name','<b>'+esc(o.prjNo)+'</b>')}${meta('Project Address',esc(pj.address||''))}${meta('Contact Person',esc(pj.contact||''))}${meta('Phone Number',esc(pj.phone||''))}${meta('Delivery Date',dLong(o.deliveryDate))}</table></div>
+      <div class="subj"><span>Subject : </span><u>${esc(o.subject||'Purchase Order')}</u></div>
+      <div style="font-weight:bold;margin-bottom:4px">Dear Sir,</div>
+      <div style="line-height:1.5">Please refer to your offer and the subsequent discussion we had with you. Your offer is accepted at a cost of negotiated price as mentioned below with mentioned terms &amp; conditions in the Purchase order for our project. Requests you to arrange supply of following materials from your organization.</div>
+      <table class="it"><tr><th>S.L</th><th>MPR No(System)</th><th>Materials Name</th><th>Specification</th><th>Unit</th><th>Qty</th><th>Rate</th><th>Disc %</th><th>Rate After Dis</th><th>Amount</th></tr>${rows}</table>
+      <table class="tot"><tr><td>Sub Total</td><td>${money(sub)}</td></tr><tr><td>Discount</td><td>${disc?money(disc):''}</td></tr><tr><td>Total Amount</td><td>${money(o.total)}</td></tr><tr><td>Advanced/PDC Amount</td><td>${money(adv)}</td></tr></table>
+      <div style="margin-top:8px;font-weight:bold;font-style:italic">In Word: ( ${esc(takaWords(o.total))} )</div>
+      ${o.remarks?`<div style="margin-top:8px"><b><u>Remarks:-</u></b><div style="font-weight:bold">${esc(o.remarks)}</div></div>`:''}
+      <div style="margin-top:10px;font-weight:bold"><u>Supply Terms &amp; Conditions:-</u></div>
+      <ol class="conds">${conds.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>
+      ${o.terms?`<div style="margin-top:6px"><b>Payment terms:</b> ${esc(o.terms)}</div>`:''}
+      <div class="sg"><div><div class="ln"></div>Prepared By<small>${esc(o.createdBy||'')} · ${d8(o.createdAt)}</small></div><div><div class="ln"></div>Checked By<small>${fw?esc(fw.by)+' · '+d8(fw.at):'&nbsp;'}</small></div><div><div class="ln"></div>Approved By<small>${ap?esc(ap.by)+' · '+d8(ap.at):'&nbsp;'}</small></div></div>
+    </body></html>`;
     printDoc(html);
   };
 
-  /* ---- PO page, edit, report ---- */
+  /* ---------- PO page + report ---------- */
   const mineP=()=>window.currentEngineerAllowedProjects||[];
   const visible=()=>role()==='site'?[]:pos;
   const filtered=()=>{const pj=document.getElementById('poFPrj').value,q=document.getElementById('poFQ').value.trim().toLowerCase();return visible().filter(o=>(!pj||o.prjNo===pj)&&(!q||(o.no+' '+o.reqNo+' '+o.supplier.name).toLowerCase().includes(q)));};
@@ -4547,48 +4673,12 @@ async function deleteEntryFromFirebase(firebaseId){
     const L=filtered();
     document.getElementById('poSum').textContent=L.length+' PO · Tk '+money(L.reduce((a,o)=>a+o.total,0));
     document.getElementById('poPageList').innerHTML=L.map(o=>{const e=o.edits||[],le=e[e.length-1];
-      return `<div class="rounded-xl border p-3 text-sm"><b>${esc(o.no)}</b> · ${esc(o.prjNo)}<div class="text-xs text-muted">${esc(o.reqNo)} · ${esc(o.supplier.name)} · ${new Date(o.createdAt).toLocaleDateString('en-GB')}</div><div class="font-bold">Tk ${money(o.total)}</div>${le?`<div class="text-xs text-muted"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg> Edited ${e.length}× · last by ${esc(le.by)} · ${new Date(le.at).toLocaleString()}</div>`:''}<div class="flex gap-2 mt-2"><button class="btn btn-secondary" onclick="poPrint('${o.id}')">Print</button>${role()==='proc'?`<button class="btn btn-secondary" onclick="poEdit('${o.id}')">Edit</button>`:''}</div></div>`;}).join('')||'<div class="text-xs text-muted">No purchase orders.</div>';
+      return `<div class="rounded-xl border p-3 text-sm"><b>${esc(o.no)}</b> · ${esc(o.prjNo)}<div class="text-xs text-muted">${esc(o.reqNo)} · ${esc(o.supplier.name)} · ${d8(o.createdAt)}</div><div class="font-bold">Tk ${money(o.total)}</div>${le?`<div class="text-xs text-muted">Edited ${e.length}× · last by ${esc(le.by)} · ${new Date(le.at).toLocaleString()}</div>`:''}<div class="flex gap-2 mt-2"><button class="btn btn-secondary" onclick="poPrint('${o.id}')">Print</button>${role()==='proc'?`<button class="btn btn-secondary" onclick="poEdit('${o.id}')">Edit</button>`:''}</div></div>`;}).join('')||'<div class="text-xs text-muted">No purchase orders.</div>';
   };
   window.poReport=function(){
     const L=filtered();if(!L.length){showToast('No purchase orders to print.','error');return;}
-    const rows=L.map((o,k)=>`<tr><td>${k+1}</td><td>${esc(o.no)}</td><td>${new Date(o.createdAt).toLocaleDateString('en-GB')}</td><td>${esc(o.prjNo)}</td><td>${esc(o.reqNo)}</td><td>${esc(o.supplier.name)}</td><td style="text-align:right">${money(o.total)}</td></tr>`).join('');
-    printDoc(`<html><head><title>PO Report</title><style>body{font-family:Arial;font-size:12px;margin:20px}table{width:100%;border-collapse:collapse;margin-top:10px}td,th{border:1px solid #444;padding:5px}th{background:#eee}</style></head><body><h2 style="margin:0">MARS STRUCTURE LIMITED</h2><div>Purchase Order Report · ${new Date().toLocaleDateString('en-GB')}</div><table><tr><th>SL</th><th>PO No</th><th>Date</th><th>Project</th><th>Requisition</th><th>Supplier</th><th>Total (Tk)</th></tr>${rows}<tr><td colspan="6" style="text-align:right"><b>Grand Total</b></td><td style="text-align:right"><b>${money(L.reduce((a,o)=>a+o.total,0))}</b></td></tr></table></body></html>`);
-  };
-  window.poEdit=function(id){
-    const o=pos.find(x=>x.id===id);if(!o||role()!=='proc')return;
-    const m=document.createElement('div');
-    m.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:12px';
-    m.innerHTML=`<div class="card p-5" style="background:#fff;max-width:480px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Edit ${esc(o.no)}</h3><div class="text-xs text-muted mb-3">Item and quantity cannot change. Every edit is recorded.</div>
-      <div class="space-y-3">
-        <div><label class="field-label">Supplier Name</label><input id="peSup" class="field" value="${esc(o.supplier.name)}"></div>
-        <div><label class="field-label">Supplier Phone</label><input id="pePh" class="field" value="${esc(o.supplier.phone)}"></div>
-        <div><label class="field-label">Supplier Address</label><input id="peAd" class="field" value="${esc(o.supplier.address)}"></div>
-        <div><label class="field-label">Delivery Date</label><input id="peDt" type="date" class="field" value="${esc(o.deliveryDate)}"></div>
-        <div><label class="field-label">Terms</label><input id="peTm" class="field" value="${esc(o.terms)}"></div>
-        ${o.items.map((i,k)=>`<div class="grid grid-cols-6 gap-2 items-center text-sm"><span class="col-span-3">${esc(i.material)}<br><span class="text-xs text-muted">${i.qty} ${esc(i.unit)}</span></span><input class="field col-span-3 pe-r" data-k="${k}" type="number" step="0.01" value="${i.rate}"></div>`).join('')}
-      </div><div class="flex gap-2 mt-4"><button class="btn btn-primary" id="peSave">Save changes</button><button class="btn btn-secondary" id="peClose">Close</button></div></div>`;
-    document.body.appendChild(m);
-    const q=x=>m.querySelector(x);q('#peClose').onclick=()=>m.remove();
-    q('#peSave').onclick=async()=>{
-      const rates=[...m.querySelectorAll('.pe-r')].map(x=>parseFloat(x.value)||0);
-      if(!q('#peSup').value.trim()||!q('#peDt').value||rates.some(r=>r<=0)){showToast('Supplier, date and all rates are required.','error');return;}
-      const by=window.currentEngineerName||'Admin',db=fb(),ref=db.collection('purchase_orders').doc(id);
-      try{
-        await db.runTransaction(async tx=>{
-          const d=await tx.get(ref),c=d.data(),ch=[];
-          const sup={name:q('#peSup').value.trim(),phone:q('#pePh').value.trim(),address:q('#peAd').value.trim()};
-          if(sup.name!==c.supplier.name)ch.push('Supplier '+c.supplier.name+' → '+sup.name);
-          if(sup.phone!==c.supplier.phone||sup.address!==c.supplier.address)ch.push('Supplier contact');
-          if(q('#peDt').value!==c.deliveryDate)ch.push('Delivery '+c.deliveryDate+' → '+q('#peDt').value);
-          if(q('#peTm').value.trim()!==c.terms)ch.push('Terms');
-          const items=c.items.map((i,k)=>{if(i.rate!==rates[k])ch.push(i.material+' rate '+i.rate+' → '+rates[k]);return{...i,rate:rates[k],amount:Math.round(i.qty*rates[k]*100)/100};});
-          if(!ch.length)throw new Error('No changes made.');
-          const total=Math.round(items.reduce((a,x)=>a+x.amount,0)*100)/100;
-          tx.update(ref,{supplier:sup,deliveryDate:q('#peDt').value,terms:q('#peTm').value.trim(),items,total,edits:(c.edits||[]).concat([{by,at:Date.now(),note:ch.join('; ')}])});
-        });
-        m.remove();showToast('PO updated and edit recorded.');
-      }catch(e){showToast(e.message==='No changes made.'?e.message:'Failed: '+(e.code||e.message),'error');}
-    };
+    const rows=L.map((o,k)=>`<tr><td>${k+1}</td><td>${esc(o.no)}</td><td>${d8(o.createdAt)}</td><td>${esc(o.prjNo)}</td><td>${esc(o.reqNo)}</td><td>${esc(o.supplier.name)}</td><td style="text-align:right">${money(o.total)}</td></tr>`).join('');
+    printDoc(`<html><head><title>PO Report</title><style>body{font-family:Arial;font-size:12px;margin:20px}table{width:100%;border-collapse:collapse;margin-top:10px}td,th{border:1px solid #444;padding:5px}th{background:#eee}</style></head><body><h2 style="margin:0">${esc(co().name||'MARS STRUCTURE LIMITED')}</h2><div>Purchase Order Report · ${new Date().toLocaleDateString('en-GB')}</div><table><tr><th>SL</th><th>PO No</th><th>Date</th><th>Project</th><th>Requisition</th><th>Supplier</th><th>Total (Tk)</th></tr>${rows}<tr><td colspan="6" style="text-align:right"><b>Grand Total</b></td><td style="text-align:right"><b>${money(L.reduce((a,o)=>a+o.total,0))}</b></td></tr></table></body></html>`);
   };
   window.addEventListener('load',()=>{let k='';setInterval(()=>{const n=role()+'|'+mineP().join(',');if(n!==k){k=n;poRenderPage();}document.querySelectorAll('[data-page="purchaseorders"]').forEach(e=>{e.style.display=role()==='site'?'none':'';});},1000);});
   function start(){
@@ -5089,6 +5179,31 @@ async function deleteEntryFromFirebase(firebaseId){
     if(sec&&box&&sec.offsetParent!==null&&box.dataset.ready!=='1')shell();
     if(sec&&sec.offsetParent===null&&box)box.dataset.ready='';
   },1000));
+})();
+</script>
+<script>
+/* ================= COMPANY DETAILS (letterhead + default PO terms) ================= */
+(function(){
+  const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
+  let cfg={};window.marsCompany=()=>cfg;
+  function load(){if(!fb())return setTimeout(load,800);fb().collection('config').doc('company').get().then(d=>{cfg=d.exists?d.data():{};}).catch(()=>{});}
+  window.addEventListener('load',()=>{setTimeout(load,1500);setTimeout(load,6000);});
+  window.marsRenderCompany=async function(){
+    const box=document.getElementById('adminCompanyBox');if(!box)return;
+    try{const d=await fb().collection('config').doc('company').get();cfg=d.exists?d.data():{};}catch(e){}
+    const f=(id,l,v,ph)=>`<div><label class="field-label">${l}</label><input id="${id}" class="field" value="${esc(v)}" placeholder="${esc(ph||'')}"></div>`;
+    box.innerHTML=`<div class="text-xs text-muted mb-3">These details appear at the top of every Purchase Order and MPR printout. The default terms are copied into each new PO, where they can still be edited.</div>
+      <div class="space-y-3">${f('cmName','Company name',cfg.name||'MARS STRUCTURE LIMITED')}${f('cmAddr','Address',cfg.address,'Office address')}${f('cmPh','Phone',cfg.phone)}${f('cmEm','E-mail',cfg.email)}${f('cmWeb','Website',cfg.web)}
+      <div><label class="field-label">Default supply terms &amp; conditions (one per line; {supplier} becomes the supplier name)</label><textarea id="cmTerms" class="field" rows="9" placeholder="Leave empty to use the standard terms">${esc(cfg.terms||'')}</textarea></div></div>
+      <button class="btn btn-primary mt-3" id="cmSave">Save company details</button>`;
+    box.querySelector('#cmSave').onclick=async()=>{
+      const g=id=>box.querySelector('#'+id).value.trim();
+      const v={name:g('cmName'),address:g('cmAddr'),phone:g('cmPh'),email:g('cmEm'),web:g('cmWeb'),terms:box.querySelector('#cmTerms').value.trim()};
+      try{await fb().collection('config').doc('company').set(v,{merge:true});cfg={...cfg,...v};showToast('Company details saved.');}
+      catch(e){showToast('Failed: '+(e.code||e.message),'error');}
+    };
+  };
 })();
 </script>
 </body>
