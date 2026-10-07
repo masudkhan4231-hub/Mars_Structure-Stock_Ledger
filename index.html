@@ -4099,8 +4099,9 @@ async function deleteEntryFromFirebase(firebaseId){
   const hist=(r,a,note)=>(r.history||[]).concat([Object.assign({by:who(),role:role(),action:a,at:Date.now()},note?{note}:{})]);
   async function mut(id,fn){
     const db=fb(),ref=db.collection('requisitions').doc(id);
-    try{await db.runTransaction(async tx=>{const d=await tx.get(ref);const x=await fn(Object.assign({},d.data(),{id}),tx,db);if(!x)throw new Error('blocked');const lg=x.ledger;delete x.ledger;(lg||[]).forEach(en=>tx.set(db.collection(FIREBASE_COLLECTION).doc(en.id),en.data));tx.update(ref,x);});showToast('Done.');}
-    catch(e){showToast(e.message==='blocked'?'Action not allowed at this stage.':'Failed: '+(e.code||e.message||'check Rules/connection'),'error');console.error(e);}
+    const slow=setTimeout(()=>showToast('Network is slow - still saving. Please do not tap again.','error'),10000);
+    try{await db.runTransaction(async tx=>{const d=await tx.get(ref);const x=await fn(Object.assign({},d.data(),{id}),tx,db);if(!x)throw new Error('blocked');const lg=x.ledger;delete x.ledger;(lg||[]).forEach(en=>tx.set(db.collection(FIREBASE_COLLECTION).doc(en.id),en.data));tx.update(ref,x);});clearTimeout(slow);showToast('Done.');return true;}
+    catch(e){clearTimeout(slow);showToast(e.message==='blocked'?'Action not allowed at this stage (check your role / project access).':'Failed: '+(e.code||e.message||'check Rules/connection'),'error');console.error('[requisition action failed]',e);return false;}
   }
   window.rqAddRow=function(){
     const d=document.createElement('div');d.className='rq-row border rounded-xl p-2 space-y-2';
@@ -4162,19 +4163,41 @@ async function deleteEntryFromFirebase(firebaseId){
   };
   window.rqReceive=(id,iid)=>{
     const r0=reqs.find(x=>x.id===id),it=r0&&r0.items.find(i=>i.id===iid);if(!it)return;
-    const v=prompt('Quantity received for '+it.material+' (ordered '+it.qty+' '+it.unit+')',it.qty);if(v===null)return;
-    const q=parseFloat(v);if(!(q>0)||q>it.qty){showToast('Enter a quantity above 0 and up to '+it.qty+'.','error');return;}
-    mut(id,async(r,tx,db)=>{
+    const old=document.getElementById('rcvModal');if(old)old.remove();
+    const m=document.createElement('div');m.id='rcvModal';
+    m.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:12px';
+    m.innerHTML='<div class="card p-5" style="background:#fff;max-width:420px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Confirm received</h3><div class="text-xs text-muted mb-3">'+esc(it.material)+' &middot; ordered '+it.qty+' '+esc(it.unit)+'</div><div class="space-y-3"><div><label class="field-label">Quantity received</label><input id="rcQ" type="number" step="0.01" class="field" value="'+it.qty+'"></div><div><label class="field-label">Challan / delivery note no (optional)</label><input id="rcC" class="field"></div><div><label class="field-label">Note (optional)</label><input id="rcN" class="field" placeholder="e.g. 2 bags damaged"></div><div class="text-xs text-muted">If you receive less than ordered, the balance stays open as awaiting delivery.</div></div><div class="flex gap-2 mt-4"><button class="btn btn-primary" id="rcOk">Confirm</button><button class="btn btn-secondary" id="rcNo">Cancel</button></div></div>';
+    document.body.appendChild(m);
+    m.querySelector('#rcNo').onclick=()=>m.remove();
+    const ok=m.querySelector('#rcOk');
+    ok.onclick=async()=>{
+      const q=parseFloat(m.querySelector('#rcQ').value);
+      if(!(q>0)||q>it.qty){showToast('Enter a quantity above 0 and up to '+it.qty+'.','error');return;}
+      const ch=m.querySelector('#rcC').value.trim(),nt=m.querySelector('#rcN').value.trim();
+      ok.disabled=true;ok.textContent='Saving...';
+      const done=await rqReceiveDo(id,iid,q,ch,nt);
+      if(done)m.remove();else{ok.disabled=false;ok.textContent='Confirm';}
+    };
+  };
+  function rqReceiveDo(id,iid,q,ch,nt){
+    return mut(id,async(r,tx,db)=>{
       const it2=r.items.find(i=>i.id===iid);
       if(!(isAdmin||(role()==='site'&&myPrj().includes(r.prjNo)))||!it2||it2.state!=='purchased')return null;
       const lref=db.collection(FIREBASE_COLLECTION).doc('rq_'+r.id+'_'+iid),ld=await tx.get(lref),legacy=ld.exists;
-      const items=r.items.map(i=>i.id===iid?{...i,state:'received',receivedQty:legacy?i.qty:q,receivedBy:who(),receivedAt:Date.now()}:i);
-      const p=projectDatabase.find(x=>x.prjNo===r.prjNo)||{},now=Date.now(),day=new Date().toISOString().slice(0,10);
-      const ledger=legacy?[]:[{id:'rq_'+r.id+'_'+iid,data:{createdAt:now,updatedAt:now,dateStr:day,prjNo:r.prjNo,prjId:p.id||'',engineerName:p.eng||'',loggedByEngineerName:who(),material:it2.material,unit:it2.unit,procMrr:r.no,procQty:q,recPrj:'-',recGp:'-',recQty:0,trGp:'-',trPrj:'-',trQty:0,purpose:'-',issueQty:0,requisitionId:r.id}}];
+      const now=Date.now(),t=new Date(),day=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
+      const items=[];
+      r.items.forEach(i=>{
+        if(i.id!==iid){items.push(i);return;}
+        const rec={...i,state:'received',receivedQty:legacy?i.qty:q,receivedBy:who(),receivedAt:now,challanNo:ch||'',receiveNote:nt||''};
+        if(!legacy&&q<i.qty){rec.qty=q;rec.ofQty=i.ofQty||i.qty;items.push(rec);items.push({...i,id:i.id+'_'+now.toString(36),qty:Math.round((i.qty-q)*100)/100,ofQty:i.ofQty||i.qty,state:'purchased'});}
+        else items.push(rec);
+      });
+      const p=projectDatabase.find(x=>x.prjNo===r.prjNo)||{};
+      const ledger=legacy?[]:[{id:'rq_'+r.id+'_'+iid,data:{createdAt:now,updatedAt:now,dateStr:day,prjNo:r.prjNo,prjId:p.id||'',engineerName:p.eng||'',loggedByEngineerName:who(),material:it2.material,unit:it2.unit||'',procMrr:ch||r.no,procQty:q,recPrj:'-',recGp:'-',recQty:0,trGp:'-',trPrj:'-',trQty:0,purpose:'-',issueQty:0,requisitionId:r.id}}];
       const open=items.some(i=>i.state==='pending'),wait=items.some(i=>i.state==='purchased');
-      return{items,ledger,stage:open?'procurement':(wait?'delivery':'closed'),history:hist(r,'Received '+(legacy?it2.qty:q)+' '+it2.unit+' '+it2.material)};
+      return{items,ledger,stage:open?'procurement':(wait?'delivery':'closed'),history:hist(r,'Received '+(legacy?it2.qty:q)+' '+(it2.unit||'')+' '+it2.material+(ch?' (challan '+ch+')':''))};
     });
-  };
+  }
   window.rqSetRole=(i,v)=>{engineerDatabase[i].role=v;saveEngineerDatabase(engineerDatabase);showToast('Role updated.');window.rqPanelRefresh&&rqPanelRefresh();};
   const IS={pending:marsPill('pending','Pending'),cancelled:marsPill('rejected','Cancelled'),purchased:marsPill('progress','Purchased · awaiting delivery'),received:marsPill('approved','Received · added to stock')};
   function card(r){
@@ -4466,6 +4489,7 @@ async function deleteEntryFromFirebase(firebaseId){
   let pos=[],reqSnap={};
   const DEFAULT_TERMS=['Quality: As per Purchase order.','Payment mode: Payment will be made in favor of "{supplier}" as per agreed terms.','Transportation: Delivery through supplier transports.','Other Cost: Carrying, loading & unloading cost are included with rate.','VAT & TDS: VAT & TDS as per Govt. rules & AIT included with the rate.','Bill: At actual.','Quality/specification: Quality/specification as per mentioned here.','Penalty: Management may impose penalty if material is not delivered within specified time or bad quality.','Special Condition: Management has the right to cancel the purchase order at any time without giving any reasons.'].join('\n');
   const co=()=>(window.marsCompany?marsCompany():{})||{};
+  const MARS_ADDR='Plot-05, Road-409, Sector-11, Jalshiri Abashon, Narayanganj, Rupganj, Dhaka';
   function words(n){
     n=Math.round(n);if(n===0)return 'Zero';
     const a=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'],b=['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
@@ -4513,6 +4537,9 @@ async function deleteEntryFromFirebase(firebaseId){
       ${f('pjAd','Project address',v.project.address)}${f('pjCp','Project contact person',v.project.contact)}${f('pjPh','Project contact phone',v.project.phone,'type="tel"')}
       <div class="text-xs font-extrabold text-navy">Order</div>
       ${f('poDt','Delivery date',v.deliveryDate,'type="date"')}${f('poMrf','MRF No (optional)',v.mrfNo)}${f('poSubj','Subject',v.subject)}${f('poTm','Payment terms (short)',v.terms)}
+      <div><label class="field-label">Payment method</label><select id="poPm" class="field">${['','Cash','Cheque / PDC','Bank transfer (Banking)','Credit','Advance + balance on delivery'].map(x=>`<option value="${x}"${(v.payMode||'')===x?' selected':''}>${x||'As per agreed terms'}</option>`).join('')}</select></div>
+      <div><label class="field-label">Priority</label><select id="poPri" class="field">${['Normal','Urgent','Very Urgent'].map(x=>`<option${(v.priority||'Normal')===x?' selected':''}>${x}</option>`).join('')}</select></div>
+      ${f('poDa','Deliver to (if different from project address)',v.deliveryAddr||'')}
       <div><label class="field-label">Remarks</label><input id="poRem" class="field" value="${esc(v.remarks)}" placeholder="e.g. For 2nd slab casting purpose use."></div>
       <div class="text-xs font-extrabold text-navy">Items</div>${rows}
       <div class="text-sm" style="line-height:1.7">Sub total: Tk <b id="poSub">0.00</b><br>Discount: Tk <b id="poDisc">0.00</b><br>Total: Tk <b id="poTot">0.00</b></div>
@@ -4545,7 +4572,7 @@ async function deleteEntryFromFirebase(firebaseId){
       const k=x.dataset.i,c=m.querySelector('.po-c[data-i="'+k+'"]');if(c&&!c.checked)return;
       lines.push({key:k,spec:m.querySelector('.po-s[data-i="'+k+'"]').value.trim(),rate:parseFloat(x.value)||0,disc:Math.min(100,Math.max(0,parseFloat(m.querySelector('.po-d[data-i="'+k+'"]').value)||0))});
     });
-    return{supplier:{name:g('#poSup'),contact:g('#poCp'),phone:g('#poPh'),address:g('#poAd')},project:{address:g('#pjAd'),contact:g('#pjCp'),phone:g('#pjPh')},deliveryDate:g('#poDt'),mrfNo:g('#poMrf'),subject:g('#poSubj'),terms:g('#poTm'),remarks:g('#poRem'),conditions:m.querySelector('#poCond').value.trim(),advance:m.querySelector('#poAdv').value===''?null:parseFloat(m.querySelector('#poAdv').value)||0,lines};
+    return{supplier:{name:g('#poSup'),contact:g('#poCp'),phone:g('#poPh'),address:g('#poAd')},project:{address:g('#pjAd'),contact:g('#pjCp'),phone:g('#pjPh')},deliveryDate:g('#poDt'),mrfNo:g('#poMrf'),subject:g('#poSubj'),terms:g('#poTm'),payMode:g('#poPm'),priority:g('#poPri'),deliveryAddr:g('#poDa'),remarks:g('#poRem'),conditions:m.querySelector('#poCond').value.trim(),advance:m.querySelector('#poAdv').value===''?null:parseFloat(m.querySelector('#poAdv').value)||0,lines};
   }
   const priced=(i,L)=>{const ra=r2(L.rate*(1-L.disc/100));return{material:i.material,unit:i.unit,qty:i.qty,spec:L.spec,rate:L.rate,disc:L.disc,rateAfter:ra,amount:r2(i.qty*ra)};};
 
@@ -4554,7 +4581,7 @@ async function deleteEntryFromFirebase(firebaseId){
     const r=reqSnap[rid];if(!r)return;
     const its=r.items.filter(i=>i.state==='pending'&&!i.poNo);
     const mats=[...new Set(its.map(i=>i.material))];
-    const v={supplier:{name:'',contact:'',phone:'',address:''},project:lastProject(r.prjNo),deliveryDate:'',mrfNo:'',subject:'Purchase Order for Supply '+mats.slice(0,3).join(', ')+'.',terms:'',remarks:'',conditions:co().terms||DEFAULT_TERMS,advance:''};
+    const v={supplier:{name:'',contact:'',phone:'',address:''},project:lastProject(r.prjNo),deliveryDate:'',mrfNo:'',subject:'Purchase Order for Supply '+mats.slice(0,3).join(', ')+'.',terms:'',payMode:'',priority:'Normal',deliveryAddr:'',remarks:'',conditions:co().terms||DEFAULT_TERMS,advance:''};
     const rows=its.map(i=>rowHtml(i.id,i.material,i.unit,i.qty,'','','',true,window.marsRateHint?marsRateHint(i.material):'')).join('');
     const m=overlay(formHtml('Purchase Order',esc(r.no)+' · '+esc(r.prjNo),v,rows,'Create Purchase Order'),'poModal');
     wire(m,false);m.querySelector('#poSave').onclick=()=>submit(rid,m);
@@ -4577,7 +4604,7 @@ async function deleteEntryFromFirebase(firebaseId){
         const items=sel.map(i=>priced(i,f.lines.find(l=>l.key===i.id)));
         const subTotal=r2(items.reduce((a,x)=>a+x.qty*x.rate,0)),total=r2(items.reduce((a,x)=>a+x.amount,0));
         tx.set(cref,{n});
-        tx.set(db.collection('purchase_orders').doc(),{no:pno,requisitionId:rid,reqNo:r.no,prjNo:r.prjNo,mrfNo:f.mrfNo,subject:f.subject,supplier:f.supplier,project:f.project,deliveryDate:f.deliveryDate,terms:f.terms,remarks:f.remarks,conditions:f.conditions,items,subTotal,discount:r2(subTotal-total),total,advance:f.advance===null?total:f.advance,createdBy:by,createdAt:Date.now()});
+        tx.set(db.collection('purchase_orders').doc(),{no:pno,requisitionId:rid,reqNo:r.no,prjNo:r.prjNo,mrfNo:f.mrfNo,subject:f.subject,supplier:f.supplier,project:f.project,deliveryDate:f.deliveryDate,terms:f.terms,payMode:f.payMode,priority:f.priority,deliveryAddr:f.deliveryAddr,remarks:f.remarks,conditions:f.conditions,items,subTotal,discount:r2(subTotal-total),total,advance:f.advance===null?total:f.advance,createdBy,createdAt:Date.now()});
         tx.update(rref,{items:r.items.map(i=>sel.includes(i)?{...i,poNo:pno}:i),history:(r.history||[]).concat([{by,role:'proc',action:'Created '+pno,at:Date.now()}])});
       });
       if(window.marsEnsureSupplier)marsEnsureSupplier({name:f.supplier.name,phone:f.supplier.phone,address:f.supplier.address});
@@ -4588,7 +4615,7 @@ async function deleteEntryFromFirebase(firebaseId){
   /* ---------- edit ---------- */
   window.poEdit=function(id){
     const o=pos.find(x=>x.id===id);if(!o||role()!=='proc')return;
-    const v={supplier:{name:o.supplier.name,contact:o.supplier.contact||'',phone:o.supplier.phone||'',address:o.supplier.address||''},project:o.project||{address:'',contact:'',phone:''},deliveryDate:o.deliveryDate||'',mrfNo:o.mrfNo||'',subject:o.subject||'',terms:o.terms||'',remarks:o.remarks||'',conditions:o.conditions||co().terms||DEFAULT_TERMS,advance:o.advance??o.total};
+    const v={supplier:{name:o.supplier.name,contact:o.supplier.contact||'',phone:o.supplier.phone||'',address:o.supplier.address||''},project:o.project||{address:'',contact:'',phone:''},deliveryDate:o.deliveryDate||'',mrfNo:o.mrfNo||'',subject:o.subject||'',terms:o.terms||'',payMode:o.payMode||'',priority:o.priority||'Normal',deliveryAddr:o.deliveryAddr||'',remarks:o.remarks||'',conditions:o.conditions||co().terms||DEFAULT_TERMS,advance:o.advance??o.total};
     const rows=o.items.map((i,k)=>rowHtml(String(k),i.material,i.unit,i.qty,i.spec||'',i.rate,i.disc||'',false,'')).join('');
     const m=overlay(formHtml('Edit '+esc(o.no),'Item and quantity cannot change. Every edit is recorded.',v,rows,'Save changes'),'poEditModal');
     m.querySelector('#poAdv').dataset.dirty='1';wire(m,true);
@@ -4605,6 +4632,7 @@ async function deleteEntryFromFirebase(firebaseId){
           if(f.project.address!==pj.address||f.project.contact!==pj.contact||f.project.phone!==pj.phone)ch.push('Project details');
           if(f.deliveryDate!==c.deliveryDate)ch.push('Delivery '+c.deliveryDate+' → '+f.deliveryDate);
           if(f.mrfNo!==(c.mrfNo||'')||f.subject!==(c.subject||'')||f.remarks!==(c.remarks||'')||f.terms!==(c.terms||''))ch.push('Order details');
+          if(f.payMode!==(c.payMode||'')||f.priority!==(c.priority||'Normal')||f.deliveryAddr!==(c.deliveryAddr||''))ch.push('Payment method / priority / delivery address');
           if(f.conditions!==(c.conditions||''))ch.push('Terms & conditions');
           const items=c.items.map((i,k)=>{const L=f.lines.find(l=>l.key===String(k)),n=priced(i,L);
             if(i.rate!==n.rate)ch.push(i.material+' rate '+i.rate+' → '+n.rate);
@@ -4614,7 +4642,7 @@ async function deleteEntryFromFirebase(firebaseId){
           const subTotal=r2(items.reduce((a,x)=>a+x.qty*x.rate,0)),total=r2(items.reduce((a,x)=>a+x.amount,0)),adv=f.advance===null?total:f.advance;
           if(adv!==(c.advance??c.total))ch.push('Advance/PDC amount');
           if(!ch.length)throw new Error('No changes made.');
-          tx.update(ref,{supplier:f.supplier,project:f.project,deliveryDate:f.deliveryDate,mrfNo:f.mrfNo,subject:f.subject,terms:f.terms,remarks:f.remarks,conditions:f.conditions,items,subTotal,discount:r2(subTotal-total),total,advance:adv,edits:(c.edits||[]).concat([{by,at:Date.now(),note:ch.join('; ')}])});
+          tx.update(ref,{supplier:f.supplier,project:f.project,deliveryDate:f.deliveryDate,mrfNo:f.mrfNo,subject:f.subject,terms:f.terms,payMode:f.payMode,priority:f.priority,deliveryAddr:f.deliveryAddr,remarks:f.remarks,conditions:f.conditions,items,subTotal,discount:r2(subTotal-total),total,advance:adv,edits:(c.edits||[]).concat([{by,at:Date.now(),note:ch.join('; ')}])});
         });
         m.remove();showToast('PO updated and edit recorded.');
       }catch(e){showToast(e.message==='No changes made.'?e.message:'Failed: '+(e.code||e.message),'error');}
@@ -4632,33 +4660,55 @@ async function deleteEntryFromFirebase(firebaseId){
     const rows=o.items.map((i,k)=>`<tr><td class="c">${k+1}</td><td>${esc(o.reqNo)}</td><td>${esc(i.material)}</td><td>${esc(i.spec||'')}</td><td class="c">${esc(i.unit)}</td><td class="r">${money(i.qty)}</td><td class="r">${money(i.rate)}</td><td class="c">${i.disc?esc(i.disc):''}</td><td class="r">${money(i.rateAfter??i.rate)}</td><td class="r">${money(i.amount)}</td></tr>`).join('');
     const conds=String(o.conditions||co().terms||DEFAULT_TERMS).split('\n').map(x=>x.trim().replace(/^\d+[\.\)]\s*/,'')).filter(Boolean).map(x=>x.replace(/\{supplier\}/g,sp.name||''));
     const meta=(a,b)=>`<tr><td class="k">${a}</td><td class="s">:</td><td>${b}</td></tr>`;
-    const html=`<html><head><title>${esc(o.no)}</title><style>
-      @page{size:A4;margin:12mm}body{font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#111;margin:0}
-      .hd{display:flex;align-items:center;gap:14px;border-bottom:1px solid #999;padding-bottom:8px}.hd img{height:54px}.hd .t{flex:1;text-align:center}.hd h1{margin:0;font-size:20px}.hd .a{font-size:10.5px;line-height:1.5}
-      .ttl{position:relative;text-align:center;margin:14px 0 10px;font-size:17px;font-weight:bold}.ttl .cp{position:absolute;right:0;top:-4px;border:1.5px solid #111;padding:4px 26px;font-size:13px;font-weight:bold}
-      .two{display:flex;gap:16px}.two>table{width:50%;border-collapse:collapse}.two td{padding:2px 3px;vertical-align:top}.k{font-weight:bold;white-space:nowrap;width:1%}.s{width:1%}
-      .subj{margin:12px 0 6px;font-size:13px;font-weight:bold}.subj u{font-weight:bold}
-      table.it{width:100%;border-collapse:collapse;margin-top:8px}table.it th,table.it td{border:1px solid #333;padding:5px 5px}table.it th{background:#f1f1f1;text-align:center}
+    const html=`<html><head><meta charset="utf-8"><title>${esc(o.no)}</title><style>
+      @page{size:A4;margin:11mm 12mm 12mm}
+      *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      body{font-family:Tahoma,Verdana,"Segoe UI",Arial,sans-serif;font-size:11.5px;color:#111;margin:0;line-height:1.35}
+      .wm{position:fixed;left:0;top:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:0;opacity:.07}
+      .wm img{width:360px;max-width:70%}.wm .wn{margin-top:16px;font-size:40px;font-weight:900;letter-spacing:3px;color:#16294d;text-align:center;line-height:1.1}
+      .pg{position:relative;z-index:1}
+      .hd{display:flex;align-items:center;gap:16px;padding-bottom:8px;border-bottom:1.5px solid #16294d}.hd img{height:58px}.hd .t{flex:1;text-align:center}
+      .hd h1{margin:0 0 3px;font-size:21px;font-weight:bold;letter-spacing:.4px;color:#111}.hd .a{font-size:10px;line-height:1.55;color:#222}
+      .ttl{position:relative;text-align:center;margin:14px 0 12px;font-size:16px;font-weight:bold;letter-spacing:.3px}
+      .ttl .cp{position:absolute;right:0;top:-6px;border:1.5px solid #111;padding:5px 0;width:150px;font-size:12.5px;font-weight:bold;background:#fff}
+      .two{display:flex;gap:18px}.two>table{width:50%;border-collapse:collapse}.two td{padding:2.5px 3px;vertical-align:top}
+      .k{font-weight:bold;white-space:nowrap;width:1%;padding-right:10px!important}.s{width:1%;font-weight:bold}
+      .subj{margin:14px 0 6px;font-size:12.5px;font-weight:bold}.subj u{font-weight:bold}
+      .ltr{line-height:1.55;text-align:justify}
+      table.it{width:100%;border-collapse:collapse;margin-top:10px;font-size:11px}
+      table.it thead{display:table-header-group}table.it tr{page-break-inside:avoid}
+      table.it th,table.it td{border:1px solid #b8bec9;padding:6px 6px}
+      table.it th{background:rgba(232,237,245,.85);color:#16294d;font-weight:bold;text-align:center;font-size:11px}
+      table.it tbody tr:nth-child(even) td{background:rgba(245,247,250,.6)}
       .c{text-align:center}.r{text-align:right}
-      .tot{margin-left:auto;margin-top:4px;border-collapse:collapse}.tot td{padding:3px 6px;font-weight:bold;text-align:right}.tot td:first-child{padding-right:14px}
-      .conds{margin:4px 0 0 18px;padding:0;line-height:1.6}
-      .sg{display:flex;justify-content:space-between;margin-top:60px}.sg div{width:30%;text-align:center}.sg .ln{border-top:1px solid #333;margin-bottom:3px}.sg small{display:block;color:#444}
+      .tot{margin-left:auto;margin-top:6px;border-collapse:collapse;page-break-inside:avoid}.tot td{padding:3px 8px;font-weight:bold;text-align:right}.tot td:first-child{padding-right:22px}
+      .tot tr.g td{border-top:1.5px solid #16294d;border-bottom:1.5px solid #16294d;font-size:12.5px;color:#16294d}
+      .inw{margin-top:8px;border-top:1.5px solid #111;padding-top:6px;font-weight:bold;font-style:italic;page-break-inside:avoid}
+      .sec{margin-top:10px;font-weight:bold;font-size:12px;text-decoration:underline}
+      .conds{margin:4px 0 0 18px;padding:0;line-height:1.7;page-break-inside:avoid}
+      .sg{display:flex;justify-content:space-between;margin-top:56px;page-break-inside:avoid}.sg div{width:23%;text-align:center;font-weight:bold}.sg .ln{border-top:1px solid #333;margin-bottom:4px}.sg small{display:block;color:#444;font-weight:normal;font-size:10px}
+      .ft{margin-top:18px;border-top:1px solid #b8bec9;padding-top:5px;text-align:center;font-size:9px;color:#666}
     </style></head><body>
-      <div class="hd">${lg?`<img src="${lg}">`:''}<div class="t"><h1>${esc(c.name||'MARS STRUCTURE LIMITED')}</h1><div class="a">${esc(c.address||'')}${c.phone||c.email||c.web?'<br>':''}${c.phone?'Phone: '+esc(c.phone)+' ':''}${c.email?'E-mail: '+esc(c.email)+' ':''}${c.web?'Web: '+esc(c.web):''}</div></div></div>
+      <div class="wm">${lg?`<img src="${lg}">`:''}<div class="wn">${esc(c.name||'MARS STRUCTURE LIMITED')}</div></div>
+      <div class="pg">
+      <div class="hd">${lg?`<img src="${lg}">`:''}<div class="t"><h1>${esc(c.name||'MARS STRUCTURE LIMITED')}</h1><div class="a">${esc(c.address||MARS_ADDR)}${c.phone||c.email||c.web?'<br>':''}${c.phone?'Phone: '+esc(c.phone)+' &nbsp; ':''}${c.email?'E-mail: '+esc(c.email)+' &nbsp; ':''}${c.web?'Web: '+esc(c.web):''}</div></div></div>
       <div class="ttl">Purchase Order<span class="cp">Main Copy</span></div>
-      <div class="two"><table>${meta('P.O. No',esc(o.no)+((o.edits||[]).length?' (Revised '+o.edits.length+')':''))}${meta('Supplier Name','<b>'+esc(sp.name)+'</b>')}${meta('Supplier Address',esc(sp.address||''))}${meta('Contact Person',esc(sp.contact||''))}${meta('Phone Number',esc(sp.phone||''))}${meta('MRF No','<b>'+esc(o.mrfNo||'')+'</b>')}</table>
-      <table>${meta('P.O Date',d8(o.createdAt).replace(/\//g,'-'))}${meta('Project Name','<b>'+esc(o.prjNo)+'</b>')}${meta('Project Address',esc(pj.address||''))}${meta('Contact Person',esc(pj.contact||''))}${meta('Phone Number',esc(pj.phone||''))}${meta('Delivery Date',dLong(o.deliveryDate))}</table></div>
+      <div class="two"><table>${meta('P.O. No',esc(o.no)+((o.edits||[]).length?' (Revised '+o.edits.length+')':''))}${meta('Supplier Name','<b>'+esc(sp.name)+'</b>')}${meta('Supplier Address',esc(sp.address||''))}${meta('Contact Person',esc(sp.contact||''))}${meta('Phone Number',esc(sp.phone||''))}${meta('MRF No','<b>'+esc(o.mrfNo||'')+'</b>')}${meta('Priority',esc(o.priority||'Normal'))}</table>
+      <table>${meta('P.O Date',d8(o.createdAt).replace(/\//g,'-'))}${meta('Project Name','<b>'+esc(o.prjNo)+'</b>')}${meta('Project Address',esc(pj.address||''))}${meta('Contact Person',esc(pj.contact||''))}${meta('Phone Number',esc(pj.phone||''))}${meta('Delivery Date',dLong(o.deliveryDate))}${meta('Payment Method',esc(o.payMode||'As per agreed terms'))}</table></div>
+      ${o.deliveryAddr?`<div style="margin-top:4px"><b>Deliver To</b> &nbsp;: ${esc(o.deliveryAddr)}</div>`:''}
       <div class="subj"><span>Subject : </span><u>${esc(o.subject||'Purchase Order')}</u></div>
       <div style="font-weight:bold;margin-bottom:4px">Dear Sir,</div>
-      <div style="line-height:1.5">Please refer to your offer and the subsequent discussion we had with you. Your offer is accepted at a cost of negotiated price as mentioned below with mentioned terms &amp; conditions in the Purchase order for our project. Requests you to arrange supply of following materials from your organization.</div>
-      <table class="it"><tr><th>S.L</th><th>MPR No(System)</th><th>Materials Name</th><th>Specification</th><th>Unit</th><th>Qty</th><th>Rate</th><th>Disc %</th><th>Rate After Dis</th><th>Amount</th></tr>${rows}</table>
-      <table class="tot"><tr><td>Sub Total</td><td>${money(sub)}</td></tr><tr><td>Discount</td><td>${disc?money(disc):''}</td></tr><tr><td>Total Amount</td><td>${money(o.total)}</td></tr><tr><td>Advanced/PDC Amount</td><td>${money(adv)}</td></tr></table>
-      <div style="margin-top:8px;font-weight:bold;font-style:italic">In Word: ( ${esc(takaWords(o.total))} )</div>
+      <div class="ltr">Please refer to your offer and the subsequent discussion we had with you. Your offer is accepted at a cost of negotiated price as mentioned below with mentioned terms &amp; conditions in the Purchase order for our project. Requests you to arrange supply of following materials from your organization.</div>
+      <table class="it"><thead><tr><th>S.L</th><th>MPR No(System)</th><th>Materials Name</th><th>Specification</th><th>Unit</th><th>Qty</th><th>Rate</th><th>Disc %</th><th>Rate After Dis</th><th>Amount</th></tr></thead><tbody>${rows}</tbody></table>
+      <table class="tot"><tr><td>Sub Total</td><td>${money(sub)}</td></tr><tr><td>Discount</td><td>${disc?money(disc):''}</td></tr><tr class="g"><td>Total Amount</td><td>${money(o.total)}</td></tr><tr><td>Advanced/PDC Amount</td><td>${money(adv)}</td></tr></table>
+      <div class="inw">In Word: ( ${esc(takaWords(o.total))} )</div>
       ${o.remarks?`<div style="margin-top:8px"><b><u>Remarks:-</u></b><div style="font-weight:bold">${esc(o.remarks)}</div></div>`:''}
-      <div style="margin-top:10px;font-weight:bold"><u>Supply Terms &amp; Conditions:-</u></div>
+      <div class="sec">Supply Terms &amp; Conditions:-</div>
       <ol class="conds">${conds.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>
       ${o.terms?`<div style="margin-top:6px"><b>Payment terms:</b> ${esc(o.terms)}</div>`:''}
-      <div class="sg"><div><div class="ln"></div>Prepared By<small>${esc(o.createdBy||'')} · ${d8(o.createdAt)}</small></div><div><div class="ln"></div>Checked By<small>${fw?esc(fw.by)+' · '+d8(fw.at):'&nbsp;'}</small></div><div><div class="ln"></div>Approved By<small>${ap?esc(ap.by)+' · '+d8(ap.at):'&nbsp;'}</small></div></div>
+      <div class="sg"><div><div class="ln"></div>Prepared By<small>${esc(o.createdBy||'')} · ${d8(o.createdAt)}</small></div><div><div class="ln"></div>Checked By<small>${fw?esc(fw.by)+' · '+d8(fw.at):'&nbsp;'}</small></div><div><div class="ln"></div>Approved By<small>${ap?esc(ap.by)+' · '+d8(ap.at):'&nbsp;'}</small></div><div><div class="ln"></div>Supplier Acceptance<small>Sign &amp; seal</small></div></div>
+      <div class="ft">${esc(c.name||'MARS STRUCTURE LIMITED')} &middot; ${esc(c.address||MARS_ADDR)}${c.phone?' &middot; '+esc(c.phone):''}<br>This is a system generated Purchase Order.</div>
+      </div>
     </body></html>`;
     printDoc(html);
   };
@@ -5194,7 +5244,7 @@ async function deleteEntryFromFirebase(firebaseId){
     try{const d=await fb().collection('config').doc('company').get();cfg=d.exists?d.data():{};}catch(e){}
     const f=(id,l,v,ph)=>`<div><label class="field-label">${l}</label><input id="${id}" class="field" value="${esc(v)}" placeholder="${esc(ph||'')}"></div>`;
     box.innerHTML=`<div class="text-xs text-muted mb-3">These details appear at the top of every Purchase Order and MPR printout. The default terms are copied into each new PO, where they can still be edited.</div>
-      <div class="space-y-3">${f('cmName','Company name',cfg.name||'MARS STRUCTURE LIMITED')}${f('cmAddr','Address',cfg.address,'Office address')}${f('cmPh','Phone',cfg.phone)}${f('cmEm','E-mail',cfg.email)}${f('cmWeb','Website',cfg.web)}
+      <div class="space-y-3">${f('cmName','Company name',cfg.name||'MARS STRUCTURE LIMITED')}${f('cmAddr','Address',cfg.address||'Plot-05, Road-409, Sector-11, Jalshiri Abashon, Narayanganj, Rupganj, Dhaka','Office address')}${f('cmPh','Phone',cfg.phone)}${f('cmEm','E-mail',cfg.email)}${f('cmWeb','Website',cfg.web)}
       <div><label class="field-label">Default supply terms &amp; conditions (one per line; {supplier} becomes the supplier name)</label><textarea id="cmTerms" class="field" rows="9" placeholder="Leave empty to use the standard terms">${esc(cfg.terms||'')}</textarea></div></div>
       <button class="btn btn-primary mt-3" id="cmSave">Save company details</button>`;
     box.querySelector('#cmSave').onclick=async()=>{
