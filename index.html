@@ -123,6 +123,7 @@
     @keyframes logoReveal{to{opacity:1;transform:translateY(0) scale(1)}}
 
     /* ---- Full finance-style dashboard (rail / trend / mini / dynamics / team / table) ---- */
+    .nav-group{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:#94a3b8;padding:14px 12px 4px}
     .fd-rail-wrap{position:relative;overflow:hidden;border-radius:20px}
     .fd-rail{position:relative;z-index:1;display:flex;gap:14px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
     .fd-rail::-webkit-scrollbar{display:none}
@@ -783,22 +784,25 @@ window.marsPill=function(kind,text){
       </button>
       <div class="text-[10px] uppercase tracking-[.16em] text-muted px-3 mb-3">Workspace</div>
       <nav class="space-y-1">
+        <div class="nav-group">Overview</div>
         <a href="javascript:void(0)" class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg> Dashboard</a>
+        <div class="nav-group">Stock</div>
         <a href="javascript:void(0)" class="nav-item" data-page="entry" onclick="showPage('entry')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> New Ledger Entry</a>
-        <a href="javascript:void(0)" class="nav-item" data-page="print" onclick="showPage('print')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6M9 9h1"/></svg> Stock Ledger &amp; Reports</a>
+        <a href="javascript:void(0)" class="nav-item" data-page="transfers" onclick="showPage('transfers')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h13l-3-3M17 17H4l3 3"/></svg> Transfers <span id="trBadge" class="hidden" style="background:#dc2626;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;margin-left:6px">0</span></a>
+        <a href="javascript:void(0)" class="nav-item admin-only" data-page="verify" onclick="showPage('verify')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg> Physical Check</a>
+        <div class="nav-group">Procurement</div>
+        <a href="javascript:void(0)" class="nav-item" data-page="requisition" onclick="showPage('requisition')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/></svg> Requisition <span id="rqBadge" class="hidden" style="background:#dc2626;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;margin-left:6px">0</span></a>
+        <a href="javascript:void(0)" class="nav-item" data-page="track" onclick="showPage('track')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg> Track Requisition</a>
+        <a href="javascript:void(0)" class="nav-item" data-page="suppliers" onclick="showPage('suppliers')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l1-5h16l1 5M3 9v11h18V9M3 9h18M9 20v-6h6v6"/></svg> Suppliers</a>
+        <a href="javascript:void(0)" class="nav-item" data-page="purchaseorders" onclick="showPage('purchaseorders')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg> Purchase Orders</a>
+        <div class="nav-group" id="ngReports">Reports</div>
+        <a href="javascript:void(0)" class="nav-item" data-page="print" onclick="showPage('print')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6M9 9h1"/></svg> Reports</a>
+        <div class="nav-group">Admin &amp; Account</div>
+        <a href="javascript:void(0)" class="nav-item admin-only" onclick="openAdminSettings('apps')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M13 10h5M13 14h5"/></svg> Admin Panel <span id="idBadge" class="hidden" style="background:#dc2626;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;margin-left:6px">0</span></a>
+        <a href="javascript:void(0)" class="nav-item" id="pushNav" onclick="pushEnable(true)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg> Enable phone alerts</a>
         <div id="acctNav" style="display:none"><a href="javascript:void(0)" class="nav-item" onclick="marsProfile()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profile</a>
         <a href="javascript:void(0)" class="nav-item" onclick="marsChangePw()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg> Change Password</a>
         <a href="javascript:void(0)" class="nav-item" onclick="marsLogout()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg> Logout</a></div>
-        <a href="javascript:void(0)" class="nav-item" data-page="dashboard" onclick="showPage('dashboard')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Dashboard</a>
-        <a href="javascript:void(0)" class="nav-item" data-page="transfers" onclick="showPage('transfers')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h13l-3-3M17 17H4l3 3"/></svg> Transfers <span id="trBadge" class="hidden" style="background:#dc2626;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;margin-left:6px">0</span></a>
-        <a href="javascript:void(0)" class="nav-item" data-page="suppliers" onclick="showPage('suppliers')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l1-5h16l1 5M3 9v11h18V9M3 9h18M9 20v-6h6v6"/></svg> Suppliers</a>
-        <a href="javascript:void(0)" class="nav-item" data-page="purchaseorders" onclick="showPage('purchaseorders')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg> Purchase Orders</a>
-        <a href="javascript:void(0)" class="nav-item" data-page="track" onclick="showPage('track')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg> Track Requisition</a>
-        <a href="javascript:void(0)" class="nav-item" data-page="requisition" onclick="showPage('requisition')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/></svg> Requisition <span id="rqBadge" class="hidden" style="background:#dc2626;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;margin-left:6px">0</span></a>
-        <a href="javascript:void(0)" class="nav-item admin-only" onclick="openAdminSettings('apps')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M13 10h5M13 14h5"/></svg> Admin Panel <span id="idBadge" class="hidden" style="background:#dc2626;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;margin-left:6px">0</span></a>
-        <a href="javascript:void(0)" class="nav-item" id="pushNav" onclick="pushEnable(true)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg> Enable phone alerts</a>
-        <a href="javascript:void(0)" class="nav-item admin-only" data-page="verify" onclick="showPage('verify')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg> Physical Check</a>
-        <button class="nav-item w-full text-left" onclick="downloadPDF()"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg> Print / PDF</button>
       </nav>
       <div class="mt-8 p-3 rounded-xl bg-blue-50/60 border border-blue-100">
         <div class="text-xs font-bold text-navy">Firebase Stock Ledger</div>
@@ -1046,15 +1050,13 @@ window.marsPill=function(kind,text){
         <section id="dashSection" class="card p-5 md:p-6 page-section page-hidden" data-page="dashboard">
           <h2 class="text-lg font-extrabold text-navy mb-1">Dashboard</h2>
           <p class="text-xs text-muted mb-4">Live summary of requisitions, transfers and purchase orders. Items waiting more than 24 hours are flagged.</p>
-          <div class="flex flex-wrap items-center gap-2 mb-1"><input type="month" class="field exp-month" style="max-width:170px" onchange="marsSetMonth(this.value)"><button class="btn btn-secondary" onclick="marsExport()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Download Excel report</button></div>
-          <div class="text-xs text-muted mb-4">Pick a month to export only that month. Leave empty for all data.</div>
-          <div id="dashBox"></div>
+<div id="dashBox"></div>
         </section>
 
         <section id="trackSection" class="card p-5 md:p-6 page-section page-hidden" data-page="track">
           <h2 class="text-lg font-extrabold text-navy mb-1">Track Requisition</h2>
           <p class="text-xs text-muted mb-3">See which step each requisition has reached. Tap a requisition to open its route map. The PDF button prints the MPR form.</p>
-          <input id="trkQ" class="field mb-3" placeholder="Search REQ number" oninput="rqRenderTrack()">
+          <input id="trkQ" class="field mb-3" placeholder="Search REQ number" oninput="rqTrackReset()">
           <div id="trkList" class="space-y-3"></div>
         </section>
 
@@ -1079,7 +1081,7 @@ window.marsPill=function(kind,text){
           <h2 class="text-lg font-extrabold text-navy mb-1">Purchase Orders</h2>
           <p class="text-xs text-muted mb-3">Procurement can correct a PO (supplier, date, terms, rates). Every correction is recorded with name and time. A PO cannot be deleted.</p>
           <div class="grid grid-cols-2 gap-2 mb-2"><select id="poFPrj" class="field" onchange="poRenderPage()"><option value="">All projects</option></select><input id="poFQ" class="field" placeholder="Search PO, REQ, supplier" oninput="poRenderPage()"></div>
-          <div class="flex justify-between items-center mb-3"><div id="poSum" class="text-sm font-bold"></div><button class="btn btn-secondary" onclick="poReport()">Print report</button></div>
+          <div class="flex justify-between items-center mb-3"><div id="poSum" class="text-sm font-bold"></div></div>
           <div id="poPageList" class="space-y-2"></div>
         </section>
 
@@ -1113,7 +1115,7 @@ window.marsPill=function(kind,text){
 
         <section id="filterSection" class="filter-panel card p-4 md:p-5 no-print page-section page-hidden" data-page="print">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
-            <div><div class="section-title">Ledger View</div><div class="text-xs text-muted mt-1">Filter by project and/or material to focus the report — select both to see just that material's ledger for that project.</div></div>
+            <div><div class="section-title">Reports</div><div class="text-xs text-muted mt-1">Filter by project and/or material to focus the report — select both to see just that material's ledger for that project.</div></div>
             <div class="flex flex-col sm:flex-row gap-2 flex-wrap">
               <select id="filterProject" onchange="recalculateAndRender()" class="field min-w-[220px]"><option value="ALL">Show All Projects</option></select>
               <input id="filterMaterial" list="materialsDatalist" autocomplete="off" oninput="recalculateAndRender()" placeholder="Filter by Material (optional)" class="field min-w-[200px]">
@@ -1121,8 +1123,12 @@ window.marsPill=function(kind,text){
               <button type="button" onclick="generateCombinedPDF()" class="btn btn-primary">▤ Combined PDF</button>
               <button type="button" onclick="generateAllEngineerReports()" class="btn btn-secondary">⇩ All Project PDFs</button>
               <button type="button" onclick="generateMaterialsSummaryReport()" class="btn btn-warning admin-only">Materials Summary (All Projects)</button>
-              <button type="button" onclick="generateProjectMaterialsSummary()" class="btn btn-warning">This Project's Materials (Serial-wise)</button></div>
+              <button type="button" onclick="generateProjectMaterialsSummary()" class="btn btn-warning">This Project's Materials (Serial-wise)</button>
+              <button type="button" onclick="poReport()" class="btn btn-secondary">PO Report (PDF)</button></div>
           </div>
+          <div class="mt-4 pt-3 border-t border-line"><div class="font-extrabold text-sm mb-2">Requisition, Transfer &amp; PO data (Excel)</div>
+          <div class="flex flex-wrap items-center gap-2 mb-1"><input type="month" class="field exp-month" style="max-width:170px" onchange="marsSetMonth(this.value)"><button class="btn btn-secondary" onclick="marsExport()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Download Excel report</button></div>
+          <div class="text-xs text-muted">Pick a month to export only that month. Leave empty for all data.</div></div>
         </section>
 
         <section id="pdfCard" class="card pdf-card p-5 md:p-7 page-section page-hidden" data-page="print">
@@ -1186,7 +1192,6 @@ window.marsPill=function(kind,text){
             <button class="btn btn-secondary" onclick="clearAdvancedFilters()">↺ Clear Filters</button>
             <button class="btn btn-success" onclick="exportCSV()">⇩ CSV</button>
             <button class="btn btn-primary" onclick="exportExcelCompatible()">▣ Excel</button>
-            <button class="btn btn-secondary" onclick="downloadPDF()"><svg class="vic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg> Print / PDF</button>
             <button class="btn btn-secondary" onclick="backupData()">⬇ Backup</button>
             <label class="btn btn-secondary cursor-pointer">⬆ Restore <input type="file" accept=".json,application/json" class="hidden" onchange="restoreData(event)"></label>
             <button class="btn btn-warning" onclick="openStockSettings()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg> Stock Alert</button>
@@ -1317,6 +1322,9 @@ window.marsPill=function(kind,text){
     let engineerDatabase = getEngineerDatabase();
 
     let entries = JSON.parse(localStorage.getItem('mars_ledger_entries')) || [];
+    let allEntriesMaster = null;
+    function marsScope(list){ allEntriesMaster = list; const a = window.currentEngineerAllowedProjects; return a ? list.filter(e => a.includes(e.prjNo)) : list; }
+    window.marsRescope = function(){ if(allEntriesMaster){ entries = marsScope(allEntriesMaster); if(typeof recalculateAndRender==='function'){ recalculateAndRender(); } if(typeof renderAdvanced==='function'){ renderAdvanced(); } } };
     let editIndex = -1;
     let isAdmin = false;
     // Admin identity/authentication is now handled by Firebase Authentication
@@ -2760,6 +2768,9 @@ window.marsPill=function(kind,text){
 
 <script>
 function showPage(page){
+  const noRep = !isAdmin && window.currentEngineerRole==='proc';
+  document.querySelectorAll('.nav-item[data-page="print"], .mobile-bottom button[data-page="print"], #ngReports').forEach(el=>{ el.style.display = noRep ? 'none' : ''; });
+  if(page==='print' && noRep){ showToast('Reports are not available for the Procurement role.','error'); page='dashboard'; }
   if(page==='verify' && !isAdmin){ showToast('Physical Check is available to Admin only.','error'); page='dashboard'; }
   document.querySelectorAll('.page-section').forEach(el=>{
     el.classList.toggle('page-hidden', el.dataset.page!==page);
@@ -3772,7 +3783,7 @@ function startFirebaseSync(){
         if(da!==dbb) return da.localeCompare(dbb);
         return Number(a.createdAt||0)-Number(b.createdAt||0);
       });
-      entries=firebaseEntries;
+      entries=marsScope(firebaseEntries);
       saveToStorage();
       recalculateAndRender();
       renderAdvanced();
@@ -3781,7 +3792,7 @@ function startFirebaseSync(){
       console.error("Firestore listener error:",err);
       setFirebaseStatus("Firebase Error","error");
       showToast("Firebase read failed: "+(err.code||err.message),"error");
-      try{const local=JSON.parse(localStorage.getItem('mars_ledger_entries')||'[]');if(Array.isArray(local)&&local.length){entries=local;recalculateAndRender();renderAdvanced();}}catch(e){}
+      try{const local=JSON.parse(localStorage.getItem('mars_ledger_entries')||'[]');if(Array.isArray(local)&&local.length){entries=marsScope(local);recalculateAndRender();renderAdvanced();}}catch(e){}
     });
   }catch(err){console.error(err);setFirebaseStatus("Firebase Error","error");showToast("Firebase connection failed: "+err.message,"error");}
 }
@@ -3821,6 +3832,7 @@ async function deleteEntryFromFirebase(firebaseId){
   function finishAdminLogin(){
     isAdmin=true;window.currentAccessRole='admin';
     window.currentEngineerAllowedProjects=null;
+    if(window.marsRescope)window.marsRescope();
     refreshProjectDropdowns();
     document.getElementById('adminBadge')?.classList.remove('hidden');
     document.body.classList.add('admin-mode');
@@ -3902,6 +3914,7 @@ async function deleteEntryFromFirebase(firebaseId){
     window.currentEngineerRole=eng.role||'site';
     window.currentEngineerName=eng.name;
     window.currentEngineerAllowedProjects=(eng.projects||[]).slice();
+    if(window.marsRescope)window.marsRescope();
     refreshProjectDropdowns(projectDatabase.indexOf(match));
     onProjectSelect();
     setEngineerStatus('SITE ACCESS GRANTED • '+eng.name,'success');
@@ -4092,7 +4105,7 @@ async function deleteEntryFromFirebase(firebaseId){
   const who=()=>window.currentEngineerName||'Admin';
   const myPrj=()=>window.currentEngineerAllowedProjects||[];
   const STAGE={delivery:marsPill('delivery','Awaiting delivery'),dpm:marsPill('pending','With DPM'),ed:marsPill('pending','With Executive Director'),procurement:marsPill('progress','With Procurement'),closed:marsPill('approved','Closed'),rejected:marsPill('rejected','Rejected')};
-  const ROLES={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement',acct:'Accounts',viewer:'Management (view only)'};
+  const ROLES={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement',pmgr:'Purchase Manager',acct:'Accounts',viewer:'Management (view only)'};
   let reqs=[],lastCount=0;
   const pending=r=>(r.items||[]).filter(i=>i.state==='pending');
   const actionable=r=>(role()==='site'&&myPrj().includes(r.prjNo)&&(r.items||[]).some(i=>i.state==='purchased'))||(role()==='dpm'&&r.stage==='dpm')||(role()==='ed'&&r.stage==='ed')||(role()==='proc'&&r.stage==='procurement'&&pending(r).length>0);
@@ -4146,6 +4159,8 @@ async function deleteEntryFromFirebase(firebaseId){
     document.querySelectorAll('.rq-chk[data-r="'+id+'"]:checked').forEach(c=>{const inp=document.querySelector('.rq-pq[data-r="'+id+'"][data-i="'+c.dataset.i+'"]');sel[c.dataset.i]=parseFloat(inp&&inp.value)||0;});
     const ids=Object.keys(sel),r0=reqs.find(x=>x.id===id);
     if(!ids.length){showToast('Tick the items that were purchased.','error');return;}
+    const unapp=ids.filter(k=>{const it=r0.items.find(i=>i.id===k),po=it&&it.poNo&&(window.marsPOs?marsPOs():[]).find(o=>o.no===it.poNo);return po&&(po.status||'approved')!=='approved';});
+    if(unapp.length){showToast('The PO for these items is not approved yet.','error');return;}
     let part=0;
     for(const k of ids){const it=r0.items.find(i=>i.id===k);if(!(sel[k]>0)||sel[k]>it.qty){showToast('Purchased quantity for '+it.material+' must be above 0 and up to '+it.qty+'.','error');return;}if(sel[k]<it.qty)part++;}
     if(!confirm('Mark '+ids.length+' item(s) as purchased'+(part?' ('+part+' partly; the remaining quantity stays pending)':'')+'? Stock is added only after the Site Engineer confirms delivery. This cannot be undone.'))return;
@@ -4166,7 +4181,7 @@ async function deleteEntryFromFirebase(firebaseId){
     const old=document.getElementById('rcvModal');if(old)old.remove();
     const m=document.createElement('div');m.id='rcvModal';
     m.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:12px';
-    m.innerHTML='<div class="card p-5" style="background:#fff;max-width:420px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Confirm received</h3><div class="text-xs text-muted mb-3">'+esc(it.material)+' &middot; ordered '+it.qty+' '+esc(it.unit)+'</div><div class="space-y-3"><div><label class="field-label">Quantity received</label><input id="rcQ" type="number" step="0.01" class="field" value="'+it.qty+'"></div><div><label class="field-label">Challan / delivery note no (optional)</label><input id="rcC" class="field"></div><div><label class="field-label">Note (optional)</label><input id="rcN" class="field" placeholder="e.g. 2 bags damaged"></div><div class="text-xs text-muted">If you receive less than ordered, the balance stays open as awaiting delivery.</div></div><div class="flex gap-2 mt-4"><button class="btn btn-primary" id="rcOk">Confirm</button><button class="btn btn-secondary" id="rcNo">Cancel</button></div></div>';
+    m.innerHTML='<div class="card p-5" style="background:#fff;max-width:420px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Confirm received</h3><div class="text-xs text-muted mb-3">'+esc(it.material)+(it.poNo?' &middot; '+esc(it.poNo):'')+' &middot; ordered '+it.qty+' '+esc(it.unit)+'</div><div class="space-y-3"><div><label class="field-label">Quantity received</label><input id="rcQ" type="number" step="0.01" class="field" value="'+it.qty+'"></div><div><label class="field-label">Challan / delivery note no (optional)</label><input id="rcC" class="field"></div><div><label class="field-label">Note (optional)</label><input id="rcN" class="field" placeholder="e.g. 2 bags damaged"></div><div class="text-xs text-muted">If you receive less than ordered, the balance stays open as awaiting delivery.</div></div><div class="flex gap-2 mt-4"><button class="btn btn-primary" id="rcOk">Confirm</button><button class="btn btn-secondary" id="rcNo">Cancel</button></div></div>';
     document.body.appendChild(m);
     m.querySelector('#rcNo').onclick=()=>m.remove();
     const ok=m.querySelector('#rcOk');
@@ -4281,17 +4296,27 @@ async function deleteEntryFromFirebase(firebaseId){
   const COL={done:['#dcfce7','#15803d','#86efac'],cur:['#dbeafe','#1d4ed8','#93c5fd'],wait:['#f1f5f9','#94a3b8','#e2e8f0'],bad:['#fee2e2','#b91c1c','#fecaca']};
   const openSet=new Set();
   window.rqTog=(id,o)=>{o?openSet.add(id):openSet.delete(id);};
+  let trkPage=1;const TRK_N=10;
   function renderTrack(){
     const box=document.getElementById('trkList');if(!box)return;
     const q=(document.getElementById('trkQ').value||'').trim().toLowerCase(),rl=role();
     const L=reqs.filter(r=>(rl!=='site'||myPrj().includes(r.prjNo))&&(!q||String(r.no).toLowerCase().includes(q)));
-    box.innerHTML=L.map(r=>{
+    const trkPages=Math.max(1,Math.ceil(L.length/TRK_N));if(trkPage>trkPages)trkPage=trkPages;if(trkPage<1)trkPage=1;
+    const pageL=L.slice((trkPage-1)*TRK_N,trkPage*TRK_N);
+    box.innerHTML=pageL.map(r=>{
       const[lab,c]=chip(r),S=steps(r);
       const route=S.map((x,i)=>{const[bg,fg,bd]=COL[x.s];return `<div style="display:flex;gap:12px"><div style="display:flex;flex-direction:column;align-items:center"><div style="width:36px;height:36px;border-radius:50%;background:${bg};border:1.5px solid ${bd};display:flex;align-items:center;justify-content:center;${x.s==='cur'?'box-shadow:0 0 0 4px #eff6ff':''}">${ico(x.s==='bad'?'x':x.k,fg)}</div>${i<S.length-1?`<div style="width:3px;flex:1;min-height:22px;background:${x.s==='done'?'#86efac':'#e2e8f0'}"></div>`:''}</div><div style="padding-bottom:14px"><div class="font-bold text-sm">${x.t}</div><div class="text-xs" style="color:${x.s==='bad'?'#b91c1c':x.s==='cur'?'#1d4ed8':x.s==='done'?'#15803d':'#94a3b8'}">${x.d||(x.s==='wait'?'Waiting':'')}</div></div></div>`;}).join('');
       const items=(r.items||[]).map(i=>`<div class="text-xs py-1 border-t">${esc(i.material)}: <b>${i.qty}</b> ${esc(i.unit)}${i.ofQty&&i.ofQty!==i.qty?' of '+i.ofQty:''} · ${IS[i.state]}${i.ofQty&&i.state==='pending'?' (balance)':''}${i.state==='cancelled'&&i.cancelReason?'<div style="color:#b91c1c">Reason: '+esc(i.cancelReason)+'</div>':''}</div>`).join('');
       return `<details class="rounded-xl border p-3" ${openSet.has(r.id)?'open':''} ontoggle="rqTog('${r.id}',this.open)"><summary style="cursor:pointer"><b>${esc(r.no)}</b> · ${esc(r.prjNo)} <span style="margin-left:6px">${marsPill(c,chip(r)[0])}</span><div class="text-xs text-muted">${esc(r.requestedBy)} · ${d8(r.createdAt)}</div></summary><div style="margin-top:12px">${route}</div><div class="mt-2">${items}</div><button class="btn btn-secondary mt-2" onclick="rqPdf('${r.id}')">PDF</button></details>`;
     }).join('')||'<div class="text-xs text-muted">No requisitions found.</div>';
+    if(L.length>TRK_N){
+      let from=Math.max(1,trkPage-2),to=Math.min(trkPages,from+4);from=Math.max(1,to-4);
+      let nums='';for(let n=from;n<=to;n++)nums+=`<button class="btn ${n===trkPage?'btn-primary':'btn-secondary'}" style="min-width:38px;padding-left:8px;padding-right:8px" onclick="rqTrackGo(${n})">${n}</button>`;
+      box.innerHTML+=`<div class="flex items-center justify-between gap-2 flex-wrap pt-2"><div class="text-xs text-muted">Showing ${(trkPage-1)*TRK_N+1}-${Math.min(L.length,trkPage*TRK_N)} of ${L.length}</div><div class="flex items-center gap-1 flex-wrap"><button class="btn btn-secondary" ${trkPage<=1?'disabled':''} onclick="rqTrackGo(${trkPage-1})">&lsaquo; Prev</button>${nums}<button class="btn btn-secondary" ${trkPage>=trkPages?'disabled':''} onclick="rqTrackGo(${trkPage+1})">Next &rsaquo;</button></div></div>`;
+    }
   }
+  window.rqTrackGo=n=>{trkPage=n;renderTrack();const e=document.getElementById('trackSection');if(e)e.scrollIntoView({behavior:'smooth',block:'start'});};
+  window.rqTrackReset=()=>{trkPage=1;renderTrack();};
   window.rqRenderTrack=renderTrack;
   window.rqPdf=function(id){
     const r=reqs.find(x=>x.id===id);if(!r||!window.marsPrintDoc)return;
@@ -4324,7 +4349,7 @@ async function deleteEntryFromFirebase(firebaseId){
   const GEO={};"Dhaka:Dhamrai,Dohar,Keraniganj,Nawabganj,Savar,Dhaka Metropolitan|Gazipur:Gazipur Sadar,Kaliakair,Kaliganj,Kapasia,Sreepur|Narayanganj:Araihazar,Bandar,Narayanganj Sadar,Rupganj,Sonargaon|Narsingdi:Belabo,Monohardi,Narsingdi Sadar,Palash,Raipura,Shibpur|Manikganj:Daulatpur,Ghior,Harirampur,Manikganj Sadar,Saturia,Shivalaya,Singair|Munshiganj:Gazaria,Lohajang,Munshiganj Sadar,Sirajdikhan,Sreenagar,Tongibari|Faridpur:Alfadanga,Bhanga,Boalmari,Charbhadrasan,Faridpur Sadar,Madhukhali,Nagarkanda,Sadarpur,Saltha|Gopalganj:Gopalganj Sadar,Kashiani,Kotalipara,Muksudpur,Tungipara|Madaripur:Kalkini,Madaripur Sadar,Rajoir,Shibchar|Rajbari:Baliakandi,Goalanda,Kalukhali,Pangsha,Rajbari Sadar|Shariatpur:Bhedarganj,Damudya,Gosairhat,Naria,Shariatpur Sadar,Zajira|Kishoreganj:Austagram,Bajitpur,Bhairab,Hossainpur,Itna,Karimganj,Katiadi,Kishoreganj Sadar,Kuliarchar,Mithamain,Nikli,Pakundia,Tarail|Tangail:Basail,Bhuapur,Delduar,Dhanbari,Ghatail,Gopalpur,Kalihati,Madhupur,Mirzapur,Nagarpur,Sakhipur,Tangail Sadar|Chattogram:Anwara,Banshkhali,Boalkhali,Chandanaish,Fatikchhari,Hathazari,Karnaphuli,Lohagara,Mirsharai,Patiya,Rangunia,Raozan,Sandwip,Satkania,Sitakunda|Cox's Bazar:Chakaria,Cox's Bazar Sadar,Eidgaon,Kutubdia,Maheshkhali,Pekua,Ramu,Teknaf,Ukhia|Cumilla:Barura,Brahmanpara,Burichang,Chandina,Chauddagram,Daudkandi,Debidwar,Homna,Laksam,Lalmai,Meghna,Monohargonj,Muradnagar,Nangalkot,Cumilla Adarsha Sadar,Cumilla Sadar Dakshin,Titas|Brahmanbaria:Akhaura,Ashuganj,Bancharampur,Bijoynagar,Brahmanbaria Sadar,Kasba,Nabinagar,Nasirnagar,Sarail|Chandpur:Chandpur Sadar,Faridganj,Haimchar,Haziganj,Kachua,Matlab Dakshin,Matlab Uttar,Shahrasti|Feni:Chhagalnaiya,Daganbhuiyan,Feni Sadar,Fulgazi,Parshuram,Sonagazi|Lakshmipur:Kamalnagar,Lakshmipur Sadar,Raipur,Ramganj,Ramgati|Noakhali:Begumganj,Chatkhil,Companiganj,Hatiya,Kabirhat,Noakhali Sadar,Senbagh,Sonaimuri,Subarnachar|Khagrachhari:Dighinala,Guimara,Khagrachhari Sadar,Lakshmichhari,Mahalchhari,Manikchhari,Matiranga,Panchhari,Ramgarh|Rangamati:Baghaichhari,Barkal,Belaichhari,Juraichhari,Kaptai,Kawkhali,Langadu,Naniarchar,Rajasthali,Rangamati Sadar|Bandarban:Alikadam,Bandarban Sadar,Lama,Naikhongchhari,Rowangchhari,Ruma,Thanchi|Rajshahi:Bagha,Bagmara,Charghat,Durgapur,Godagari,Mohanpur,Paba,Puthia,Tanore|Bogura:Adamdighi,Bogura Sadar,Dhunat,Dhupchanchia,Gabtali,Kahaloo,Nandigram,Sariakandi,Shajahanpur,Sherpur,Shibganj,Sonatala|Chapainawabganj:Bholahat,Gomastapur,Nachole,Nawabganj Sadar,Shibganj|Joypurhat:Akkelpur,Joypurhat Sadar,Kalai,Khetlal,Panchbibi|Naogaon:Atrai,Badalgachhi,Dhamoirhat,Mahadebpur,Manda,Naogaon Sadar,Niamatpur,Patnitala,Porsha,Raninagar,Sapahar|Natore:Bagatipara,Baraigram,Gurudaspur,Lalpur,Naldanga,Natore Sadar,Singra|Pabna:Atgharia,Bera,Bhangura,Chatmohar,Faridpur,Ishwardi,Pabna Sadar,Santhia,Sujanagar|Sirajganj:Belkuchi,Chauhali,Kamarkhanda,Kazipur,Raiganj,Shahjadpur,Sirajganj Sadar,Tarash,Ullahpara|Khulna:Batiaghata,Dacope,Dighalia,Dumuria,Koyra,Paikgachha,Phultala,Rupsha,Terokhada|Bagerhat:Bagerhat Sadar,Chitalmari,Fakirhat,Kachua,Mollahat,Mongla,Morrelganj,Rampal,Sarankhola|Chuadanga:Alamdanga,Chuadanga Sadar,Damurhuda,Jibannagar|Jashore:Abhaynagar,Bagherpara,Chaugachha,Jashore Sadar,Jhikargachha,Keshabpur,Manirampur,Sharsha|Jhenaidah:Harinakunda,Jhenaidah Sadar,Kaliganj,Kotchandpur,Maheshpur,Shailkupa|Kushtia:Bheramara,Daulatpur,Khoksa,Kumarkhali,Kushtia Sadar,Mirpur|Magura:Magura Sadar,Mohammadpur,Shalikha,Sreepur|Meherpur:Gangni,Meherpur Sadar,Mujibnagar|Narail:Kalia,Lohagara,Narail Sadar,Naragati|Satkhira:Assasuni,Debhata,Kalaroa,Kaliganj,Satkhira Sadar,Shyamnagar,Tala|Barishal:Agailjhara,Babuganj,Bakerganj,Banaripara,Barishal Sadar,Gaurnadi,Hizla,Mehendiganj,Muladi,Wazirpur|Barguna:Amtali,Bamna,Barguna Sadar,Betagi,Patharghata,Taltali|Bhola:Bhola Sadar,Burhanuddin,Char Fasson,Daulatkhan,Lalmohan,Manpura,Tazumuddin|Jhalokati:Jhalokati Sadar,Kathalia,Nalchity,Rajapur|Patuakhali:Bauphal,Dashmina,Dumki,Galachipa,Kalapara,Mirzaganj,Patuakhali Sadar,Rangabali|Pirojpur:Bhandaria,Kawkhali,Mathbaria,Nazirpur,Nesarabad,Pirojpur Sadar,Zianagar|Sylhet:Balaganj,Beanibazar,Bishwanath,Companiganj,Dakshin Surma,Fenchuganj,Golapganj,Gowainghat,Jaintiapur,Kanaighat,Osmani Nagar,Sylhet Sadar,Zakiganj|Habiganj:Ajmiriganj,Bahubal,Baniachong,Chunarughat,Habiganj Sadar,Lakhai,Madhabpur,Nabiganj,Shayestaganj|Moulvibazar:Barlekha,Juri,Kamalganj,Kulaura,Moulvibazar Sadar,Rajnagar,Sreemangal|Sunamganj:Bishwamvarpur,Chhatak,Dakshin Sunamganj,Derai,Dharampasha,Dowarabazar,Jagannathpur,Jamalganj,Sullah,Sunamganj Sadar,Tahirpur|Rangpur:Badarganj,Gangachara,Kaunia,Mithapukur,Pirgachha,Pirganj,Rangpur Sadar,Taraganj|Dinajpur:Birampur,Birganj,Biral,Bochaganj,Chirirbandar,Dinajpur Sadar,Ghoraghat,Hakimpur,Kaharole,Khansama,Nawabganj,Parbatipur,Phulbari|Gaibandha:Fulchhari,Gaibandha Sadar,Gobindaganj,Palashbari,Sadullapur,Saghata,Sundarganj|Kurigram:Bhurungamari,Char Rajibpur,Chilmari,Kurigram Sadar,Nageshwari,Phulbari,Rajarhat,Raomari,Ulipur|Lalmonirhat:Aditmari,Hatibandha,Kaliganj,Lalmonirhat Sadar,Patgram|Nilphamari:Dimla,Domar,Jaldhaka,Kishoreganj,Nilphamari Sadar,Saidpur|Panchagarh:Atwari,Boda,Debiganj,Panchagarh Sadar,Tetulia|Thakurgaon:Baliadangi,Haripur,Pirganj,Ranisankail,Thakurgaon Sadar|Mymensingh:Bhaluka,Dhobaura,Fulbaria,Gaffargaon,Gauripur,Haluaghat,Ishwarganj,Muktagachha,Mymensingh Sadar,Nandail,Phulpur,Tarakanda,Trishal|Jamalpur:Bakshiganj,Dewanganj,Islampur,Jamalpur Sadar,Madarganj,Melandaha,Sarishabari|Netrokona:Atpara,Barhatta,Durgapur,Kalmakanda,Kendua,Khaliajuri,Madan,Mohanganj,Netrokona Sadar,Purbadhala|Sherpur:Jhenaigati,Nakla,Nalitabari,Sherpur Sadar,Sreebardi".split('|').forEach(x=>{const[a,b]=x.split(':');GEO[a]=b.split(',');});
   const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-  const ROLES={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement',acct:'Accounts',viewer:'Management (view only)'};
+  const ROLES={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement',pmgr:'Purchase Manager',acct:'Accounts',viewer:'Management (view only)'};
   let nidData='',sigData='';
   const LIM={nid:{minW:600,minH:380,maxW:3000,maxH:2000,minKB:50,maxKB:2048,name:'NID photo'},sig:{minW:250,minH:60,maxW:350,maxH:100,minKB:5,maxKB:100,name:'Signature'}};
   function checkImg(f,L){
@@ -4486,7 +4511,7 @@ async function deleteEntryFromFirebase(firebaseId){
   const r2=x=>Math.round(x*100)/100;
   const d8=t=>new Date(t).toLocaleDateString('en-GB');
   const dLong=v=>{const m=String(v||'').match(/^(\d{4})-(\d\d)-(\d\d)$/);if(!m)return esc(v||'');const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return m[3]+'-'+mn[+m[2]-1]+'-'+m[1];};
-  let pos=[],reqSnap={};
+  let pos=[],reqSnap={},csList=[];
   const DEFAULT_TERMS=['Quality: As per Purchase order.','Payment mode: Payment will be made in favor of "{supplier}" as per agreed terms.','Transportation: Delivery through supplier transports.','Other Cost: Carrying, loading & unloading cost are included with rate.','VAT & TDS: VAT & TDS as per Govt. rules & AIT included with the rate.','Bill: At actual.','Quality/specification: Quality/specification as per mentioned here.','Penalty: Management may impose penalty if material is not delivered within specified time or bad quality.','Special Condition: Management has the right to cancel the purchase order at any time without giving any reasons.'].join('\n');
   const co=()=>(window.marsCompany?marsCompany():{})||{};
   const MARS_ADDR='Plot-05, Road-409, Sector-11, Jalshiri Abashon, Narayanganj, Rupganj, Dhaka';
@@ -4517,15 +4542,25 @@ async function deleteEntryFromFirebase(firebaseId){
     reqSnap[r.id]=r;
     if(role()==='site')return '';
     let h='';
-    pos.filter(o=>o.requisitionId===r.id).forEach(o=>{h+=`<div class="flex justify-between items-center gap-2 py-1 border-t text-sm"><span>${DOC} <b>${esc(o.no)}</b> · ${esc(o.supplier.name)}<br><span class="text-xs text-muted">Tk ${money(o.total)}</span></span><span class="flex gap-2"><button class="btn btn-secondary" onclick="poPrint('${o.id}')">Print</button>${role()==='proc'?`<button class="btn btn-secondary" onclick="poEdit('${o.id}')">Edit</button>`:''}</span></div>`;});
-    if(role()==='proc'&&r.stage==='procurement'&&(r.items||[]).some(i=>i.state==='pending'&&!i.poNo))h+=`<button class="btn btn-primary mt-2" onclick="poOpen('${r.id}')">Create Purchase Order</button>`;
+    pos.filter(o=>o.requisitionId===r.id).forEach(o=>{h+=`<div class="flex justify-between items-center gap-2 py-1 border-t text-sm"><span>${DOC} <b>${esc(o.no)}</b> · ${esc(o.supplier.name)}<br><span class="text-xs text-muted">Tk ${money(o.total)}</span> ${poStatusPill(o)}${poDelivery(o)}</span><span class="flex gap-2">${poBtns(o)}</span></div>`;});
+    rfqList.filter(x=>x.requisitionId===r.id).forEach(rf=>{
+      const sub=rf.invites.filter(v=>invMap[v.token]&&invMap[v.token].status==='submitted').length;
+      const chips=rf.invites.map(v=>{const d=invMap[v.token],q=d&&d.status==='submitted';return `<span style="font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px;${q?'color:#166534;background:#dcfce7':'color:#92400e;background:#fef3c7'}">${esc(v.name)}: ${q?'Quoted':'Waiting'}</span>`;}).join(' ');
+      h+=`<div class="rounded-xl border border-line bg-white p-3 mt-2 text-sm"><b>${esc(rf.no)}</b> <span class="text-xs text-muted">RFQ &middot; deadline ${dFmt(rf.deadlineMs)} &middot; ${sub}/${rf.invites.length} quoted</span><div class="flex gap-1 flex-wrap mt-1">${chips}</div>${role()==='proc'?`<div class="flex gap-2 flex-wrap mt-1"><button class="btn btn-secondary" onclick="rfqShare('${rf.id}')">Links / Print</button>${sub&&r.stage==='procurement'?`<button class="btn btn-primary" onclick="rfqToCs('${rf.id}')">Compare in CS (${sub})</button>`:''}</div>`:''}</div>`;
+    });
+    csList.filter(c=>c.requisitionId===r.id).forEach(c=>{
+      const left=[];c.suppliers.forEach((sp,k)=>{const n=(r.items||[]).filter(i=>i.state==='pending'&&!i.poNo&&c.lines.some(l=>l.itemId===i.id&&l.sel===k)).length;if(n)left.push([k,sp.name,n]);});
+      const canEditCs=role()==='proc'&&c.lines.every(l=>!((r.items||[]).find(i=>i.id===l.itemId)||{}).poNo);
+      h+=`<div class="rounded-xl border border-line bg-white p-3 mt-2 text-sm"><b>${esc(c.no)}</b> <span class="text-xs text-muted">Comparative Statement &middot; ${c.suppliers.length} suppliers &middot; ${esc(c.createdBy||'')}</span><div class="flex gap-2 flex-wrap mt-1"><button class="btn btn-secondary" onclick="csPrint('${c.id}')">Print CS</button>${canEditCs?`<button class="btn btn-secondary" onclick="csOpen('${r.id}','${c.id}')">Edit</button>`:''}${role()==='proc'&&r.stage==='procurement'?left.map(x=>`<button class="btn btn-primary" onclick="csPO('${c.id}',${x[0]})">Create PO &middot; ${esc(x[1])} (${x[2]})</button>`).join(''):''}</div></div>`;
+    });
+    if(role()==='proc'&&r.stage==='procurement'&&(r.items||[]).some(i=>i.state==='pending'&&!i.poNo))h+=`<div class="flex gap-2 flex-wrap mt-2"><button class="btn btn-primary" onclick="rfqOpen('${r.id}')">New RFQ</button><button class="btn btn-secondary" onclick="csOpen('${r.id}')">Comparative Statement</button><button class="btn btn-secondary" onclick="poOpen('${r.id}')">Direct PO (no CS)</button></div>`;
     return h;
   };
 
   /* ---------- shared form ---------- */
   function lastProject(prj){const o=pos.filter(x=>x.prjNo===prj&&x.project).sort((a,b)=>b.createdAt-a.createdAt)[0];return o?o.project:{address:'',contact:'',phone:''};}
   function rowHtml(key,mat,unit,qty,spec,rate,disc,check,hint){
-    return `<div class="rounded-xl border p-2 space-y-2 text-sm"><label>${check?`<input type="checkbox" class="po-c" data-i="${key}" checked> `:''}<b>${esc(mat)}</b> <span class="text-xs text-muted">${qty} ${esc(unit)}</span></label><div class="grid grid-cols-6 gap-2"><input class="field col-span-3 po-s" data-i="${key}" placeholder="Specification (e.g. 10mm)" value="${esc(spec)}"><input class="field col-span-2 po-r" data-i="${key}" data-q="${qty}" type="number" step="0.01" placeholder="Rate" value="${rate}"><input class="field po-d" data-i="${key}" type="number" step="0.01" placeholder="Disc %" value="${disc}"></div>${hint?`<div class="text-xs text-muted">${hint}</div>`:''}</div>`;
+    return `<div class="rounded-xl border border-line bg-white p-3 space-y-2 text-sm"><label>${check?`<input type="checkbox" class="po-c" data-i="${key}" checked> `:''}<b>${esc(mat)}</b> <span class="text-xs text-muted">${qty} ${esc(unit)}</span></label><div class="grid grid-cols-6 gap-2"><input class="field col-span-3 po-s" data-i="${key}" placeholder="Specification (e.g. 10mm)" value="${esc(spec)}"><input class="field col-span-2 po-r" data-i="${key}" data-q="${qty}" type="number" step="0.01" placeholder="Rate" value="${rate}"><input class="field po-d" data-i="${key}" type="number" step="0.01" placeholder="Disc %" value="${disc}"></div>${hint?`<div class="text-xs text-muted">${hint}</div>`:''}</div>`;
   }
   function formHtml(title,sub,v,rows,okLabel){
     const f=(id,l,val,extra)=>`<div><label class="field-label">${l}</label><input id="${id}" class="field" value="${esc(val)}" ${extra||''}></div>`;
@@ -4541,6 +4576,7 @@ async function deleteEntryFromFirebase(firebaseId){
       <div><label class="field-label">Priority</label><select id="poPri" class="field">${['Normal','Urgent','Very Urgent'].map(x=>`<option${(v.priority||'Normal')===x?' selected':''}>${x}</option>`).join('')}</select></div>
       ${f('poDa','Deliver to (if different from project address)',v.deliveryAddr||'')}
       <div><label class="field-label">Remarks</label><input id="poRem" class="field" value="${esc(v.remarks)}" placeholder="e.g. For 2nd slab casting purpose use."></div>
+      ${v.direct?'<div><label class="field-label">Reason for direct purchase (no CS)</label><input id="poDr" class="field" placeholder="e.g. Emergency / single source / small amount"></div>':''}
       <div class="text-xs font-extrabold text-navy">Items</div>${rows}
       <div class="text-sm" style="line-height:1.7">Sub total: Tk <b id="poSub">0.00</b><br>Discount: Tk <b id="poDisc">0.00</b><br>Total: Tk <b id="poTot">0.00</b></div>
       <div><label class="field-label">Advanced / PDC amount</label><input id="poAdv" class="field" type="number" step="0.01" value="${v.advance??''}" placeholder="Defaults to the total"></div>
@@ -4572,22 +4608,251 @@ async function deleteEntryFromFirebase(firebaseId){
       const k=x.dataset.i,c=m.querySelector('.po-c[data-i="'+k+'"]');if(c&&!c.checked)return;
       lines.push({key:k,spec:m.querySelector('.po-s[data-i="'+k+'"]').value.trim(),rate:parseFloat(x.value)||0,disc:Math.min(100,Math.max(0,parseFloat(m.querySelector('.po-d[data-i="'+k+'"]').value)||0))});
     });
-    return{supplier:{name:g('#poSup'),contact:g('#poCp'),phone:g('#poPh'),address:g('#poAd')},project:{address:g('#pjAd'),contact:g('#pjCp'),phone:g('#pjPh')},deliveryDate:g('#poDt'),mrfNo:g('#poMrf'),subject:g('#poSubj'),terms:g('#poTm'),payMode:g('#poPm'),priority:g('#poPri'),deliveryAddr:g('#poDa'),remarks:g('#poRem'),conditions:m.querySelector('#poCond').value.trim(),advance:m.querySelector('#poAdv').value===''?null:parseFloat(m.querySelector('#poAdv').value)||0,lines};
+    return{supplier:{name:g('#poSup'),contact:g('#poCp'),phone:g('#poPh'),address:g('#poAd')},project:{address:g('#pjAd'),contact:g('#pjCp'),phone:g('#pjPh')},deliveryDate:g('#poDt'),mrfNo:g('#poMrf'),subject:g('#poSubj'),terms:g('#poTm'),payMode:g('#poPm'),priority:g('#poPri'),deliveryAddr:g('#poDa'),directReason:(m.querySelector('#poDr')||{value:''}).value.trim(),remarks:g('#poRem'),conditions:m.querySelector('#poCond').value.trim(),advance:m.querySelector('#poAdv').value===''?null:parseFloat(m.querySelector('#poAdv').value)||0,lines};
   }
   const priced=(i,L)=>{const ra=r2(L.rate*(1-L.disc/100));return{material:i.material,unit:i.unit,qty:i.qty,spec:L.spec,rate:L.rate,disc:L.disc,rateAfter:ra,amount:r2(i.qty*ra)};};
 
-  /* ---------- create ---------- */
-  window.poOpen=function(rid){
-    const r=reqSnap[rid];if(!r)return;
+  /* ---------- approval + delivery status ---------- */
+  const pst=o=>o.status||'approved';
+  const canApprove=()=>['admin','pmgr','ed'].includes(role());
+  const poStatusPill=o=>{const m={pending:['#fef3c7','#92400e','Pending approval'],approved:['#dcfce7','#166534','Approved'],rejected:['#fee2e2','#991b1b','Rejected']}[pst(o)]||['#e5e7eb','#374151',pst(o)];return `<span style="background:${m[0]};color:${m[1]};border-radius:999px;padding:2px 8px;font-size:11px;font-weight:700;white-space:nowrap">${m[2]}</span>`;};
+  const poDelivery=o=>{
+    if(pst(o)==='rejected')return o.approvalNote?`<div class="text-xs" style="color:#991b1b">Rejected by ${esc(o.approvedBy||'')}: ${esc(o.approvalNote)}</div>`:'';
+    if(pst(o)==='pending')return `<div class="text-xs text-muted">Waiting for approval before delivery.</div>`;
+    const req=(window.marsReqs?marsReqs():[]).find(x=>x.id===o.requisitionId);if(!req)return '';
+    const its=(req.items||[]).filter(i=>i.poNo===o.no&&i.state==='received');
+    let full=0,any=false;
+    o.items.forEach(l=>{const rec=its.filter(i=>i.material===l.material).reduce((a,i)=>a+(i.receivedQty??i.qty),0);if(rec>0)any=true;if(rec>=l.qty-0.0001)full++;});
+    const lab=full===o.items.length?'Delivered':(any?'Partially delivered':'Awaiting delivery');
+    return `<div class="text-xs text-muted">${lab} &middot; ${full}/${o.items.length} item(s) received</div>`;
+  };
+  const poBtns=o=>`<button class="btn btn-secondary" onclick="poPrint('${o.id}')">Print</button>${role()==='proc'&&pst(o)!=='rejected'?`<button class="btn btn-secondary" onclick="poEdit('${o.id}')">Edit</button>`:''}${canApprove()&&pst(o)==='pending'?`<button class="btn btn-primary" onclick="poReview('${o.id}')">Review &amp; Approve</button>`:''}`;
+  window.poReview=function(id){
+    const o=pos.find(x=>x.id===id);if(!o||!canApprove()||pst(o)!=='pending')return;
+    const rows=o.items.map(i=>`<div class="flex justify-between text-xs py-1 border-t"><span>${esc(i.material)} <span class="text-muted">${i.qty} ${esc(i.unit)} x ${money(i.rateAfter??i.rate)}</span></span><b>${money(i.amount)}</b></div>`).join('');
+    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:460px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Review ${esc(o.no)}</h3><div class="text-xs text-muted mb-3">${esc(o.prjNo)} &middot; ${esc(o.reqNo)} &middot; created by ${esc(o.createdBy||'')}</div><div class="text-sm mb-2"><b>${esc(o.supplier.name)}</b><br>Delivery: ${esc(o.deliveryDate||'')} &middot; ${esc(o.payMode||'As per agreed terms')} &middot; ${esc(o.priority||'Normal')}</div>${o.csId?`<div class="text-xs mb-1">Comparative Statement: <b>${esc(o.csNo)}</b> <a href="#" onclick="csPrint('${o.csId}');return false" style="color:#2563eb">view CS</a></div>`:''}${o.directReason?`<div class="text-xs mb-1" style="color:#991b1b"><b>Direct purchase, no CS:</b> ${esc(o.directReason)}</div>`:''}${rows}<div class="text-sm font-bold mt-2">Total: Tk ${money(o.total)}</div><div class="mt-3"><label class="field-label">Reason (needed only when rejecting)</label><input id="poRvN" class="field" placeholder="e.g. Rate too high, get another quotation"></div><div class="flex gap-2 mt-4 flex-wrap"><button class="btn btn-primary" id="poRvOk">Approve</button><button class="btn btn-secondary" id="poRvNo">Reject</button><button class="btn btn-secondary" id="poRvX">Close</button></div></div>`,'poReviewModal');
+    m.querySelector('#poRvX').onclick=()=>m.remove();
+    const run=async ap=>{
+      const note=m.querySelector('#poRvN').value.trim(),me=window.currentEngineerName||'Admin';
+      if(!ap&&!note){showToast('Write a reason to reject.','error');return;}
+      if(ap&&o.createdBy===me){showToast('The person who created the PO cannot approve it.','error');return;}
+      const b1=m.querySelector('#poRvOk'),b2=m.querySelector('#poRvNo');b1.disabled=b2.disabled=true;
+      const db=fb();
+      try{
+        await db.runTransaction(async tx=>{
+          const pr=db.collection('purchase_orders').doc(id),ps=await tx.get(pr),p=ps.data();
+          if(pst(p)!=='pending')throw new Error('This PO is no longer pending.');
+          const rr=db.collection('requisitions').doc(p.requisitionId),rs=await tx.get(rr),r=rs.data(),now=Date.now();
+          let items;
+          if(ap)items=r.items.map(i=>(i.poNo===p.no&&i.state==='pending')?{...i,state:'purchased',by:p.createdBy||me,purchasedAt:now,poApprovedBy:me}:i);
+          else items=r.items.map(i=>{if(i.poNo===p.no&&i.state==='pending'){const {poNo,...rest}=i;return rest;}return i;});
+          const stage=items.some(i=>i.state==='pending')?'procurement':'delivery';
+          tx.update(pr,ap?{status:'approved',approvedBy:me,approvedAt:now}:{status:'rejected',approvedBy:me,approvedAt:now,approvalNote:note});
+          tx.update(rr,{items,stage,history:(r.history||[]).concat([Object.assign({by:me,role:role(),action:'PO '+p.no+(ap?' approved - items ordered, awaiting delivery':' rejected - items released for a new PO'),at:now},ap?{}:{note})])});
+        });
+        m.remove();showToast(ap?'PO approved. Items are now awaiting delivery.':'PO rejected. Items released.');
+      }catch(e){b1.disabled=b2.disabled=false;console.error(e);showToast('Failed: '+(e.code||e.message),'error');}
+    };
+    m.querySelector('#poRvOk').onclick=()=>run(true);m.querySelector('#poRvNo').onclick=()=>run(false);
+  };
+
+  /* ---------- RFQ + supplier portal links ---------- */
+  let rfqList=[],invMap={},invSubs={};
+  const tok=()=>[...crypto.getRandomValues(new Uint8Array(16))].map(x=>x.toString(16).padStart(2,'0')).join('');
+  const portalUrl=t=>location.origin+location.pathname+'?rfq='+t;
+  const waNum=p=>{let d=String(p||'').replace(/\D/g,'');if(d.startsWith('0'))d='88'+d;return d;};
+  const dFmt=ms=>new Date(ms).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  const rfqMsg=(rf,v)=>'Assalamu alaikum. '+(co().name||'Mars Structure Limited')+' requests your quotation ('+rf.no+') for '+rf.items.length+' item(s). Please submit your rates online before '+dFmt(rf.deadlineMs)+':\n'+portalUrl(v.token);
+  window.rfqOpen=function(rid){
+    const r=reqSnap[rid];if(!r||role()!=='proc')return;
     const its=r.items.filter(i=>i.state==='pending'&&!i.poNo);
+    if(!its.length){showToast('No pending items without a PO.','error');return;}
+    const rows=its.map(i=>`<div class="rounded-xl border border-line bg-white p-3 text-sm space-y-1"><label><input type="checkbox" class="rf-c" data-i="${i.id}" checked> <b>${esc(i.material)}</b> <span class="text-xs text-muted">${i.qty} ${esc(i.unit)}</span></label><input class="field rf-sp" data-i="${i.id}" placeholder="Specification / brand (optional)"></div>`).join('');
+    const sups=[0,1,2,3,4,5].map(k=>`<div class="rounded-xl border border-line p-2 space-y-1"><div class="grid grid-cols-5 gap-1"><input class="field col-span-3 rf-n" list="rfSupList" autocomplete="off" placeholder="Supplier ${k+1}${k<2?' (required)':''}"><input class="field col-span-2 rf-p" type="tel" placeholder="Phone (WhatsApp)"></div><input class="field rf-e" type="email" placeholder="Email (Gmail)"></div>`).join('');
+    const dl0=new Date(Date.now()+2*864e5).toISOString().slice(0,10);
+    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:520px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Request for Quotation</h3><div class="text-xs text-muted mb-3">${esc(r.no)} &middot; ${esc(r.prjNo)}. Suppliers get a private link to enter their rates.</div><datalist id="rfSupList">${(window.marsSuppliers?marsSuppliers():[]).map(x=>`<option value="${esc(x.name)}">`).join('')}</datalist><div class="space-y-2"><div class="text-xs font-extrabold text-navy">Items</div>${rows}<div class="text-xs font-extrabold text-navy">Suppliers (2 to 6)</div>${sups}<div><label class="field-label">Quotation deadline</label><input id="rfDl" class="field" type="date" value="${dl0}"></div><div><label class="field-label">Note to suppliers (optional)</label><input id="rfNote" class="field" placeholder="e.g. Rates must include carrying to site"></div></div><div class="flex gap-2 mt-4"><button class="btn btn-primary" id="rfSave">Create RFQ</button><button class="btn btn-secondary" id="rfClose">Close</button></div></div>`,'rfqModal');
+    m.addEventListener('change',e=>{if(e.target.classList.contains('rf-n')){const f=window.marsFindSupplier&&marsFindSupplier(e.target.value),ph=e.target.parentNode.querySelector('.rf-p'),em=e.target.parentNode.parentNode.querySelector('.rf-e');if(f&&ph&&!ph.value)ph.value=f.phone||'';if(f&&em&&!em.value)em.value=f.email||'';}});
+    m.querySelector('#rfClose').onclick=()=>m.remove();
+    m.querySelector('#rfSave').onclick=async()=>{
+      const items=[...m.querySelectorAll('.rf-c')].filter(c=>c.checked).map(c=>{const i=its.find(x=>x.id===c.dataset.i);return{id:i.id,material:i.material,unit:i.unit||'',qty:i.qty,spec:m.querySelector('.rf-sp[data-i="'+i.id+'"]').value.trim()};});
+      if(!items.length){showToast('Tick at least one item.','error');return;}
+      const dl=m.querySelector('#rfDl').value,dlMs=dl?new Date(dl+'T23:59:59').getTime():0;
+      if(!dlMs||dlMs<Date.now()){showToast('Choose a deadline that is today or later.','error');return;}
+      const ns=[...m.querySelectorAll('.rf-n')],ps=[...m.querySelectorAll('.rf-p')],es=[...m.querySelectorAll('.rf-e')],sup=[];
+      ns.forEach((n,k)=>{const nm=n.value.trim();if(nm)sup.push({name:nm,phone:ps[k].value.trim(),email:es[k].value.trim(),token:tok()});});
+      if(sup.length<2){showToast('Add at least 2 suppliers.','error');return;}
+      if(new Set(sup.map(x=>x.name.toLowerCase())).size!==sup.length){showToast('Supplier names must be different.','error');return;}
+      const b=m.querySelector('#rfSave');b.disabled=true;b.textContent='Creating...';
+      const db=fb(),me=window.currentEngineerName||'Admin',nref=db.collection('rfqs').doc(),note=m.querySelector('#rfNote').value.trim();
+      const site=(lastProject(r.prjNo)||{}).address||'',company=co().name||'MARS STRUCTURE LIMITED';
+      let rfObj=null;
+      try{
+        await db.runTransaction(async tx=>{
+          const nw=new Date(),yy=String(nw.getFullYear()).slice(-2),mm=String(nw.getMonth()+1).padStart(2,'0');
+          const cref=db.collection('counters').doc('rfq_year_'+yy),cc=await tx.get(cref),n=(cc.exists?cc.data().n:0)+1;
+          const no='RFQ'+yy+'-'+mm+'-'+String(n).padStart(5,'0'),now=Date.now();
+          tx.set(cref,{n});
+          rfObj={id:nref.id,no,requisitionId:rid,reqNo:r.no,prjNo:r.prjNo,items,deadline:dl,deadlineMs:dlMs,note,invites:sup,createdBy:me,createdAt:now,status:'open'};
+          const {id:_i,...rfData}=rfObj;tx.set(nref,rfData);
+          sup.forEach(v=>tx.set(db.collection('rfq_invites').doc(v.token),{rfqId:nref.id,rfqNo:no,supplier:{name:v.name,phone:v.phone},company,site,prjNo:r.prjNo,items,deadline:dl,deadlineMs:dlMs,note,status:'sent',createdAt:now}));
+        });
+        m.remove();showToast('RFQ created. Send the links to suppliers.');shareModal(rfObj);
+      }catch(e){b.disabled=false;b.textContent='Create RFQ';console.error(e);showToast('Failed: '+(e.code||e.message)+' (check Firestore Rules for rfqs / rfq_invites)','error');}
+    };
+  };
+  function shareModal(rf){
+    const rows=rf.invites.map((v,k)=>{const link=portalUrl(v.token),wa='https://wa.me/'+(v.phone?waNum(v.phone):'')+'?text='+encodeURIComponent(rfqMsg(rf,v)),sub=encodeURIComponent('Request for Quotation '+rf.no+' - '+(co().name||'Mars Structure Limited')),gm='https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(v.email||'')+'&su='+sub+'&body='+encodeURIComponent(rfqMsg(rf,v)),ml='mailto:'+encodeURIComponent(v.email||'')+'?subject='+sub+'&body='+encodeURIComponent(rfqMsg(rf,v));
+      return `<div class="rounded-xl border border-line bg-white p-3 text-sm space-y-1"><b>${esc(v.name)}</b>${v.phone?' <span class="text-xs text-muted">'+esc(v.phone)+'</span>':''}${v.email?' <span class="text-xs text-muted">'+esc(v.email)+'</span>':''}<input class="field rf-link" readonly value="${esc(link)}" onfocus="this.select()"><div class="flex gap-2 flex-wrap"><button class="btn btn-secondary rf-copy" data-l="${esc(link)}">Copy link</button><a class="btn btn-secondary" target="_blank" rel="noopener" href="${wa}">WhatsApp</a><a class="btn btn-secondary" target="_blank" rel="noopener" href="${gm}">Gmail</a><a class="btn btn-secondary" href="${ml}">Mail app</a><button class="btn btn-secondary" onclick="rfqPrint('${rf.id}',${k})">Print RFQ</button></div></div>`;}).join('');
+    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:520px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">${esc(rf.no)} &middot; send to suppliers</h3><div class="text-xs text-muted mb-3">Each supplier has a private link. They enter rates on their phone and submit before ${dFmt(rf.deadlineMs)}. To attach the RFQ as a PDF: tap Print RFQ, save as PDF, then attach it in Gmail or WhatsApp.</div><div class="space-y-2">${rows}</div><div class="flex gap-2 mt-4"><button class="btn btn-secondary" id="rfShX">Close</button></div></div>`,'rfShareModal');
+    m.querySelector('#rfShX').onclick=()=>m.remove();
+    m.querySelectorAll('.rf-copy').forEach(b=>b.onclick=()=>{const t=b.dataset.l,ok=()=>showToast('Link copied.');(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(ok).catch(()=>{const i=b.parentNode.parentNode.querySelector('.rf-link');i.select();document.execCommand('copy');ok();});});
+  }
+  window.rfqShare=function(id){const rf=rfqList.find(x=>x.id===id);if(rf&&role()==='proc')shareModal(rf);};
+  window.rfqToCs=function(id){
+    const rf=rfqList.find(x=>x.id===id);if(!rf||role()!=='proc')return;
+    const got=rf.invites.filter(v=>invMap[v.token]&&invMap[v.token].status==='submitted');
+    if(!got.length){showToast('No quotation received yet.','error');return;}
+    if(got.length>4)showToast('A CS holds 4 suppliers. The first 4 quotations were loaded.','error');
+    const use=got.slice(0,4);
+    const pre={rfqId:rf.id,rfqNo:rf.no,suppliers:use.map(v=>({name:v.name})),lines:rf.items.map(it=>({itemId:it.id,material:it.material,unit:it.unit,qty:it.qty,sel:-1,quotes:use.map(v=>{const ln=((invMap[v.token].quote||{}).lines||[]).find(x=>x.id===it.id)||{};return{rate:+ln.rate||0,disc:+ln.disc||0};})}))};
+    window.csOpen(rf.requisitionId,null,pre);
+  };
+  window.rfqPrint=function(id,k){
+    const rf=rfqList.find(x=>x.id===id);if(!rf)return;
+    const v=rf.invites[k]||{name:'',phone:''},c=co(),lg=logo(),inv=invMap[v.token]||{};
+    const rows=rf.items.map((i,n)=>`<tr><td class="c">${n+1}</td><td>${esc(i.material)}</td><td>${esc(i.spec||'')}</td><td class="c">${esc(i.unit)}</td><td class="r">${money(i.qty)}</td><td></td><td></td><td></td></tr>`).join('');
+    const html=`<html><head><meta charset="utf-8"><title>${esc(rf.no)}</title><style>
+      @page{size:A4;margin:11mm 12mm 12mm}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      body{font-family:Tahoma,Verdana,Arial,sans-serif;font-size:11.5px;color:#111;margin:0;line-height:1.4}
+      .hd{display:flex;align-items:center;gap:16px;padding-bottom:8px;border-bottom:1.5px solid #16294d}.hd img{height:58px}.hd .t{flex:1;text-align:center}.hd h1{margin:0 0 3px;font-size:21px}.hd .a{font-size:10px;color:#222}
+      .ttl{text-align:center;margin:14px 0 10px;font-size:16px;font-weight:bold}.mt td{padding:2px 6px;vertical-align:top}.k{font-weight:bold;white-space:nowrap}
+      table.it{width:100%;border-collapse:collapse;margin-top:10px}table.it th,table.it td{border:1px solid #b8bec9;padding:8px 6px}table.it th{background:#e8edf5;color:#16294d}.c{text-align:center}.r{text-align:right}
+      ol{line-height:1.7;margin:4px 0 0 18px;padding:0}.sg{margin-top:50px;width:30%;text-align:center;font-weight:bold}.sg .ln{border-top:1px solid #333;margin-bottom:4px}
+    </style></head><body>
+      <div class="hd">${lg?`<img src="${lg}">`:''}<div class="t"><h1>${esc(c.name||'MARS STRUCTURE LIMITED')}</h1><div class="a">${esc(c.address||MARS_ADDR)}${c.phone?'<br>Phone: '+esc(c.phone):''}${c.email?' &nbsp; E-mail: '+esc(c.email):''}</div></div></div>
+      <div class="ttl">Request for Quotation (RFQ)</div>
+      <table class="mt"><tr><td class="k">RFQ No</td><td>: ${esc(rf.no)}</td><td class="k">Date</td><td>: ${d8(rf.createdAt)}</td></tr>
+      <tr><td class="k">To</td><td>: <b>${esc(v.name)}</b></td><td class="k">Submit Before</td><td>: <b>${dFmt(rf.deadlineMs)}</b></td></tr>
+      <tr><td class="k">Phone</td><td>: ${esc(v.phone||'')}</td><td class="k">Project</td><td>: ${esc(rf.prjNo)}</td></tr></table>
+      <p>Dear Sir,<br>Please quote your best rates for the following materials, delivered to our project site.${rf.note?' '+esc(rf.note):''}</p>
+      <table class="it"><thead><tr><th>S.L</th><th>Materials Name</th><th>Specification</th><th>Unit</th><th>Qty</th><th>Rate</th><th>Disc %</th><th>Amount</th></tr></thead><tbody>${rows}</tbody></table>
+      <div class="ttl" style="font-size:12px;text-align:left;margin-top:12px">Terms</div>
+      <ol><li>Rates must be in BDT, per unit, including carrying, loading and unloading.</li><li>VAT / TDS / AIT as per Govt. rules (please state if extra).</li><li>Quoted rates must stay valid for at least 7 days.</li><li>Delivery period: ____________ days &nbsp; Payment terms offered: ______________________</li><li>This is a request for quotation only. It is not a purchase order.</li></ol>
+      ${v.token?`<p style="font-size:10.5px;color:#444">You can also submit online: ${esc(portalUrl(v.token))}</p>`:''}
+      <div class="sg"><div class="ln"></div>Authorised Signature &amp; Seal</div>
+    </body></html>`;
+    printDoc(html);
+  };
+
+  /* ---------- Comparative Statement (CS) ---------- */
+  const csNet=q=>q&&q.rate>0?r2(q.rate*(1-(q.disc||0)/100)):0;
+  window.csOpen=function(rid,csId,pre){
+    const r=reqSnap[rid];if(!r||role()!=='proc')return;
+    const ex=csId?csList.find(c=>c.id===csId):null;
+    if(ex&&ex.lines.some(l=>(r.items.find(i=>i.id===l.itemId)||{}).poNo)){showToast('A PO was already created from this CS, so it cannot be edited.','error');return;}
+    const its=ex?ex.lines.map(l=>({id:l.itemId,material:l.material,unit:l.unit,qty:l.qty})):r.items.filter(i=>i.state==='pending'&&!i.poNo);
+    if(!its.length){showToast('No pending items without a PO.','error');return;}
+    const src=ex||pre||null;const names=src?src.suppliers.map(x=>x.name):[];while(names.length<4)names.push('');
+    const lineHtml=its.map(i=>{
+      const l=src&&src.lines.find(x=>x.itemId===i.id);
+      return `<div class="rounded-xl border border-line bg-white p-3 space-y-2 text-sm cs-l" data-i="${i.id}"${ex&&l?' data-manual="1"':''}><div><b>${esc(i.material)}</b> <span class="text-xs text-muted">${i.qty} ${esc(i.unit)}</span><div class="cs-lo text-xs" style="color:#166534;font-weight:700"></div></div>`
+      +[0,1,2,3].map(k=>{const q=l&&l.quotes[k];return `<div class="grid grid-cols-6 gap-1 items-center"><span class="col-span-2 text-xs cs-sn" data-k="${k}">Supplier ${k+1}</span><input class="field col-span-2 cs-r" data-k="${k}" type="number" step="0.01" placeholder="Rate" value="${q&&q.rate?q.rate:''}"><input class="field cs-d" data-k="${k}" type="number" step="0.01" placeholder="Disc%" value="${q&&q.disc?q.disc:''}"><label class="text-center text-xs"><input type="radio" name="sel_${i.id}" class="cs-p" data-k="${k}"${l&&l.sel===k?' checked':''}> Pick</label></div>`;}).join('')
+      +`<input class="cs-why field" placeholder="Reason for not choosing the lowest rate" style="display:none" value="${esc(l&&l.why||'')}"></div>`;
+    }).join('');
+    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:520px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Comparative Statement</h3><div class="text-xs text-muted mb-3">${esc(r.no)} &middot; ${esc(r.prjNo)}. Enter each supplier's rate. The lowest rate is picked automatically; change it only with a reason.</div><datalist id="csSupList">${(window.marsSuppliers?marsSuppliers():[]).map(x=>`<option value="${esc(x.name)}">`).join('')}</datalist><div class="space-y-2"><div class="text-xs font-extrabold text-navy">Suppliers (2 to 4)</div>${[0,1,2,3].map(k=>`<input class="field cs-s" data-k="${k}" list="csSupList" autocomplete="off" placeholder="Supplier ${k+1}${k<2?' (required)':''}" value="${esc(names[k])}">`).join('')}<div class="text-xs font-extrabold text-navy">Items</div>${lineHtml}</div><div class="flex gap-2 mt-4"><button class="btn btn-primary" id="csSave">Save CS</button><button class="btn btn-secondary" id="csClose">Close</button></div></div>`,'csModal');
+    const calc=()=>{
+      const sn=[...m.querySelectorAll('.cs-s')].map(x=>x.value.trim());
+      m.querySelectorAll('.cs-sn').forEach(e=>{const k=+e.dataset.k;e.textContent=sn[k]||('Supplier '+(k+1));});
+      m.querySelectorAll('.cs-l').forEach(L=>{
+        const net=[0,1,2,3].map(k=>csNet({rate:parseFloat(L.querySelector('.cs-r[data-k="'+k+'"]').value)||0,disc:Math.min(100,Math.max(0,parseFloat(L.querySelector('.cs-d[data-k="'+k+'"]').value)||0))}));
+        let lo=-1;net.forEach((v,k)=>{if(v>0&&(lo<0||v<net[lo]))lo=k;});
+        L.querySelector('.cs-lo').textContent=lo>=0?'Lowest: '+(sn[lo]||'Supplier '+(lo+1))+' @ '+money(net[lo]):'';
+        if(!L.dataset.manual&&lo>=0){const rd=L.querySelector('.cs-p[data-k="'+lo+'"]');if(rd)rd.checked=true;}
+        const pk=L.querySelector('.cs-p:checked'),k=pk?+pk.dataset.k:-1;
+        L.querySelector('.cs-why').style.display=(k>=0&&lo>=0&&net[k]>net[lo])?'':'none';
+      });
+    };
+    const onAny=e=>{if(e.target.classList&&e.target.classList.contains('cs-p'))e.target.closest('.cs-l').dataset.manual='1';calc();};
+    m.addEventListener('input',onAny);m.addEventListener('change',onAny);calc();
+    m.querySelector('#csClose').onclick=()=>m.remove();
+    m.querySelector('#csSave').onclick=async()=>{
+      const names2=[...m.querySelectorAll('.cs-s')].map(x=>x.value.trim()),idx=[];names2.forEach((n,k)=>{if(n)idx.push(k);});
+      if(idx.length<2){showToast('Enter at least 2 suppliers.','error');return;}
+      if(new Set(idx.map(k=>names2[k].toLowerCase())).size!==idx.length){showToast('Supplier names must be different.','error');return;}
+      const sups=idx.map(k=>({name:names2[k]})),lines=[];let err='';
+      m.querySelectorAll('.cs-l').forEach(L=>{
+        if(err)return;
+        const it=its.find(x=>x.id===L.dataset.i);
+        const quotes=idx.map(k=>({rate:parseFloat(L.querySelector('.cs-r[data-k="'+k+'"]').value)||0,disc:Math.min(100,Math.max(0,parseFloat(L.querySelector('.cs-d[data-k="'+k+'"]').value)||0))}));
+        const pk=L.querySelector('.cs-p:checked');if(!pk){err=it.material+': pick a supplier.';return;}
+        const sel=idx.indexOf(+pk.dataset.k);
+        if(sel<0||!(quotes[sel].rate>0)){err=it.material+': the picked supplier has no rate.';return;}
+        const net=quotes.map(csNet);let lo=sel;net.forEach((v,k)=>{if(v>0&&v<net[lo])lo=k;});
+        const why=L.querySelector('.cs-why').value.trim(),notLow=net[sel]>net[lo];
+        if(notLow&&!why){err=it.material+': write the reason for not choosing the lowest rate.';return;}
+        lines.push({itemId:it.id,material:it.material,unit:it.unit||'',qty:it.qty,quotes,sel,why:notLow?why:''});
+      });
+      if(err){showToast(err,'error');return;}
+      const b=m.querySelector('#csSave');b.disabled=true;b.textContent='Saving...';
+      const db=fb(),me=window.currentEngineerName||'Admin';
+      try{
+        if(ex)await db.collection('comparative_statements').doc(ex.id).update({suppliers:sups,lines,updatedAt:Date.now()});
+        else await db.runTransaction(async tx=>{
+          const nw=new Date(),yy=String(nw.getFullYear()).slice(-2),mm=String(nw.getMonth()+1).padStart(2,'0');
+          const cref=db.collection('counters').doc('cs_year_'+yy),cc=await tx.get(cref),n=(cc.exists?cc.data().n:0)+1;
+          tx.set(cref,{n});
+          tx.set(db.collection('comparative_statements').doc(),{no:'CS'+yy+'-'+mm+'-'+String(n).padStart(5,'0'),requisitionId:rid,reqNo:r.no,prjNo:r.prjNo,suppliers:sups,lines,...(pre?{rfqId:pre.rfqId,rfqNo:pre.rfqNo}:{}),createdBy:me,createdAt:Date.now(),updatedAt:Date.now()});
+        });
+        m.remove();showToast('Comparative Statement saved. Now create the PO from it.');
+      }catch(e){b.disabled=false;b.textContent='Save CS';console.error(e);showToast('Failed: '+(e.code||e.message)+' (check Firestore Rules for comparative_statements)','error');}
+    };
+  };
+  window.csPO=function(csId,k){const c=csList.find(x=>x.id===csId);if(!c)return;window.poOpen(c.requisitionId,{csId,sup:k});};
+  window.csPrint=function(id){
+    const cc=csList.find(x=>x.id===id);if(!cc)return;
+    const c=co(),lg=logo(),n=cc.suppliers.length;
+    const head2=cc.suppliers.map(()=>'<th>Rate</th><th>Amount</th>').join('');
+    const tot=cc.suppliers.map(()=>0);
+    const rows=cc.lines.map((l,k)=>{
+      const cells=cc.suppliers.map((sp,j)=>{const nt=csNet(l.quotes[j]),am=r2(nt*l.qty);if(nt>0)tot[j]+=am;const on=l.sel===j;return nt>0?`<td class="r${on?' sel':''}">${money(nt)}</td><td class="r${on?' sel':''}">${money(am)}</td>`:`<td class="c">-</td><td class="c">-</td>`;}).join('');
+      return `<tr><td class="c">${k+1}</td><td>${esc(l.material)}</td><td class="c">${esc(l.unit)}</td><td class="r">${money(l.qty)}</td>${cells}<td>${esc(cc.suppliers[l.sel].name)}${l.why?'<br><i>Reason: '+esc(l.why)+'</i>':''}</td></tr>`;}).join('');
+    const html=`<html><head><meta charset="utf-8"><title>${esc(cc.no)}</title><style>
+      @page{size:A4 landscape;margin:10mm}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      body{font-family:Tahoma,Verdana,Arial,sans-serif;font-size:11px;color:#111;margin:0}
+      .hd{display:flex;align-items:center;gap:14px;border-bottom:1.5px solid #16294d;padding-bottom:6px}.hd img{height:48px}.hd h1{margin:0;font-size:18px;flex:1;text-align:center}
+      h2{text-align:center;margin:10px 0 6px;font-size:15px}.mt{display:flex;justify-content:space-between;margin-bottom:6px}
+      table{width:100%;border-collapse:collapse}th,td{border:1px solid #b8bec9;padding:5px}th{background:#e8edf5;color:#16294d}.c{text-align:center}.r{text-align:right}
+      td.sel{background:#dff3e4;font-weight:bold}.sg{display:flex;justify-content:space-between;margin-top:46px}.sg div{width:22%;text-align:center;font-weight:bold}.sg .ln{border-top:1px solid #333;margin-bottom:4px}
+    </style></head><body>
+      <div class="hd">${lg?`<img src="${lg}">`:''}<h1>${esc(c.name||'MARS STRUCTURE LIMITED')}</h1></div>
+      <h2>Comparative Statement (CS)</h2>
+      <div class="mt"><div><b>CS No:</b> ${esc(cc.no)} &nbsp; <b>Requisition:</b> ${esc(cc.reqNo)} &nbsp; <b>Project:</b> ${esc(cc.prjNo)}</div><div><b>Date:</b> ${d8(cc.createdAt)}</div></div>
+      <table><thead><tr><th rowspan="2">SL</th><th rowspan="2">Material</th><th rowspan="2">Unit</th><th rowspan="2">Qty</th>${cc.suppliers.map(x=>`<th colspan="2">${esc(x.name)}</th>`).join('')}<th rowspan="2">Selected</th></tr><tr>${head2}</tr></thead><tbody>${rows}
+      <tr><td colspan="4" class="r"><b>Total (quoted items)</b></td>${tot.map(t=>`<td colspan="2" class="r"><b>${money(t)}</b></td>`).join('')}<td></td></tr></tbody></table>
+      <div style="margin-top:6px;font-size:10px;color:#444">Rates shown are after discount. Green = selected supplier.</div>
+      <div class="sg"><div><div class="ln"></div>Prepared By<br><small style="font-weight:normal">${esc(cc.createdBy||'')} &middot; ${d8(cc.createdAt)}</small></div><div><div class="ln"></div>Checked By</div><div><div class="ln"></div>Purchase Manager</div><div><div class="ln"></div>Approved By</div></div>
+    </body></html>`;
+    printDoc(html);
+  };
+
+  /* ---------- create ---------- */
+  window.poOpen=function(rid,opt){
+    const r=reqSnap[rid];if(!r)return;
+    const csd=opt&&opt.csId?csList.find(c=>c.id===opt.csId):null;
+    let its=r.items.filter(i=>i.state==='pending'&&!i.poNo);
+    if(csd)its=its.filter(i=>csd.lines.some(l=>l.itemId===i.id&&l.sel===opt.sup));
+    if(!its.length){showToast('No items left for this PO.','error');return;}
     const mats=[...new Set(its.map(i=>i.material))];
     const v={supplier:{name:'',contact:'',phone:'',address:''},project:lastProject(r.prjNo),deliveryDate:'',mrfNo:'',subject:'Purchase Order for Supply '+mats.slice(0,3).join(', ')+'.',terms:'',payMode:'',priority:'Normal',deliveryAddr:'',remarks:'',conditions:co().terms||DEFAULT_TERMS,advance:''};
-    const rows=its.map(i=>rowHtml(i.id,i.material,i.unit,i.qty,'','','',true,window.marsRateHint?marsRateHint(i.material):'')).join('');
+    if(csd){const sn=csd.suppliers[opt.sup].name,fs=window.marsFindSupplier&&marsFindSupplier(sn);v.supplier={name:sn,contact:'',phone:fs?fs.phone||'':'',address:fs?fs.address||'':''};}else v.direct=true;
+    const rows=its.map(i=>{const l=csd&&csd.lines.find(x=>x.itemId===i.id),q=l&&l.quotes[l.sel];return rowHtml(i.id,i.material,i.unit,i.qty,'',q?q.rate:'',q&&q.disc?q.disc:'',true,csd?'Per '+csd.no:(window.marsRateHint?marsRateHint(i.material):''));}).join('');
     const m=overlay(formHtml('Purchase Order',esc(r.no)+' · '+esc(r.prjNo),v,rows,'Create Purchase Order'),'poModal');
-    wire(m,false);m.querySelector('#poSave').onclick=()=>submit(rid,m);
+    wire(m,false);m.querySelector('#poSave').onclick=()=>submit(rid,m,csd?{csId:csd.id,csNo:csd.no}:{direct:true});
   };
-  async function submit(rid,m){
+  async function submit(rid,m,meta){
+    meta=meta||{};
     const f=readForm(m),ids=f.lines.map(l=>l.key);
+    if(meta.direct&&!f.directReason){showToast('Write the reason for a direct purchase (no CS).','error');return;}
     if(!f.supplier.name||!f.deliveryDate||!ids.length||f.lines.some(l=>l.rate<=0)){showToast('Enter supplier, delivery date and a rate for every ticked item.','error');return;}
     const by=window.currentEngineerName||'Admin',db=fb(),rref=db.collection('requisitions').doc(rid);
     try{
@@ -4604,17 +4869,18 @@ async function deleteEntryFromFirebase(firebaseId){
         const items=sel.map(i=>priced(i,f.lines.find(l=>l.key===i.id)));
         const subTotal=r2(items.reduce((a,x)=>a+x.qty*x.rate,0)),total=r2(items.reduce((a,x)=>a+x.amount,0));
         tx.set(cref,{n});
-        tx.set(db.collection('purchase_orders').doc(),{no:pno,requisitionId:rid,reqNo:r.no,prjNo:r.prjNo,mrfNo:f.mrfNo,subject:f.subject,supplier:f.supplier,project:f.project,deliveryDate:f.deliveryDate,terms:f.terms,payMode:f.payMode,priority:f.priority,deliveryAddr:f.deliveryAddr,remarks:f.remarks,conditions:f.conditions,items,subTotal,discount:r2(subTotal-total),total,advance:f.advance===null?total:f.advance,createdBy,createdAt:Date.now()});
+        tx.set(db.collection('purchase_orders').doc(),{no:pno,status:'pending',...(meta.csId?{csId:meta.csId,csNo:meta.csNo}:{directReason:f.directReason||''}),requisitionId:rid,reqNo:r.no,prjNo:r.prjNo,mrfNo:f.mrfNo,subject:f.subject,supplier:f.supplier,project:f.project,deliveryDate:f.deliveryDate,terms:f.terms,payMode:f.payMode,priority:f.priority,deliveryAddr:f.deliveryAddr,remarks:f.remarks,conditions:f.conditions,items,subTotal,discount:r2(subTotal-total),total,advance:f.advance===null?total:f.advance,createdBy:by,createdAt:Date.now()});
         tx.update(rref,{items:r.items.map(i=>sel.includes(i)?{...i,poNo:pno}:i),history:(r.history||[]).concat([{by,role:'proc',action:'Created '+pno,at:Date.now()}])});
       });
       if(window.marsEnsureSupplier)marsEnsureSupplier({name:f.supplier.name,phone:f.supplier.phone,address:f.supplier.address});
-      m.remove();showToast('Purchase Order '+pno+' created.');
+      m.remove();showToast('Purchase Order '+pno+' created. Sent for approval.');
     }catch(e){console.error(e);showToast('Failed: '+(e.code||e.message),'error');}
   }
 
   /* ---------- edit ---------- */
   window.poEdit=function(id){
     const o=pos.find(x=>x.id===id);if(!o||role()!=='proc')return;
+    if(pst(o)==='rejected'){showToast('A rejected PO cannot be edited. Create a new PO from the requisition.','error');return;}
     const v={supplier:{name:o.supplier.name,contact:o.supplier.contact||'',phone:o.supplier.phone||'',address:o.supplier.address||''},project:o.project||{address:'',contact:'',phone:''},deliveryDate:o.deliveryDate||'',mrfNo:o.mrfNo||'',subject:o.subject||'',terms:o.terms||'',payMode:o.payMode||'',priority:o.priority||'Normal',deliveryAddr:o.deliveryAddr||'',remarks:o.remarks||'',conditions:o.conditions||co().terms||DEFAULT_TERMS,advance:o.advance??o.total};
     const rows=o.items.map((i,k)=>rowHtml(String(k),i.material,i.unit,i.qty,i.spec||'',i.rate,i.disc||'',false,'')).join('');
     const m=overlay(formHtml('Edit '+esc(o.no),'Item and quantity cannot change. Every edit is recorded.',v,rows,'Save changes'),'poEditModal');
@@ -4642,7 +4908,8 @@ async function deleteEntryFromFirebase(firebaseId){
           const subTotal=r2(items.reduce((a,x)=>a+x.qty*x.rate,0)),total=r2(items.reduce((a,x)=>a+x.amount,0)),adv=f.advance===null?total:f.advance;
           if(adv!==(c.advance??c.total))ch.push('Advance/PDC amount');
           if(!ch.length)throw new Error('No changes made.');
-          tx.update(ref,{supplier:f.supplier,project:f.project,deliveryDate:f.deliveryDate,mrfNo:f.mrfNo,subject:f.subject,terms:f.terms,payMode:f.payMode,priority:f.priority,deliveryAddr:f.deliveryAddr,remarks:f.remarks,conditions:f.conditions,items,subTotal,discount:r2(subTotal-total),total,advance:adv,edits:(c.edits||[]).concat([{by,at:Date.now(),note:ch.join('; ')}])});
+          const reset=c.status==='approved';if(reset)ch.push('Sent back for re-approval');
+          tx.update(ref,{supplier:f.supplier,project:f.project,deliveryDate:f.deliveryDate,mrfNo:f.mrfNo,subject:f.subject,terms:f.terms,payMode:f.payMode,priority:f.priority,deliveryAddr:f.deliveryAddr,remarks:f.remarks,conditions:f.conditions,items,subTotal,discount:r2(subTotal-total),total,advance:adv,...(reset?{status:'pending',approvedBy:null,approvedAt:null}:{}),edits:(c.edits||[]).concat([{by,at:Date.now(),note:ch.join('; ')}])});
         });
         m.remove();showToast('PO updated and edit recorded.');
       }catch(e){showToast(e.message==='No changes made.'?e.message:'Failed: '+(e.code||e.message),'error');}
@@ -4655,7 +4922,7 @@ async function deleteEntryFromFirebase(firebaseId){
     const c=co(),lg=logo(),pj=o.project||{},sp=o.supplier||{};
     const req=(window.marsReqs?marsReqs():[]).find(x=>x.id===o.requisitionId)||{};
     const lastH=p=>{const a=(req.history||[]).filter(h=>String(h.action).startsWith(p));return a[a.length-1];};
-    const fw=lastH('Checked and forwarded'),ap=lastH('Approved');
+    const fw=lastH('Checked and forwarded'),ap=o.approvedBy?{by:o.approvedBy,at:o.approvedAt}:(o.status?null:lastH('Approved'));
     const sub=o.subTotal??o.items.reduce((a,x)=>a+x.qty*x.rate,0),disc=o.discount??(sub-o.total),adv=o.advance??o.total;
     const rows=o.items.map((i,k)=>`<tr><td class="c">${k+1}</td><td>${esc(o.reqNo)}</td><td>${esc(i.material)}</td><td>${esc(i.spec||'')}</td><td class="c">${esc(i.unit)}</td><td class="r">${money(i.qty)}</td><td class="r">${money(i.rate)}</td><td class="c">${i.disc?esc(i.disc):''}</td><td class="r">${money(i.rateAfter??i.rate)}</td><td class="r">${money(i.amount)}</td></tr>`).join('');
     const conds=String(o.conditions||co().terms||DEFAULT_TERMS).split('\n').map(x=>x.trim().replace(/^\d+[\.\)]\s*/,'')).filter(Boolean).map(x=>x.replace(/\{supplier\}/g,sp.name||''));
@@ -4666,11 +4933,12 @@ async function deleteEntryFromFirebase(firebaseId){
       body{font-family:Tahoma,Verdana,"Segoe UI",Arial,sans-serif;font-size:11.5px;color:#111;margin:0;line-height:1.35}
       .wm{position:fixed;left:0;top:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:0;opacity:.07}
       .wm img{width:360px;max-width:70%}.wm .wn{margin-top:16px;font-size:40px;font-weight:900;letter-spacing:3px;color:#16294d;text-align:center;line-height:1.1}
+      .dw{position:fixed;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:120px;font-weight:900;letter-spacing:8px;color:#c00000;opacity:.13;transform:rotate(-30deg);z-index:0}
       .pg{position:relative;z-index:1}
       .hd{display:flex;align-items:center;gap:16px;padding-bottom:8px;border-bottom:1.5px solid #16294d}.hd img{height:58px}.hd .t{flex:1;text-align:center}
       .hd h1{margin:0 0 3px;font-size:21px;font-weight:bold;letter-spacing:.4px;color:#111}.hd .a{font-size:10px;line-height:1.55;color:#222}
       .ttl{position:relative;text-align:center;margin:14px 0 12px;font-size:16px;font-weight:bold;letter-spacing:.3px}
-      .ttl .cp{position:absolute;right:0;top:-6px;border:1.5px solid #111;padding:5px 0;width:150px;font-size:12.5px;font-weight:bold;background:#fff}
+      .ttl .cp{position:absolute;right:0;top:-6px;border:1.5px solid #111;padding:5px 10px;min-width:150px;box-sizing:border-box;font-size:12.5px;font-weight:bold;background:#fff}
       .two{display:flex;gap:18px}.two>table{width:50%;border-collapse:collapse}.two td{padding:2.5px 3px;vertical-align:top}
       .k{font-weight:bold;white-space:nowrap;width:1%;padding-right:10px!important}.s{width:1%;font-weight:bold}
       .subj{margin:14px 0 6px;font-size:12.5px;font-weight:bold}.subj u{font-weight:bold}
@@ -4690,9 +4958,10 @@ async function deleteEntryFromFirebase(firebaseId){
       .ft{margin-top:18px;border-top:1px solid #b8bec9;padding-top:5px;text-align:center;font-size:9px;color:#666}
     </style></head><body>
       <div class="wm">${lg?`<img src="${lg}">`:''}<div class="wn">${esc(c.name||'MARS STRUCTURE LIMITED')}</div></div>
+      ${pst(o)==='approved'?'':`<div class="dw">${pst(o)==='rejected'?'REJECTED':'DRAFT'}</div>`}
       <div class="pg">
       <div class="hd">${lg?`<img src="${lg}">`:''}<div class="t"><h1>${esc(c.name||'MARS STRUCTURE LIMITED')}</h1><div class="a">${esc(c.address||MARS_ADDR)}${c.phone||c.email||c.web?'<br>':''}${c.phone?'Phone: '+esc(c.phone)+' &nbsp; ':''}${c.email?'E-mail: '+esc(c.email)+' &nbsp; ':''}${c.web?'Web: '+esc(c.web):''}</div></div></div>
-      <div class="ttl">Purchase Order<span class="cp">Main Copy</span></div>
+      <div class="ttl">Purchase Order<span class="cp">${pst(o)==='approved'?'Main Copy':(pst(o)==='rejected'?'REJECTED':'DRAFT - NOT APPROVED')}</span></div>
       <div class="two"><table>${meta('P.O. No',esc(o.no)+((o.edits||[]).length?' (Revised '+o.edits.length+')':''))}${meta('Supplier Name','<b>'+esc(sp.name)+'</b>')}${meta('Supplier Address',esc(sp.address||''))}${meta('Contact Person',esc(sp.contact||''))}${meta('Phone Number',esc(sp.phone||''))}${meta('MRF No','<b>'+esc(o.mrfNo||'')+'</b>')}${meta('Priority',esc(o.priority||'Normal'))}</table>
       <table>${meta('P.O Date',d8(o.createdAt).replace(/\//g,'-'))}${meta('Project Name','<b>'+esc(o.prjNo)+'</b>')}${meta('Project Address',esc(pj.address||''))}${meta('Contact Person',esc(pj.contact||''))}${meta('Phone Number',esc(pj.phone||''))}${meta('Delivery Date',dLong(o.deliveryDate))}${meta('Payment Method',esc(o.payMode||'As per agreed terms'))}</table></div>
       ${o.deliveryAddr?`<div style="margin-top:4px"><b>Deliver To</b> &nbsp;: ${esc(o.deliveryAddr)}</div>`:''}
@@ -4723,7 +4992,7 @@ async function deleteEntryFromFirebase(firebaseId){
     const L=filtered();
     document.getElementById('poSum').textContent=L.length+' PO · Tk '+money(L.reduce((a,o)=>a+o.total,0));
     document.getElementById('poPageList').innerHTML=L.map(o=>{const e=o.edits||[],le=e[e.length-1];
-      return `<div class="rounded-xl border p-3 text-sm"><b>${esc(o.no)}</b> · ${esc(o.prjNo)}<div class="text-xs text-muted">${esc(o.reqNo)} · ${esc(o.supplier.name)} · ${d8(o.createdAt)}</div><div class="font-bold">Tk ${money(o.total)}</div>${le?`<div class="text-xs text-muted">Edited ${e.length}× · last by ${esc(le.by)} · ${new Date(le.at).toLocaleString()}</div>`:''}<div class="flex gap-2 mt-2"><button class="btn btn-secondary" onclick="poPrint('${o.id}')">Print</button>${role()==='proc'?`<button class="btn btn-secondary" onclick="poEdit('${o.id}')">Edit</button>`:''}</div></div>`;}).join('')||'<div class="text-xs text-muted">No purchase orders.</div>';
+      return `<div class="rounded-xl border p-3 text-sm"><b>${esc(o.no)}</b> · ${esc(o.prjNo)}<div class="text-xs text-muted">${esc(o.reqNo)} · ${esc(o.supplier.name)} · ${d8(o.createdAt)}</div><div class="font-bold">Tk ${money(o.total)} ${poStatusPill(o)}</div>${poDelivery(o)}${le?`<div class="text-xs text-muted">Edited ${e.length}× · last by ${esc(le.by)} · ${new Date(le.at).toLocaleString()}</div>`:''}<div class="flex gap-2 mt-2">${poBtns(o)}</div></div>`;}).join('')||'<div class="text-xs text-muted">No purchase orders.</div>';
   };
   window.poReport=function(){
     const L=filtered();if(!L.length){showToast('No purchase orders to print.','error');return;}
@@ -4734,6 +5003,8 @@ async function deleteEntryFromFirebase(firebaseId){
   function start(){
     if(!fb())return setTimeout(start,800);
     fb().collection('purchase_orders').orderBy('createdAt','desc').onSnapshot(sn=>{pos=sn.docs.map(d=>({id:d.id,...d.data()}));if(window.rqRender)window.rqRender();poRenderPage();if(window.supBody)supBody();},e=>console.error('purchase_orders',e));
+    fb().collection('rfqs').orderBy('createdAt','desc').onSnapshot(sn=>{rfqList=sn.docs.map(d=>({id:d.id,...d.data()}));rfqList.forEach(rf=>(rf.invites||[]).forEach(v=>{if(invSubs[v.token])return;invSubs[v.token]=fb().collection('rfq_invites').doc(v.token).onSnapshot(d=>{invMap[v.token]=d.exists?{id:d.id,...d.data()}:null;if(window.rqRender)window.rqRender();},e=>console.error('rfq_invite',e));}));if(window.rqRender)window.rqRender();},e=>console.error('rfqs',e));
+    fb().collection('comparative_statements').orderBy('createdAt','desc').onSnapshot(sn=>{csList=sn.docs.map(d=>({id:d.id,...d.data()}));if(window.rqRender)window.rqRender();},e=>console.error('comparative_statements',e));
   }
   window.addEventListener('load',start);
 })();
@@ -4810,6 +5081,7 @@ async function deleteEntryFromFirebase(firebaseId){
     const add=(k,txt,page)=>tasks.push(`<div onclick="${page}" style="cursor:pointer;display:flex;gap:10px;align-items:center;padding:10px;border:1px solid #bfdbfe;background:#eff6ff;border-radius:12px">${ic(P[k],'#2563eb',20)}<div class="text-sm font-bold">${txt}</div></div>`);
     if(rl==='dpm'&&by('dpm'))add('user',by('dpm')+' requisition(s) waiting for your check',"showPage('requisition')");
     if(rl==='ed'&&by('ed'))add('shield',by('ed')+' requisition(s) waiting for your approval',"showPage('requisition')");
+    if(['pmgr','ed','admin'].includes(rl)){const n=(window.marsPOs?marsPOs():[]).filter(o=>o.status==='pending').length;if(n)add('cart',n+' purchase order(s) waiting for your approval',"showPage('purchaseorders')");}
     if(rl==='proc'){const n=open.filter(r=>r.stage==='procurement'&&(r.items||[]).some(i=>i.state==='pending')).length;if(n)add('cart',n+' requisition(s) waiting for purchase',"showPage('requisition')");}
     if(site){const n=R.reduce((a,r)=>a+(r.items||[]).filter(i=>i.state==='purchased').length,0);if(n)add('truck',n+' item(s) waiting for your delivery confirmation',"showPage('requisition')");
       const m=pt.filter(t=>mine().includes(t.toPrj)).length;if(m)add('swap',m+' transfer request(s) waiting for your approval',"showPage('transfers')");}
@@ -4843,7 +5115,7 @@ async function deleteEntryFromFirebase(firebaseId){
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
   const role=()=>isAdmin?'admin':((window.currentEngineerRole==='store')?'site':(window.currentEngineerRole||'site'));
   const mine=()=>window.currentEngineerAllowedProjects||[];
-  const RL={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement',acct:'Accounts',viewer:'Management (view only)'};
+  const RL={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement',pmgr:'Purchase Manager',acct:'Accounts',viewer:'Management (view only)'};
   const STG={dpm:'With DPM',ed:'With Executive Director',procurement:'With Procurement',delivery:'Awaiting delivery',closed:'Closed',rejected:'Rejected'};
   const ITS={pending:'Pending',cancelled:'Cancelled',purchased:'Purchased (awaiting delivery)',received:'Received'};
   const pad=n=>String(n).padStart(2,'0');
@@ -4948,7 +5220,7 @@ async function deleteEntryFromFirebase(firebaseId){
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
   const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
   const A=()=>firebase.auth();
-  const RL={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement',acct:'Accounts',viewer:'Management (view only)'};
+  const RL={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement',pmgr:'Purchase Manager',acct:'Accounts',viewer:'Management (view only)'};
   const out=()=>A().signOut().catch(()=>{});
   const errMsg=e=>{const c=(e&&e.code)||'';
     if(/invalid-credential|wrong-password|user-not-found/.test(c))return 'Wrong email or password.';
@@ -5171,7 +5443,7 @@ async function deleteEntryFromFirebase(firebaseId){
     const all=lines(),q=key(mq);
     if(!q){
       const seen={},top=[];all.forEach(l=>{if(!seen[key(l.material)]){seen[key(l.material)]=1;top.push(l);}});
-      return '<div class="text-xs text-muted mb-2">Recently purchased materials. Tap one to see its price history.</div>'+(top.slice(0,20).map(l=>`<div class="rounded-xl border p-2 text-sm" style="cursor:pointer;margin-bottom:6px" onclick="matSet(this.dataset.m)" data-m="${esc(l.material)}"><b>${esc(l.material)}</b> <span class="text-xs text-muted">Tk ${money(l.rate)} / ${esc(l.unit)} · ${esc(l.supplier)} · ${d8(l.at)}</span></div>`).join('')||'<div class="text-xs text-muted">No purchase orders yet.</div>');
+      return '<div class="text-xs text-muted mb-2">Recently purchased materials. Tap one to see its price history.</div>'+(top.slice(0,20).map(l=>`<div class="rounded-xl border border-line bg-white p-3 text-sm" style="cursor:pointer;margin-bottom:6px" onclick="matSet(this.dataset.m)" data-m="${esc(l.material)}"><b>${esc(l.material)}</b> <span class="text-xs text-muted">Tk ${money(l.rate)} / ${esc(l.unit)} · ${esc(l.supplier)} · ${d8(l.at)}</span></div>`).join('')||'<div class="text-xs text-muted">No purchase orders yet.</div>');
     }
     const L=all.filter(l=>key(l.material).includes(q));
     if(!L.length)return '<div class="text-xs text-muted">No purchase found for this material.</div>';
@@ -5254,6 +5526,66 @@ async function deleteEntryFromFirebase(firebaseId){
       catch(e){showToast('Failed: '+(e.code||e.message),'error');}
     };
   };
+})();
+</script>
+<script>
+/* ============ SUPPLIER PORTAL (opens only with ?rfq=<private token>) ============ */
+(function(){
+  const tk=new URLSearchParams(location.search).get('rfq');
+  if(!tk||!/^[a-f0-9]{32}$/.test(tk))return;
+  const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  const money=n=>Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const dFmt=ms=>new Date(ms).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  document.documentElement.style.overflow='hidden';
+  const wrap=document.createElement('div');wrap.id='supPortal';
+  wrap.style.cssText='position:fixed;left:0;top:0;width:100%;height:100%;z-index:2147483000;background:#f3f5f9;overflow:auto;font-family:Tahoma,Verdana,Arial,sans-serif;color:#111';
+  const box=h=>'<div style="max-width:560px;margin:0 auto;padding:16px">'+h+'</div>';
+  const msg=t=>box('<div style="background:#fff;border-radius:14px;padding:28px;text-align:center;margin-top:40px">'+esc(t)+'</div>');
+  wrap.innerHTML=msg('Loading request for quotation...');
+  document.body.appendChild(wrap);
+  const IN='width:100%;box-sizing:border-box;padding:10px;border:1px solid #c5ccd8;border-radius:10px;font-size:15px;background:#fff';
+  async function load(n){
+    try{
+      const db=window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
+      if(!db||!firebase.auth().currentUser)throw new Error('wait');
+      const d=await db.collection('rfq_invites').doc(tk).get();
+      if(!d.exists){wrap.innerHTML=msg('This link is not valid. Please contact the company that sent it.');return;}
+      render(d.data(),db);
+    }catch(e){if(n<20)setTimeout(()=>load(n+1),700);else{console.error(e);wrap.innerHTML=msg('Could not open this request. Please check your internet connection and try again.');}}
+  }
+  function render(inv,db,justSent){
+    const closed=Date.now()>inv.deadlineMs,q=inv.quote||{},ql=q.lines||[];
+    const dis=closed?' disabled':'';
+    const items=inv.items.map(i=>{const l=ql.find(x=>x.id===i.id)||{};
+      return '<div style="background:#fff;border-radius:14px;padding:12px;margin-top:10px"><div style="font-weight:bold">'+esc(i.material)+'</div><div style="font-size:12px;color:#555;margin-bottom:8px">'+money(i.qty)+' '+esc(i.unit)+(i.spec?' &middot; '+esc(i.spec):'')+'</div>'
+      +'<div style="display:flex;gap:8px"><div style="flex:2"><div style="font-size:11px;color:#555">Rate (Tk per '+esc(i.unit)+')</div><input class="q-r" data-i="'+esc(i.id)+'" data-q="'+i.qty+'" type="number" inputmode="decimal" step="0.01" style="'+IN+'" value="'+(l.rate||'')+'"'+dis+'></div><div style="flex:1"><div style="font-size:11px;color:#555">Disc %</div><input class="q-d" data-i="'+esc(i.id)+'" type="number" inputmode="decimal" step="0.01" style="'+IN+'" value="'+(l.disc||'')+'"'+dis+'></div></div>'
+      +'<input class="q-n" data-i="'+esc(i.id)+'" placeholder="Brand / note (optional)" style="'+IN+';margin-top:8px" value="'+esc(l.note||'')+'"'+dis+'>'
+      +'<div class="q-a" data-i="'+esc(i.id)+'" style="text-align:right;font-size:13px;font-weight:bold;margin-top:6px"></div></div>';}).join('');
+    wrap.innerHTML=box('<div style="text-align:center;padding:10px 0"><div style="font-size:20px;font-weight:bold">'+esc(inv.company)+'</div><div style="font-size:14px;color:#16294d;font-weight:bold;margin-top:2px">Request for Quotation</div></div>'
+      +(justSent?'<div style="background:#dcfce7;color:#166534;border-radius:12px;padding:12px;font-weight:bold;margin-bottom:10px">Thank you. Your quotation was submitted'+(closed?'.':'. You can change it until the deadline.')+'</div>':(inv.status==='submitted'?'<div style="background:#dbeafe;color:#1e3a8a;border-radius:12px;padding:10px;font-size:13px;margin-bottom:10px">You submitted a quotation on '+dFmt(inv.submittedAt)+'.'+(closed?'':' You can still change it until the deadline.')+'</div>':''))
+      +(closed?'<div style="background:#fee2e2;color:#991b1b;border-radius:12px;padding:12px;font-weight:bold;margin-bottom:10px">The deadline has passed. This request is closed.</div>':'')
+      +'<div style="background:#fff;border-radius:14px;padding:12px;font-size:13px;line-height:1.7"><b>RFQ No:</b> '+esc(inv.rfqNo)+'<br><b>To:</b> '+esc((inv.supplier||{}).name)+'<br><b>Deadline:</b> '+dFmt(inv.deadlineMs)+(inv.site?'<br><b>Delivery site:</b> '+esc(inv.site):'')+(inv.note?'<br><b>Note:</b> '+esc(inv.note):'')+'</div>'
+      +items
+      +'<div style="background:#fff;border-radius:14px;padding:12px;margin-top:10px"><div style="display:flex;gap:8px"><div style="flex:1"><div style="font-size:11px;color:#555">Delivery time (days)</div><input id="qDel" type="number" inputmode="numeric" style="'+IN+'" value="'+esc(q.deliveryDays||'')+'"'+dis+'></div><div style="flex:1"><div style="font-size:11px;color:#555">Offer valid (days)</div><input id="qVal" type="number" inputmode="numeric" style="'+IN+'" value="'+esc(q.validityDays||'')+'"'+dis+'></div></div>'
+      +'<div style="font-size:11px;color:#555;margin-top:8px">Payment terms you offer</div><input id="qPay" style="'+IN+'" value="'+esc(q.payment||'')+'"'+dis+'>'
+      +'<div style="font-size:11px;color:#555;margin-top:8px">Remarks</div><input id="qRem" style="'+IN+'" value="'+esc(q.remark||'')+'"'+dis+'></div>'
+      +'<div id="qTot" style="text-align:right;font-weight:bold;font-size:16px;margin:12px 4px 0"></div>'
+      +'<button id="qGo" style="width:100%;margin:12px 0 40px;padding:14px;border:0;border-radius:12px;background:#16294d;color:#fff;font-size:16px;font-weight:bold"'+dis+'>'+(inv.status==='submitted'?'Update quotation':'Submit quotation')+'</button>');
+    const calc=()=>{let t=0;wrap.querySelectorAll('.q-r').forEach(r=>{const id=r.dataset.i,rt=parseFloat(r.value)||0,dc=Math.min(100,Math.max(0,parseFloat(wrap.querySelector('.q-d[data-i="'+id+'"]').value)||0)),a=Math.round(rt*(1-dc/100)*100)/100*parseFloat(r.dataset.q);t+=a;wrap.querySelector('.q-a[data-i="'+id+'"]').textContent=rt>0?'Amount: Tk '+money(a):'';});wrap.querySelector('#qTot').textContent=t>0?'Total: Tk '+money(t):'';};
+    wrap.addEventListener('input',calc);calc();
+    wrap.querySelector('#qGo').onclick=async()=>{
+      const lines=inv.items.map(i=>({id:i.id,rate:parseFloat(wrap.querySelector('.q-r[data-i="'+i.id+'"]').value)||0,disc:Math.min(100,Math.max(0,parseFloat(wrap.querySelector('.q-d[data-i="'+i.id+'"]').value)||0)),note:wrap.querySelector('.q-n[data-i="'+i.id+'"]').value.trim()}));
+      if(!lines.some(l=>l.rate>0)){alert('Enter a rate for at least one item.');return;}
+      const b=wrap.querySelector('#qGo');b.disabled=true;b.textContent='Submitting...';
+      const quote={lines,deliveryDays:parseFloat(wrap.querySelector('#qDel').value)||0,validityDays:parseFloat(wrap.querySelector('#qVal').value)||0,payment:wrap.querySelector('#qPay').value.trim(),remark:wrap.querySelector('#qRem').value.trim(),by:(inv.supplier||{}).name||'',at:Date.now(),rev:(q.rev||0)+1};
+      try{
+        const at=Date.now();
+        await db.collection('rfq_invites').doc(tk).update({status:'submitted',submittedAt:at,quote});
+        render(Object.assign({},inv,{status:'submitted',submittedAt:at,quote}),db,true);
+      }catch(e){console.error(e);b.disabled=false;b.textContent='Submit quotation';alert(e&&e.code==='permission-denied'?'Could not submit. The deadline may have passed.':'Could not submit. Please check your internet and try again.');}
+    };
+  }
+  window.addEventListener('load',()=>load(0));
 })();
 </script>
 </body>
