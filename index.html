@@ -4606,13 +4606,15 @@ async function deleteEntryFromFirebase(firebaseId){
     pos.filter(o=>o.requisitionId===r.id).forEach(o=>{h+=`<div class="flex justify-between items-center gap-2 py-1 border-t text-sm"><span>${DOC} <b>${esc(o.no)}</b> · ${esc(o.supplier.name)}<br><span class="text-xs text-muted">Tk ${money(o.total)}</span> ${poStatusPill(o)}${poDelivery(o)}</span><span class="flex gap-2">${poBtns(o)}</span></div>`;});
     rfqList.filter(x=>x.requisitionId===r.id).forEach(rf=>{
       const sub=rf.invites.filter(v=>invMap[v.token]&&invMap[v.token].status==='submitted').length;
-      const chips=rf.invites.map(v=>{const d=invMap[v.token],q=d&&d.status==='submitted';return `<span style="font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px;${q?'color:#166534;background:#dcfce7':'color:#92400e;background:#fef3c7'}">${esc(v.name)}: ${q?'Quoted':'Waiting'}</span>`;}).join(' ');
+      const chips=rf.invites.map(v=>{const d=invMap[v.token],q=d&&d.status==='submitted';return `<span ${q?`onclick="rfqViewQuote('${v.token}')"`:''} style="font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px;cursor:${q?'pointer':'default'};${q?'color:#166534;background:#dcfce7':'color:#92400e;background:#fef3c7'}">${esc(v.name)}: ${q?'Quoted - view':(d&&d.status==='draft'?'Preparing':'Waiting')}</span>`;}).join(' ');
       h+=`<div class="rounded-xl border border-line bg-white p-3 mt-2 text-sm"><b>${esc(rf.no)}</b> <span class="text-xs text-muted">RFQ &middot; deadline ${dFmt(rf.deadlineMs)} &middot; ${sub}/${rf.invites.length} quoted</span><div class="flex gap-1 flex-wrap mt-1">${chips}</div>${role()==='proc'?`<div class="flex gap-2 flex-wrap mt-1"><button class="btn btn-secondary" onclick="rfqShare('${rf.id}')">Links / Print</button>${sub&&r.stage==='procurement'?`<button class="btn btn-primary" onclick="rfqToCs('${rf.id}')">Compare in CS (${sub})</button>`:''}</div>`:''}</div>`;
     });
     csList.filter(c=>c.requisitionId===r.id).forEach(c=>{
       const left=[];c.suppliers.forEach((sp,k)=>{const n=(r.items||[]).filter(i=>i.state==='pending'&&!i.poNo&&c.lines.some(l=>l.itemId===i.id&&l.sel===k)).length;if(n)left.push([k,sp.name,n]);});
-      const canEditCs=role()==='proc'&&c.lines.every(l=>!((r.items||[]).find(i=>i.id===l.itemId)||{}).poNo);
-      h+=`<div class="rounded-xl border border-line bg-white p-3 mt-2 text-sm"><b>${esc(c.no)}</b> <span class="text-xs text-muted">Comparative Statement &middot; ${c.suppliers.length} suppliers &middot; ${esc(c.createdBy||'')}</span><div class="flex gap-2 flex-wrap mt-1"><button class="btn btn-secondary" onclick="csPrint('${c.id}')">Print CS</button>${canEditCs?`<button class="btn btn-secondary" onclick="csOpen('${r.id}','${c.id}')">Edit</button>`:''}${role()==='proc'&&r.stage==='procurement'?left.map(x=>`<button class="btn btn-primary" onclick="csPO('${c.id}',${x[0]})">Create PO &middot; ${esc(x[1])} (${x[2]})</button>`).join(''):''}</div></div>`;
+      const cs=csst(c),canEditCs=role()==='proc'&&cs!=='approved'&&c.lines.every(l=>!((r.items||[]).find(i=>i.id===l.itemId)||{}).poNo);
+      const pc=cs==='approved'?['#dcfce7','#166534','CS approved']:(cs==='rejected'?['#fee2e2','#991b1b','CS rejected']:(cs==='pending'?(c.recommendedBy?['#e0e7ff','#3730a3','Recommended - waiting for ED']:['#fef3c7','#92400e','CS pending approval']):['#e5e7eb','#374151','CS']));
+      const note=cs==='approved'?'Approved by '+esc(c.approvedBy||'')+' on '+dFmt(c.approvedAt||Date.now())+'.':(cs==='rejected'?'Rejected by '+esc(c.approvedBy||'')+(c.approvalNote?': '+esc(c.approvalNote):'')+'. Edit it and send again.':(cs==='pending'?'Waiting for approval before a PO can be created.':''));
+      h+=`<div class="rounded-xl border border-line bg-white p-3 mt-2 text-sm"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>${esc(c.no)}</b><span style="background:${pc[0]};color:${pc[1]};border-radius:999px;padding:2px 8px;font-size:11px;font-weight:700;white-space:nowrap">${pc[2]}</span></div><span class="text-xs text-muted">Comparative Statement &middot; ${c.suppliers.length} suppliers &middot; ${esc(c.createdBy||'')}</span>${note?`<div class="text-xs mt-1">${note}</div>`:''}<div class="flex gap-2 flex-wrap mt-1"><button class="btn btn-secondary" onclick="csPrint('${c.id}')">Print CS</button>${canEditCs?`<button class="btn btn-secondary" onclick="csOpen('${r.id}','${c.id}')">Edit</button>`:''}${canApprove()&&cs==='pending'?`<button class="btn btn-primary" onclick="csReview('${c.id}')">Review &amp; Approve</button>`:''}${canRecommend()&&cs==='pending'&&!c.recommendedBy?`<button class="btn btn-primary" onclick="csReview('${c.id}')">Review &amp; Recommend</button>`:''}${role()==='proc'&&r.stage==='procurement'&&(cs==='approved'||cs==='legacy')?left.map(x=>`<button class="btn btn-primary" onclick="csPO('${c.id}',${x[0]})">Create PO &middot; ${esc(x[1])} (${x[2]})</button>`).join(''):''}</div></div>`;
     });
     if(role()==='proc'&&r.stage==='procurement'&&(r.items||[]).some(i=>i.state==='pending'&&!i.poNo))h+=`<div class="flex gap-2 flex-wrap mt-2"><button class="btn btn-primary" onclick="rfqOpen('${r.id}')">New RFQ</button><button class="btn btn-secondary" onclick="csOpen('${r.id}')">Comparative Statement</button><button class="btn btn-secondary" onclick="poOpen('${r.id}')">Direct PO (no CS)</button></div>`;
     return h;
@@ -4675,23 +4677,41 @@ async function deleteEntryFromFirebase(firebaseId){
 
   /* ---------- approval + delivery status ---------- */
   const pst=o=>o.status||'approved';
-  const canApprove=()=>['admin','pmgr','ed'].includes(role());
-  const poStatusPill=o=>{const m={pending:['#fef3c7','#92400e','Pending approval'],approved:['#dcfce7','#166534','Approved'],rejected:['#fee2e2','#991b1b','Rejected']}[pst(o)]||['#e5e7eb','#374151',pst(o)];return `<span style="background:${m[0]};color:${m[1]};border-radius:999px;padding:2px 8px;font-size:11px;font-weight:700;white-space:nowrap">${m[2]}</span>`;};
+  const canApprove=()=>['admin','ed'].includes(role());
+  const canRecommend=()=>role()==='pmgr';
+  const poStatusPill=o=>{
+    const st=pst(o);let m;
+    if(st==='pending')m=o.recommendedBy?['#e0e7ff','#3730a3','Recommended - waiting for ED']:['#fef3c7','#92400e','Pending approval'];
+    else if(st==='rejected')m=['#fee2e2','#991b1b','Rejected'];
+    else if(o.status==='approved'&&!o.sentAt)m=['#ffedd5','#9a3412','Approved - not sent to supplier'];
+    else if(o.sentAt)m=['#dbeafe','#1e3a8a','Sent to supplier'];
+    else m=['#dcfce7','#166534','Approved'];
+    return `<span style="background:${m[0]};color:${m[1]};border-radius:999px;padding:2px 8px;font-size:11px;font-weight:700;white-space:nowrap">${m[2]}</span>`;
+  };
+  let spoMap={};
+  const spoNote=o=>{
+    const sp=spoMap[o.id];if(!sp)return '';
+    const r=sp.response,d=sp.dispatches||[];let h='';
+    if(r)h+=`<div class="text-xs" style="color:${r.action==='accepted'?'#166534':(r.action==='rejected'?'#991b1b':'#3730a3')}"><b>Supplier ${r.action==='accepted'?'accepted':(r.action==='rejected'?'rejected':'asked for a change')}</b> ${dFmt(r.at)}${r.note?': '+esc(r.note):''}</div>`;
+    else h+='<div class="text-xs text-muted">Supplier has not replied yet.</div>';
+    if(d.length){const last=d[d.length-1];h+=`<div class="text-xs">Dispatched ${d.length} time(s). Last: challan ${esc(last.challan)}${last.expected?', arrives '+esc(last.expected):''}${last.vehicle?', vehicle '+esc(last.vehicle):''}</div>`;}
+    return h;
+  };
   const poDelivery=o=>{
     if(pst(o)==='rejected')return o.approvalNote?`<div class="text-xs" style="color:#991b1b">Rejected by ${esc(o.approvedBy||'')}: ${esc(o.approvalNote)}</div>`:'';
-    if(pst(o)==='pending')return `<div class="text-xs text-muted">Waiting for approval before delivery.</div>`;
+    if(pst(o)==='pending')return `<div class="text-xs text-muted">${o.recommendedBy?'Recommended by '+esc(o.recommendedBy)+'. Waiting for ED approval.':'Waiting for approval before it can be sent.'}</div>`;
     const req=(window.marsReqs?marsReqs():[]).find(x=>x.id===o.requisitionId);if(!req)return '';
     const its=(req.items||[]).filter(i=>i.poNo===o.no&&i.state==='received');
     let full=0,any=false;
     o.items.forEach(l=>{const rec=its.filter(i=>i.material===l.material).reduce((a,i)=>a+(i.receivedQty??i.qty),0);if(rec>0)any=true;if(rec>=l.qty-0.0001)full++;});
     const lab=full===o.items.length?'Delivered':(any?'Partially delivered':'Awaiting delivery');
-    return `<div class="text-xs text-muted">${lab} &middot; ${full}/${o.items.length} item(s) received</div>`;
+    return `<div class="text-xs text-muted">${o.status==='approved'&&!o.sentAt?'<b style="color:#9a3412">Not sent to supplier yet.</b> ':(o.sentAt?'Sent '+dFmt(o.sentAt)+(o.sentVia?' via '+esc(o.sentVia):'')+'. ':'')}${lab} &middot; ${full}/${o.items.length} item(s) received</div>`+spoNote(o);
   };
-  const poBtns=o=>`<button class="btn btn-secondary" onclick="poPrint('${o.id}')">Print</button>${role()==='proc'&&pst(o)!=='rejected'?`<button class="btn btn-secondary" onclick="poEdit('${o.id}')">Edit</button>`:''}${canApprove()&&pst(o)==='pending'?`<button class="btn btn-primary" onclick="poReview('${o.id}')">Review &amp; Approve</button>`:''}`;
+  const poBtns=o=>`<button class="btn btn-secondary" onclick="poPrint('${o.id}')">Print</button>${role()==='proc'&&pst(o)!=='rejected'?`<button class="btn btn-secondary" onclick="poEdit('${o.id}')">Edit</button>`:''}${canApprove()&&pst(o)==='pending'?`<button class="btn btn-primary" onclick="poReview('${o.id}')">Review &amp; Approve</button>`:''}${canRecommend()&&pst(o)==='pending'&&!o.recommendedBy?`<button class="btn btn-primary" onclick="poReview('${o.id}')">Review &amp; Recommend</button>`:''}${(role()==='proc'||role()==='admin')&&o.status==='approved'?`<button class="btn ${o.sentAt?'btn-secondary':'btn-primary'}" onclick="poSend('${o.id}')">${o.sentAt?'Sent - resend':'Send to supplier'}</button>`:''}`;
   window.poReview=function(id){
-    const o=pos.find(x=>x.id===id);if(!o||!canApprove()||pst(o)!=='pending')return;
+    const o=pos.find(x=>x.id===id);if(!o||(!canApprove()&&!canRecommend())||pst(o)!=='pending')return;
     const rows=o.items.map(i=>`<div class="flex justify-between text-xs py-1 border-t"><span>${esc(i.material)} <span class="text-muted">${i.qty} ${esc(i.unit)} x ${money(i.rateAfter??i.rate)}</span></span><b>${money(i.amount)}</b></div>`).join('');
-    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:460px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Review ${esc(o.no)}</h3><div class="text-xs text-muted mb-3">${esc(o.prjNo)} &middot; ${esc(o.reqNo)} &middot; created by ${esc(o.createdBy||'')}</div><div class="text-sm mb-2"><b>${esc(o.supplier.name)}</b><br>Delivery: ${esc(o.deliveryDate||'')} &middot; ${esc(o.payMode||'As per agreed terms')} &middot; ${esc(o.priority||'Normal')}</div>${o.csId?`<div class="text-xs mb-1">Comparative Statement: <b>${esc(o.csNo)}</b> <a href="#" onclick="csPrint('${o.csId}');return false" style="color:#2563eb">view CS</a></div>`:''}${o.directReason?`<div class="text-xs mb-1" style="color:#991b1b"><b>Direct purchase, no CS:</b> ${esc(o.directReason)}</div>`:''}${rows}<div class="text-sm font-bold mt-2">Total: Tk ${money(o.total)}</div><div class="mt-3"><label class="field-label">Reason (needed only when rejecting)</label><input id="poRvN" class="field" placeholder="e.g. Rate too high, get another quotation"></div><div class="flex gap-2 mt-4 flex-wrap"><button class="btn btn-primary" id="poRvOk">Approve</button><button class="btn btn-secondary" id="poRvNo">Reject</button><button class="btn btn-secondary" id="poRvX">Close</button></div></div>`,'poReviewModal');
+    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:460px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Review ${esc(o.no)}</h3><div class="text-xs text-muted mb-3">${esc(o.prjNo)} &middot; ${esc(o.reqNo)} &middot; created by ${esc(o.createdBy||'')}</div><div class="text-sm mb-2"><b>${esc(o.supplier.name)}</b><br>Delivery: ${esc(o.deliveryDate||'')} &middot; ${esc(o.payMode||'As per agreed terms')} &middot; ${esc(o.priority||'Normal')}</div>${o.csId?`<div class="text-xs mb-1">Comparative Statement: <b>${esc(o.csNo)}</b> <a href="#" onclick="csPrint('${o.csId}');return false" style="color:#2563eb">view CS</a></div>`:''}${o.directReason?`<div class="text-xs mb-1" style="color:#991b1b"><b>Direct purchase, no CS:</b> ${esc(o.directReason)}</div>`:''}${o.recommendedBy?`<div class="text-xs mb-1" style="color:#3730a3">Recommended by <b>${esc(o.recommendedBy)}</b></div>`:''}${rows}<div class="text-sm font-bold mt-2">Total: Tk ${money(o.total)}</div><div class="mt-3"><label class="field-label">Reason (needed only when rejecting)</label><input id="poRvN" class="field" placeholder="e.g. Rate too high, get another quotation"></div><div class="flex gap-2 mt-4 flex-wrap"><button class="btn btn-primary" id="poRvOk">${canApprove()?'Approve':'Recommend to ED'}</button><button class="btn btn-secondary" id="poRvNo">Reject</button><button class="btn btn-secondary" id="poRvX">Close</button></div></div>`,'poReviewModal');
     m.querySelector('#poRvX').onclick=()=>m.remove();
     const run=async ap=>{
       const note=m.querySelector('#poRvN').value.trim(),me=window.currentEngineerName||'Admin';
@@ -4699,6 +4719,11 @@ async function deleteEntryFromFirebase(firebaseId){
       if(ap&&o.createdBy===me){showToast('The person who created the PO cannot approve it.','error');return;}
       const b1=m.querySelector('#poRvOk'),b2=m.querySelector('#poRvNo');b1.disabled=b2.disabled=true;
       const db=fb();
+      if(ap&&!canApprove()){
+        try{await db.collection('purchase_orders').doc(id).update({recommendedBy:me,recommendedAt:Date.now()});if(window.marsAudit)marsAudit('PO',o.no,'Recommended to ED');m.remove();showToast('Recommended. The ED can now approve this PO.');}
+        catch(e){b1.disabled=b2.disabled=false;console.error(e);showToast('Failed: '+(e.code||e.message),'error');}
+        return;
+      }
       try{
         await db.runTransaction(async tx=>{
           const pr=db.collection('purchase_orders').doc(id),ps=await tx.get(pr),p=ps.data();
@@ -4715,6 +4740,32 @@ async function deleteEntryFromFirebase(firebaseId){
       }catch(e){b1.disabled=b2.disabled=false;console.error(e);showToast('Failed: '+(e.code||e.message),'error');}
     };
     m.querySelector('#poRvOk').onclick=()=>run(true);m.querySelector('#poRvNo').onclick=()=>run(false);
+  };
+
+  /* ---------- send approved PO to supplier ---------- */
+  async function upsertSupplierPo(o,email){
+    if(!email)return 'no-email';
+    const snap={poId:o.id,no:o.no,supplierEmail:String(email).toLowerCase(),supplierName:o.supplier.name,company:co().name||'MARS STRUCTURE LIMITED',prjNo:o.prjNo||'',site:o.deliveryAddr||((o.project&&o.project.address)||''),deliveryDate:o.deliveryDate||'',payMode:o.payMode||'',terms:o.terms||'',remarks:o.remarks||'',conditions:o.conditions||'',items:(o.items||[]).map(i=>({material:i.material,unit:i.unit||'',qty:i.qty,spec:i.spec||'',rate:i.rate,disc:i.disc||0,amount:i.amount})),subTotal:o.subTotal||0,discount:o.discount||0,total:o.total||0,advance:o.advance===undefined?(o.total||0):o.advance,sentAt:Date.now()};
+    try{await fb().collection('supplier_pos').doc(o.id).set(snap,{merge:true});return 'ok';}catch(e){console.warn('supplier portal copy',e&&e.code);return 'fail';}
+  }
+  window.poSend=function(id){
+    const o=pos.find(x=>x.id===id);if(!o||o.status!=='approved'||!(role()==='proc'||role()==='admin'))return;
+    const sp=(window.marsFindSupplier&&marsFindSupplier(o.supplier.name))||{},phone=o.supplier.phone||sp.phone||'',email=sp.email||'';
+    const company=co().name||'Mars Structure Limited';
+    const msg='Assalamu alaikum. '+company+' Purchase Order '+o.no+' for '+(o.prjNo||'')+' (total Tk '+money(o.total)+(o.deliveryDate?', delivery by '+o.deliveryDate:'')+') is approved. Please confirm and arrange supply. The signed PO copy is attached.';
+    const sub=encodeURIComponent('Purchase Order '+o.no+' - '+company);
+    const wa='https://wa.me/'+(phone?waNum(phone):'')+'?text='+encodeURIComponent(msg);
+    const gm='https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(email)+'&su='+sub+'&body='+encodeURIComponent(msg);
+    const ml='mailto:'+encodeURIComponent(email)+'?subject='+sub+'&body='+encodeURIComponent(msg);
+    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:480px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Send ${esc(o.no)} to supplier</h3><div class="text-xs text-muted mb-3">${esc(o.supplier.name)}${phone?' &middot; '+esc(phone):''}${email?' &middot; '+esc(email):''}${o.sentAt?'<br>Last sent '+dFmt(o.sentAt)+(o.sentVia?' via '+esc(o.sentVia):'')+' by '+esc(o.sentBy||''):''}<br>${email?'Supplier portal: <b>'+esc(email)+'</b> will see this PO after you mark it as sent.':'<b style="color:#9a3412">No email saved for this supplier, so it will not appear in the supplier portal. Add the email in Suppliers.</b>'}</div><div class="space-y-2"><button class="btn btn-secondary" id="psPr" style="width:100%">1. Print / save the PO as PDF</button><div class="grid grid-cols-3 gap-2"><a class="btn btn-secondary ps-ch" data-v="WhatsApp" target="_blank" rel="noopener" href="${wa}">WhatsApp</a><a class="btn btn-secondary ps-ch" data-v="Gmail" target="_blank" rel="noopener" href="${gm}">Gmail</a><a class="btn btn-secondary ps-ch" data-v="Mail app" href="${ml}">Mail app</a></div><div class="text-xs text-muted">2. Send the PDF with WhatsApp or Gmail (attach the saved PDF).</div><div><label class="field-label">3. Mark as sent. Sent via</label><select id="psVia" class="field">${['WhatsApp','Gmail','Mail app','Printed copy','Hand delivered'].map(x=>`<option>${x}</option>`).join('')}</select></div></div><div class="flex gap-2 mt-4"><button class="btn btn-primary" id="psOk">Mark as sent</button><button class="btn btn-secondary" id="psX">Close</button></div></div>`,'poSendModal');
+    m.querySelector('#psPr').onclick=()=>window.poPrint(id);
+    m.querySelectorAll('.ps-ch').forEach(a=>a.addEventListener('click',()=>{m.querySelector('#psVia').value=a.dataset.v;}));
+    m.querySelector('#psX').onclick=()=>m.remove();
+    m.querySelector('#psOk').onclick=async()=>{
+      const via=m.querySelector('#psVia').value,me=window.currentEngineerName||'Admin',b=m.querySelector('#psOk');b.disabled=true;
+      try{await fb().collection('purchase_orders').doc(id).update({sentAt:Date.now(),sentBy:me,sentVia:via});let nt='';if(email){const rr=await upsertSupplierPo(o,email);nt=rr==='ok'?' It is now in the supplier portal.':' It could not be published to the supplier portal.';}else nt=' No supplier email, so it is not in the supplier portal.';if(window.marsAudit)marsAudit('PO',o.no,'Sent to supplier via '+via);m.remove();showToast('PO marked as sent to '+o.supplier.name+'.'+nt);}
+      catch(e){b.disabled=false;console.error(e);showToast('Failed: '+(e.code||e.message)+' (publish the new Firestore Rules)','error');}
+    };
   };
 
   /* ---------- RFQ + supplier portal links ---------- */
@@ -4779,6 +4830,17 @@ async function deleteEntryFromFirebase(firebaseId){
     const pre={rfqId:rf.id,rfqNo:rf.no,suppliers:use.map(v=>({name:v.name})),lines:rf.items.map(it=>({itemId:it.id,material:it.material,unit:it.unit,qty:it.qty,sel:-1,quotes:use.map(v=>{const ln=((invMap[v.token].quote||{}).lines||[]).find(x=>x.id===it.id)||{};return{rate:+ln.rate||0,disc:+ln.disc||0};})}))};
     window.csOpen(rf.requisitionId,null,pre);
   };
+  const dBlob=u=>{const a=u.split(','),mime=(a[0].match(/:(.*?);/)||[])[1]||'application/octet-stream',bin=atob(a[1]),arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);return new Blob([arr],{type:mime});};
+  window.rfqViewQuote=function(token){
+    const inv=invMap[token];if(!inv||inv.status!=='submitted'||role()==='site')return;
+    const q=inv.quote||{},L=q.lines||[];let sub=0,vat=0;
+    const rows=(inv.items||[]).map(i=>{const l=L.find(x=>x.id===i.id)||{},qty=(l.qty!==undefined&&l.qty!=='')?+l.qty:i.qty,net=csNet({rate:+l.rate||0,disc:+l.disc||0}),amt=r2(net*qty);sub+=amt;vat+=amt*(+l.vat||0)/100;
+      return `<div class="text-xs py-2 border-t"><b>${esc(i.material)}</b> <span class="text-muted">asked ${i.qty} ${esc(i.unit)}</span><br>${l.rate>0?`Offered ${qty} ${esc(i.unit)} @ Tk ${money(net)}${l.disc?' (after '+l.disc+'% disc)':''}${l.vat?' + VAT '+l.vat+'%':''} = <b>Tk ${money(amt)}</b>`:'<span class="text-muted">No rate given</span>'}${l.days?`<br>Delivery: ${l.days} day(s)`:''}${l.brand?`<br>Brand: ${esc(l.brand)}`:''}${l.note?`<br>Spec / note: ${esc(l.note)}`:''}${qty<i.qty&&l.rate>0?'<br><b style="color:#92400e">Partial quantity offered</b>':''}</div>`;}).join('');
+    const tax=sub*(+q.taxPct||0)/100,total=sub+vat+tax+(+q.transport||0);
+    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:520px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">${esc(inv.supplier.name)}</h3><div class="text-xs text-muted mb-2">${esc(inv.rfqNo)} &middot; submitted ${dFmt(inv.submittedAt)}${q.rev>1?' &middot; revision '+q.rev:''}</div>${rows}<div class="text-sm mt-2" style="line-height:1.8">Subtotal: Tk ${money(sub)}<br>VAT: Tk ${money(vat)}${tax?'<br>Tax / AIT: Tk '+money(tax):''}${q.transport?'<br>Transport: Tk '+money(q.transport):''}<br><b>Total (landed): Tk ${money(total)}</b></div><div class="text-xs mt-2">${q.payment?'Payment: '+esc(q.payment)+'<br>':''}${q.warranty?'Warranty: '+esc(q.warranty)+'<br>':''}${q.validityDays?'Valid for '+q.validityDays+' day(s)<br>':''}${q.remark?'Remarks: '+esc(q.remark):''}</div><div class="flex gap-2 mt-3">${q.pdf?'<button class="btn btn-secondary" id="qvPdf">Open attached file</button>':''}<button class="btn btn-secondary" id="qvX">Close</button></div></div>`,'qvModal');
+    m.querySelector('#qvX').onclick=()=>m.remove();
+    const pb=m.querySelector('#qvPdf');if(pb)pb.onclick=()=>{const u=URL.createObjectURL(dBlob(q.pdf.data)),v=overlay(`<div class="card p-5" style="background:#fff;max-width:640px;width:100%;margin:auto"><div class="flex justify-between items-center mb-2"><b>${esc(q.pdf.name)}</b><button class="btn btn-secondary" id="qvC">Close</button></div>${/pdf/.test(q.pdf.mime)?`<iframe src="${u}" style="width:100%;height:70vh;border:0"></iframe>`:`<img src="${u}" style="max-width:100%">`}<a class="btn btn-secondary mt-2" href="${u}" download="${esc(q.pdf.name)}">Download</a></div>`,'qvPdfModal');v.querySelector('#qvC').onclick=()=>{v.remove();URL.revokeObjectURL(u);};};
+  };
   window.rfqPrint=function(id,k){
     const rf=rfqList.find(x=>x.id===id);if(!rf)return;
     const v=rf.invites[k]||{name:'',phone:''},c=co(),lg=logo(),inv=invMap[v.token]||{};
@@ -4808,6 +4870,8 @@ async function deleteEntryFromFirebase(firebaseId){
 
   /* ---------- Comparative Statement (CS) ---------- */
   const csNet=q=>q&&q.rate>0?r2(q.rate*(1-(q.disc||0)/100)):0;
+  const csst=c=>c.status||'legacy';
+  window.marsCS=()=>csList;
   window.csOpen=function(rid,csId,pre){
     const r=reqSnap[rid];if(!r||role()!=='proc')return;
     const ex=csId?csList.find(c=>c.id===csId):null;
@@ -4859,18 +4923,42 @@ async function deleteEntryFromFirebase(firebaseId){
       const b=m.querySelector('#csSave');b.disabled=true;b.textContent='Saving...';
       const db=fb(),me=window.currentEngineerName||'Admin';
       try{
-        if(ex)await db.collection('comparative_statements').doc(ex.id).update({suppliers:sups,lines,updatedAt:Date.now()});
+        if(ex)await db.collection('comparative_statements').doc(ex.id).update({suppliers:sups,lines,updatedAt:Date.now(),status:'pending',recommendedBy:null,recommendedAt:null,approvedBy:null,approvedAt:null,approvalNote:null});
         else await db.runTransaction(async tx=>{
           const nw=new Date(),yy=String(nw.getFullYear()).slice(-2),mm=String(nw.getMonth()+1).padStart(2,'0');
           const cref=db.collection('counters').doc('cs_year_'+yy),cc=await tx.get(cref),n=(cc.exists?cc.data().n:0)+1;
           tx.set(cref,{n});
-          tx.set(db.collection('comparative_statements').doc(),{no:'CS'+yy+'-'+mm+'-'+String(n).padStart(5,'0'),requisitionId:rid,reqNo:r.no,prjNo:r.prjNo,suppliers:sups,lines,...(pre?{rfqId:pre.rfqId,rfqNo:pre.rfqNo}:{}),createdBy:me,createdAt:Date.now(),updatedAt:Date.now()});
+          tx.set(db.collection('comparative_statements').doc(),{status:'pending',no:'CS'+yy+'-'+mm+'-'+String(n).padStart(5,'0'),requisitionId:rid,reqNo:r.no,prjNo:r.prjNo,suppliers:sups,lines,...(pre?{rfqId:pre.rfqId,rfqNo:pre.rfqNo}:{}),createdBy:me,createdAt:Date.now(),updatedAt:Date.now()});
         });
-        m.remove();showToast('Comparative Statement saved. Now create the PO from it.');if(window.marsAudit)marsAudit('CS',ex?ex.no:r.no,ex?'Edited':'Created');
+        m.remove();showToast('Comparative Statement saved and sent for approval.');if(window.marsAudit)marsAudit('CS',ex?ex.no:r.no,ex?'Edited':'Created');
       }catch(e){b.disabled=false;b.textContent='Save CS';console.error(e);showToast('Failed: '+(e.code||e.message)+' (check Firestore Rules for comparative_statements)','error');}
     };
   };
-  window.csPO=function(csId,k){const c=csList.find(x=>x.id===csId);if(!c)return;window.poOpen(c.requisitionId,{csId,sup:k});};
+  window.csPO=function(csId,k){const c=csList.find(x=>x.id===csId);if(!c)return;if(!['approved','legacy'].includes(csst(c))){showToast('The CS must be approved before a PO can be created.','error');return;}window.poOpen(c.requisitionId,{csId,sup:k});};
+  window.csReview=function(id){
+    const c=csList.find(x=>x.id===id);if(!c||(!canApprove()&&!canRecommend())||csst(c)!=='pending')return;
+    const by={};
+    c.lines.forEach(l=>{const nm=c.suppliers[l.sel].name,amt=r2(csNet(l.quotes[l.sel])*l.qty);by[nm]=by[nm]||{n:0,t:0};by[nm].n++;by[nm].t=r2(by[nm].t+amt);});
+    const tots=Object.keys(by).map(n=>`<div class="text-sm"><b>${esc(n)}</b>: ${by[n].n} item(s), Tk ${money(by[n].t)}</div>`).join('');
+    const rows=c.lines.map(l=>{const nets=l.quotes.map(csNet),pos2=nets.filter(v=>v>0),lo=pos2.length?Math.min(...pos2):0,sv=nets[l.sel];
+      return `<div class="text-xs py-1 border-t"><b>${esc(l.material)}</b> <span class="text-muted">${l.qty} ${esc(l.unit)}</span><br>${esc(c.suppliers[l.sel].name)} @ Tk ${money(sv)}${sv>lo?` <b style="color:#991b1b">(not the lowest, lowest is Tk ${money(lo)})</b><br>Reason: ${esc(l.why||'')}`:' <b style="color:#166534">(lowest)</b>'}</div>`;}).join('');
+    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:480px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Review ${esc(c.no)}</h3><div class="text-xs text-muted mb-3">${esc(c.prjNo)} &middot; ${esc(c.reqNo)} &middot; prepared by ${esc(c.createdBy||'')}</div><div class="text-xs font-extrabold text-navy mb-1">Selected suppliers</div>${tots}<div class="text-xs font-extrabold text-navy mt-3 mb-1">Item by item</div>${rows}${c.recommendedBy?`<div class="text-xs mt-2" style="color:#3730a3">Recommended by <b>${esc(c.recommendedBy)}</b></div>`:''}<div class="mt-3"><label class="field-label">Reason (needed only when rejecting)</label><input id="csRvN" class="field" placeholder="e.g. Get one more quotation"></div><div class="flex gap-2 mt-4 flex-wrap"><button class="btn btn-primary" id="csRvOk">${canApprove()?'Approve CS':'Recommend to ED'}</button><button class="btn btn-secondary" id="csRvNo">Reject</button><button class="btn btn-secondary" id="csRvX">Close</button></div><div class="text-xs text-muted mt-2">After approval the Procurement officer creates the PO from this CS. The PO needs no second approval.</div></div>`,'csReviewModal');
+    m.querySelector('#csRvX').onclick=()=>m.remove();
+    const run=async ap=>{
+      const note=m.querySelector('#csRvN').value.trim(),me=window.currentEngineerName||'Admin';
+      if(!ap&&!note){showToast('Write a reason to reject.','error');return;}
+      if(ap&&c.createdBy===me){showToast('The person who prepared the CS cannot approve it.','error');return;}
+      const b1=m.querySelector('#csRvOk'),b2=m.querySelector('#csRvNo');b1.disabled=b2.disabled=true;
+      const ref=fb().collection('comparative_statements').doc(id),now=Date.now();
+      try{
+        if(ap&&!canApprove())await ref.update({recommendedBy:me,recommendedAt:now});
+        else await ref.update(ap?{status:'approved',approvedBy:me,approvedAt:now}:{status:'rejected',approvedBy:me,approvedAt:now,approvalNote:note});
+        if(window.marsAudit)marsAudit('CS',c.no,ap?(canApprove()?'Approved':'Recommended to ED'):'Rejected: '+note);
+        m.remove();showToast(ap?(canApprove()?'CS approved. Procurement can create the PO.':'Recommended. The ED can now approve.'):'CS rejected.');
+      }catch(e){b1.disabled=b2.disabled=false;console.error(e);showToast('Failed: '+(e.code||e.message)+' (publish the new Firestore Rules)','error');}
+    };
+    m.querySelector('#csRvOk').onclick=()=>run(true);m.querySelector('#csRvNo').onclick=()=>run(false);
+  };
   window.csPrint=function(id){
     const cc=csList.find(x=>x.id===id);if(!cc)return;
     const c=co(),lg=logo(),n=cc.suppliers.length;
@@ -4903,6 +4991,7 @@ async function deleteEntryFromFirebase(firebaseId){
     const r=reqSnap[rid];if(!r)return;
     const csd=opt&&opt.csId?csList.find(c=>c.id===opt.csId):null;
     let its=r.items.filter(i=>i.state==='pending'&&!i.poNo);
+    if(csd&&!['approved','legacy'].includes(csst(csd))){showToast('The CS must be approved before a PO can be created.','error');return;}
     if(csd)its=its.filter(i=>csd.lines.some(l=>l.itemId===i.id&&l.sel===opt.sup));
     if(!its.length){showToast('No items left for this PO.','error');return;}
     const mats=[...new Set(its.map(i=>i.material))];
@@ -4921,6 +5010,7 @@ async function deleteEntryFromFirebase(firebaseId){
     const by=window.currentEngineerName||'Admin',db=fb(),rref=db.collection('requisitions').doc(rid);
     try{
       let pno='';
+      const csd2=meta.csId?csList.find(c=>c.id===meta.csId):null,auto=!!csd2&&csst(csd2)==='approved';
       await db.runTransaction(async tx=>{
         const rs=await tx.get(rref),r=rs.data();
         if(role()!=='proc'||r.stage!=='procurement')throw new Error('Not allowed at this stage.');
@@ -4933,11 +5023,14 @@ async function deleteEntryFromFirebase(firebaseId){
         const items=sel.map(i=>priced(i,f.lines.find(l=>l.key===i.id)));
         const subTotal=r2(items.reduce((a,x)=>a+x.qty*x.rate,0)),total=r2(items.reduce((a,x)=>a+x.amount,0));
         tx.set(cref,{n});
-        tx.set(db.collection('purchase_orders').doc(),{no:pno,status:'pending',...(meta.csId?{csId:meta.csId,csNo:meta.csNo}:{directReason:f.directReason||''}),requisitionId:rid,reqNo:r.no,prjNo:r.prjNo,mrfNo:f.mrfNo,subject:f.subject,supplier:f.supplier,project:f.project,deliveryDate:f.deliveryDate,terms:f.terms,payMode:f.payMode,priority:f.priority,deliveryAddr:f.deliveryAddr,remarks:f.remarks,conditions:f.conditions,items,subTotal,discount:r2(subTotal-total),total,advance:f.advance===null?total:f.advance,createdBy:by,createdAt:Date.now()});
-        tx.update(rref,{items:r.items.map(i=>sel.includes(i)?{...i,poNo:pno}:i),history:(r.history||[]).concat([{by,role:'proc',action:'Created '+pno,at:Date.now()}])});
+        tx.set(db.collection('purchase_orders').doc(),{no:pno,status:auto?'approved':'pending',...(auto?{approvedBy:csd2.approvedBy||'',approvedAt:csd2.approvedAt||Date.now(),approvedVia:'CS '+csd2.no}:{}),...(meta.csId?{csId:meta.csId,csNo:meta.csNo}:{directReason:f.directReason||''}),requisitionId:rid,reqNo:r.no,prjNo:r.prjNo,mrfNo:f.mrfNo,subject:f.subject,supplier:f.supplier,project:f.project,deliveryDate:f.deliveryDate,terms:f.terms,payMode:f.payMode,priority:f.priority,deliveryAddr:f.deliveryAddr,remarks:f.remarks,conditions:f.conditions,items,subTotal,discount:r2(subTotal-total),total,advance:f.advance===null?total:f.advance,createdBy:by,createdAt:Date.now()});
+        if(auto){
+          const nowMs=Date.now(),its2=r.items.map(i=>sel.includes(i)?{...i,poNo:pno,state:'purchased',by,purchasedAt:nowMs,poApprovedBy:csd2.approvedBy||''}:i);
+          tx.update(rref,{items:its2,stage:its2.some(i=>i.state==='pending')?'procurement':'delivery',history:(r.history||[]).concat([{by,role:'proc',action:'PO '+pno+' created from approved '+csd2.no+' - items ordered, awaiting delivery',at:nowMs}])});
+        }else tx.update(rref,{items:r.items.map(i=>sel.includes(i)?{...i,poNo:pno}:i),history:(r.history||[]).concat([{by,role:'proc',action:'Created '+pno,at:Date.now()}])});
       });
       if(window.marsEnsureSupplier)marsEnsureSupplier({name:f.supplier.name,phone:f.supplier.phone,address:f.supplier.address});
-      m.remove();showToast('Purchase Order '+pno+' created. Sent for approval.');if(window.marsAudit)marsAudit('PO',pno,'Created ('+(meta.csNo?'from '+meta.csNo:'direct purchase: '+(f.directReason||''))+')');
+      m.remove();showToast(auto?'Purchase Order '+pno+' created and approved (CS approved). Send it to the supplier.':'Purchase Order '+pno+' created. Sent for approval.');if(window.marsAudit)marsAudit('PO',pno,'Created ('+(meta.csNo?'from '+meta.csNo:'direct purchase: '+(f.directReason||''))+')');
     }catch(e){console.error(e);showToast('Failed: '+(e.code||e.message),'error');}
   }
 
@@ -4973,7 +5066,7 @@ async function deleteEntryFromFirebase(firebaseId){
           if(adv!==(c.advance??c.total))ch.push('Advance/PDC amount');
           if(!ch.length)throw new Error('No changes made.');
           const reset=c.status==='approved';if(reset)ch.push('Sent back for re-approval');
-          tx.update(ref,{supplier:f.supplier,project:f.project,deliveryDate:f.deliveryDate,mrfNo:f.mrfNo,subject:f.subject,terms:f.terms,payMode:f.payMode,priority:f.priority,deliveryAddr:f.deliveryAddr,remarks:f.remarks,conditions:f.conditions,items,subTotal,discount:r2(subTotal-total),total,advance:adv,...(reset?{status:'pending',approvedBy:null,approvedAt:null}:{}),edits:(c.edits||[]).concat([{by,at:Date.now(),note:ch.join('; ')}])});
+          tx.update(ref,{supplier:f.supplier,project:f.project,deliveryDate:f.deliveryDate,mrfNo:f.mrfNo,subject:f.subject,terms:f.terms,payMode:f.payMode,priority:f.priority,deliveryAddr:f.deliveryAddr,remarks:f.remarks,conditions:f.conditions,items,subTotal,discount:r2(subTotal-total),total,advance:adv,...(reset?{status:'pending',approvedBy:null,approvedAt:null,sentAt:null,sentBy:null,sentVia:null,recommendedBy:null,recommendedAt:null}:(c.recommendedBy?{recommendedBy:null,recommendedAt:null}:{})),edits:(c.edits||[]).concat([{by,at:Date.now(),note:ch.join('; ')}])});
         });
         m.remove();showToast('PO updated and edit recorded.');if(window.marsAudit)marsAudit('PO',o.no,'Edited: '+ch.join('; '));
       }catch(e){showToast(e.message==='No changes made.'?e.message:'Failed: '+(e.code||e.message),'error');}
@@ -5067,6 +5160,7 @@ async function deleteEntryFromFirebase(firebaseId){
   function start(){
     if(!fb())return setTimeout(start,800);
     fb().collection('purchase_orders').orderBy('createdAt','desc').onSnapshot(sn=>{pos=sn.docs.map(d=>({id:d.id,...d.data()}));if(window.rqRender)window.rqRender();poRenderPage();if(window.supBody)supBody();},e=>console.error('purchase_orders',e));
+    fb().collection('supplier_pos').onSnapshot(sn=>{spoMap={};sn.docs.forEach(d=>{spoMap[d.id]={id:d.id,...d.data()};});if(window.rqRender)window.rqRender();if(window.poRenderPage)window.poRenderPage();},e=>console.warn('supplier_pos',e&&e.code));
     fb().collection('rfqs').orderBy('createdAt','desc').onSnapshot(sn=>{rfqList=sn.docs.map(d=>({id:d.id,...d.data()}));rfqList.forEach(rf=>(rf.invites||[]).forEach(v=>{if(invSubs[v.token])return;invSubs[v.token]=fb().collection('rfq_invites').doc(v.token).onSnapshot(d=>{invMap[v.token]=d.exists?{id:d.id,...d.data()}:null;if(window.rqRender)window.rqRender();},e=>console.error('rfq_invite',e));}));if(window.rqRender)window.rqRender();},e=>console.error('rfqs',e));
     fb().collection('comparative_statements').orderBy('createdAt','desc').onSnapshot(sn=>{csList=sn.docs.map(d=>({id:d.id,...d.data()}));if(window.rqRender)window.rqRender();},e=>console.error('comparative_statements',e));
   }
@@ -5145,7 +5239,7 @@ async function deleteEntryFromFirebase(firebaseId){
     const add=(k,txt,page)=>tasks.push(`<div onclick="${page}" style="cursor:pointer;display:flex;gap:10px;align-items:center;padding:10px;border:1px solid #bfdbfe;background:#eff6ff;border-radius:12px">${ic(P[k],'#2563eb',20)}<div class="text-sm font-bold">${txt}</div></div>`);
     if(rl==='dpm'&&by('dpm'))add('user',by('dpm')+' requisition(s) waiting for your check',"showPage('requisition')");
     if(rl==='ed'&&by('ed'))add('shield',by('ed')+' requisition(s) waiting for your approval',"showPage('requisition')");
-    if(['pmgr','ed','admin'].includes(rl)){const n=(window.marsPOs?marsPOs():[]).filter(o=>o.status==='pending').length;if(n)add('cart',n+' purchase order(s) waiting for your approval',"showPage('purchaseorders')");}
+    if(['pmgr','ed','admin'].includes(rl)){const n=(window.marsPOs?marsPOs():[]).filter(o=>o.status==='pending').length+(window.marsCS?marsCS().filter(c=>c.status==='pending').length:0);if(n)add('cart',n+' approval(s) waiting (CS / PO)',"showPage('requisition')");}
     if(rl==='proc'){const n=open.filter(r=>r.stage==='procurement'&&(r.items||[]).some(i=>i.state==='pending')).length;if(n)add('cart',n+' requisition(s) waiting for purchase',"showPage('requisition')");}
     if(site){const n=R.reduce((a,r)=>a+(r.items||[]).filter(i=>i.state==='purchased').length,0);if(n)add('truck',n+' item(s) waiting for your delivery confirmation',"showPage('requisition')");
       const m=pt.filter(t=>mine().includes(t.toPrj)).length;if(m)add('swap',m+' transfer request(s) waiting for your approval',"showPage('transfers')");}
@@ -5414,37 +5508,50 @@ async function deleteEntryFromFirebase(firebaseId){
 })();
 </script>
 <script>
-/* ============ SUPPLIER PORTAL (opens only with ?rfq=<private token>) ============ */
+/* ============ SUPPLIER PORTAL v2 (?rfq=<private token>  or  ?portal=supplier) ============ */
 (function(){
   const q0=new URLSearchParams(location.search),tk=q0.get('rfq'),hub=q0.get('portal')==='supplier';
   if(!hub&&(!tk||!/^[a-f0-9]{32}$/.test(tk)))return;
   let cur=tk;
   const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
   const money=n=>Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
-  const dFmt=ms=>new Date(ms).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  const dFmt=ms=>ms?new Date(ms).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'';
+  const num=v=>parseFloat(v)||0, pct=v=>Math.min(100,Math.max(0,num(v)));
   document.documentElement.style.overflow='hidden';
   const wrap=document.createElement('div');wrap.id='supPortal';
   wrap.style.cssText='position:fixed;left:0;top:0;width:100%;height:100%;z-index:2147483000;background:#f3f5f9;overflow:auto;font-family:Tahoma,Verdana,Arial,sans-serif;color:#111';
-  const box=h=>'<div style="max-width:560px;margin:0 auto;padding:16px">'+h+'</div>';
+  const box=h=>'<div style="max-width:600px;margin:0 auto;padding:16px">'+h+'</div>';
   const msg=t=>box('<div style="background:#fff;border-radius:14px;padding:28px;text-align:center;margin-top:40px">'+esc(t)+'</div>');
-  wrap.innerHTML=msg('Loading request for quotation...');
-  document.body.appendChild(wrap);
+  wrap.innerHTML=msg('Loading...');document.body.appendChild(wrap);
   const IN='width:100%;box-sizing:border-box;padding:10px;border:1px solid #c5ccd8;border-radius:10px;font-size:15px;background:#fff';
-
-  /* ---- supplier login hub: ?portal=supplier ---- */
   const BTN='width:100%;padding:13px;border:0;border-radius:12px;background:#16294d;color:#fff;font-size:15px;font-weight:bold;margin-top:10px';
+  const BTN2='width:100%;padding:12px;border:1px solid #c5ccd8;border-radius:12px;background:#fff;color:#16294d;font-size:14px;font-weight:bold;margin-top:8px';
   const LNK='border:0;background:none;color:#1e6fe8;font-size:13px;font-weight:bold;padding:8px 4px';
-  function hubStart(db){const u=firebase.auth().currentUser;if(u&&!u.isAnonymous&&u.emailVerified){hubList(db);return;}hubLogin(db,'','in');}
+  const CARD='background:#fff;border-radius:14px;padding:12px;margin-top:10px';
+  const LBL='font-size:11px;color:#555;margin-bottom:2px';
+  const chip=(t,bg,fg)=>'<span style="font-size:12px;font-weight:bold;border-radius:999px;padding:3px 10px;background:'+bg+';color:'+fg+';white-space:nowrap">'+t+'</span>';
+  const g=id=>wrap.querySelector('#'+id);
+
+  async function load(n){
+    try{
+      const db=window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
+      if(!db||!firebase.auth().currentUser)throw new Error('wait');
+      if(hub){hubStart(db);return;}
+      const d=await db.collection('rfq_invites').doc(cur).get();
+      if(!d.exists){wrap.innerHTML=msg('This link is not valid. Please contact the company that sent it.');return;}
+      renderRfq(d.data(),db);
+    }catch(e){if(n<20)setTimeout(()=>load(n+1),700);else{console.error(e);wrap.innerHTML=msg('Could not open this page. Please check your internet connection and try again.');}}
+  }
+
+  /* ---------- login ---------- */
+  function hubStart(db){const u=firebase.auth().currentUser;if(u&&!u.isAnonymous&&u.emailVerified){hubHome(db,'rfq');return;}hubLogin(db,'','in');}
   function hubLogin(db,note,mode){
     const t={in:['Sign in','Sign in'],up:['Create account','Create account'],forgot:['Reset password','Send reset link']}[mode];
-    wrap.innerHTML=box('<div style="text-align:center;padding:14px 0"><div style="font-size:21px;font-weight:bold">Supplier Portal</div><div style="font-size:13px;color:#555;margin-top:4px">Use the email address where you received the quotation request.</div></div><div style="background:#fff;border-radius:14px;padding:14px">'
-      +(note?'<div id="hbMsg" style="font-size:13px;margin-bottom:10px;color:'+(/^OK:/.test(note)?'#166534':'#b91c1c')+'">'+esc(note.replace(/^OK:/,''))+'</div>':'')
-      +'<div style="font-size:15px;font-weight:bold;margin-bottom:8px">'+t[0]+'</div>'
-      +'<input id="hbE" type="email" autocomplete="email" placeholder="Email" style="'+IN+'">'
+    wrap.innerHTML=box('<div style="text-align:center;padding:14px 0"><div style="font-size:21px;font-weight:bold">Supplier Portal</div><div style="font-size:13px;color:#555;margin-top:4px">Use the email address where you received the request.</div></div><div style="background:#fff;border-radius:14px;padding:14px">'
+      +(note?'<div style="font-size:13px;margin-bottom:10px;color:'+(/^OK:/.test(note)?'#166534':'#b91c1c')+'">'+esc(note.replace(/^OK:/,''))+'</div>':'')
+      +'<div style="font-size:15px;font-weight:bold;margin-bottom:8px">'+t[0]+'</div><input id="hbE" type="email" autocomplete="email" placeholder="Email" style="'+IN+'">'
       +(mode==='forgot'?'':'<input id="hbP" type="password" autocomplete="'+(mode==='up'?'new-password':'current-password')+'" placeholder="Password (min 6 characters)" style="'+IN+';margin-top:8px">')
-      +'<button id="hbGo" style="'+BTN+'">'+t[1]+'</button>'
-      +'<div style="display:flex;justify-content:space-between;flex-wrap:wrap">'+(mode!=='in'?'<button id="hbIn" style="'+LNK+'">Sign in</button>':'')+(mode!=='up'?'<button id="hbUp" style="'+LNK+'">Create account</button>':'')+(mode!=='forgot'?'<button id="hbFg" style="'+LNK+'">Forgot password?</button>':'')+'</div></div>');
-    const g=id=>wrap.querySelector('#'+id);
+      +'<button id="hbGo" style="'+BTN+'">'+t[1]+'</button><div style="display:flex;justify-content:space-between;flex-wrap:wrap">'+(mode!=='in'?'<button id="hbIn" style="'+LNK+'">Sign in</button>':'')+(mode!=='up'?'<button id="hbUp" style="'+LNK+'">Create account</button>':'')+(mode!=='forgot'?'<button id="hbFg" style="'+LNK+'">Forgot password?</button>':'')+'</div></div>');
     if(g('hbIn'))g('hbIn').onclick=()=>hubLogin(db,'','in');if(g('hbUp'))g('hbUp').onclick=()=>hubLogin(db,'','up');if(g('hbFg'))g('hbFg').onclick=()=>hubLogin(db,'','forgot');
     g('hbGo').onclick=async()=>{
       const em=g('hbE').value.trim().toLowerCase(),pw=g('hbP')?g('hbP').value:'',au=firebase.auth();
@@ -5456,68 +5563,142 @@ async function deleteEntryFromFirebase(firebaseId){
         if(mode==='up'){const c=await au.createUserWithEmailAndPassword(em,pw);await c.user.sendEmailVerification();await au.signOut();hubLogin(db,'OK:Account created. We sent a verification link to '+em+'. Open it, then sign in here.','in');return;}
         const c=await au.signInWithEmailAndPassword(em,pw);
         if(!c.user.emailVerified){await c.user.sendEmailVerification().catch(()=>{});await au.signOut();hubLogin(db,'Please verify your email first. We sent the link again. Check inbox and spam, then sign in.','in');return;}
-        hubList(db);
+        hubHome(db,'rfq');
       }catch(e){
         const m={'auth/wrong-password':'Wrong password.','auth/invalid-credential':'Wrong email or password.','auth/user-not-found':'No account with this email. Tap Create account.','auth/email-already-in-use':'An account with this email already exists. Sign in instead.','auth/invalid-email':'This email address is not valid.','auth/weak-password':'Password is too weak.','auth/too-many-requests':'Too many attempts. Please wait and try again.'}[e&&e.code]||('Could not continue: '+((e&&e.code)||'error'));
         hubLogin(db,m,mode);
       }
     };
   }
-  async function hubList(db){
+
+  /* ---------- home: RFQs and Purchase Orders ---------- */
+  async function hubHome(db,tab){
     const u=firebase.auth().currentUser;
     if(!u||u.isAnonymous||!u.emailVerified){hubLogin(db,'','in');return;}
     wrap.innerHTML=msg('Loading your requests...');
+    const em=String(u.email).toLowerCase();
+    const head='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0"><div style="font-size:20px;font-weight:bold">Supplier Portal</div><button id="hbOut" style="'+LNK+'">Sign out</button></div><div style="font-size:12px;color:#555;margin-bottom:8px">'+esc(u.email)+'</div>'
+      +'<div style="display:flex;gap:8px"><button id="tbR" style="flex:1;padding:10px;border-radius:10px;border:1px solid #16294d;font-weight:bold;'+(tab==='rfq'?'background:#16294d;color:#fff':'background:#fff;color:#16294d')+'">Quotation requests</button><button id="tbP" style="flex:1;padding:10px;border-radius:10px;border:1px solid #16294d;font-weight:bold;'+(tab==='po'?'background:#16294d;color:#fff':'background:#fff;color:#16294d')+'">Purchase orders</button></div>';
+    let rows='';
     try{
-      const sn=await db.collection('rfq_invites').where('supplierEmail','==',String(u.email).toLowerCase()).get();
-      const L=sn.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-      const rows=L.map(i=>{const closed=Date.now()>i.deadlineMs,sub=i.status==='submitted';const chip=sub?['Submitted','#dbeafe','#1e3a8a']:(closed?['Closed','#fee2e2','#991b1b']:['Open','#dcfce7','#166534']);
-        return '<div data-id="'+esc(i.id)+'" class="hb-row" style="background:#fff;border-radius:14px;padding:14px;margin-top:10px;cursor:pointer"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>'+esc(i.rfqNo)+'</b><span style="font-size:12px;font-weight:bold;border-radius:999px;padding:3px 10px;background:'+chip[1]+';color:'+chip[2]+'">'+chip[0]+'</span></div><div style="font-size:13px;color:#555;margin-top:4px">'+esc(i.company)+' &middot; '+(i.items||[]).length+' item(s) &middot; deadline '+dFmt(i.deadlineMs)+'</div></div>';}).join('')||'<div style="background:#fff;border-radius:14px;padding:22px;margin-top:10px;text-align:center;color:#555">No quotation request has been sent to '+esc(u.email)+' yet.</div>';
-      wrap.innerHTML=box('<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0"><div style="font-size:20px;font-weight:bold">My RFQs</div><button id="hbOut" style="'+LNK+'">Sign out</button></div><div style="font-size:12px;color:#555">'+esc(u.email)+'</div>'+rows);
-      wrap.querySelector('#hbOut').onclick=()=>firebase.auth().signOut().then(()=>hubLogin(db,'OK:Signed out.','in'));
-      wrap.querySelectorAll('.hb-row').forEach(r=>r.onclick=async()=>{try{cur=r.dataset.id;const d=await db.collection('rfq_invites').doc(cur).get();render(d.data(),db);}catch(e){console.error(e);alert('Could not open this request.');}});
-    }catch(e){console.error(e);wrap.innerHTML=msg('Could not load your requests. '+((e&&e.code==='permission-denied')?'The system is still being set up. Please try again later.':'Check your internet and try again.'));}
+      if(tab==='rfq'){
+        const sn=await db.collection('rfq_invites').where('supplierEmail','==',em).get();
+        const L=sn.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+        rows=L.map(i=>{const closed=Date.now()>i.deadlineMs,sub=i.status==='submitted',dr=i.status==='draft';const c=sub?['Submitted','#dbeafe','#1e3a8a']:(closed?['Closed','#fee2e2','#991b1b']:(dr?['Draft saved','#fef3c7','#92400e']:['Open','#dcfce7','#166534']));
+          return '<div data-id="'+esc(i.id)+'" class="hb-r" style="'+CARD+';cursor:pointer"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>'+esc(i.rfqNo)+'</b>'+chip(c[0],c[1],c[2])+'</div><div style="font-size:13px;color:#555;margin-top:4px">'+esc(i.company)+' &middot; '+(i.items||[]).length+' item(s) &middot; deadline '+dFmt(i.deadlineMs)+'</div></div>';}).join('')||'<div style="'+CARD+';text-align:center;color:#555">No quotation request has been sent to '+esc(u.email)+' yet.</div>';
+      }else{
+        const sn=await db.collection('supplier_pos').where('supplierEmail','==',em).get();
+        const L=sn.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.sentAt||0)-(a.sentAt||0));
+        rows=L.map(p=>{const r=p.response,rc=!r?['New - please reply','#fef3c7','#92400e']:(r.action==='accepted'?['Accepted','#dcfce7','#166534']:(r.action==='rejected'?['Rejected','#fee2e2','#991b1b']:['Change requested','#e0e7ff','#3730a3']));
+          return '<div data-id="'+esc(p.id)+'" class="hb-p" style="'+CARD+';cursor:pointer"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>'+esc(p.no)+'</b>'+chip(rc[0],rc[1],rc[2])+'</div><div style="font-size:13px;color:#555;margin-top:4px">'+esc(p.company)+' &middot; Tk '+money(p.total)+' &middot; delivery '+esc(p.deliveryDate||'')+((p.dispatches||[]).length?' &middot; '+p.dispatches.length+' dispatch(es)':'')+'</div></div>';}).join('')||'<div style="'+CARD+';text-align:center;color:#555">No purchase order has been sent to '+esc(u.email)+' yet.</div>';
+      }
+    }catch(e){console.error(e);rows='<div style="'+CARD+';text-align:center;color:#555">Could not load. '+((e&&e.code==='permission-denied')?'The system is still being set up. Please try again later.':'Check your internet and try again.')+'</div>';}
+    wrap.innerHTML=box(head+rows);
+    g('hbOut').onclick=()=>firebase.auth().signOut().then(()=>hubLogin(db,'OK:Signed out.','in'));
+    g('tbR').onclick=()=>hubHome(db,'rfq');g('tbP').onclick=()=>hubHome(db,'po');
+    wrap.querySelectorAll('.hb-r').forEach(r=>r.onclick=async()=>{try{cur=r.dataset.id;const d=await db.collection('rfq_invites').doc(cur).get();renderRfq(d.data(),db);}catch(e){console.error(e);alert('Could not open this request.');}});
+    wrap.querySelectorAll('.hb-p').forEach(r=>r.onclick=async()=>{try{const d=await db.collection('supplier_pos').doc(r.dataset.id).get();renderPo({id:d.id,...d.data()},db);}catch(e){console.error(e);alert('Could not open this order.');}});
   }
-  async function load(n){
-    try{
-      const db=window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
-      if(!db||!firebase.auth().currentUser)throw new Error('wait');
-      if(hub){hubStart(db);return;}
-      const d=await db.collection('rfq_invites').doc(cur).get();
-      if(!d.exists){wrap.innerHTML=msg('This link is not valid. Please contact the company that sent it.');return;}
-      render(d.data(),db);
-    }catch(e){if(n<20)setTimeout(()=>load(n+1),700);else{console.error(e);wrap.innerHTML=msg('Could not open this request. Please check your internet connection and try again.');}}
-  }
-  function render(inv,db,justSent){
-    const closed=Date.now()>inv.deadlineMs,q=inv.quote||{},ql=q.lines||[];
-    const dis=closed?' disabled':'';
+  const backBtn=(tab)=>hub?'<button id="qBack" style="border:0;background:none;color:#1e6fe8;font-weight:bold;font-size:14px;padding:6px 0">&lsaquo; '+(tab==='po'?'My orders':'My requests')+'</button>':'';
+
+  /* ---------- file helpers ---------- */
+  const readFile=f=>new Promise((res,rej)=>{const r=new FileReader();r.onerror=()=>rej(new Error('Could not read the file.'));r.onload=()=>res(r.result);r.readAsDataURL(f);});
+  const readImg=f=>new Promise((res,rej)=>{const r=new FileReader();r.onerror=()=>rej(new Error('Could not read the file.'));r.onload=()=>{const img=new Image();img.onerror=()=>rej(new Error('This is not a valid image.'));img.onload=()=>{let out='';for(const [mx,ql] of [[1500,.74],[1200,.62],[950,.5],[800,.42]]){const sc=Math.min(1,mx/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*sc));c.height=Math.max(1,Math.round(img.height*sc));c.getContext('2d').drawImage(img,0,0,c.width,c.height);out=c.toDataURL('image/jpeg',ql);if(out.length<=700000)break;}res(out);};img.src=r.result;};r.readAsDataURL(f);});
+
+  /* ---------- quotation (RFQ) ---------- */
+  function calc(items,lines,transport,taxPct){let sub=0,vat=0;items.forEach(i=>{const l=lines.find(x=>x.id===i.id)||{};const qty=(l.qty!==undefined&&l.qty!=='')?num(l.qty):i.qty;const a=Math.round(num(l.rate)*(1-pct(l.disc)/100)*qty*100)/100;sub+=a;vat+=a*pct(l.vat)/100;});const tax=sub*num(taxPct)/100;return{sub,vat,tax,total:sub+vat+tax+num(transport)};}
+  function renderRfq(inv,db,justSent){
+    const closed=Date.now()>inv.deadlineMs,q=inv.quote||{},ql=q.lines||[],dis=closed?' disabled':'';
+    const sub=inv.status==='submitted',dr=inv.status==='draft';
     const items=inv.items.map(i=>{const l=ql.find(x=>x.id===i.id)||{};
-      return '<div style="background:#fff;border-radius:14px;padding:12px;margin-top:10px"><div style="font-weight:bold">'+esc(i.material)+'</div><div style="font-size:12px;color:#555;margin-bottom:8px">'+money(i.qty)+' '+esc(i.unit)+(i.spec?' &middot; '+esc(i.spec):'')+'</div>'
-      +'<div style="display:flex;gap:8px"><div style="flex:2"><div style="font-size:11px;color:#555">Rate (Tk per '+esc(i.unit)+')</div><input class="q-r" data-i="'+esc(i.id)+'" data-q="'+i.qty+'" type="number" inputmode="decimal" step="0.01" style="'+IN+'" value="'+(l.rate||'')+'"'+dis+'></div><div style="flex:1"><div style="font-size:11px;color:#555">Disc %</div><input class="q-d" data-i="'+esc(i.id)+'" type="number" inputmode="decimal" step="0.01" style="'+IN+'" value="'+(l.disc||'')+'"'+dis+'></div></div>'
-      +'<input class="q-n" data-i="'+esc(i.id)+'" placeholder="Brand / note (optional)" style="'+IN+';margin-top:8px" value="'+esc(l.note||'')+'"'+dis+'>'
+      const f=(c,lab,val,ph,st)=>'<div style="flex:1;min-width:0"><div style="'+LBL+'">'+lab+'</div><input class="'+c+'" data-i="'+esc(i.id)+'" type="number" inputmode="decimal" step="0.01" placeholder="'+(ph||'')+'" style="'+IN+(st||'')+'" value="'+esc(val)+'"'+dis+'></div>';
+      return '<div style="'+CARD+'"><div style="font-weight:bold">'+esc(i.material)+'</div><div style="font-size:12px;color:#555;margin-bottom:8px">Requested: '+money(i.qty)+' '+esc(i.unit)+(i.spec?' &middot; '+esc(i.spec):'')+'</div>'
+      +'<div style="display:flex;gap:8px">'+f('q-r','Rate (Tk / '+esc(i.unit)+')',l.rate||'')+f('q-d','Disc %',l.disc||'')+f('q-v','VAT %',l.vat||'')+'</div>'
+      +'<div style="display:flex;gap:8px;margin-top:8px">'+f('q-q','Qty you can supply',l.qty!==undefined&&l.qty!==''?l.qty:i.qty)+f('q-t','Delivery (days)',l.days||'')+'</div>'
+      +'<div style="'+LBL+';margin-top:8px">Brand / make</div><input class="q-b" data-i="'+esc(i.id)+'" style="'+IN+'" value="'+esc(l.brand||'')+'"'+dis+'>'
+      +'<div style="'+LBL+';margin-top:8px">Specification offered / note</div><input class="q-n" data-i="'+esc(i.id)+'" style="'+IN+'" value="'+esc(l.note||'')+'"'+dis+'>'
       +'<div class="q-a" data-i="'+esc(i.id)+'" style="text-align:right;font-size:13px;font-weight:bold;margin-top:6px"></div></div>';}).join('');
-    wrap.innerHTML=box((hub?'<button id="qBack" style="border:0;background:none;color:#1e6fe8;font-weight:bold;font-size:14px;padding:6px 0">&lsaquo; My RFQs</button>':'')+'<div style="text-align:center;padding:10px 0"><div style="font-size:20px;font-weight:bold">'+esc(inv.company)+'</div><div style="font-size:14px;color:#16294d;font-weight:bold;margin-top:2px">Request for Quotation</div></div>'
-      +(justSent?'<div style="background:#dcfce7;color:#166534;border-radius:12px;padding:12px;font-weight:bold;margin-bottom:10px">Thank you. Your quotation was submitted'+(closed?'.':'. You can change it until the deadline.')+'</div>':(inv.status==='submitted'?'<div style="background:#dbeafe;color:#1e3a8a;border-radius:12px;padding:10px;font-size:13px;margin-bottom:10px">You submitted a quotation on '+dFmt(inv.submittedAt)+'.'+(closed?'':' You can still change it until the deadline.')+'</div>':''))
+    wrap.innerHTML=box(backBtn('rfq')+'<div style="text-align:center;padding:10px 0"><div style="font-size:20px;font-weight:bold">'+esc(inv.company)+'</div><div style="font-size:14px;color:#16294d;font-weight:bold;margin-top:2px">Request for Quotation</div></div>'
+      +(justSent==='sent'?'<div style="background:#dcfce7;color:#166534;border-radius:12px;padding:12px;font-weight:bold;margin-bottom:10px">Thank you. Your quotation was submitted'+(closed?'.':'. You can update it until the deadline.')+'</div>':'')
+      +(justSent==='draft'?'<div style="background:#fef3c7;color:#92400e;border-radius:12px;padding:12px;font-weight:bold;margin-bottom:10px">Draft saved. It is not sent to the buyer until you tap Submit.</div>':'')
+      +(!justSent&&sub?'<div style="background:#dbeafe;color:#1e3a8a;border-radius:12px;padding:10px;font-size:13px;margin-bottom:10px">Submitted on '+dFmt(inv.submittedAt)+(q.rev>1?' (revision '+q.rev+')':'')+'.'+(closed?'':' You can still update it until the deadline.')+'</div>':'')
+      +(!justSent&&dr?'<div style="background:#fef3c7;color:#92400e;border-radius:12px;padding:10px;font-size:13px;margin-bottom:10px">This is a draft. The buyer cannot see it until you submit.</div>':'')
       +(closed?'<div style="background:#fee2e2;color:#991b1b;border-radius:12px;padding:12px;font-weight:bold;margin-bottom:10px">The deadline has passed. This request is closed.</div>':'')
       +'<div style="background:#fff;border-radius:14px;padding:12px;font-size:13px;line-height:1.7"><b>RFQ No:</b> '+esc(inv.rfqNo)+'<br><b>To:</b> '+esc((inv.supplier||{}).name)+'<br><b>Deadline:</b> '+dFmt(inv.deadlineMs)+(inv.site?'<br><b>Delivery site:</b> '+esc(inv.site):'')+(inv.note?'<br><b>Note:</b> '+esc(inv.note):'')+'</div>'
       +items
-      +'<div style="background:#fff;border-radius:14px;padding:12px;margin-top:10px"><div style="display:flex;gap:8px"><div style="flex:1"><div style="font-size:11px;color:#555">Delivery time (days)</div><input id="qDel" type="number" inputmode="numeric" style="'+IN+'" value="'+esc(q.deliveryDays||'')+'"'+dis+'></div><div style="flex:1"><div style="font-size:11px;color:#555">Offer valid (days)</div><input id="qVal" type="number" inputmode="numeric" style="'+IN+'" value="'+esc(q.validityDays||'')+'"'+dis+'></div></div>'
-      +'<div style="font-size:11px;color:#555;margin-top:8px">Payment terms you offer</div><input id="qPay" style="'+IN+'" value="'+esc(q.payment||'')+'"'+dis+'>'
-      +'<div style="font-size:11px;color:#555;margin-top:8px">Remarks</div><input id="qRem" style="'+IN+'" value="'+esc(q.remark||'')+'"'+dis+'></div>'
-      +'<div id="qTot" style="text-align:right;font-weight:bold;font-size:16px;margin:12px 4px 0"></div>'
-      +'<button id="qGo" style="width:100%;margin:12px 0 40px;padding:14px;border:0;border-radius:12px;background:#16294d;color:#fff;font-size:16px;font-weight:bold"'+dis+'>'+(inv.status==='submitted'?'Update quotation':'Submit quotation')+'</button>');
-    const bk=wrap.querySelector('#qBack');if(bk)bk.onclick=()=>hubList(db);
-    const calc=()=>{let t=0;wrap.querySelectorAll('.q-r').forEach(r=>{const id=r.dataset.i,rt=parseFloat(r.value)||0,dc=Math.min(100,Math.max(0,parseFloat(wrap.querySelector('.q-d[data-i="'+id+'"]').value)||0)),a=Math.round(rt*(1-dc/100)*100)/100*parseFloat(r.dataset.q);t+=a;wrap.querySelector('.q-a[data-i="'+id+'"]').textContent=rt>0?'Amount: Tk '+money(a):'';});wrap.querySelector('#qTot').textContent=t>0?'Total: Tk '+money(t):'';};
-    wrap.addEventListener('input',calc);calc();
-    wrap.querySelector('#qGo').onclick=async()=>{
-      const lines=inv.items.map(i=>({id:i.id,rate:parseFloat(wrap.querySelector('.q-r[data-i="'+i.id+'"]').value)||0,disc:Math.min(100,Math.max(0,parseFloat(wrap.querySelector('.q-d[data-i="'+i.id+'"]').value)||0)),note:wrap.querySelector('.q-n[data-i="'+i.id+'"]').value.trim()}));
-      if(!lines.some(l=>l.rate>0)){alert('Enter a rate for at least one item.');return;}
-      const b=wrap.querySelector('#qGo');b.disabled=true;b.textContent='Submitting...';
-      const quote={lines,deliveryDays:parseFloat(wrap.querySelector('#qDel').value)||0,validityDays:parseFloat(wrap.querySelector('#qVal').value)||0,payment:wrap.querySelector('#qPay').value.trim(),remark:wrap.querySelector('#qRem').value.trim(),by:(inv.supplier||{}).name||'',at:Date.now(),rev:(q.rev||0)+1};
+      +'<div style="'+CARD+'"><div style="display:flex;gap:8px"><div style="flex:1"><div style="'+LBL+'">Transport cost (Tk, total)</div><input id="qTr" type="number" inputmode="decimal" style="'+IN+'" value="'+esc(q.transport||'')+'"'+dis+'></div><div style="flex:1"><div style="'+LBL+'">Tax / AIT % (on subtotal)</div><input id="qTx" type="number" inputmode="decimal" style="'+IN+'" value="'+esc(q.taxPct||'')+'"'+dis+'></div></div>'
+      +'<div style="'+LBL+';margin-top:8px">Payment terms you offer</div><input id="qPay" style="'+IN+'" value="'+esc(q.payment||'')+'"'+dis+'>'
+      +'<div style="display:flex;gap:8px;margin-top:8px"><div style="flex:1"><div style="'+LBL+'">Warranty / guarantee</div><input id="qWar" style="'+IN+'" value="'+esc(q.warranty||'')+'"'+dis+'></div><div style="flex:1"><div style="'+LBL+'">Offer valid (days)</div><input id="qVal" type="number" inputmode="numeric" style="'+IN+'" value="'+esc(q.validityDays||'')+'"'+dis+'></div></div>'
+      +'<div style="'+LBL+';margin-top:8px">Remarks</div><input id="qRem" style="'+IN+'" value="'+esc(q.remark||'')+'"'+dis+'>'
+      +'<div style="'+LBL+';margin-top:8px">Your quotation PDF or photo (optional, up to about 500 KB)</div><input id="qPdf" type="file" accept="application/pdf,image/*" style="'+IN+'"'+dis+'>'+(q.pdf?'<div style="font-size:12px;color:#166534;margin-top:4px">Attached: '+esc(q.pdf.name)+'</div>':'')+'</div>'
+      +'<div id="qSum" style="'+CARD+';font-size:14px;line-height:1.8"></div>'
+      +(closed?'':'<div>'+(sub?'':'<button id="qDraft" style="'+BTN2+'">Save draft</button>')+'<button id="qGo" style="'+BTN+'">'+(sub?'Update quotation':'Submit quotation')+'</button></div>')
+      +'<div style="height:40px"></div>');
+    const bk=g('qBack');if(bk)bk.onclick=()=>hubHome(db,'rfq');
+    const read=()=>inv.items.map(i=>{const v=c=>wrap.querySelector('.'+c+'[data-i="'+i.id+'"]').value;return{id:i.id,rate:num(v('q-r')),disc:pct(v('q-d')),vat:pct(v('q-v')),qty:v('q-q')===''?i.qty:num(v('q-q')),days:num(v('q-t')),brand:v('q-b').trim(),note:v('q-n').trim()};});
+    const upd=()=>{const L=read(),tr=num(g('qTr').value),tx=num(g('qTx').value),c=calc(inv.items,L,tr,tx);
+      wrap.querySelectorAll('.q-a').forEach(e=>{const l=L.find(x=>x.id===e.dataset.i);const a=Math.round(l.rate*(1-l.disc/100)*l.qty*100)/100;e.textContent=l.rate>0?'Amount: Tk '+money(a)+(l.vat?' + VAT '+money(a*l.vat/100):''):'';});
+      g('qSum').innerHTML=c.sub>0?'Subtotal: Tk '+money(c.sub)+'<br>VAT: Tk '+money(c.vat)+(c.tax?'<br>Tax / AIT: Tk '+money(c.tax):'')+(tr?'<br>Transport: Tk '+money(tr):'')+'<br><b style="font-size:16px">Total: Tk '+money(c.total)+'</b>':'<span style="color:#555;font-size:13px">Enter your rates to see the total.</span>';};
+    wrap.addEventListener('input',upd);upd();
+    const save=async final=>{
+      const L=read();
+      if(final){if(!L.some(l=>l.rate>0)){alert('Enter a rate for at least one item.');return;}
+        const bad=inv.items.find(i=>{const l=L.find(x=>x.id===i.id);return l.rate>0&&!(l.qty>0);});if(bad){alert('Enter the quantity you can supply for '+bad.material+'.');return;}}
+      const b1=g('qGo'),b2=g('qDraft');if(b1)b1.disabled=true;if(b2)b2.disabled=true;(final?b1:b2).textContent='Saving...';
       try{
+        let pdf=q.pdf||null;const fl=g('qPdf').files[0];
+        if(fl){const isPdf=/pdf/i.test(fl.type)||/\.pdf$/i.test(fl.name);if(!isPdf&&!/^image\//.test(fl.type))throw new Error('Attach a PDF or a photo only.');
+          const data=isPdf?await readFile(fl):await readImg(fl);if(data.length>700000)throw new Error('The file is too large (about 500 KB limit). Use a smaller file.');
+          pdf={name:fl.name.slice(0,80),mime:isPdf?'application/pdf':'image/jpeg',data};}
         const at=Date.now();
-        await db.collection('rfq_invites').doc(cur).update({status:'submitted',submittedAt:at,quote});
-        render(Object.assign({},inv,{status:'submitted',submittedAt:at,quote}),db,true);
-      }catch(e){console.error(e);b.disabled=false;b.textContent='Submit quotation';alert(e&&e.code==='permission-denied'?'Could not submit. The deadline may have passed.':'Could not submit. Please check your internet and try again.');}
+        const quote={lines:L,transport:num(g('qTr').value),taxPct:num(g('qTx').value),payment:g('qPay').value.trim(),warranty:g('qWar').value.trim(),validityDays:num(g('qVal').value),remark:g('qRem').value.trim(),by:(inv.supplier||{}).name||'',at,rev:final?(q.rev||0)+1:(q.rev||0)};
+        if(pdf)quote.pdf=pdf;
+        const patch=final?{status:'submitted',submittedAt:at,quote}:{status:'draft',quote};
+        await db.collection('rfq_invites').doc(cur).update(patch);
+        renderRfq(Object.assign({},inv,patch),db,final?'sent':'draft');
+      }catch(e){console.error(e);if(b1){b1.disabled=false;b1.textContent=sub?'Update quotation':'Submit quotation';}if(b2){b2.disabled=false;b2.textContent='Save draft';}alert(e&&e.code==='permission-denied'?'Could not save. The deadline may have passed.':(e&&e.message&&!e.code?e.message:'Could not save. Please check your internet and try again.'));}
+    };
+    if(g('qGo'))g('qGo').onclick=()=>save(true);if(g('qDraft'))g('qDraft').onclick=()=>save(false);
+  }
+
+  /* ---------- purchase order ---------- */
+  function renderPo(po,db){
+    const r=po.response,disp=po.dispatches||[],sent={};
+    disp.forEach(d=>(d.lines||[]).forEach(l=>{sent[l.i]=(sent[l.i]||0)+num(l.qty);}));
+    const rc=!r?['Waiting for your reply','#fef3c7','#92400e']:(r.action==='accepted'?['You accepted this order','#dcfce7','#166534']:(r.action==='rejected'?['You rejected this order','#fee2e2','#991b1b']:['You asked for a change','#e0e7ff','#3730a3']));
+    const items=(po.items||[]).map((i,k)=>'<div style="padding:8px 0;border-top:1px solid #e5e9f0"><div style="font-weight:bold;font-size:14px">'+esc(i.material)+'</div><div style="font-size:12px;color:#555">'+money(i.qty)+' '+esc(i.unit)+' x Tk '+money(i.rate)+(i.disc?' (disc '+esc(i.disc)+'%)':'')+(i.spec?' &middot; '+esc(i.spec):'')+'</div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Dispatched: '+money(sent[k]||0)+' / '+money(i.qty)+'</span><b>Tk '+money(i.amount)+'</b></div></div>').join('');
+    const dh=disp.slice().reverse().map(d=>'<div style="background:#f6f8fb;border-radius:10px;padding:8px;margin-top:6px;font-size:12px;line-height:1.6"><b>Challan '+esc(d.challan)+'</b> &middot; sent '+dFmt(d.date)+(d.expected?' &middot; arrives '+dFmt(new Date(d.expected+'T00:00:00').getTime()):'')+(d.vehicle?'<br>Vehicle '+esc(d.vehicle):'')+(d.driverPhone?' &middot; driver '+esc(d.driverPhone):'')+'<br>'+(d.lines||[]).map(l=>esc(((po.items||[])[l.i]||{}).material)+': '+money(l.qty)).join(' &middot; ')+(d.note?'<br>'+esc(d.note):'')+'</div>').join('');
+    const accepted=r&&r.action==='accepted';
+    wrap.innerHTML=box(backBtn('po')+'<div style="text-align:center;padding:10px 0"><div style="font-size:20px;font-weight:bold">'+esc(po.company)+'</div><div style="font-size:14px;color:#16294d;font-weight:bold">Purchase Order '+esc(po.no)+'</div></div>'
+      +'<div style="'+CARD+'">'+chip(rc[0],rc[1],rc[2])+(r&&r.note?'<div style="font-size:13px;margin-top:6px">Your note: '+esc(r.note)+'</div>':'')+'<div style="font-size:13px;line-height:1.7;margin-top:8px"><b>To:</b> '+esc(po.supplierName)+'<br><b>Project:</b> '+esc(po.prjNo)+'<br><b>Deliver to:</b> '+esc(po.site||'-')+'<br><b>Delivery date:</b> '+esc(po.deliveryDate||'-')+'<br><b>Payment:</b> '+esc(po.payMode||'As per agreed terms')+(po.terms?' &middot; '+esc(po.terms):'')+'<br><b>Sent on:</b> '+dFmt(po.sentAt)+'</div></div>'
+      +'<div style="'+CARD+'"><div style="font-weight:bold;margin-bottom:4px">Items</div>'+items+'<div style="border-top:2px solid #16294d;margin-top:6px;padding-top:6px;font-size:13px;line-height:1.7">Subtotal: Tk '+money(po.subTotal)+(po.discount?'<br>Discount: Tk '+money(po.discount):'')+'<br><b style="font-size:15px">Total: Tk '+money(po.total)+'</b>'+(po.advance!==undefined&&po.advance!==po.total?'<br>Advance / PDC: Tk '+money(po.advance):'')+'</div></div>'
+      +(po.remarks?'<div style="'+CARD+';font-size:13px"><b>Remarks:</b> '+esc(po.remarks)+'</div>':'')
+      +(po.conditions?'<details style="'+CARD+';font-size:12px"><summary style="font-weight:bold;font-size:13px">Supply terms &amp; conditions</summary><div style="white-space:pre-line;margin-top:6px">'+esc(po.conditions)+'</div></details>':'')
+      +'<div style="'+CARD+'"><div style="font-weight:bold;margin-bottom:6px">Your reply</div><input id="poNote" placeholder="Note (needed to reject or ask for a change)" style="'+IN+'" value="">'
+      +'<button id="poAcc" style="'+BTN+'">'+(accepted?'Accepted':'Accept this order')+'</button><button id="poChg" style="'+BTN2+'">Ask for a change</button><button id="poRej" style="'+BTN2+';color:#b91c1c;border-color:#fca5a5">Reject</button></div>'
+      +(accepted?'<div style="'+CARD+'"><div style="font-weight:bold">Dispatch</div><div style="font-size:12px;color:#555;margin-bottom:6px">Tell the buyer when material is on the way. Add one entry for each truck or delivery.</div>'+dh+'<button id="dpOpen" style="'+BTN2+'">Add dispatch</button><div id="dpForm"></div></div>':'')
+      +'<div style="height:40px"></div>');
+    const bk=g('qBack');if(bk)bk.onclick=()=>hubHome(db,'po');
+    const reply=async action=>{
+      const note=g('poNote').value.trim();if(action!=='accepted'&&!note){alert('Write a note first.');return;}
+      try{const resp={action,note,at:Date.now(),by:po.supplierName};await db.collection('supplier_pos').doc(po.id).update({response:resp});renderPo(Object.assign({},po,{response:resp}),db);}
+      catch(e){console.error(e);alert('Could not save your reply. Please try again.');}
+    };
+    g('poAcc').onclick=()=>reply('accepted');g('poChg').onclick=()=>reply('change_requested');g('poRej').onclick=()=>reply('rejected');
+    if(g('dpOpen'))g('dpOpen').onclick=()=>{
+      const today=new Date().toISOString().slice(0,10);
+      const lines=(po.items||[]).map((i,k)=>{const left=Math.max(0,Math.round((num(i.qty)-(sent[k]||0))*100)/100);return '<div style="display:flex;gap:8px;align-items:center;margin-top:6px"><div style="flex:2;font-size:13px">'+esc(i.material)+'<div style="font-size:11px;color:#555">left '+money(left)+' '+esc(i.unit)+'</div></div><input class="dp-q" data-k="'+k+'" data-max="'+left+'" type="number" inputmode="decimal" step="0.01" style="flex:1;'+IN+'" value="'+left+'"></div>';}).join('');
+      g('dpForm').innerHTML='<div style="margin-top:10px"><div style="'+LBL+'">Challan / delivery note no</div><input id="dpC" style="'+IN+'"><div style="display:flex;gap:8px;margin-top:8px"><div style="flex:1"><div style="'+LBL+'">Dispatch date</div><input id="dpD" type="date" style="'+IN+'" value="'+today+'"></div><div style="flex:1"><div style="'+LBL+'">Expected arrival</div><input id="dpE" type="date" style="'+IN+'"></div></div><div style="display:flex;gap:8px;margin-top:8px"><div style="flex:1"><div style="'+LBL+'">Vehicle no</div><input id="dpV" style="'+IN+'"></div><div style="flex:1"><div style="'+LBL+'">Driver phone</div><input id="dpP" type="tel" style="'+IN+'"></div></div><div style="'+LBL+';margin-top:8px">Quantity on this dispatch</div>'+lines+'<div style="'+LBL+';margin-top:8px">Note</div><input id="dpN" style="'+IN+'"><button id="dpSave" style="'+BTN+'">Send dispatch notice</button></div>';
+      g('dpSave').onclick=async()=>{
+        const challan=g('dpC').value.trim(),exp=g('dpE').value,dt=g('dpD').value;
+        if(!challan||!exp||!dt){alert('Enter the challan number, dispatch date and expected arrival.');return;}
+        const ls=[];let bad='';wrap.querySelectorAll('.dp-q').forEach(e=>{const q=num(e.value);if(q>0){if(q>num(e.dataset.max)+0.0001)bad='You cannot dispatch more than the quantity left.';ls.push({i:+e.dataset.k,qty:q});}});
+        if(bad){alert(bad);return;}if(!ls.length){alert('Enter a quantity for at least one item.');return;}
+        const d={id:Date.now().toString(36),challan,date:new Date(dt+'T00:00:00').getTime(),expected:exp,vehicle:g('dpV').value.trim(),driverPhone:g('dpP').value.trim(),lines:ls,note:g('dpN').value.trim(),at:Date.now(),by:po.supplierName};
+        const all=disp.concat([d]);g('dpSave').disabled=true;g('dpSave').textContent='Sending...';
+        try{await db.collection('supplier_pos').doc(po.id).update({dispatches:all});renderPo(Object.assign({},po,{dispatches:all}),db);}
+        catch(e){console.error(e);g('dpSave').disabled=false;g('dpSave').textContent='Send dispatch notice';alert('Could not send. Please try again.');}
+      };
     };
   }
   window.addEventListener('load',()=>load(0));
@@ -5554,7 +5735,7 @@ async function deleteEntryFromFirebase(firebaseId){
     const mats=new Set(ents.map(e=>(e.material||'').trim().toLowerCase()).filter(Boolean)).size;
     const openReq=reqs.filter(r=>r.stage!=='closed'&&r.stage!=='rejected').length;
     const approver=['admin','pmgr','ed'].includes(role);
-    const pendPO=pos.filter(o=>o.status==='pending').length;
+    const pendPO=pos.filter(o=>o.status==='pending').length+(window.marsCS?marsCS().filter(c=>c.status==='pending'&&inScope(c.prjNo)).length:0),toSend=pos.filter(o=>o.status==='approved'&&!o.sentAt).length;
     const awaiting=reqs.reduce((a,r)=>a+(r.items||[]).filter(i=>i.state==='purchased').length,0);
     const poVal=pos.filter(o=>(o.status||'approved')==='approved').reduce((a,o)=>a+(+o.total||0),0);
     const h=new Date().getHours(),hi=h<12?'Good morning,':(h<17?'Good afternoon,':'Good evening,');
@@ -5572,7 +5753,7 @@ async function deleteEntryFromFirebase(firebaseId){
     act.sort((x,y)=>y.t-x.t);
     const rows=act.slice(0,5).map(x=>'<div class="hx-row"><div class="ic" style="background:'+x.bg+'">'+x.ic+'</div><div class="m"><div class="a">'+x.a+'</div><div class="b">'+x.b+'</div></div><span class="hx-pill" style="background:'+PILL[x.p[1]][0]+';color:'+PILL[x.p[1]][1]+'">'+x.p[0]+'</span></div>').join('')||'<div style="padding:18px;color:#64748b;font-size:13px">No recent activity yet.</div>';
     const html='<div class="hx-greet"><div><div class="hi">'+hi+'</div><div class="nm">'+esc(name)+'</div><div class="sb">Here&rsquo;s what&rsquo;s happening today.</div></div><div class="dt">'+dt+'<i>Build Today<br>for a Stronger Tomorrow</i><b></b></div></div>'
-     +'<div class="hx-hero"><div><div class="l">Open requisitions</div><div><div class="n">'+openReq+'</div><div class="s">in progress</div></div></div><div><div class="l">'+(approver?'POs waiting for approval':'Items awaiting delivery')+'</div><div><div class="n">'+(approver?pendPO:awaiting)+'</div><div class="s">'+(approver?'needs a decision':'to be received')+'</div></div></div></div>'
+     +'<div class="hx-hero"><div><div class="l">Open requisitions</div><div><div class="n">'+openReq+'</div><div class="s">in progress</div></div></div><div><div class="l">'+(approver?'Waiting for your approval':(role==='proc'?'Approved POs to send':'Items awaiting delivery'))+'</div><div><div class="n">'+(approver?pendPO:(role==='proc'?toSend:awaiting))+'</div><div class="s">'+(approver?'needs a decision':(role==='proc'?'send to supplier':'to be received'))+'</div></div></div></div>'
      +'<div class="hx-stats">'+stat('blue',ico.box,'Materials',mats,'Active Items','print'.replace('print',role==='proc'?'dashboard':'print'))
        +stat('orange',ico.doc,'Requests',openReq,'Pending','track')
        +stat('green',ico.cart,'Orders',pos.length,'Total Orders',role==='site'?'track':'purchaseorders')
