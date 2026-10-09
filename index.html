@@ -373,7 +373,55 @@
 @keyframes panelIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
 @keyframes glassShake{25%{transform:translateX(-7px)}50%{transform:translateX(7px)}75%{transform:translateX(-4px)}}
 @media(max-width:620px){.glass-panel{padding:26px 18px}.glass-title{font-size:20px}.glass-cards{grid-template-columns:1fr;gap:11px}.glass-card{min-height:130px;padding:18px}.back-role{top:10px;left:10px}}
-</style>
+
+    /* ===== Mars design refresh ===== */
+    body{background:linear-gradient(180deg,#eaf3ff 0%,#f5f9ff 40%,#ffffff 100%) fixed}
+    .card{border-radius:20px;border-color:#e3ecfa;box-shadow:0 8px 26px rgba(24,90,190,.08)}
+    .sidebar{background:linear-gradient(180deg,#ffffff,#f4f9ff)}
+    .nav-item{border-radius:14px;padding:12px 14px}
+    .nav-item::after{content:"\203A";margin-left:auto;font-size:20px;line-height:1;color:#94a3b8;font-weight:400}
+    .nav-item.active{background:linear-gradient(90deg,#1e90ff,#0a55d6);box-shadow:0 10px 22px rgba(14,90,220,.28)}
+    .nav-item.active::after{color:#fff}
+    .mobile-bottom{border-radius:22px;margin:0 10px 10px;border:1px solid #e3ecfa;box-shadow:0 12px 32px rgba(20,80,180,.16)}
+    .hx-greet{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap}
+    .hx-greet .hi{font-size:19px;color:#1e293b}.hx-greet .nm{font-size:36px;font-weight:800;color:#0b1b3a;line-height:1.05}.hx-greet .sb{font-size:14px;color:#64748b;margin-top:4px}
+    .hx-greet .dt{text-align:right;font-size:13px;color:#334155}.hx-greet .dt i{display:block;font-style:normal;color:#64748b;font-size:12px;margin-top:2px}.hx-greet .dt b{display:block;width:44px;height:3px;border-radius:3px;background:#1e90ff;margin:6px 0 0 auto}
+    .hx-hero{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+    .hx-hero>div{border-radius:22px;padding:16px;color:#fff;min-height:118px;background:linear-gradient(135deg,#2a9bff,#0a55d6);box-shadow:0 14px 30px rgba(14,90,220,.28);display:flex;flex-direction:column;justify-content:space-between}
+    .hx-hero .l{font-size:13px;opacity:.92}.hx-hero .n{font-size:34px;font-weight:800;line-height:1}.hx-hero .s{font-size:12px;opacity:.85}
+    .hx-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+    @media(min-width:900px){.hx-stats{grid-template-columns:repeat(4,1fr)}}
+    .hx-st{position:relative;border-radius:20px;padding:14px;display:flex;gap:12px;border:1px solid;cursor:pointer;overflow:hidden;min-height:104px}
+    .hx-ic{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.75);flex:none}
+    .hx-ic svg{width:24px;height:24px}
+    .hx-st .t{font-size:13px;color:#334155}.hx-st .v{font-size:25px;font-weight:800;color:#0b1b3a;line-height:1.15}.hx-st .u{font-size:12.5px;color:#64748b}
+    .hx-go{position:absolute;right:12px;bottom:10px;width:30px;height:30px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,.08);font-size:18px;font-weight:700;line-height:1}
+    .hx-h{display:flex;justify-content:space-between;align-items:center;margin:22px 2px 10px}.hx-h h2{font-size:21px;font-weight:800;color:#0b1b3a;margin:0}.hx-h a{font-size:14px;color:#1e6fe8;font-weight:600;cursor:pointer}
+    .hx-q{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .hx-qt{position:relative;border-radius:20px;padding:12px 11px 40px;border:1px solid;cursor:pointer;min-height:150px}
+    .hx-qt .tt{font-size:14.5px;font-weight:800;color:#0b1b3a;margin-top:10px;line-height:1.2}.hx-qt .ds{font-size:12px;color:#64748b;margin-top:4px;line-height:1.3}.hx-qt .hx-go{right:10px;bottom:10px}
+    .hx-qt svg{width:30px;height:30px}
+    .hx-act{background:#fff;border:1px solid #e3ecfa;border-radius:22px;box-shadow:0 8px 26px rgba(24,90,190,.08);padding:4px 14px}
+    .hx-row{display:flex;align-items:center;gap:14px;padding:13px 0;border-top:1px solid #edf2fa}.hx-row:first-child{border-top:0}
+    .hx-row .ic{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex:none}.hx-row .ic svg{width:22px;height:22px}
+    .hx-row .m{flex:1;min-width:0}.hx-row .a{font-size:15px;font-weight:800;color:#0b1b3a}.hx-row .b{font-size:12.5px;color:#64748b;margin-top:2px}
+    .hx-pill{font-size:12.5px;font-weight:700;border-radius:999px;padding:6px 14px;white-space:nowrap}
+    .hx-c-blue{background:linear-gradient(135deg,#eef6ff,#dfeeff);border-color:#d3e6ff}.hx-c-orange{background:linear-gradient(135deg,#fff5ec,#ffe8d4);border-color:#ffdcbc}
+    .hx-c-green{background:linear-gradient(135deg,#ecfbf4,#d8f4e6);border-color:#c8ecd9}.hx-c-purple{background:linear-gradient(135deg,#f3f2ff,#e5e3ff);border-color:#d9d6fb}
+    /* ---- match the approved card / menu look ---- */
+    .nav-item{color:#111c3d;font-size:15px;font-weight:700;padding:14px 14px;gap:14px}
+    .nav-item svg.vic{color:#4a5a78;width:20px;height:20px}
+    .nav-item::after{font-size:24px;color:#6b7a90}
+    .hx-st{backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 6px 20px rgba(24,90,190,.06),inset 0 1px 0 rgba(255,255,255,.8);min-height:112px;padding:16px 14px}
+    .hx-st>div{position:relative;z-index:1}
+    .hx-st::after{content:"";position:absolute;left:-12%;bottom:-46px;width:78%;height:84px;border-radius:50%;pointer-events:none}
+    .hx-c-blue.hx-st::after{background:rgba(30,144,255,.10)}.hx-c-orange.hx-st::after{background:rgba(255,140,50,.11)}
+    .hx-c-green.hx-st::after{background:rgba(16,165,107,.10)}.hx-c-purple.hx-st::after{background:rgba(90,85,224,.10)}
+    .hx-c-blue .hx-ic{background:#d9eaff}.hx-c-orange .hx-ic{background:#ffe5d2}.hx-c-green .hx-ic{background:#d4f2e4}.hx-c-purple .hx-ic{background:#dfdffb}
+    .hx-ic{width:50px;height:50px;border-radius:15px}.hx-ic svg{width:27px;height:27px}
+    .hx-st .t{font-size:14.5px;color:#1e293b}.hx-st .v{font-size:clamp(22px,6.4vw,31px);font-weight:800;letter-spacing:-.01em}.hx-st .u{font-size:13.5px;color:#64748b}
+    .hx-st .hx-go{width:36px;height:36px;font-size:22px;right:12px;bottom:12px;z-index:2;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+  </style>
 
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-app-compat.js"></script>
@@ -787,7 +835,7 @@ window.marsPill=function(kind,text){
         <div class="nav-group">Overview</div>
         <a href="javascript:void(0)" class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg> Dashboard</a>
         <div class="nav-group">Stock</div>
-        <a href="javascript:void(0)" class="nav-item" data-page="entry" onclick="showPage('entry')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> New Ledger Entry</a>
+        <a href="javascript:void(0)" class="nav-item" data-page="entry" onclick="showPage('entry')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Stock Entry</a>
         <a href="javascript:void(0)" class="nav-item" data-page="transfers" onclick="showPage('transfers')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h13l-3-3M17 17H4l3 3"/></svg> Transfers <span id="trBadge" class="hidden" style="background:#dc2626;color:#fff;border-radius:99px;font-size:10px;padding:1px 7px;margin-left:6px">0</span></a>
         <a href="javascript:void(0)" class="nav-item admin-only" data-page="verify" onclick="showPage('verify')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg> Physical Check</a>
         <div class="nav-group">Procurement</div>
@@ -814,14 +862,7 @@ window.marsPill=function(kind,text){
     <main class="main flex-1 page-pad p-5 md:p-7" id="dashboard">
       <div class="max-w-[1350px] mx-auto space-y-6">
 
-        <section class="flex flex-col md:flex-row md:items-end justify-between gap-3 page-section" data-page="dashboard">
-          <div>
-            <div class="text-xs font-bold text-brand uppercase tracking-wider">Operations</div>
-            <h1 class="text-2xl md:text-3xl font-extrabold text-ink mt-1">Stock Ledger Dashboard</h1>
-            <p class="text-sm text-muted mt-1">Track procurement, site transfers, issues and current material balance.</p>
-          </div>
-          <button class="btn btn-primary no-print" onclick="showPage('entry')"><svg class="vic" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Add New Entry</button>
-        </section>
+        <section class="page-section" data-page="dashboard" id="mxHome"></section>
 
         <section class="fd-rail-wrap page-section" data-page="dashboard">
           <div class="stats-glow-a"></div><div class="stats-glow-b"></div>
@@ -1001,7 +1042,20 @@ window.marsPill=function(kind,text){
           <datalist id="unitsList"></datalist>
           <datalist id="materialsDatalist"></datalist>
 
-          <div id="ledgerForm" class="mt-5">
+          <div id="entryTypeBox" class="mt-5 rounded-xl border border-line p-3" style="background:#f6faff">
+            <label class="field-label">Entry Type</label>
+            <select id="entryType" class="field" onchange="applyEntryType()">
+              <option value="issue">Issue / Consumption (used at site)</option>
+              <option value="direct">Direct Purchase (without requisition)</option>
+              <option value="gain">Adjustment: Stock Gain (+)</option>
+              <option value="loss">Adjustment: Loss / Damage (-)</option>
+              <option value="gatepass">Gate Pass: other site (receive / send)</option>
+              <option value="all">All fields (Admin / correction)</option>
+            </select>
+            <div id="entryTypeHelp" class="text-xs text-muted mt-2"></div>
+            <div id="entryReasonWrap" class="mt-2 hidden"><label class="field-label" id="entryReasonLabel">Reason</label><input id="entryReason" class="field" placeholder="Write the reason"></div>
+          </div>
+          <div id="ledgerForm" class="mt-3">
             <div id="itemRowsWrap">
               <div class="item-row border border-line rounded-xl p-3 mb-3" data-row="0">
                 <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
@@ -2078,6 +2132,10 @@ window.marsPill=function(kind,text){
 
       const items = collectItemRowsData();
       if (!items.length) { alert("Please add at least one material item."); return; }
+      const et = (document.getElementById('entryType') || {}).value || 'issue';
+      const reasonTxt = ((document.getElementById('entryReason') || {}).value || '').trim();
+      const prepErr = (typeof entryTypePrepare === 'function') ? entryTypePrepare(items, et, reasonTxt, prjInfo) : null;
+      if (prepErr) { alert(prepErr); return; }
 
       isSaving = true;
       const btnSubmitEl = document.getElementById('btnSubmit');
@@ -2109,7 +2167,9 @@ window.marsPill=function(kind,text){
         trPrj: item.trPrj,
         trQty: item.trQty,
         purpose: item.purpose,
-        issueQty: item.issueQty
+        issueQty: item.issueQty,
+        entryType: editIndex === -1 ? et : (old?.entryType || 'all'),
+        reason: editIndex === -1 ? reasonTxt : (old?.reason || '')
       });
 
       try{
@@ -4113,7 +4173,8 @@ async function deleteEntryFromFirebase(firebaseId){
   async function mut(id,fn){
     const db=fb(),ref=db.collection('requisitions').doc(id);
     const slow=setTimeout(()=>showToast('Network is slow - still saving. Please do not tap again.','error'),10000);
-    try{await db.runTransaction(async tx=>{const d=await tx.get(ref);const x=await fn(Object.assign({},d.data(),{id}),tx,db);if(!x)throw new Error('blocked');const lg=x.ledger;delete x.ledger;(lg||[]).forEach(en=>tx.set(db.collection(FIREBASE_COLLECTION).doc(en.id),en.data));tx.update(ref,x);});clearTimeout(slow);showToast('Done.');return true;}
+    let act='';
+    try{await db.runTransaction(async tx=>{const d=await tx.get(ref);const x=await fn(Object.assign({},d.data(),{id}),tx,db);if(!x)throw new Error('blocked');act=((x.history||[]).slice(-1)[0]||{}).action||'';const lg=x.ledger;delete x.ledger;(lg||[]).forEach(en=>tx.set(db.collection(FIREBASE_COLLECTION).doc(en.id),en.data));tx.update(ref,x);});clearTimeout(slow);showToast('Done.');if(window.marsAudit)marsAudit('Requisition',id,act);return true;}
     catch(e){clearTimeout(slow);showToast(e.message==='blocked'?'Action not allowed at this stage (check your role / project access).':'Failed: '+(e.code||e.message||'check Rules/connection'),'error');console.error('[requisition action failed]',e);return false;}
   }
   window.rqAddRow=function(){
@@ -4566,7 +4627,7 @@ async function deleteEntryFromFirebase(firebaseId){
     const f=(id,l,val,extra)=>`<div><label class="field-label">${l}</label><input id="${id}" class="field" value="${esc(val)}" ${extra||''}></div>`;
     return `<div class="card p-5" style="background:#fff;max-width:520px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">${title}</h3><div class="text-xs text-muted mb-3">${sub}</div><div class="space-y-3">
       <div class="text-xs font-extrabold text-navy">Supplier</div>
-      <div><label class="field-label">Supplier name</label><input id="poSup" class="field" value="${esc(v.supplier.name)}" list="supNameList" autocomplete="off" placeholder="Pick from list or type a new supplier"><datalist id="supNameList">${(window.marsSuppliers?marsSuppliers():[]).map(x=>`<option value="${esc(x.name)}">`).join('')}</datalist></div>
+      <div><label class="field-label">Supplier name</label><input id="poSup" class="field" value="${esc(v.supplier.name)}" list="supNameList" autocomplete="off" placeholder="Pick from list or type a new supplier"><datalist id="supNameList">${(window.marsSuppliersUsable?marsSuppliersUsable():[]).map(x=>`<option value="${esc(x.name)}">`).join('')}</datalist></div>
       ${f('poCp','Contact person',v.supplier.contact)}${f('poPh','Phone',v.supplier.phone,'type="tel"')}${f('poAd','Address',v.supplier.address)}
       <div class="text-xs font-extrabold text-navy">Project (shown on the PO)</div>
       ${f('pjAd','Project address',v.project.address)}${f('pjCp','Project contact person',v.project.contact)}${f('pjPh','Project contact phone',v.project.phone,'type="tel"')}
@@ -4650,7 +4711,7 @@ async function deleteEntryFromFirebase(firebaseId){
           tx.update(pr,ap?{status:'approved',approvedBy:me,approvedAt:now}:{status:'rejected',approvedBy:me,approvedAt:now,approvalNote:note});
           tx.update(rr,{items,stage,history:(r.history||[]).concat([Object.assign({by:me,role:role(),action:'PO '+p.no+(ap?' approved - items ordered, awaiting delivery':' rejected - items released for a new PO'),at:now},ap?{}:{note})])});
         });
-        m.remove();showToast(ap?'PO approved. Items are now awaiting delivery.':'PO rejected. Items released.');
+        m.remove();showToast(ap?'PO approved. Items are now awaiting delivery.':'PO rejected. Items released.');if(window.marsAudit)marsAudit('PO',o.no,ap?'Approved':'Rejected: '+note);
       }catch(e){b1.disabled=b2.disabled=false;console.error(e);showToast('Failed: '+(e.code||e.message),'error');}
     };
     m.querySelector('#poRvOk').onclick=()=>run(true);m.querySelector('#poRvNo').onclick=()=>run(false);
@@ -4670,7 +4731,7 @@ async function deleteEntryFromFirebase(firebaseId){
     const rows=its.map(i=>`<div class="rounded-xl border border-line bg-white p-3 text-sm space-y-1"><label><input type="checkbox" class="rf-c" data-i="${i.id}" checked> <b>${esc(i.material)}</b> <span class="text-xs text-muted">${i.qty} ${esc(i.unit)}</span></label><input class="field rf-sp" data-i="${i.id}" placeholder="Specification / brand (optional)"></div>`).join('');
     const sups=[0,1,2,3,4,5].map(k=>`<div class="rounded-xl border border-line p-2 space-y-1"><div class="grid grid-cols-5 gap-1"><input class="field col-span-3 rf-n" list="rfSupList" autocomplete="off" placeholder="Supplier ${k+1}${k<2?' (required)':''}"><input class="field col-span-2 rf-p" type="tel" placeholder="Phone (WhatsApp)"></div><input class="field rf-e" type="email" placeholder="Email (Gmail)"></div>`).join('');
     const dl0=new Date(Date.now()+2*864e5).toISOString().slice(0,10);
-    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:520px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Request for Quotation</h3><div class="text-xs text-muted mb-3">${esc(r.no)} &middot; ${esc(r.prjNo)}. Suppliers get a private link to enter their rates.</div><datalist id="rfSupList">${(window.marsSuppliers?marsSuppliers():[]).map(x=>`<option value="${esc(x.name)}">`).join('')}</datalist><div class="space-y-2"><div class="text-xs font-extrabold text-navy">Items</div>${rows}<div class="text-xs font-extrabold text-navy">Suppliers (2 to 6)</div>${sups}<div><label class="field-label">Quotation deadline</label><input id="rfDl" class="field" type="date" value="${dl0}"></div><div><label class="field-label">Note to suppliers (optional)</label><input id="rfNote" class="field" placeholder="e.g. Rates must include carrying to site"></div></div><div class="flex gap-2 mt-4"><button class="btn btn-primary" id="rfSave">Create RFQ</button><button class="btn btn-secondary" id="rfClose">Close</button></div></div>`,'rfqModal');
+    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:520px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Request for Quotation</h3><div class="text-xs text-muted mb-3">${esc(r.no)} &middot; ${esc(r.prjNo)}. Suppliers get a private link to enter their rates.</div><datalist id="rfSupList">${(window.marsSuppliersUsable?marsSuppliersUsable():[]).map(x=>`<option value="${esc(x.name)}">`).join('')}</datalist><div class="space-y-2"><div class="text-xs font-extrabold text-navy">Items</div>${rows}<div class="text-xs font-extrabold text-navy">Suppliers (2 to 6)</div>${sups}<div><label class="field-label">Quotation deadline</label><input id="rfDl" class="field" type="date" value="${dl0}"></div><div><label class="field-label">Note to suppliers (optional)</label><input id="rfNote" class="field" placeholder="e.g. Rates must include carrying to site"></div></div><div class="flex gap-2 mt-4"><button class="btn btn-primary" id="rfSave">Create RFQ</button><button class="btn btn-secondary" id="rfClose">Close</button></div></div>`,'rfqModal');
     m.addEventListener('change',e=>{if(e.target.classList.contains('rf-n')){const f=window.marsFindSupplier&&marsFindSupplier(e.target.value),ph=e.target.parentNode.querySelector('.rf-p'),em=e.target.parentNode.parentNode.querySelector('.rf-e');if(f&&ph&&!ph.value)ph.value=f.phone||'';if(f&&em&&!em.value)em.value=f.email||'';}});
     m.querySelector('#rfClose').onclick=()=>m.remove();
     m.querySelector('#rfSave').onclick=async()=>{
@@ -4681,6 +4742,7 @@ async function deleteEntryFromFirebase(firebaseId){
       const ns=[...m.querySelectorAll('.rf-n')],ps=[...m.querySelectorAll('.rf-p')],es=[...m.querySelectorAll('.rf-e')],sup=[];
       ns.forEach((n,k)=>{const nm=n.value.trim();if(nm)sup.push({name:nm,phone:ps[k].value.trim(),email:es[k].value.trim(),token:tok()});});
       if(sup.length<2){showToast('Add at least 2 suppliers.','error');return;}
+      for(const v of sup){const bl=window.marsSupplierBlocked&&marsSupplierBlocked(v.name);if(bl){showToast(bl,'error');return;}}
       if(new Set(sup.map(x=>x.name.toLowerCase())).size!==sup.length){showToast('Supplier names must be different.','error');return;}
       const b=m.querySelector('#rfSave');b.disabled=true;b.textContent='Creating...';
       const db=fb(),me=window.currentEngineerName||'Admin',nref=db.collection('rfqs').doc(),note=m.querySelector('#rfNote').value.trim();
@@ -4694,16 +4756,16 @@ async function deleteEntryFromFirebase(firebaseId){
           tx.set(cref,{n});
           rfObj={id:nref.id,no,requisitionId:rid,reqNo:r.no,prjNo:r.prjNo,items,deadline:dl,deadlineMs:dlMs,note,invites:sup,createdBy:me,createdAt:now,status:'open'};
           const {id:_i,...rfData}=rfObj;tx.set(nref,rfData);
-          sup.forEach(v=>tx.set(db.collection('rfq_invites').doc(v.token),{rfqId:nref.id,rfqNo:no,supplier:{name:v.name,phone:v.phone},company,site,prjNo:r.prjNo,items,deadline:dl,deadlineMs:dlMs,note,status:'sent',createdAt:now}));
+          sup.forEach(v=>tx.set(db.collection('rfq_invites').doc(v.token),{rfqId:nref.id,rfqNo:no,supplier:{name:v.name,phone:v.phone},supplierEmail:String(v.email||'').toLowerCase(),company,site,prjNo:r.prjNo,items,deadline:dl,deadlineMs:dlMs,note,status:'sent',createdAt:now}));
         });
-        m.remove();showToast('RFQ created. Send the links to suppliers.');shareModal(rfObj);
+        m.remove();showToast('RFQ created. Send the links to suppliers.');if(window.marsAudit)marsAudit('RFQ',rfObj.no,'Created for '+sup.map(x=>x.name).join(', '));shareModal(rfObj);
       }catch(e){b.disabled=false;b.textContent='Create RFQ';console.error(e);showToast('Failed: '+(e.code||e.message)+' (check Firestore Rules for rfqs / rfq_invites)','error');}
     };
   };
   function shareModal(rf){
     const rows=rf.invites.map((v,k)=>{const link=portalUrl(v.token),wa='https://wa.me/'+(v.phone?waNum(v.phone):'')+'?text='+encodeURIComponent(rfqMsg(rf,v)),sub=encodeURIComponent('Request for Quotation '+rf.no+' - '+(co().name||'Mars Structure Limited')),gm='https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(v.email||'')+'&su='+sub+'&body='+encodeURIComponent(rfqMsg(rf,v)),ml='mailto:'+encodeURIComponent(v.email||'')+'?subject='+sub+'&body='+encodeURIComponent(rfqMsg(rf,v));
       return `<div class="rounded-xl border border-line bg-white p-3 text-sm space-y-1"><b>${esc(v.name)}</b>${v.phone?' <span class="text-xs text-muted">'+esc(v.phone)+'</span>':''}${v.email?' <span class="text-xs text-muted">'+esc(v.email)+'</span>':''}<input class="field rf-link" readonly value="${esc(link)}" onfocus="this.select()"><div class="flex gap-2 flex-wrap"><button class="btn btn-secondary rf-copy" data-l="${esc(link)}">Copy link</button><a class="btn btn-secondary" target="_blank" rel="noopener" href="${wa}">WhatsApp</a><a class="btn btn-secondary" target="_blank" rel="noopener" href="${gm}">Gmail</a><a class="btn btn-secondary" href="${ml}">Mail app</a><button class="btn btn-secondary" onclick="rfqPrint('${rf.id}',${k})">Print RFQ</button></div></div>`;}).join('');
-    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:520px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">${esc(rf.no)} &middot; send to suppliers</h3><div class="text-xs text-muted mb-3">Each supplier has a private link. They enter rates on their phone and submit before ${dFmt(rf.deadlineMs)}. To attach the RFQ as a PDF: tap Print RFQ, save as PDF, then attach it in Gmail or WhatsApp.</div><div class="space-y-2">${rows}</div><div class="flex gap-2 mt-4"><button class="btn btn-secondary" id="rfShX">Close</button></div></div>`,'rfShareModal');
+    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:520px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">${esc(rf.no)} &middot; send to suppliers</h3><div class="text-xs text-muted mb-3">Each supplier has a private link. They enter rates on their phone and submit before ${dFmt(rf.deadlineMs)}. To attach the RFQ as a PDF: tap Print RFQ, save as PDF, then attach it in Gmail or WhatsApp.</div><div class="space-y-2">${rows}</div><div class="text-xs text-muted mt-3">Suppliers with an email can also sign in at <b>${esc(location.origin+location.pathname+'?portal=supplier')}</b> to see all RFQs sent to that email.</div><div class="flex gap-2 mt-4"><button class="btn btn-secondary" id="rfShX">Close</button></div></div>`,'rfShareModal');
     m.querySelector('#rfShX').onclick=()=>m.remove();
     m.querySelectorAll('.rf-copy').forEach(b=>b.onclick=()=>{const t=b.dataset.l,ok=()=>showToast('Link copied.');(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(ok).catch(()=>{const i=b.parentNode.parentNode.querySelector('.rf-link');i.select();document.execCommand('copy');ok();});});
   }
@@ -4759,7 +4821,7 @@ async function deleteEntryFromFirebase(firebaseId){
       +[0,1,2,3].map(k=>{const q=l&&l.quotes[k];return `<div class="grid grid-cols-6 gap-1 items-center"><span class="col-span-2 text-xs cs-sn" data-k="${k}">Supplier ${k+1}</span><input class="field col-span-2 cs-r" data-k="${k}" type="number" step="0.01" placeholder="Rate" value="${q&&q.rate?q.rate:''}"><input class="field cs-d" data-k="${k}" type="number" step="0.01" placeholder="Disc%" value="${q&&q.disc?q.disc:''}"><label class="text-center text-xs"><input type="radio" name="sel_${i.id}" class="cs-p" data-k="${k}"${l&&l.sel===k?' checked':''}> Pick</label></div>`;}).join('')
       +`<input class="cs-why field" placeholder="Reason for not choosing the lowest rate" style="display:none" value="${esc(l&&l.why||'')}"></div>`;
     }).join('');
-    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:520px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Comparative Statement</h3><div class="text-xs text-muted mb-3">${esc(r.no)} &middot; ${esc(r.prjNo)}. Enter each supplier's rate. The lowest rate is picked automatically; change it only with a reason.</div><datalist id="csSupList">${(window.marsSuppliers?marsSuppliers():[]).map(x=>`<option value="${esc(x.name)}">`).join('')}</datalist><div class="space-y-2"><div class="text-xs font-extrabold text-navy">Suppliers (2 to 4)</div>${[0,1,2,3].map(k=>`<input class="field cs-s" data-k="${k}" list="csSupList" autocomplete="off" placeholder="Supplier ${k+1}${k<2?' (required)':''}" value="${esc(names[k])}">`).join('')}<div class="text-xs font-extrabold text-navy">Items</div>${lineHtml}</div><div class="flex gap-2 mt-4"><button class="btn btn-primary" id="csSave">Save CS</button><button class="btn btn-secondary" id="csClose">Close</button></div></div>`,'csModal');
+    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:520px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Comparative Statement</h3><div class="text-xs text-muted mb-3">${esc(r.no)} &middot; ${esc(r.prjNo)}. Enter each supplier's rate. The lowest rate is picked automatically; change it only with a reason.</div><datalist id="csSupList">${(window.marsSuppliersUsable?marsSuppliersUsable():[]).map(x=>`<option value="${esc(x.name)}">`).join('')}</datalist><div class="space-y-2"><div class="text-xs font-extrabold text-navy">Suppliers (2 to 4)</div>${[0,1,2,3].map(k=>`<input class="field cs-s" data-k="${k}" list="csSupList" autocomplete="off" placeholder="Supplier ${k+1}${k<2?' (required)':''}" value="${esc(names[k])}">`).join('')}<div class="text-xs font-extrabold text-navy">Items</div>${lineHtml}</div><div class="flex gap-2 mt-4"><button class="btn btn-primary" id="csSave">Save CS</button><button class="btn btn-secondary" id="csClose">Close</button></div></div>`,'csModal');
     const calc=()=>{
       const sn=[...m.querySelectorAll('.cs-s')].map(x=>x.value.trim());
       m.querySelectorAll('.cs-sn').forEach(e=>{const k=+e.dataset.k;e.textContent=sn[k]||('Supplier '+(k+1));});
@@ -4780,6 +4842,7 @@ async function deleteEntryFromFirebase(firebaseId){
       if(idx.length<2){showToast('Enter at least 2 suppliers.','error');return;}
       if(new Set(idx.map(k=>names2[k].toLowerCase())).size!==idx.length){showToast('Supplier names must be different.','error');return;}
       const sups=idx.map(k=>({name:names2[k]})),lines=[];let err='';
+      for(const sp of sups){const bl=window.marsSupplierBlocked&&marsSupplierBlocked(sp.name);if(bl){showToast(bl,'error');return;}}
       m.querySelectorAll('.cs-l').forEach(L=>{
         if(err)return;
         const it=its.find(x=>x.id===L.dataset.i);
@@ -4803,7 +4866,7 @@ async function deleteEntryFromFirebase(firebaseId){
           tx.set(cref,{n});
           tx.set(db.collection('comparative_statements').doc(),{no:'CS'+yy+'-'+mm+'-'+String(n).padStart(5,'0'),requisitionId:rid,reqNo:r.no,prjNo:r.prjNo,suppliers:sups,lines,...(pre?{rfqId:pre.rfqId,rfqNo:pre.rfqNo}:{}),createdBy:me,createdAt:Date.now(),updatedAt:Date.now()});
         });
-        m.remove();showToast('Comparative Statement saved. Now create the PO from it.');
+        m.remove();showToast('Comparative Statement saved. Now create the PO from it.');if(window.marsAudit)marsAudit('CS',ex?ex.no:r.no,ex?'Edited':'Created');
       }catch(e){b.disabled=false;b.textContent='Save CS';console.error(e);showToast('Failed: '+(e.code||e.message)+' (check Firestore Rules for comparative_statements)','error');}
     };
   };
@@ -4853,6 +4916,7 @@ async function deleteEntryFromFirebase(firebaseId){
     meta=meta||{};
     const f=readForm(m),ids=f.lines.map(l=>l.key);
     if(meta.direct&&!f.directReason){showToast('Write the reason for a direct purchase (no CS).','error');return;}
+    {const blk=window.marsSupplierBlocked&&marsSupplierBlocked(f.supplier.name);if(blk){showToast(blk,'error');return;}}
     if(!f.supplier.name||!f.deliveryDate||!ids.length||f.lines.some(l=>l.rate<=0)){showToast('Enter supplier, delivery date and a rate for every ticked item.','error');return;}
     const by=window.currentEngineerName||'Admin',db=fb(),rref=db.collection('requisitions').doc(rid);
     try{
@@ -4873,7 +4937,7 @@ async function deleteEntryFromFirebase(firebaseId){
         tx.update(rref,{items:r.items.map(i=>sel.includes(i)?{...i,poNo:pno}:i),history:(r.history||[]).concat([{by,role:'proc',action:'Created '+pno,at:Date.now()}])});
       });
       if(window.marsEnsureSupplier)marsEnsureSupplier({name:f.supplier.name,phone:f.supplier.phone,address:f.supplier.address});
-      m.remove();showToast('Purchase Order '+pno+' created. Sent for approval.');
+      m.remove();showToast('Purchase Order '+pno+' created. Sent for approval.');if(window.marsAudit)marsAudit('PO',pno,'Created ('+(meta.csNo?'from '+meta.csNo:'direct purchase: '+(f.directReason||''))+')');
     }catch(e){console.error(e);showToast('Failed: '+(e.code||e.message),'error');}
   }
 
@@ -4911,7 +4975,7 @@ async function deleteEntryFromFirebase(firebaseId){
           const reset=c.status==='approved';if(reset)ch.push('Sent back for re-approval');
           tx.update(ref,{supplier:f.supplier,project:f.project,deliveryDate:f.deliveryDate,mrfNo:f.mrfNo,subject:f.subject,terms:f.terms,payMode:f.payMode,priority:f.priority,deliveryAddr:f.deliveryAddr,remarks:f.remarks,conditions:f.conditions,items,subTotal,discount:r2(subTotal-total),total,advance:adv,...(reset?{status:'pending',approvedBy:null,approvedAt:null}:{}),edits:(c.edits||[]).concat([{by,at:Date.now(),note:ch.join('; ')}])});
         });
-        m.remove();showToast('PO updated and edit recorded.');
+        m.remove();showToast('PO updated and edit recorded.');if(window.marsAudit)marsAudit('PO',o.no,'Edited: '+ch.join('; '));
       }catch(e){showToast(e.message==='No changes made.'?e.message:'Failed: '+(e.code||e.message),'error');}
     };
   };
@@ -5145,299 +5209,37 @@ async function deleteEntryFromFirebase(firebaseId){
     return L.filter(x=>role()!=='site'||!x.prj||x.prj.split(' → ').some(inScope)).sort((a,b)=>b.at-a.at);
   }
   const F=window._logF=window._logF||{type:'',prj:'',q:''};
+  const CATS=['Cement','Steel / Rod','Brick, Sand & Stone','Ready Mix / Concrete','Electrical','Plumbing & Sanitary','Paint & Finishing','Tiles & Marble','Hardware & Tools','Shuttering & Scaffolding','Transport / Equipment','Others'];
+  const TERMS=['','Cash on delivery','Credit 15 days','Credit 30 days','Credit 45 days','Credit 60 days','PDC','Advance + balance on delivery','Bank transfer'];
+  const DTYPES=['Trade License','BIN Certificate','TIN Certificate','Bank Info / Cheque','NID / Passport','Agreement / Work Order','Other'];
+  const ST={active:['Active','#dcfce7','#166534'],inactive:['Inactive','#e5e7eb','#374151'],blacklisted:['Blacklisted','#fee2e2','#991b1b']};
+  const stOf=x=>x.status||'active';
+  const pill=(t,bg,fg)=>`<span style="background:${bg};color:${fg};border-radius:999px;padding:2px 8px;font-size:11px;font-weight:700;white-space:nowrap">${t}</span>`;
+  const daysLeft=ds=>{if(!ds)return null;const t=new Date(ds+'T23:59:59').getTime();return Math.ceil((t-Date.now())/864e5);};
+  const expBadge=(label,ds)=>{const d=daysLeft(ds);if(d===null||d>30)return '';return d<0?pill(esc(label)+': Expired','#fee2e2','#991b1b'):pill(esc(label)+': '+d+' day'+(d===1?'':'s')+' left','#fef3c7','#92400e');};
+  const expItems=x=>{const a=[];if(x.tradeLicenseExpiry)a.push(['Trade License',x.tradeLicenseExpiry]);(x.docs||[]).forEach(d=>{if(d.expiry)a.push([d.type,d.expiry]);});return a.filter(e=>{const d=daysLeft(e[1]);return d!==null&&d<=30;});};
+  function filtered(){const q=key(sq);return sups.filter(x=>{
+    const st=stOf(x),arch=!!x.archived;
+    if(sf==='archived'){if(!arch)return false;}else{if(arch)return false;if(sf!=='all'&&st!==sf)return false;}
+    if(sc&&x.category!==sc)return false;
+    return !q||key([x.name,x.code,x.phone,x.email,x.contactPerson,x.materials,x.category,x.tin,x.bin].join(' ')).includes(q);});}
+  function alertsHtml(){
+    const rows=[];sups.filter(x=>!x.archived).forEach(x=>expItems(x).forEach(e=>rows.push({n:x.name,t:e[0],d:daysLeft(e[1])})));
+    if(!rows.length)return '';rows.sort((a,b)=>a.d-b.d);
+    const ex=rows.filter(r=>r.d<0).length;
+    return `<div class="rounded-xl border p-3 mb-3 text-sm" style="border-color:#fcd34d;background:#fffbeb"><b>Document expiry alert</b> <span class="text-xs text-muted">${ex} expired, ${rows.length-ex} expiring within 30 days</span>${rows.slice(0,6).map(r=>`<div class="text-xs mt-1">${esc(r.n)}: ${esc(r.t)} ${r.d<0?'<b style="color:#991b1b">expired '+(-r.d)+' day(s) ago</b>':'in <b>'+r.d+'</b> day(s)'}</div>`).join('')}${rows.length>6?'<div class="text-xs text-muted mt-1">and '+(rows.length-6)+' more</div>':''}</div>`;
+  }
   function listHtml(){
-    const q=F.q.toLowerCase();
-    const L=buildLog().filter(x=>(!F.type||x.type===F.type)&&(!F.prj||String(x.prj).includes(F.prj))&&(!q||(x.ref+' '+x.action+' '+x.by).toLowerCase().includes(q))&&inMonth(x.at));
-    const rows=L.slice(0,200).map(x=>`<div style="padding:9px 0;border-top:1px solid #e2e8f0"><div class="text-xs text-muted">${dt(x.at)} · ${window.marsPill?marsPill('neutral',esc(x.type)):esc(x.type)}</div><div class="text-sm"><b>${esc(x.ref)}</b> ${esc(x.action)}</div><div class="text-xs text-muted">by ${esc(x.by||'-')}${x.prj&&x.type!=='Transfer'?' · '+esc(x.prj):''}</div></div>`).join('');
-    return `<div class="text-xs text-muted mb-1">${L.length} record(s)${L.length>200?' — showing the latest 200. Download Excel for all.':''}</div>`+(rows||'<div class="text-xs text-muted py-4">No activity found.</div>');
-  }
-  window.logSet=(k,v)=>{F[k]=v;const b=document.getElementById('logList');if(b)b.innerHTML=listHtml();};
-  window.marsRenderLog=function(){
-    const box=document.getElementById('adminLogBox');if(!box)return;
-    const types=['','Requisition','Transfer','Purchase Order','ID Application'],prj=(typeof projectDatabase!=='undefined'?projectDatabase:[]).map(p=>p.prjNo);
-    box.innerHTML=`<div class="text-xs text-muted mb-3">Every Approve, Cancel, Purchase, Receive, Edit and ID action with who did it and when.</div>
-      <div class="grid grid-cols-2 gap-2 mb-2"><select class="field" onchange="logSet('type',this.value)">${types.map(t=>`<option value="${t}"${F.type===t?' selected':''}>${t||'All types'}</option>`).join('')}</select>
-      <select class="field" onchange="logSet('prj',this.value)"><option value="">All projects</option>${prj.map(p=>`<option${F.prj===p?' selected':''}>${esc(p)}</option>`).join('')}</select></div>
-      <div class="flex flex-wrap gap-2 mb-3"><input class="field" placeholder="Search name, REQ, PO…" value="${esc(F.q)}" oninput="logSet('q',this.value)"><input type="month" class="field exp-month" value="${window._expMonth||''}" style="max-width:160px" onchange="marsSetMonth(this.value)"><button class="btn btn-primary" onclick="marsExport()">Excel</button></div>
-      <div id="logList" style="max-height:55vh;overflow:auto">${listHtml()}</div>`;
-  };
-
-  window.marsExport=function(){
-    if(!window.XLSX){showToast('Excel library could not load. Check the internet connection.','error');return;}
-    const wb=XLSX.utils.book_new();
-    const sheet=(name,head,rows,w)=>{const ws=XLSX.utils.aoa_to_sheet([head].concat(rows.length?rows:[['No data']]));ws['!cols']=(w||head.map(()=>14)).map(x=>({wch:x}));XLSX.utils.book_append_sheet(wb,ws,name);};
-    const R=get('marsReqs').filter(r=>inScope(r.prjNo)&&inMonth(r.createdAt));
-    sheet('Requisitions',['REQ No','Date','Project','Requested By','Requisition Status','Material','Unit','Qty','Original Qty','Present Balance','Required Date','Location','Remarks','Item Status','PO No','Received Qty','Cancel / Reject Reason'],
-      R.flatMap(r=>(r.items||[]).map(i=>[r.no,dt(r.createdAt),r.prjNo,r.requestedBy,STG[r.stage]||r.stage,i.material,i.unit,i.qty,i.ofQty||i.qty,i.bal??'',i.reqDate||'',i.loc||'',i.remark||'',ITS[i.state]||i.state,i.poNo||'',i.state==='received'?(i.receivedQty??i.qty):'',i.cancelReason||(r.stage==='rejected'?((r.history||[]).filter(h=>h.action==='Rejected').pop()||{}).note||'':'')])),
-      [16,17,12,18,22,28,8,9,12,13,13,20,24,26,16,12,34]);
-    const PO=get('marsPOs').filter(o=>inScope(o.prjNo)&&inMonth(o.createdAt));
-    sheet('Purchase Orders',['PO No','Date','Project','REQ No','Supplier','Phone','Delivery Date','Terms','Material','Unit','Qty','Rate','Amount','PO Total','Edits'],
-      PO.flatMap(o=>o.items.map(i=>[o.no,dt(o.createdAt),o.prjNo,o.reqNo,o.supplier.name,o.supplier.phone||'',o.deliveryDate||'',o.terms||'',i.material,i.unit,i.qty,i.rate,i.amount,o.total,(o.edits||[]).length])),
-      [18,17,12,16,24,14,13,18,28,8,9,10,12,12,7]);
-    if(role()!=='site'&&window.marsSuppliers)sheet('Suppliers',['Supplier','Phone','Address','Notes','PO Count','PO Total'],get('marsSuppliers').map(x=>{const o=get('marsPOs').filter(p=>String(p.supplier.name).toLowerCase()===String(x.name).toLowerCase());return[x.name,x.phone||'',x.address||'',x.notes||'',o.length,o.reduce((a,p)=>a+(p.total||0),0)];}),[26,16,34,30,10,14]);
-    const T=get('marsTransfers').filter(t=>(inScope(t.fromPrj)||inScope(t.toPrj))&&inMonth(t.createdAt));
-    sheet('Transfers',['Date','From','To','Material','Qty','Unit','Status','Requested By','Decided By','Decided At'],
-      T.map(t=>[dt(t.createdAt),t.fromPrj,t.toPrj,t.material,t.qty,t.unit||'',t.status,t.requestedBy||'',t.decidedBy||'',dt(t.decidedAt)]),
-      [17,12,12,28,9,8,10,18,18,17]);
-    if(isAdmin){const L=buildLog().filter(x=>inMonth(x.at));sheet('Activity Log',['Time','Type','Reference','Project','Action','By'],L.map(x=>[dt(x.at),x.type,x.ref,x.prj,x.action,x.by]),[17,16,22,22,60,20]);}
-    const n=new Date();XLSX.writeFile(wb,'MARS_Report_'+(window._expMonth||(n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())))+'.xlsx');
-    showToast('Excel report downloaded'+(window._expMonth?' for '+window._expMonth:'')+'.');
-  };
-})();
-</script>
-<script>
-/* ================= BACKUP ================= */
-(function(){
-  const pad=n=>String(n).padStart(2,'0');
-  window.marsRenderBackup=function(){
-    const box=document.getElementById('adminBackupBox');if(!box)return;
-    const lb=+localStorage.getItem('mars_last_backup')||0;
-    box.innerHTML=`<div class="text-sm mb-2">Download a full copy of your data (stock entries, requisitions, transfers, purchase orders, counters, catalog, settings) as one file.</div>
-      <div class="text-xs text-muted mb-3">Last backup on this device: <b>${lb?new Date(lb).toLocaleString():'never'}</b>. Make one at least once a week and keep the file somewhere safe (Google Drive or email to yourself).</div>
-      <button class="btn btn-primary" onclick="marsBackup()">Download backup</button>
-      <div class="text-xs mt-3" style="color:#b45309">The file contains Engineer IDs and coded PINs, so keep it private. Engineer ID applications (NID, photos, signatures) are not included on purpose.</div>`;
-  };
-  window.marsBackup=async function(){
-    const db=window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
-    if(!db){showToast('Not connected to the database.','error');return;}
-    const names=[FIREBASE_COLLECTION,'requisitions','transfers','purchase_orders','counters','stock_checks','catalog','config'];
-    const out={app:'MARS Stock Ledger',exportedAt:new Date().toISOString(),collections:{}};
-    try{
-      for(const n of names){const sn=await db.collection(n).get();out.collections[n]=sn.docs.map(d=>({id:d.id,data:d.data()}));}
-      const blob=new Blob([JSON.stringify(out)],{type:'application/json'}),a=document.createElement('a'),d=new Date();
-      a.href=URL.createObjectURL(blob);a.download='MARS_Backup_'+d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'.json';
-      document.body.appendChild(a);a.click();a.remove();
-      localStorage.setItem('mars_last_backup',String(Date.now()));
-      showToast('Backup downloaded ('+Object.values(out.collections).reduce((x,c)=>x+c.length,0)+' records).');
-      marsRenderBackup();
-    }catch(e){console.error(e);showToast('Backup failed: '+(e.code||e.message),'error');}
-  };
-})();
-</script>
-<script>
-/* ============ EMAIL ACCOUNTS: SIGN IN, PROFILE, PASSWORD, ADMIN ACCOUNTS ============ */
-(function(){
-  const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-  const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
-  const A=()=>firebase.auth();
-  const RL={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement',pmgr:'Purchase Manager',acct:'Accounts',viewer:'Management (view only)'};
-  const out=()=>A().signOut().catch(()=>{});
-  const errMsg=e=>{const c=(e&&e.code)||'';
-    if(/invalid-credential|wrong-password|user-not-found/.test(c))return 'Wrong email or password.';
-    if(/email-already-in-use/.test(c))return 'This email already has an account. Sign in instead.';
-    if(/weak-password/.test(c))return 'Password is too weak (at least 6 characters).';
-    if(/invalid-email/.test(c))return 'Enter a valid email address.';
-    if(/too-many-requests/.test(c))return 'Too many attempts. Try again later.';
-    if(/popup-closed|cancelled-popup/.test(c))return 'Sign-in was cancelled.';
-    if(/unauthorized-domain/.test(c))return 'This website address is not authorised in Firebase.';
-    return 'Error: '+(c||(e&&e.message)||'unknown');};
-  const shell=(id,inner)=>{const o=document.getElementById(id);if(o)o.remove();const m=document.createElement('div');m.id=id;
-    m.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:12px';
-    m.innerHTML='<div class="card p-5" style="background:#fff;max-width:440px;width:100%;margin:auto">'+inner+'</div>';document.body.appendChild(m);return m;};
-
-  /* ---- sign in / create account / forgot ---- */
-  window.marsAuthOpen=function(tab){
-    let cur=tab||'in',msg='',ok=false;
-    const draw=()=>{
-      const m=shell('authModal',`<h3 class="text-lg font-extrabold text-navy mb-3">${cur==='in'?'Sign in':cur==='create'?'Create account':'Reset password'}</h3>
-        <div class="space-y-3">
-          <div><label class="field-label">Email (Gmail)</label><input id="auEmail" type="email" autocomplete="email" class="field"></div>
-          ${cur!=='forgot'?`<div><label class="field-label">Password</label><input id="auPw" type="password" autocomplete="${cur==='in'?'current-password':'new-password'}" class="field"></div>`:''}
-          ${cur==='create'?`<div><label class="field-label">Confirm password</label><input id="auPw2" type="password" autocomplete="new-password" class="field"></div>`:''}
-        </div>
-        <div id="auMsg" class="text-sm mt-3" style="color:${ok?'#15803d':'#b91c1c'}">${esc(msg)}</div>
-        <div class="flex flex-wrap gap-2 mt-3"><button class="btn btn-primary" id="auGo">${cur==='in'?'Sign in':cur==='create'?'Create account':'Send reset link'}</button>${cur!=='forgot'?'<button class="btn btn-secondary" id="auG">Continue with Google</button>':''}</div>
-        <div class="text-xs mt-4" style="display:flex;flex-wrap:wrap;gap:14px">
-          ${cur!=='in'?'<a href="javascript:void(0)" id="auIn" style="text-decoration:underline">Sign in</a>':''}${cur!=='create'?'<a href="javascript:void(0)" id="auCr" style="text-decoration:underline">Create account</a>':''}${cur!=='forgot'?'<a href="javascript:void(0)" id="auFg" style="text-decoration:underline">Forgot password?</a>':''}<a href="javascript:void(0)" id="auCl" style="text-decoration:underline">Close</a></div>`);
-      const $=i=>m.querySelector('#'+i),sw=t=>()=>{cur=t;msg='';ok=false;draw();};
-      if($('auIn'))$('auIn').onclick=sw('in');if($('auCr'))$('auCr').onclick=sw('create');if($('auFg'))$('auFg').onclick=sw('forgot');$('auCl').onclick=()=>m.remove();
-      const say=(t,g)=>{msg=t;ok=!!g;const e=$('auMsg');e.textContent=t;e.style.color=g?'#15803d':'#b91c1c';};
-      if($('auG'))$('auG').onclick=async()=>{try{const c=await A().signInWithPopup(new firebase.auth.GoogleAuthProvider());m.remove();afterLogin(c.user);}catch(e){say(errMsg(e));}};
-      $('auGo').onclick=async()=>{
-        const em=$('auEmail').value.trim().toLowerCase(),pw=$('auPw')?$('auPw').value:'';
-        if(!em){say('Enter your email.');return;}
-        $('auGo').disabled=true;
-        try{
-          if(cur==='forgot'){await A().sendPasswordResetEmail(em);say('Reset link sent. Check your inbox and spam folder.',true);}
-          else if(cur==='create'){
-            if(pw.length<6){say('Password must be at least 6 characters.');}
-            else if(pw!==$('auPw2').value){say('The two passwords do not match.');}
-            else{const c=await A().createUserWithEmailAndPassword(em,pw);await c.user.sendEmailVerification();await out();cur='in';ok=true;msg='Account created. We sent a verification link to '+em+'. Open it, then sign in here.';draw();return;}
-          }else{
-            const c=await A().signInWithEmailAndPassword(em,pw);
-            if(!c.user.emailVerified){await c.user.sendEmailVerification().catch(()=>{});await out();say('Please verify your email first. We sent the link again. Check inbox and spam, then sign in.');}
-            else{m.remove();afterLogin(c.user);return;}
-          }
-        }catch(e){say(errMsg(e));}
-        const g=$('auGo');if(g)g.disabled=false;
-      };
-    };
-    draw();
-  };
-
-  async function afterLogin(u,silent){
-    try{
-      const email=String(u.email||'').toLowerCase();
-      const snap=await fb().collection('users').doc(email).get();
-      if(!snap.exists){if(!silent){showToast('Your account is not approved yet. Please complete the application.');window.marsApplyOpen&&window.marsApplyOpen();}return;}
-      const d=snap.data();
-      if(d.disabled){await out();showToast('This account is disabled. Contact Admin.','error');return;}
-      const eng={id:d.engineerId||email,name:d.name||email,projects:d.projects||[],role:d.role||'site'};
-      const match=projectDatabase.find(p=>eng.projects.includes(p.prjNo))||projectDatabase[0];
-      if(!silent&&window._legacyOff){location.reload();return;}
-      window._emailSession=email;
-      window.marsEnterProject(match,eng);
-    }catch(e){console.error(e);showToast('Could not sign in: '+(e.code||e.message),'error');}
-  }
-
-  /* ---- login card button ---- */
-  function addBtn(){
-    const st=document.getElementById('engineerIdStep');if(!st)return setTimeout(addBtn,800);
-    if(document.getElementById('emailSignBtn'))return;
-    const b=document.createElement('button');b.id='emailSignBtn';b.type='button';b.textContent='Sign in with Email';
-    b.style.cssText='display:block;width:100%;margin:10px 0 0;padding:11px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.55);background:rgba(255,255,255,.12);color:#fff;font-weight:700;font-size:14px;cursor:pointer';
-    b.onclick=()=>marsAuthOpen('in');
-    const ap=document.getElementById('idRegBtn');ap?st.insertBefore(b,ap):st.appendChild(b);
-  }
-  function applySwitch(){
-    fb().collection('config').doc('settings').get().then(st=>{
-      window._legacyOff=!!(st.exists&&st.data().legacyLoginOff);
-      if(window._legacyOff)['engId','engPin','engEnter'].forEach(id=>{const e=document.getElementById(id);if(e){e.style.display='none';if(e.previousElementSibling&&e.previousElementSibling.tagName==='LABEL')e.previousElementSibling.style.display='none';}});
-    }).catch(()=>{});
-  }
-  let resumed=false;
-  window.addEventListener('load',()=>{
-    setTimeout(()=>{if(fb())applySwitch();},1200);setTimeout(()=>{if(fb())applySwitch();},3500);
-    A().onAuthStateChanged(async u=>{
-      if(!u||u.isAnonymous||!u.email||!u.emailVerified||resumed||window.currentAccessRole)return;
-      try{const ad=await fb().collection('admins').doc(u.uid).get();if(ad.exists)return;}catch(e){}
-      resumed=true;await afterLogin(u,true);
-    });
-    addBtn();setTimeout(addBtn,2000);
-    setInterval(()=>{const n=document.getElementById('acctNav');if(!n)return;const u=A().currentUser;n.style.display=(window.currentAccessRole==='engineer'&&window._emailSession&&u&&!u.isAnonymous)?'':'none';},1000);});
-
-  /* ---- profile / password / logout ---- */
-  window.marsProfile=function(){
-    const u=A().currentUser;
-    const m=shell('profModal',`<h3 class="text-lg font-extrabold text-navy mb-3">Profile</h3>
-      <div class="text-sm space-y-2"><div><span class="text-muted">Name</span><br><b>${esc(window.currentEngineerName||'')}</b></div><div><span class="text-muted">Email</span><br><b>${esc(u&&u.email||'')}</b></div><div><span class="text-muted">Role</span><br><b>${esc(RL[window.currentEngineerRole]||window.currentEngineerRole||'')}</b></div><div><span class="text-muted">Projects</span><br><b>${esc((window.currentEngineerAllowedProjects||[]).join(', ')||'All')}</b></div></div>
-      <button class="btn btn-secondary mt-4" id="pfC">Close</button>`);
-    m.querySelector('#pfC').onclick=()=>m.remove();
-  };
-  window.marsChangePw=function(){
-    const u=A().currentUser;if(!u)return;
-    if(!u.providerData.some(p=>p.providerId==='password')){showToast('You sign in with Google, so your password is managed by Google.','error');return;}
-    const m=shell('pwModal',`<h3 class="text-lg font-extrabold text-navy mb-3">Change Password</h3>
-      <div class="space-y-3"><div><label class="field-label">Current password</label><input id="pwOld" type="password" class="field" autocomplete="current-password"></div><div><label class="field-label">New password</label><input id="pwNew" type="password" class="field" autocomplete="new-password"></div><div><label class="field-label">Confirm new password</label><input id="pwNew2" type="password" class="field" autocomplete="new-password"></div></div>
-      <div id="pwMsg" class="text-sm mt-3" style="color:#b91c1c"></div>
-      <div class="flex gap-2 mt-3"><button class="btn btn-primary" id="pwGo">Update password</button><button class="btn btn-secondary" id="pwC">Close</button></div>`);
-    const $=i=>m.querySelector('#'+i),say=(t,g)=>{$('pwMsg').textContent=t;$('pwMsg').style.color=g?'#15803d':'#b91c1c';};
-    $('pwC').onclick=()=>m.remove();
-    $('pwGo').onclick=async()=>{
-      const o=$('pwOld').value,n=$('pwNew').value;
-      if(n.length<6){say('New password must be at least 6 characters.');return;}
-      if(n!==$('pwNew2').value){say('The new passwords do not match.');return;}
-      $('pwGo').disabled=true;
-      try{await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email,o));await u.updatePassword(n);say('Password updated.',true);showToast('Password updated.');setTimeout(()=>m.remove(),1200);}
-      catch(e){say(errMsg(e));$('pwGo').disabled=false;}
-    };
-  };
-  window.marsLogout=function(){
-    if(!confirm('Log out of your account?'))return;
-    out().finally(()=>location.reload());
-  };
-
-  /* ---- admin: Accounts tab ---- */
-  let users=[];
-  window.marsRenderUsers=async function(){
-    const box=document.getElementById('adminUsersBox');if(!box)return;
-    box.innerHTML='<div class="text-xs text-muted">Loading accounts…</div>';
-    try{
-      const sn=await fb().collection('users').get();
-      users=sn.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(a.name).localeCompare(String(b.name)));
-      let off=false;try{const st=await fb().collection('config').doc('settings').get();off=!!(st.exists&&st.data().legacyLoginOff);}catch(e){}
-      window._legacyOff=off;
-      box.innerHTML=`<div class="rounded-xl border p-3 mb-3 text-sm"><b>Engineer ID &amp; PIN login: ${off?'OFF':'ON'}</b><div class="text-xs text-muted mt-1">${off?'Everyone must sign in with email and password.':'Old ID and PIN login still works. Turn it OFF only after every engineer has an email account.'}</div><button class="btn btn-secondary mt-2" onclick="marsLegacyToggle()">${off?'Turn ON again':'Turn OFF'}</button></div>
-        <div class="text-xs text-muted mb-3">People who sign in with email and password. Their Role and Projects are set here by email address.</div>
-        <button class="btn btn-primary mb-3" onclick="marsUserEdit(null)">Add account by email</button>
-        <div class="space-y-2">${users.map((u,i)=>`<div class="rounded-xl border p-3 text-sm"><b>${esc(u.name||'')}</b>${u.disabled?' <b style="color:#b91c1c">· Disabled</b>':''}<div class="text-xs text-muted">${esc(u.email||u.id)}<br>${esc(RL[u.role]||u.role)} · ${esc((u.projects||[]).join(', ')||'All projects')}</div><div class="flex gap-2 mt-2"><button class="btn btn-secondary" onclick="marsUserEdit(${i})">Edit</button><button class="btn btn-secondary" onclick="marsUserToggle(${i})">${u.disabled?'Enable':'Disable'}</button><button class="btn btn-secondary" style="color:#b91c1c" onclick="marsUserDelete(${i})">Delete</button></div></div>`).join('')||'<div class="text-xs text-muted">No accounts yet. Approve an application or add one by email.</div>'}</div>`;
-    }catch(e){box.innerHTML='<div class="text-xs" style="color:#b91c1c">Could not load accounts: '+esc(e.code||e.message)+'. Add the users rules block in Firestore.</div>';}
-  };
-  window.marsLegacyToggle=async()=>{
-    const off=!window._legacyOff;
-    if(!confirm(off?'Turn OFF the old Engineer ID and PIN login?\n\nEvery engineer must then sign in with email and password. Make sure each one already has an account in this list.':'Turn the old Engineer ID and PIN login back ON?'))return;
-    try{await fb().collection('config').doc('settings').set({legacyLoginOff:off},{merge:true});showToast(off?'ID and PIN login is now OFF.':'ID and PIN login is ON again.');marsRenderUsers();}
-    catch(e){showToast('Failed: '+(e.code||e.message),'error');}
-  };
-  window.marsUserToggle=async i=>{const u=users[i];if(!confirm((u.disabled?'Enable ':'Disable ')+u.email+'?'))return;
-    try{await fb().collection('users').doc(u.id).update({disabled:!u.disabled});showToast(u.disabled?'Account enabled.':'Account disabled.');marsRenderUsers();}catch(e){showToast('Failed: '+(e.code||e.message),'error');}};
-  window.marsUserDelete=async i=>{
-    const u=users[i],em=String(u.email||u.id).toLowerCase();
-    if(!confirm('Delete '+em+'?\n\nThis person loses access. The personal data in their application (NID, photo, signature, address) will be erased. Past requisitions, transfers and other records stay.'))return;
-    try{
-      await fb().collection('users').doc(u.id).delete();
-      const sn=await fb().collection('engineer_applications').where('email','==',em).get();
-      await Promise.all(sn.docs.map(d=>{const a=d.data();return d.ref.set({email:a.email,name:a.name||'',status:'deleted',createdAt:a.createdAt||0,decidedAt:Date.now()});}));
-      showToast('Account deleted and personal data erased.');marsRenderUsers();
-    }catch(e){showToast('Failed: '+(e.code||e.message),'error');}
-  };
-  window.marsUserEdit=function(i){
-    const u=i===null?{role:'site',projects:[]}:users[i],prj=(typeof projectDatabase!=='undefined'?projectDatabase:[]).map(p=>p.prjNo);
-    const m=shell('userModal',`<h3 class="text-lg font-extrabold text-navy mb-3">${i===null?'Add account':'Edit account'}</h3>
-      <div class="space-y-3"><div><label class="field-label">Email</label><input id="ueEm" type="email" class="field" value="${esc(u.email||'')}" ${i===null?'':'disabled'}></div>
-      <div><label class="field-label">Name</label><input id="ueNm" class="field" value="${esc(u.name||'')}"></div>
-      <div><label class="field-label">Role</label><select id="ueRl" class="field">${Object.keys(RL).map(k=>`<option value="${k}"${u.role===k?' selected':''}>${RL[k]}</option>`).join('')}</select></div>
-      <div><label class="field-label">Projects</label><div style="max-height:180px;overflow:auto;border:1px solid #cbd5e1;border-radius:12px;padding:8px">${prj.map(p=>`<label style="display:block;font-size:13px;padding:3px 0"><input type="checkbox" class="ue-p" value="${esc(p)}"${(u.projects||[]).includes(p)?' checked':''}> ${esc(p)}</label>`).join('')}</div><div class="text-xs text-muted mt-1">Site Engineers and Store Keepers need at least one project. Other roles can be left empty.</div></div></div>
-      <div class="flex gap-2 mt-4"><button class="btn btn-primary" id="ueSv">Save</button><button class="btn btn-secondary" id="ueCl">Close</button></div>`);
-    const $=id=>m.querySelector('#'+id);$('ueCl').onclick=()=>m.remove();
-    $('ueSv').onclick=async()=>{
-      const em=$('ueEm').value.trim().toLowerCase(),nm=$('ueNm').value.trim(),rl=$('ueRl').value,pj=[...m.querySelectorAll('.ue-p:checked')].map(x=>x.value);
-      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)||!nm){showToast('Enter a valid email and name.','error');return;}
-      if((rl==='site'||rl==='store')&&!pj.length){showToast('Select at least one project for this role.','error');return;}
-      try{await fb().collection('users').doc(em).set({email:em,name:nm,role:rl,projects:pj,disabled:!!u.disabled,updatedAt:Date.now(),...(i===null?{createdAt:Date.now()}:{})},{merge:true});m.remove();showToast('Account saved.');marsRenderUsers();}
-      catch(e){showToast('Failed: '+(e.code||e.message),'error');}
-    };
-  };
-})();
-</script>
-<script>
-/* ================= SUPPLIERS & PRICE HISTORY ================= */
-(function(){
-  const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-  const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
-  const role=()=>isAdmin?'admin':((window.currentEngineerRole==='store')?'site':(window.currentEngineerRole||'site'));
-  const canEdit=()=>role()==='proc'||role()==='admin';
-  const money=n=>Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2});
-  const d8=t=>new Date(t).toLocaleDateString('en-GB');
-  const key=n=>String(n||'').trim().toLowerCase();
-  let sups=[],tab='list',sq='',mq='',started=false,retryAt=0;
-  window.marsSuppliers=()=>sups;
-  window.marsFindSupplier=n=>sups.find(x=>key(x.name)===key(n));
-  const POs=()=>window.marsPOs?marsPOs():[];
-  function lines(){const out=[];POs().forEach(o=>(o.items||[]).forEach(i=>out.push({at:o.createdAt,supplier:o.supplier.name,material:i.material,unit:i.unit,rate:i.rate,qty:i.qty,po:o.no,prj:o.prjNo})));return out.sort((a,b)=>b.at-a.at);}
-  window.marsRateHint=function(mat){
-    const L=lines().filter(x=>key(x.material)===key(mat));
-    if(!L.length)return 'No earlier purchase of this material';
-    const lo=L.reduce((a,b)=>b.rate<a.rate?b:a);
-    return 'Last Tk '+money(L[0].rate)+' ('+esc(L[0].supplier)+', '+d8(L[0].at)+') · Lowest Tk '+money(lo.rate)+' ('+esc(lo.supplier)+')';
-  };
-  window.marsEnsureSupplier=async function(s){
-    try{if(!s.name||window.marsFindSupplier(s.name))return;await fb().collection('suppliers').add({name:s.name.trim(),phone:s.phone||'',address:s.address||'',notes:'',createdAt:Date.now(),createdBy:window.currentEngineerName||'Admin'});}catch(e){console.error('supplier',e);}
-  };
-  function spark(L){
-    const a=L.slice().reverse();if(a.length<2)return '';
-    const W=300,H=70,P=8,mn=Math.min(...a.map(x=>x.rate)),mx=Math.max(...a.map(x=>x.rate)),rg=(mx-mn)||1;
-    const pts=a.map((x,i)=>[P+i*(W-2*P)/(a.length-1),H-P-(x.rate-mn)/rg*(H-2*P)]);
-    return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:70px"><polyline fill="none" stroke="#2563eb" stroke-width="2" points="${pts.map(q=>q.join(',')).join(' ')}"/>${pts.map(q=>`<circle cx="${q[0]}" cy="${q[1]}" r="3" fill="#2563eb"/>`).join('')}</svg>`;
-  }
-  function stats(name){const o=POs().filter(x=>key(x.supplier.name)===key(name));return{n:o.length,total:o.reduce((a,x)=>a+(x.total||0),0),last:o.length?Math.max(...o.map(x=>x.createdAt)):0};}
-  function listHtml(){
-    const q=key(sq),L=lines();
-    return sups.filter(x=>!q||key(x.name+' '+x.phone+' '+x.address).includes(q)).map((x,i)=>{
-      const st=stats(x.name),mine=L.filter(l=>key(l.supplier)===key(x.name)),seen={},top=[];
-      mine.forEach(l=>{if(!seen[key(l.material)]){seen[key(l.material)]=1;top.push(l);}});
-      return `<div class="rounded-xl border p-3 text-sm"><b>${esc(x.name)}</b><div class="text-xs text-muted">${esc(x.phone||'-')}${x.address?' · '+esc(x.address):''}${x.notes?'<br>'+esc(x.notes):''}</div><div class="text-xs mt-1"><b>${st.n}</b> PO · Tk <b>${money(st.total)}</b>${st.last?' · last '+d8(st.last):''}</div>${top.length?'<div class="text-xs text-muted mt-1">'+top.slice(0,5).map(l=>esc(l.material)+' Tk '+money(l.rate)).join(' · ')+'</div>':''}${canEdit()?`<button class="btn btn-secondary mt-2" onclick="supEdit('${x.id}')">Edit</button>`:''}</div>`;
-    }).join('')||'<div class="text-xs text-muted">No suppliers yet.'+(canEdit()?' Add one, or create a Purchase Order and the supplier is added automatically.':'')+'</div>';
+    const L=lines(),F=filtered(),pages=Math.max(1,Math.ceil(F.length/SUP_N));if(sp>pages)sp=pages;if(sp<1)sp=1;
+    const pg=F.slice((sp-1)*SUP_N,sp*SUP_N);
+    const cards=pg.map(x=>{
+      const st=stats(x.name),stt=ST[stOf(x)]||ST.active,badges=expItems(x).map(e=>expBadge(e[0],e[1])).join(' ');
+      return `<div class="rounded-xl border border-line bg-white p-3 text-sm"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div><b>${esc(x.name)}</b>${x.code?' <span class="text-xs text-muted">'+esc(x.code)+'</span>':''}</div>${pill(stt[0],stt[1],stt[2])}</div><div class="text-xs text-muted mt-1">${x.category?esc(x.category)+' &middot; ':''}${esc(x.contactPerson||'')}${x.contactPerson?' &middot; ':''}${esc(x.phone||'-')}${x.email?' &middot; '+esc(x.email):''}${x.address?'<br>'+esc(x.address):''}${x.materials?'<br>Supplies: '+esc(x.materials):''}</div><div class="text-xs mt-1"><b>${st.n}</b> PO &middot; Tk <b>${money(st.total)}</b>${st.last?' &middot; last '+d8(st.last):''}${x.paymentTerms?' &middot; '+esc(x.paymentTerms):''}${x.creditLimit?' &middot; limit Tk '+money(x.creditLimit):''}</div>${badges?'<div class="flex gap-1 flex-wrap mt-1">'+badges+'</div>':''}<div class="flex gap-2 mt-2"><button class="btn btn-secondary" onclick="supView('${x.id}')">View</button>${canEdit()?`<button class="btn btn-secondary" onclick="supEdit('${x.id}')">Edit</button>`:''}</div></div>`;
+    }).join('')||'<div class="text-xs text-muted">No suppliers found.'+(canEdit()&&!sups.length?' Add one, or create a Purchase Order and the supplier is added automatically.':'')+'</div>';
+    let pager='';
+    if(F.length>SUP_N){let from=Math.max(1,sp-2),to=Math.min(pages,from+4);from=Math.max(1,to-4);let nums='';for(let n=from;n<=to;n++)nums+=`<button class="btn ${n===sp?'btn-primary':'btn-secondary'}" style="min-width:38px;padding-left:8px;padding-right:8px" onclick="supGo(${n})">${n}</button>`;
+      pager=`<div class="flex items-center justify-between gap-2 flex-wrap pt-2"><div class="text-xs text-muted">Showing ${(sp-1)*SUP_N+1}-${Math.min(F.length,sp*SUP_N)} of ${F.length}</div><div class="flex items-center gap-1 flex-wrap"><button class="btn btn-secondary" ${sp<=1?'disabled':''} onclick="supGo(${sp-1})">&lsaquo; Prev</button>${nums}<button class="btn btn-secondary" ${sp>=pages?'disabled':''} onclick="supGo(${sp+1})">Next &rsaquo;</button></div></div>`;}
+    return alertsHtml()+'<div class="space-y-2">'+cards+'</div>'+pager;
   }
   function priceHtml(){
     const all=lines(),q=key(mq);
@@ -5463,31 +5265,114 @@ async function deleteEntryFromFirebase(firebaseId){
   };
   function shell(){
     const box=document.getElementById('supBox');if(!box)return;
-    box.innerHTML=`<div class="flex gap-2 mb-3"><button class="btn ${tab==='list'?'btn-primary':'btn-secondary'}" onclick="supTab('list')">Suppliers</button><button class="btn ${tab==='price'?'btn-primary':'btn-secondary'}" onclick="supTab('price')">Price history</button></div>`+
-      (tab==='list'?`<div class="flex gap-2 mb-3"><input class="field" placeholder="Search supplier" value="${esc(sq)}" oninput="supQ(this.value)">${canEdit()?'<button class="btn btn-primary" onclick="supEdit(null)">Add supplier</button>':''}</div>`
-        :`<div class="mb-3"><input class="field" list="matList" placeholder="Search material, e.g. Cement" value="${esc(mq)}" oninput="matQ(this.value)"><datalist id="matList"></datalist></div>`)+'<div id="supBody"></div>';
+    const tabs=`<div class="flex gap-2 mb-3"><button class="btn ${tab==='list'?'btn-primary':'btn-secondary'}" onclick="supTab('list')">Suppliers</button><button class="btn ${tab==='price'?'btn-primary':'btn-secondary'}" onclick="supTab('price')">Price history</button></div>`;
+    const tools=tab==='list'?`<div class="flex gap-2 mb-2"><input class="field" placeholder="Search name, code, phone, TIN, material" value="${esc(sq)}" oninput="supQ(this.value)">${canEdit()?'<button class="btn btn-primary" onclick="supEdit(null)">Add supplier</button>':''}</div>
+      <div class="grid grid-cols-2 gap-2 mb-3"><select class="field" onchange="supF(this.value)">${[['active','Active'],['all','All (not archived)'],['inactive','Inactive'],['blacklisted','Blacklisted'],['archived','Archived']].map(o=>`<option value="${o[0]}"${sf===o[0]?' selected':''}>${o[1]}</option>`).join('')}</select><select class="field" onchange="supC(this.value)"><option value="">All categories</option>${CATS.map(c=>`<option${sc===c?' selected':''}>${esc(c)}</option>`).join('')}</select></div>`
+      :`<div class="mb-3"><input class="field" list="matList" placeholder="Search material, e.g. Cement" value="${esc(mq)}" oninput="matQ(this.value)"><datalist id="matList"></datalist></div>`;
+    box.innerHTML=tabs+tools+'<div id="supBody"></div>';
     box.dataset.ready='1';window.supBody();
   }
   window.supTab=t=>{tab=t;shell();};
-  window.supQ=v=>{sq=v;window.supBody();};
+  window.supQ=v=>{sq=v;sp=1;window.supBody();};
+  window.supF=v=>{sf=v;sp=1;window.supBody();};
+  window.supC=v=>{sc=v;sp=1;window.supBody();};
+  window.supGo=n=>{sp=n;window.supBody();const e=document.getElementById('supSection');if(e)e.scrollIntoView({behavior:'smooth',block:'start'});};
   window.matQ=v=>{mq=v;window.supBody();};
   window.matSet=v=>{mq=v;shell();};
+  const modal=html=>{const m=document.createElement('div');m.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:12px';m.innerHTML='<div class="card p-5" style="background:#fff;max-width:560px;width:100%;margin:auto">'+html+'</div>';document.body.appendChild(m);return m;};
+  const who=()=>window.currentEngineerName||'Admin';
+  const audit=(a,t,d)=>{if(window.marsAudit)marsAudit(a,t,d);};
+  const sel=(id,opts,val)=>`<select id="${id}" class="field">${opts.map(o=>`<option value="${esc(o)}"${o===(val||'')?' selected':''}>${esc(o||'Select')}</option>`).join('')}</select>`;
+  const fld=(id,label,val,extra)=>`<div><label class="field-label">${label}</label><input id="${id}" class="field" value="${esc(val||'')}" ${extra||''}></div>`;
+  const sec=t=>`<div class="text-xs font-extrabold text-navy" style="margin-top:6px">${t}</div>`;
   window.supEdit=function(id){
-    const x=id?sups.find(s=>s.id===id):{name:'',phone:'',address:'',notes:''};if(!x||!canEdit())return;
-    const m=document.createElement('div');m.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:12px';
-    m.innerHTML=`<div class="card p-5" style="background:#fff;max-width:440px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-3">${id?'Edit supplier':'Add supplier'}</h3><div class="space-y-3">
-      <div><label class="field-label">Supplier name</label><input id="spN" class="field" value="${esc(x.name)}" ${id?'disabled':''}>${id?'<div class="text-xs text-muted mt-1">The name cannot change, so earlier purchase orders stay linked.</div>':''}</div>
-      <div><label class="field-label">Phone</label><input id="spP" class="field" value="${esc(x.phone)}"></div>
-      <div><label class="field-label">Address</label><input id="spA" class="field" value="${esc(x.address)}"></div>
-      <div><label class="field-label">Notes</label><input id="spT" class="field" value="${esc(x.notes)}" placeholder="e.g. delivers in 2 days, credit 30 days"></div></div>
-      <div class="flex gap-2 mt-4"><button class="btn btn-primary" id="spS">Save</button><button class="btn btn-secondary" id="spC">Close</button></div></div>`;
-    document.body.appendChild(m);const q=i=>m.querySelector('#'+i);q('spC').onclick=()=>m.remove();
+    const x=id?sups.find(s=>s.id===id):{name:'',bank:{}};if(!x||!canEdit())return;const b=x.bank||{};
+    const m=modal(`<h3 class="text-lg font-extrabold text-navy mb-3">${id?'Edit supplier':'Add supplier'}${x.code?' <span class="text-xs text-muted">'+esc(x.code)+'</span>':''}</h3><div class="space-y-3">
+      ${sec('Company')}
+      <div><label class="field-label">Company name</label><input id="spN" class="field" value="${esc(x.name)}" ${id?'disabled':''}>${id?'<div class="text-xs text-muted mt-1">The name cannot change, so earlier purchase orders stay linked.</div>':''}</div>
+      ${fld('spCp','Contact person',x.contactPerson)}${fld('spP','Mobile number',x.phone,'type="tel"')}${fld('spE','Email',x.email,'type="email"')}${fld('spA','Address',x.address)}
+      ${sec('Supply')}
+      <div><label class="field-label">Category</label>${sel('spCat',[''].concat(CATS),x.category)}</div>${fld('spM','Materials supplied (comma separated)',x.materials,'placeholder="e.g. Cement, Sand, Stone chips"')}
+      ${sec('Legal')}
+      ${fld('spTL','Trade license no',x.tradeLicenseNo)}<div><label class="field-label">Trade license expiry</label><input id="spTLE" type="date" class="field" value="${esc(x.tradeLicenseExpiry||'')}"></div>${fld('spB','BIN',x.bin)}${fld('spTi','TIN',x.tin)}
+      ${sec('Bank details')}
+      ${fld('spBk','Bank name',b.bankName)}${fld('spBr','Branch',b.branch)}${fld('spAn','Account name',b.accountName)}${fld('spAc','Account number',b.accountNo)}${fld('spRt','Routing number',b.routing)}
+      ${sec('Terms')}
+      <div><label class="field-label">Payment terms</label>${sel('spPt',TERMS,x.paymentTerms)}</div><div><label class="field-label">Credit limit (Tk)</label><input id="spCl" type="number" step="0.01" class="field" value="${x.creditLimit||''}"></div>
+      ${sec('Status')}
+      <div><label class="field-label">Status</label><select id="spSt" class="field">${['active','inactive','blacklisted'].map(o=>`<option value="${o}"${stOf(x)===o?' selected':''}>${ST[o][0]}</option>`).join('')}</select></div>
+      ${fld('spSr','Reason (needed for Inactive / Blacklisted)',x.statusReason)}${fld('spT','Notes',x.notes,'placeholder="e.g. delivers in 2 days"')}
+      </div><div class="flex gap-2 mt-4"><button class="btn btn-primary" id="spS">Save</button><button class="btn btn-secondary" id="spC">Close</button></div>`);
+    const q=i=>m.querySelector('#'+i),v=i=>q(i).value.trim();q('spC').onclick=()=>m.remove();
     q('spS').onclick=async()=>{
-      const name=q('spN').value.trim();if(!name){showToast('Enter the supplier name.','error');return;}
+      const name=v('spN');if(!name){showToast('Enter the company name.','error');return;}
       if(!id&&window.marsFindSupplier(name)){showToast('This supplier already exists.','error');return;}
-      const d={phone:q('spP').value.trim(),address:q('spA').value.trim(),notes:q('spT').value.trim()};
-      try{if(id)await fb().collection('suppliers').doc(id).update(d);else await fb().collection('suppliers').add({name,...d,createdAt:Date.now(),createdBy:window.currentEngineerName||'Admin'});m.remove();showToast('Supplier saved.');}
-      catch(e){showToast('Failed: '+(e.code||e.message),'error');}
+      const email=v('spE').toLowerCase();
+      if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showToast('The email address is not valid.','error');return;}
+      if(!v('spP')&&!email){showToast('Enter a mobile number or an email.','error');return;}
+      const stv=q('spSt').value;if(stv!=='active'&&!v('spSr')){showToast('Write the reason for this status.','error');return;}
+      const tin=v('spTi'),bin=v('spB');
+      const dup=sups.find(o=>o.id!==id&&((tin&&o.tin&&key(o.tin)===key(tin))||(bin&&o.bin&&key(o.bin)===key(bin))));
+      if(dup){showToast('TIN or BIN already used by '+dup.name+'.','error');return;}
+      const d={contactPerson:v('spCp'),phone:v('spP'),email,address:v('spA'),category:q('spCat').value,materials:v('spM'),tradeLicenseNo:v('spTL'),tradeLicenseExpiry:q('spTLE').value,bin,tin,bank:{bankName:v('spBk'),branch:v('spBr'),accountName:v('spAn'),accountNo:v('spAc'),routing:v('spRt')},paymentTerms:q('spPt').value,creditLimit:parseFloat(q('spCl').value)||0,status:stv,statusReason:stv==='active'?'':v('spSr'),notes:v('spT'),updatedAt:Date.now(),updatedBy:who()};
+      const btn=q('spS');btn.disabled=true;btn.textContent='Saving...';
+      const db=fb();
+      try{
+        const nextCode=async tx=>{const cref=db.collection('counters').doc('supplier_code'),c=await tx.get(cref),n=(c.exists?c.data().n:0)+1;tx.set(cref,{n});return 'SUP-'+String(n).padStart(4,'0');};
+        if(id&&x.code)await db.collection('suppliers').doc(id).update(d);
+        else if(id)await db.runTransaction(async tx=>{const code=await nextCode(tx);tx.update(db.collection('suppliers').doc(id),{...d,code});});
+        else await db.runTransaction(async tx=>{const code=await nextCode(tx);tx.set(db.collection('suppliers').doc(),{name,code,...d,docs:[],archived:false,createdAt:Date.now(),createdBy:who()});});
+        audit('Supplier',name||x.name,id?'Edited':'Created');
+        m.remove();showToast('Supplier saved.');
+      }catch(e){btn.disabled=false;btn.textContent='Save';console.error(e);showToast('Failed: '+(e.code||e.message),'error');}
+    };
+  };
+  const dataBlob=u=>{const a=u.split(','),mime=(a[0].match(/:(.*?);/)||[])[1]||'application/octet-stream',bin=atob(a[1]),arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);return new Blob([arr],{type:mime});};
+  const readImg=file=>new Promise((res,rej)=>{const r=new FileReader();r.onerror=()=>rej(new Error('Could not read the file.'));r.onload=()=>{const img=new Image();img.onerror=()=>rej(new Error('This is not a valid image.'));img.onload=()=>{let out='';for(const [mx,ql] of [[1500,.74],[1200,.62],[950,.5],[800,.42]]){const sc=Math.min(1,mx/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*sc));c.height=Math.max(1,Math.round(img.height*sc));c.getContext('2d').drawImage(img,0,0,c.width,c.height);out=c.toDataURL('image/jpeg',ql);if(out.length<=900000)break;}res(out);};img.src=r.result;};r.readAsDataURL(file);});
+  const readFile=file=>new Promise((res,rej)=>{const r=new FileReader();r.onerror=()=>rej(new Error('Could not read the file.'));r.onload=()=>res(r.result);r.readAsDataURL(file);});
+  window.supView=function(id){
+    const x=sups.find(s=>s.id===id);if(!x)return;const b=x.bank||{},st=ST[stOf(x)]||ST.active,pst=stats(x.name);
+    const row=(l,v)=>v?`<div class="text-sm" style="padding:3px 0"><span class="text-muted">${l}:</span> ${esc(v)}</div>`:'';
+    const docs=(x.docs||[]).slice().sort((a,c)=>(c.at||0)-(a.at||0)).map(d=>`<div class="rounded-xl border border-line p-2 text-sm" style="display:flex;justify-content:space-between;gap:8px;align-items:center"><div><b>${esc(d.type)}</b><div class="text-xs text-muted">${esc(d.name)} &middot; ${d.sizeKb||0} KB &middot; ${d8(d.at)}${d.expiry?' &middot; expiry '+esc(d.expiry):''}</div>${d.expiry?'<div class="mt-1">'+(expBadge(d.type,d.expiry)||'')+'</div>':''}</div><div class="flex gap-1"><button class="btn btn-secondary" data-vd="${d.id}">Open</button>${canEdit()?`<button class="btn btn-secondary" data-dd="${d.id}">Delete</button>`:''}</div></div>`).join('')||'<div class="text-xs text-muted">No documents uploaded yet.</div>';
+    const m=modal(`<div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div><h3 class="text-lg font-extrabold text-navy">${esc(x.name)}</h3><div class="text-xs text-muted">${esc(x.code||'No code yet')}${x.category?' &middot; '+esc(x.category):''}</div></div><div>${pill(st[0],st[1],st[2])}${x.archived?' '+pill('Archived','#e5e7eb','#374151'):''}</div></div>
+      ${x.statusReason?`<div class="text-xs mt-1" style="color:#991b1b">Reason: ${esc(x.statusReason)}</div>`:''}
+      <div class="mt-3">${row('Contact person',x.contactPerson)}${row('Mobile',x.phone)}${row('Email',x.email)}${row('Address',x.address)}${row('Materials',x.materials)}${row('Trade license',(x.tradeLicenseNo||'')+(x.tradeLicenseExpiry?' (expires '+x.tradeLicenseExpiry+')':''))}${row('BIN',x.bin)}${row('TIN',x.tin)}${row('Payment terms',x.paymentTerms)}${row('Credit limit',x.creditLimit?'Tk '+money(x.creditLimit):'')}${row('Notes',x.notes)}</div>
+      ${(b.bankName||b.accountNo)?`<div class="text-xs font-extrabold text-navy mt-3">Bank</div>${row('Bank',(b.bankName||'')+(b.branch?', '+b.branch:''))}${row('Account name',b.accountName)}${row('Account no',b.accountNo)}${row('Routing',b.routing)}`:''}
+      <div class="text-xs mt-3"><b>${pst.n}</b> PO &middot; Tk <b>${money(pst.total)}</b>${pst.last?' &middot; last '+d8(pst.last):''}</div>
+      <div class="text-xs font-extrabold text-navy mt-3 mb-2">Documents</div><div class="space-y-2" id="svDocs">${docs}</div>
+      ${canEdit()?`<div class="rounded-xl border border-line p-3 mt-3 space-y-2"><div class="text-xs font-extrabold text-navy">Upload document</div><select id="svT" class="field">${DTYPES.map(t=>`<option>${esc(t)}</option>`).join('')}</select><input id="svF" type="file" accept="image/*,application/pdf" class="field"><div><label class="field-label">Expiry date (if any)</label><input id="svX" type="date" class="field"></div><div class="text-xs text-muted">Photo or PDF, up to about 700 KB. Photos are shrunk automatically.</div><button class="btn btn-primary" id="svU">Upload</button></div>`:''}
+      <div class="flex gap-2 mt-4 flex-wrap">${canEdit()?'<button class="btn btn-secondary" id="svE">Edit</button><button class="btn btn-secondary" id="svA">'+(x.archived?'Restore':'Archive')+'</button>':''}<button class="btn btn-secondary" id="svC">Close</button></div>`);
+    const q=i=>m.querySelector('#'+i);q('svC').onclick=()=>m.remove();
+    if(q('svE'))q('svE').onclick=()=>{m.remove();window.supEdit(id);};
+    if(q('svA'))q('svA').onclick=async()=>{try{await fb().collection('suppliers').doc(id).update({archived:!x.archived,updatedAt:Date.now(),updatedBy:who()});audit('Supplier',x.name,x.archived?'Restored':'Archived');m.remove();showToast(x.archived?'Supplier restored.':'Supplier archived.');}catch(e){showToast('Failed: '+(e.code||e.message),'error');}};
+    m.querySelectorAll('[data-vd]').forEach(bn=>bn.onclick=async()=>{
+      try{const d=await fb().collection('supplier_docs').doc(bn.dataset.vd).get();if(!d.exists){showToast('Document file not found.','error');return;}
+        const f=d.data(),u=URL.createObjectURL(dataBlob(f.data));
+        const v=modal(`<div class="flex justify-between items-center mb-2"><b>${esc(f.type||'')} &middot; ${esc(f.name||'')}</b><button class="btn btn-secondary" id="dvC">Close</button></div>${(f.mime||'').indexOf('pdf')>=0?`<iframe src="${u}" style="width:100%;height:70vh;border:0"></iframe>`:`<img src="${u}" style="max-width:100%;border-radius:10px">`}<a class="btn btn-secondary mt-2" href="${u}" download="${esc(f.name||'document')}">Download</a>`);
+        v.querySelector('#dvC').onclick=()=>{v.remove();URL.revokeObjectURL(u);};
+      }catch(e){showToast('Could not open: '+(e.code||e.message)+' (documents need an approved email account)','error');}
+    });
+    m.querySelectorAll('[data-dd]').forEach(bn=>bn.onclick=async()=>{
+      const did=bn.dataset.dd,meta=(x.docs||[]).find(z=>z.id===did);if(!meta)return;
+      bn.disabled=true;
+      try{const left=(x.docs||[]).filter(z=>z.id!==did);await fb().collection('suppliers').doc(id).update({docs:left,updatedAt:Date.now(),updatedBy:who()});await fb().collection('supplier_docs').doc(did).delete().catch(()=>{});x.docs=left;audit('Supplier',x.name,'Document deleted: '+meta.type);m.remove();window.supView(id);showToast('Document deleted.');}
+      catch(e){bn.disabled=false;showToast('Failed: '+(e.code||e.message),'error');}
+    });
+    if(q('svU'))q('svU').onclick=async()=>{
+      const f=q('svF').files[0];if(!f){showToast('Choose a file first.','error');return;}
+      const isPdf=/pdf/i.test(f.type)||/\.pdf$/i.test(f.name),isImg=/^image\//.test(f.type);
+      if(!isPdf&&!isImg){showToast('Only a photo or a PDF can be uploaded.','error');return;}
+      const bn=q('svU');bn.disabled=true;bn.textContent='Uploading...';
+      try{
+        const data=isPdf?await readFile(f):await readImg(f);
+        if(data.length>950000)throw new Error('The file is too large (limit about 700 KB). Use a smaller photo or compress the PDF.');
+        const db=fb(),did=db.collection('supplier_docs').doc().id,type=q('svT').value,expiry=q('svX').value||'';
+        const meta={id:did,type,name:f.name.slice(0,80),mime:isPdf?'application/pdf':'image/jpeg',sizeKb:Math.round(data.length*0.75/1024),expiry,at:Date.now(),by:who()};
+        await db.collection('supplier_docs').doc(did).set({supplierId:id,type,name:meta.name,mime:meta.mime,data,createdAt:meta.at,by:meta.by});
+        const all=(x.docs||[]).concat([meta]);
+        await db.collection('suppliers').doc(id).update({docs:all,updatedAt:Date.now(),updatedBy:who()});
+        x.docs=all;audit('Supplier',x.name,'Document added: '+type);m.remove();window.supView(id);showToast('Document uploaded.');
+      }catch(e){bn.disabled=false;bn.textContent='Upload';console.error(e);showToast((e.message&&!e.code)?e.message:'Failed: '+(e.code||e.message)+(e.code==='permission-denied'?' (publish the new Firestore Rules, and sign in with an approved email account)':''),'error');}
     };
   };
   function start(){
@@ -5531,8 +5416,9 @@ async function deleteEntryFromFirebase(firebaseId){
 <script>
 /* ============ SUPPLIER PORTAL (opens only with ?rfq=<private token>) ============ */
 (function(){
-  const tk=new URLSearchParams(location.search).get('rfq');
-  if(!tk||!/^[a-f0-9]{32}$/.test(tk))return;
+  const q0=new URLSearchParams(location.search),tk=q0.get('rfq'),hub=q0.get('portal')==='supplier';
+  if(!hub&&(!tk||!/^[a-f0-9]{32}$/.test(tk)))return;
+  let cur=tk;
   const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
   const money=n=>Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
   const dFmt=ms=>new Date(ms).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
@@ -5544,11 +5430,59 @@ async function deleteEntryFromFirebase(firebaseId){
   wrap.innerHTML=msg('Loading request for quotation...');
   document.body.appendChild(wrap);
   const IN='width:100%;box-sizing:border-box;padding:10px;border:1px solid #c5ccd8;border-radius:10px;font-size:15px;background:#fff';
+
+  /* ---- supplier login hub: ?portal=supplier ---- */
+  const BTN='width:100%;padding:13px;border:0;border-radius:12px;background:#16294d;color:#fff;font-size:15px;font-weight:bold;margin-top:10px';
+  const LNK='border:0;background:none;color:#1e6fe8;font-size:13px;font-weight:bold;padding:8px 4px';
+  function hubStart(db){const u=firebase.auth().currentUser;if(u&&!u.isAnonymous&&u.emailVerified){hubList(db);return;}hubLogin(db,'','in');}
+  function hubLogin(db,note,mode){
+    const t={in:['Sign in','Sign in'],up:['Create account','Create account'],forgot:['Reset password','Send reset link']}[mode];
+    wrap.innerHTML=box('<div style="text-align:center;padding:14px 0"><div style="font-size:21px;font-weight:bold">Supplier Portal</div><div style="font-size:13px;color:#555;margin-top:4px">Use the email address where you received the quotation request.</div></div><div style="background:#fff;border-radius:14px;padding:14px">'
+      +(note?'<div id="hbMsg" style="font-size:13px;margin-bottom:10px;color:'+(/^OK:/.test(note)?'#166534':'#b91c1c')+'">'+esc(note.replace(/^OK:/,''))+'</div>':'')
+      +'<div style="font-size:15px;font-weight:bold;margin-bottom:8px">'+t[0]+'</div>'
+      +'<input id="hbE" type="email" autocomplete="email" placeholder="Email" style="'+IN+'">'
+      +(mode==='forgot'?'':'<input id="hbP" type="password" autocomplete="'+(mode==='up'?'new-password':'current-password')+'" placeholder="Password (min 6 characters)" style="'+IN+';margin-top:8px">')
+      +'<button id="hbGo" style="'+BTN+'">'+t[1]+'</button>'
+      +'<div style="display:flex;justify-content:space-between;flex-wrap:wrap">'+(mode!=='in'?'<button id="hbIn" style="'+LNK+'">Sign in</button>':'')+(mode!=='up'?'<button id="hbUp" style="'+LNK+'">Create account</button>':'')+(mode!=='forgot'?'<button id="hbFg" style="'+LNK+'">Forgot password?</button>':'')+'</div></div>');
+    const g=id=>wrap.querySelector('#'+id);
+    if(g('hbIn'))g('hbIn').onclick=()=>hubLogin(db,'','in');if(g('hbUp'))g('hbUp').onclick=()=>hubLogin(db,'','up');if(g('hbFg'))g('hbFg').onclick=()=>hubLogin(db,'','forgot');
+    g('hbGo').onclick=async()=>{
+      const em=g('hbE').value.trim().toLowerCase(),pw=g('hbP')?g('hbP').value:'',au=firebase.auth();
+      if(!em){hubLogin(db,'Enter your email.',mode);return;}
+      if(mode!=='forgot'&&pw.length<6){hubLogin(db,'Password must be at least 6 characters.',mode);return;}
+      g('hbGo').disabled=true;g('hbGo').textContent='Please wait...';
+      try{
+        if(mode==='forgot'){await au.sendPasswordResetEmail(em);hubLogin(db,'OK:Reset link sent. Check your inbox and spam folder.','in');return;}
+        if(mode==='up'){const c=await au.createUserWithEmailAndPassword(em,pw);await c.user.sendEmailVerification();await au.signOut();hubLogin(db,'OK:Account created. We sent a verification link to '+em+'. Open it, then sign in here.','in');return;}
+        const c=await au.signInWithEmailAndPassword(em,pw);
+        if(!c.user.emailVerified){await c.user.sendEmailVerification().catch(()=>{});await au.signOut();hubLogin(db,'Please verify your email first. We sent the link again. Check inbox and spam, then sign in.','in');return;}
+        hubList(db);
+      }catch(e){
+        const m={'auth/wrong-password':'Wrong password.','auth/invalid-credential':'Wrong email or password.','auth/user-not-found':'No account with this email. Tap Create account.','auth/email-already-in-use':'An account with this email already exists. Sign in instead.','auth/invalid-email':'This email address is not valid.','auth/weak-password':'Password is too weak.','auth/too-many-requests':'Too many attempts. Please wait and try again.'}[e&&e.code]||('Could not continue: '+((e&&e.code)||'error'));
+        hubLogin(db,m,mode);
+      }
+    };
+  }
+  async function hubList(db){
+    const u=firebase.auth().currentUser;
+    if(!u||u.isAnonymous||!u.emailVerified){hubLogin(db,'','in');return;}
+    wrap.innerHTML=msg('Loading your requests...');
+    try{
+      const sn=await db.collection('rfq_invites').where('supplierEmail','==',String(u.email).toLowerCase()).get();
+      const L=sn.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+      const rows=L.map(i=>{const closed=Date.now()>i.deadlineMs,sub=i.status==='submitted';const chip=sub?['Submitted','#dbeafe','#1e3a8a']:(closed?['Closed','#fee2e2','#991b1b']:['Open','#dcfce7','#166534']);
+        return '<div data-id="'+esc(i.id)+'" class="hb-row" style="background:#fff;border-radius:14px;padding:14px;margin-top:10px;cursor:pointer"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>'+esc(i.rfqNo)+'</b><span style="font-size:12px;font-weight:bold;border-radius:999px;padding:3px 10px;background:'+chip[1]+';color:'+chip[2]+'">'+chip[0]+'</span></div><div style="font-size:13px;color:#555;margin-top:4px">'+esc(i.company)+' &middot; '+(i.items||[]).length+' item(s) &middot; deadline '+dFmt(i.deadlineMs)+'</div></div>';}).join('')||'<div style="background:#fff;border-radius:14px;padding:22px;margin-top:10px;text-align:center;color:#555">No quotation request has been sent to '+esc(u.email)+' yet.</div>';
+      wrap.innerHTML=box('<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0"><div style="font-size:20px;font-weight:bold">My RFQs</div><button id="hbOut" style="'+LNK+'">Sign out</button></div><div style="font-size:12px;color:#555">'+esc(u.email)+'</div>'+rows);
+      wrap.querySelector('#hbOut').onclick=()=>firebase.auth().signOut().then(()=>hubLogin(db,'OK:Signed out.','in'));
+      wrap.querySelectorAll('.hb-row').forEach(r=>r.onclick=async()=>{try{cur=r.dataset.id;const d=await db.collection('rfq_invites').doc(cur).get();render(d.data(),db);}catch(e){console.error(e);alert('Could not open this request.');}});
+    }catch(e){console.error(e);wrap.innerHTML=msg('Could not load your requests. '+((e&&e.code==='permission-denied')?'The system is still being set up. Please try again later.':'Check your internet and try again.'));}
+  }
   async function load(n){
     try{
       const db=window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
       if(!db||!firebase.auth().currentUser)throw new Error('wait');
-      const d=await db.collection('rfq_invites').doc(tk).get();
+      if(hub){hubStart(db);return;}
+      const d=await db.collection('rfq_invites').doc(cur).get();
       if(!d.exists){wrap.innerHTML=msg('This link is not valid. Please contact the company that sent it.');return;}
       render(d.data(),db);
     }catch(e){if(n<20)setTimeout(()=>load(n+1),700);else{console.error(e);wrap.innerHTML=msg('Could not open this request. Please check your internet connection and try again.');}}
@@ -5561,7 +5495,7 @@ async function deleteEntryFromFirebase(firebaseId){
       +'<div style="display:flex;gap:8px"><div style="flex:2"><div style="font-size:11px;color:#555">Rate (Tk per '+esc(i.unit)+')</div><input class="q-r" data-i="'+esc(i.id)+'" data-q="'+i.qty+'" type="number" inputmode="decimal" step="0.01" style="'+IN+'" value="'+(l.rate||'')+'"'+dis+'></div><div style="flex:1"><div style="font-size:11px;color:#555">Disc %</div><input class="q-d" data-i="'+esc(i.id)+'" type="number" inputmode="decimal" step="0.01" style="'+IN+'" value="'+(l.disc||'')+'"'+dis+'></div></div>'
       +'<input class="q-n" data-i="'+esc(i.id)+'" placeholder="Brand / note (optional)" style="'+IN+';margin-top:8px" value="'+esc(l.note||'')+'"'+dis+'>'
       +'<div class="q-a" data-i="'+esc(i.id)+'" style="text-align:right;font-size:13px;font-weight:bold;margin-top:6px"></div></div>';}).join('');
-    wrap.innerHTML=box('<div style="text-align:center;padding:10px 0"><div style="font-size:20px;font-weight:bold">'+esc(inv.company)+'</div><div style="font-size:14px;color:#16294d;font-weight:bold;margin-top:2px">Request for Quotation</div></div>'
+    wrap.innerHTML=box((hub?'<button id="qBack" style="border:0;background:none;color:#1e6fe8;font-weight:bold;font-size:14px;padding:6px 0">&lsaquo; My RFQs</button>':'')+'<div style="text-align:center;padding:10px 0"><div style="font-size:20px;font-weight:bold">'+esc(inv.company)+'</div><div style="font-size:14px;color:#16294d;font-weight:bold;margin-top:2px">Request for Quotation</div></div>'
       +(justSent?'<div style="background:#dcfce7;color:#166534;border-radius:12px;padding:12px;font-weight:bold;margin-bottom:10px">Thank you. Your quotation was submitted'+(closed?'.':'. You can change it until the deadline.')+'</div>':(inv.status==='submitted'?'<div style="background:#dbeafe;color:#1e3a8a;border-radius:12px;padding:10px;font-size:13px;margin-bottom:10px">You submitted a quotation on '+dFmt(inv.submittedAt)+'.'+(closed?'':' You can still change it until the deadline.')+'</div>':''))
       +(closed?'<div style="background:#fee2e2;color:#991b1b;border-radius:12px;padding:12px;font-weight:bold;margin-bottom:10px">The deadline has passed. This request is closed.</div>':'')
       +'<div style="background:#fff;border-radius:14px;padding:12px;font-size:13px;line-height:1.7"><b>RFQ No:</b> '+esc(inv.rfqNo)+'<br><b>To:</b> '+esc((inv.supplier||{}).name)+'<br><b>Deadline:</b> '+dFmt(inv.deadlineMs)+(inv.site?'<br><b>Delivery site:</b> '+esc(inv.site):'')+(inv.note?'<br><b>Note:</b> '+esc(inv.note):'')+'</div>'
@@ -5571,6 +5505,7 @@ async function deleteEntryFromFirebase(firebaseId){
       +'<div style="font-size:11px;color:#555;margin-top:8px">Remarks</div><input id="qRem" style="'+IN+'" value="'+esc(q.remark||'')+'"'+dis+'></div>'
       +'<div id="qTot" style="text-align:right;font-weight:bold;font-size:16px;margin:12px 4px 0"></div>'
       +'<button id="qGo" style="width:100%;margin:12px 0 40px;padding:14px;border:0;border-radius:12px;background:#16294d;color:#fff;font-size:16px;font-weight:bold"'+dis+'>'+(inv.status==='submitted'?'Update quotation':'Submit quotation')+'</button>');
+    const bk=wrap.querySelector('#qBack');if(bk)bk.onclick=()=>hubList(db);
     const calc=()=>{let t=0;wrap.querySelectorAll('.q-r').forEach(r=>{const id=r.dataset.i,rt=parseFloat(r.value)||0,dc=Math.min(100,Math.max(0,parseFloat(wrap.querySelector('.q-d[data-i="'+id+'"]').value)||0)),a=Math.round(rt*(1-dc/100)*100)/100*parseFloat(r.dataset.q);t+=a;wrap.querySelector('.q-a[data-i="'+id+'"]').textContent=rt>0?'Amount: Tk '+money(a):'';});wrap.querySelector('#qTot').textContent=t>0?'Total: Tk '+money(t):'';};
     wrap.addEventListener('input',calc);calc();
     wrap.querySelector('#qGo').onclick=async()=>{
@@ -5580,13 +5515,155 @@ async function deleteEntryFromFirebase(firebaseId){
       const quote={lines,deliveryDays:parseFloat(wrap.querySelector('#qDel').value)||0,validityDays:parseFloat(wrap.querySelector('#qVal').value)||0,payment:wrap.querySelector('#qPay').value.trim(),remark:wrap.querySelector('#qRem').value.trim(),by:(inv.supplier||{}).name||'',at:Date.now(),rev:(q.rev||0)+1};
       try{
         const at=Date.now();
-        await db.collection('rfq_invites').doc(tk).update({status:'submitted',submittedAt:at,quote});
+        await db.collection('rfq_invites').doc(cur).update({status:'submitted',submittedAt:at,quote});
         render(Object.assign({},inv,{status:'submitted',submittedAt:at,quote}),db,true);
       }catch(e){console.error(e);b.disabled=false;b.textContent='Submit quotation';alert(e&&e.code==='permission-denied'?'Could not submit. The deadline may have passed.':'Could not submit. Please check your internet and try again.');}
     };
   }
   window.addEventListener('load',()=>load(0));
 })();
+</script>
+<script>
+/* ============ Mars home dashboard (cards like the approved design) ============ */
+(function(){
+  const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  const ico={
+    box:'<svg viewBox="0 0 24 24" fill="none" stroke="#1e6fe8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>',
+    doc:'<svg viewBox="0 0 24 24" fill="none" stroke="#f26a1b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8l-5-5z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>',
+    cart:'<svg viewBox="0 0 24 24" fill="none" stroke="#10a56b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2 3h3l2.4 11.2a2 2 0 002 1.6h8.2a2 2 0 002-1.5L21 7H6"/></svg>',
+    coins:'<svg viewBox="0 0 24 24" fill="none" stroke="#5a55e0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg>',
+    plus:'<svg viewBox="0 0 24 24" fill="none" stroke="#1e6fe8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h6"/><path d="M14 3v5h5M18 14v6M15 17h6"/></svg>',
+    swap:'<svg viewBox="0 0 24 24" fill="none" stroke="#10a56b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h15l-4-4M20 16H5l4 4"/></svg>',
+    send:'<svg viewBox="0 0 24 24" fill="none" stroke="#1e6fe8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>',
+    chart:'<svg viewBox="0 0 24 24" fill="none" stroke="#5a55e0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8l-5-5z"/><path d="M14 3v5h5M9 17v-3M12 17v-5M15 17v-2"/></svg>'
+  };
+  const PILL={blue:['#dbeafe','#1d4ed8'],green:['#d1fae5','#047857'],orange:['#ffedd5','#c2410c'],red:['#fee2e2','#b91c1c']};
+  const IC={blue:'#e4efff',green:'#dcf6ea',orange:'#ffeadb',purple:'#e9e7ff'};
+  const money=n=>Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const when=ms=>{if(!ms)return '';const d=new Date(ms);return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})+', '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
+  const rl=()=>{try{if(isAdmin)return 'admin';}catch(e){}const r=window.currentEngineerRole||'site';return r==='store'?'site':r;};
+  const arrow=c=>'<span class="hx-go" style="color:'+c+'">&rsaquo;</span>';
+  let last='';
+  function render(){
+    const box=document.getElementById('mxHome');if(!box||box.offsetParent===null&&last)return;
+    const role=rl(),allowed=window.currentEngineerAllowedProjects||null,inScope=p=>!allowed||allowed.includes(p);
+    const ents=(typeof entries!=='undefined'&&Array.isArray(entries))?entries:[];
+    const reqs=(window.marsReqs?marsReqs():[]).filter(r=>inScope(r.prjNo));
+    const pos=(window.marsPOs?marsPOs():[]).filter(o=>inScope(o.prjNo));
+    const trs=(window.marsTransfers?marsTransfers():[]).filter(t=>inScope(t.fromPrj)||inScope(t.toPrj));
+    const mats=new Set(ents.map(e=>(e.material||'').trim().toLowerCase()).filter(Boolean)).size;
+    const openReq=reqs.filter(r=>r.stage!=='closed'&&r.stage!=='rejected').length;
+    const approver=['admin','pmgr','ed'].includes(role);
+    const pendPO=pos.filter(o=>o.status==='pending').length;
+    const awaiting=reqs.reduce((a,r)=>a+(r.items||[]).filter(i=>i.state==='purchased').length,0);
+    const poVal=pos.filter(o=>(o.status||'approved')==='approved').reduce((a,o)=>a+(+o.total||0),0);
+    const h=new Date().getHours(),hi=h<12?'Good morning,':(h<17?'Good afternoon,':'Good evening,');
+    const name=role==='admin'?'Admin':(window.currentEngineerName||'Engineer');
+    const dt=new Date().toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+    const stat=(c,ic,t,v,u,pg)=>'<div class="hx-st hx-c-'+c+'" onclick="showPage(\''+pg+'\')"><div class="hx-ic">'+ic+'</div><div><div class="t">'+t+'</div><div class="v">'+v+'</div><div class="u">'+u+'</div></div>'+arrow('#1e6fe8')+'</div>';
+    const q=(c,ic,t,d,pg)=>'<div class="hx-qt hx-c-'+c+'" onclick="showPage(\''+pg+'\')">'+ic+'<div class="tt">'+t+'</div><div class="ds">'+d+'</div>'+arrow('#1e6fe8')+'</div>';
+    const qa=[q('blue',ico.plus,'Stock Entry','Record stock in/out','entry'),q('green',ico.swap,'Transfers','Move stock between sites','transfers')];
+    if(role==='site'){qa.push(q('orange',ico.doc,'Requisition','Raise a material request','requisition'));qa.push(q('purple',ico.send,'Track Requisition','Follow your requests','track'));}
+    else{qa.push(q('orange',ico.cart,'Purchase Orders','Create and manage PO','purchaseorders'));qa.push(role==='proc'?q('purple',ico.send,'Track Requisition','Follow requests','track'):q('purple',ico.chart,'Reports','View reports &amp; analytics','print'));}
+    const act=[];
+    reqs.forEach(r=>{const t=r.createdAt||((r.history||[])[0]||{}).at||0,done=r.stage==='closed',rej=r.stage==='rejected';act.push({t,ic:ico.doc,bg:IC.blue,a:'New Requisition',b:esc(r.no)+' &bull; '+when(t),p:rej?['Rejected','red']:(done?['Completed','green']:['Pending','orange'])});});
+    pos.forEach(o=>{const st=o.status||'approved';act.push({t:o.createdAt||0,ic:ico.cart,bg:IC.orange,a:st==='pending'?'New Purchase Order Created':'Purchase Order '+(st==='approved'?'Approved':'Rejected'),b:esc(o.no)+' &bull; '+when(o.createdAt),p:st==='pending'?['New','blue']:(st==='approved'?['Approved','green']:['Rejected','red'])});});
+    trs.forEach(t=>{const ms=t.createdAt||t.at||0;act.push({t:ms,ic:ico.swap,bg:IC.green,a:'Stock Transferred',b:esc(t.fromPrj)+' &rarr; '+esc(t.toPrj)+' &bull; '+when(ms),p:t.status==='approved'?['Completed','green']:(t.status==='rejected'?['Rejected','red']:['Pending','orange'])});});
+    act.sort((x,y)=>y.t-x.t);
+    const rows=act.slice(0,5).map(x=>'<div class="hx-row"><div class="ic" style="background:'+x.bg+'">'+x.ic+'</div><div class="m"><div class="a">'+x.a+'</div><div class="b">'+x.b+'</div></div><span class="hx-pill" style="background:'+PILL[x.p[1]][0]+';color:'+PILL[x.p[1]][1]+'">'+x.p[0]+'</span></div>').join('')||'<div style="padding:18px;color:#64748b;font-size:13px">No recent activity yet.</div>';
+    const html='<div class="hx-greet"><div><div class="hi">'+hi+'</div><div class="nm">'+esc(name)+'</div><div class="sb">Here&rsquo;s what&rsquo;s happening today.</div></div><div class="dt">'+dt+'<i>Build Today<br>for a Stronger Tomorrow</i><b></b></div></div>'
+     +'<div class="hx-hero"><div><div class="l">Open requisitions</div><div><div class="n">'+openReq+'</div><div class="s">in progress</div></div></div><div><div class="l">'+(approver?'POs waiting for approval':'Items awaiting delivery')+'</div><div><div class="n">'+(approver?pendPO:awaiting)+'</div><div class="s">'+(approver?'needs a decision':'to be received')+'</div></div></div></div>'
+     +'<div class="hx-stats">'+stat('blue',ico.box,'Materials',mats,'Active Items','print'.replace('print',role==='proc'?'dashboard':'print'))
+       +stat('orange',ico.doc,'Requests',openReq,'Pending','track')
+       +stat('green',ico.cart,'Orders',pos.length,'Total Orders',role==='site'?'track':'purchaseorders')
+       +(role==='site'?stat('purple',ico.coins,'Ledger Entries',ents.length,'Your projects','entry'):stat('purple',ico.coins,'PO Value','&#2547; '+money(poVal),'Approved POs','purchaseorders'))+'</div>'
+     +'<div class="hx-h"><h2>Quick Actions</h2></div><div class="hx-q">'+qa.join('')+'</div>'
+     +'<div class="hx-h"><h2>Recent Activity</h2><a onclick="showPage(\'track\')">View All &rsaquo;</a></div><div class="hx-act">'+rows+'</div>';
+    if(html!==last){last=html;box.innerHTML=html;}
+  }
+  window.mxHomeRender=render;
+  setInterval(render,1500);
+  window.addEventListener('load',()=>setTimeout(render,600));
+})();
+</script>
+<script>
+/* ============ Stock Entry types ============ */
+const ENTRY_TYPES={
+  issue:{show:['issue'],help:'Material used at site (slab, wall, etc.). The quantity goes out of stock.'},
+  direct:{show:['proc'],help:'Only for material bought without a requisition. Enter the bill / challan no. and the reason. Material ordered through a requisition is added automatically when the engineer confirms receipt, so do not enter it here.',reason:'Reason for direct purchase (required)'},
+  gain:{show:['proc'],help:'Stock found more than the ledger shows. The quantity is added to stock.',reason:'Reason for the gain (required)'},
+  loss:{show:['issue'],help:'Stock lost, damaged or wasted. The quantity is deducted from stock.',reason:'Reason for the loss / damage (required)'},
+  gatepass:{show:['rec','tr'],help:'Material received from, or sent to, another site with a gate pass. For approval-based moves use the Transfers page.'},
+  all:{show:['proc','rec','tr','issue'],help:'All fields. Use only to correct old or special entries.'}
+};
+function applyEntryType(){
+  const sel=document.getElementById('entryType');if(!sel)return;
+  const allOpt=sel.querySelector('option[value="all"]');if(allOpt){let adm=false;try{adm=!!isAdmin;}catch(e){}allOpt.hidden=!adm&&sel.value!=='all';}
+  const t=sel.value,cfg=ENTRY_TYPES[t]||ENTRY_TYPES.issue;
+  document.querySelectorAll('.item-row').forEach(row=>{
+    const P=(role)=>{const el=row.querySelector('[data-role="'+role+'"]');return el&&el.parentElement;};
+    [['proc','procMrr'],['rec','recPrj'],['tr','trGp'],['issue','purpose']].forEach(([k,role])=>{const p=P(role);if(p)p.style.display=cfg.show.includes(k)?'':'none';});
+    const mrr=row.querySelector('[data-role="procMrr"]');if(mrr){mrr.style.display=t==='gain'?'none':'';mrr.placeholder=t==='direct'?'Bill / Challan No. (required)':'MRR No.';}
+    const pu=row.querySelector('[data-role="purpose"]');if(pu){pu.style.display=t==='loss'?'none':'';pu.placeholder=t==='issue'?'Purpose (e.g. 3rd floor slab)':'Purpose';}
+    const ph=P('procMrr');if(ph&&ph.firstElementChild)ph.firstElementChild.textContent=t==='direct'?'Direct Purchase':(t==='gain'?'Stock Gain (+)':'Receiving Procurement');
+    const ih=P('purpose');if(ih&&ih.firstElementChild)ih.firstElementChild.textContent=t==='loss'?'Stock Loss / Damage (-)':'Issue of Work at Site';
+  });
+  const h=document.getElementById('entryTypeHelp');if(h)h.textContent=cfg.help;
+  const rw=document.getElementById('entryReasonWrap'),rl=document.getElementById('entryReasonLabel');
+  if(rw){rw.classList.toggle('hidden',!cfg.reason);if(rl&&cfg.reason)rl.textContent=cfg.reason;}
+}
+function entryTypePrepare(items,t,reason,prjInfo){
+  if(t==='all')return null;
+  const keep={issue:['issue'],loss:['issue'],direct:['proc'],gain:['proc'],gatepass:['rec','tr']}[t]||['issue'];
+  for(const it of items){
+    if(!keep.includes('proc')){it.procQty=0;it.procMrr='-';}
+    if(!keep.includes('rec')){it.recQty=0;it.recPrj='-';it.recGp='-';}
+    if(!keep.includes('tr')){it.trQty=0;it.trPrj='-';it.trGp='-';}
+    if(!keep.includes('issue')){it.issueQty=0;it.purpose='-';}
+    if(!it.material)return 'Select a material for every row.';
+    const q=(t==='issue'||t==='loss')?it.issueQty:((t==='direct'||t==='gain')?it.procQty:(it.recQty||it.trQty));
+    if(!(q>0))return 'Enter a quantity for '+it.material+'.';
+    if(t==='issue'&&(!it.purpose||it.purpose==='-'))return 'Enter the purpose of use for '+it.material+'.';
+    if(t==='direct'&&(!it.procMrr||it.procMrr==='-'))return 'Enter the Bill / Challan no. for '+it.material+'.';
+    if(t==='gatepass'&&it.recQty>0&&(it.recPrj==='-'||it.recGp==='-'))return 'Enter the project no. and gate pass no. for '+it.material+'.';
+    if(t==='gatepass'&&it.trQty>0&&(it.trPrj==='-'||it.trGp==='-'))return 'Enter the project no. and gate pass no. for '+it.material+'.';
+  }
+  if((t==='direct'||t==='gain'||t==='loss')&&!reason)return 'Please write the reason.';
+  if(t==='direct'){
+    let adm=false;try{adm=!!isAdmin;}catch(e){}
+    if(!adm){
+      const reqs=window.marsReqs?marsReqs():[];
+      for(const it of items){
+        const hit=reqs.find(r=>r.prjNo===prjInfo.prjNo&&(r.items||[]).some(i=>i.state==='purchased'&&String(i.material||'').toLowerCase()===String(it.material).toLowerCase()));
+        if(hit)return it.material+' is already on order ('+hit.no+'). Receive it from Track Requisition > Confirm received so the stock is not counted twice.';
+      }
+    }
+  }
+  items.forEach(it=>{
+    if(t==='gain')it.procMrr='ADJ-GAIN';
+    if(t==='loss')it.purpose='Adjustment (loss/damage): '+reason;
+    if(t==='direct')it.purpose='-';
+  });
+  return null;
+}
+(function(){
+  const wrap=(name,fn)=>{const o=window[name];if(typeof o!=='function')return;window[name]=function(){const r=o.apply(this,arguments);try{fn.apply(this,arguments);}catch(e){console.error(e);}return r;};};
+  wrap('addItemRow',()=>applyEntryType());
+  wrap('editEntry',()=>{const sel=document.getElementById('entryType');if(sel){sel.value='all';applyEntryType();}});
+  wrap('resetForm',()=>{const sel=document.getElementById('entryType');if(sel){sel.value='issue';}const r=document.getElementById('entryReason');if(r)r.value='';applyEntryType();});
+  window.addEventListener('load',()=>setTimeout(applyEntryType,300));
+})();
+</script>
+<script>
+/* ============ Audit log (who did what) ============ */
+window.marsAudit=function(action,target,detail){
+  try{
+    const db=window.MARS_FIREBASE&&window.MARS_FIREBASE.db;if(!db)return;
+    const u=firebase.auth().currentUser;let adm=false;try{adm=!!isAdmin;}catch(e){}
+    db.collection('audit_logs').add({at:Date.now(),by:String(window.currentEngineerName||(adm?'Admin':'')||''),email:String((u&&u.email)||''),role:String(adm?'admin':(window.currentEngineerRole||'')),action:String(action||''),target:String(target||''),detail:String(detail||'').slice(0,300)}).catch(e=>console.warn('audit log not saved',e&&e.code));
+  }catch(e){console.warn(e);}
+};
+(function(){const o=window.logActivity;if(typeof o!=='function')return;window.logActivity=function(a,d){const r=o.apply(this,arguments);try{window.marsAudit('Ledger',a,d);}catch(e){}return r;};})();
 </script>
 </body>
 </html>
