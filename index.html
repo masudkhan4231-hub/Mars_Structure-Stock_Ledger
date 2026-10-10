@@ -123,6 +123,7 @@
     @keyframes logoReveal{to{opacity:1;transform:translateY(0) scale(1)}}
 
     /* ---- Full finance-style dashboard (rail / trend / mini / dynamics / team / table) ---- */
+    .nav-hidden{display:none!important}
     .nav-group{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:#94a3b8;padding:14px 12px 4px}
     .fd-rail-wrap{position:relative;overflow:hidden;border-radius:20px}
     .fd-rail{position:relative;z-index:1;display:flex;gap:14px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
@@ -1089,14 +1090,17 @@ window.marsPill=function(kind,text){
         <section id="transferSection" class="card p-5 md:p-6 page-section page-hidden" data-page="transfers">
           <h2 class="text-lg font-extrabold text-navy mb-1">Inter-Project Material Transfer</h2>
           <p class="text-xs text-muted mb-4">Balances do not change while a request is pending. When the receiving project approves, ledger entries are created automatically for both projects.</p>
-          <div class="grid md:grid-cols-5 gap-3 mb-4">
+          <div class="grid md:grid-cols-6 gap-3 mb-3">
             <div><label class="field-label">From Project</label><select id="trFrom" class="field"></select></div>
             <div><label class="field-label">To Project</label><select id="trTo" class="field"></select></div>
             <div><label class="field-label">Material</label><input id="trMat" list="materialsDatalist" class="field" placeholder="Material"></div>
             <div><label class="field-label">Quantity</label><input id="trQ" type="number" step="0.01" class="field" placeholder="Qty"></div>
-            <div><label class="field-label">Gate Pass</label><input id="trG" class="field" placeholder="Optional"></div>
+            <div><label class="field-label">Remarks</label><input id="trRem" class="field" placeholder="e.g. New, Unsize"></div>
+            <div><label class="field-label">Gate Pass No</label><input id="trG" class="field" placeholder="Auto if empty"></div>
           </div>
-          <button class="btn btn-primary" onclick="trSubmit()">Send Transfer Request</button>
+          <div id="trItems" class="space-y-2 mb-3"></div>
+          <div class="flex gap-2 flex-wrap"><button class="btn btn-secondary" onclick="trAdd()">&#65291; Add another material</button><button class="btn btn-primary" onclick="trSubmit()">Send Transfer Request</button></div>
+          <div class="text-xs text-muted mt-2">Add every material that goes on the same gate pass, then send. The gate pass number is made automatically.</div>
           <div class="text-xs font-extrabold text-navy mt-6 mb-2">Waiting for my approval</div><div id="trIncoming" class="space-y-2"></div>
           <div class="text-xs font-extrabold text-navy mt-6 mb-2">All transfers</div><div id="trList" class="space-y-2"></div>
         </section>
@@ -2827,10 +2831,27 @@ window.marsPill=function(kind,text){
   </script>
 
 <script>
+/* Each person sees only the pages that belong to their role */
+const NAV_ALLOW={
+  admin:'*',
+  site:['dashboard','entry','transfers','requisition','track','print'],
+  store:['dashboard','entry','transfers','requisition','track','print'],
+  dpm:['dashboard','requisition','track','transfers','print'],
+  ed:['dashboard','requisition','track','purchaseorders','suppliers','transfers','print'],
+  proc:['dashboard','requisition','track','suppliers','purchaseorders'],
+  pmgr:['dashboard','requisition','track','suppliers','purchaseorders','print'],
+  acct:['dashboard','track','suppliers','purchaseorders','print'],
+  viewer:['dashboard','track','purchaseorders','print']
+};
+window.marsAllowed=function(page){let r='site';try{r=isAdmin?'admin':(window.currentEngineerRole||'site');}catch(e){}const a=NAV_ALLOW[r]||NAV_ALLOW.site;return a==='*'||a.indexOf(page)>=0;};
+window.marsApplyNav=function(){
+  document.querySelectorAll('.nav-item[data-page], .mobile-bottom button[data-page]').forEach(el=>el.classList.toggle('nav-hidden',!window.marsAllowed(el.getAttribute('data-page'))));
+  document.querySelectorAll('.nav-group').forEach(g=>{let n=g.nextElementSibling,any=false;while(n&&!n.classList.contains('nav-group')){if(!n.classList.contains('nav-hidden')&&getComputedStyle(n).display!=='none')any=true;n=n.nextElementSibling;}g.classList.toggle('nav-hidden',!any);});
+};
+setInterval(function(){try{window.marsApplyNav();}catch(e){}},1200);
 function showPage(page){
-  const noRep = !isAdmin && window.currentEngineerRole==='proc';
-  document.querySelectorAll('.nav-item[data-page="print"], .mobile-bottom button[data-page="print"], #ngReports').forEach(el=>{ el.style.display = noRep ? 'none' : ''; });
-  if(page==='print' && noRep){ showToast('Reports are not available for the Procurement role.','error'); page='dashboard'; }
+  if(!window.marsAllowed(page)){ showToast('This page is not available for your role.','error'); page='dashboard'; }
+  try{window.marsApplyNav();}catch(e){}
   if(page==='verify' && !isAdmin){ showToast('Physical Check is available to Admin only.','error'); page='dashboard'; }
   document.querySelectorAll('.page-section').forEach(el=>{
     el.classList.toggle('page-hidden', el.dataset.page!==page);
@@ -4098,48 +4119,75 @@ async function deleteEntryFromFirebase(firebaseId){
     t.innerHTML=all.map(x=>`<option>${esc(x)}</option>`).join('');
     if(fv)f.value=fv; if(tv)t.value=tv;
   }
+  let trBasket=[];
+  function renderBasket(){const bx=document.getElementById('trItems');if(!bx)return;bx.innerHTML=trBasket.map((b,i)=>`<div class="flex justify-between items-center text-sm rounded-xl border border-line bg-white p-2"><span>${i+1}. ${esc(b.mat)} &middot; <b>${b.qty}</b>${b.rem?' <span class="text-xs text-muted">('+esc(b.rem)+')</span>':''}</span><button class="btn btn-secondary" onclick="trDel(${i})">Remove</button></div>`).join('');}
+  window.trDel=i=>{trBasket.splice(i,1);renderBasket();};
+  window.trAdd=function(){
+    const from=trFrom.value,to=trTo.value,mat=trMat.value.trim(),qty=parseFloat(trQ.value)||0,rem=((document.getElementById('trRem')||{}).value||'').trim();
+    if(!from||!to){showToast('Choose the From and To project.','error');return false;}
+    if(from===to){showToast('From and To project cannot be the same.','error');return false;}
+    if(!mat||qty<=0){showToast('Enter the material and quantity.','error');return false;}
+    const already=trBasket.filter(b=>b.mat.toLowerCase()===mat.toLowerCase()).reduce((a,b)=>a+b.qty,0),bal=computeCurrentBalance(from,mat);
+    if(qty+already>bal){showToast('Not enough stock: '+from+' balance of '+mat+' is '+bal.toFixed(2)+'.','error');return false;}
+    trBasket.push({mat,qty,rem});trMat.value='';trQ.value='';if(document.getElementById('trRem'))document.getElementById('trRem').value='';renderBasket();return true;
+  };
   window.trSubmit=async function(){
-    const from=trFrom.value,to=trTo.value,mat=trMat.value.trim(),qty=parseFloat(trQ.value)||0;
-    if(!from||!to||!mat||qty<=0){showToast('Enter project, material and quantity.','error');return;}
-    if(from===to){showToast('From and To project cannot be the same.','error');return;}
-    const bal=computeCurrentBalance(from,mat);
-    if(qty>bal){showToast('Not enough stock: '+from+' balance is '+bal.toFixed(2)+'.','error');return;}
+    if(trMat.value.trim()||parseFloat(trQ.value)>0){if(!window.trAdd())return;}
+    if(!trBasket.length){showToast('Add at least one material.','error');return;}
+    const from=trFrom.value,to=trTo.value;if(!from||!to||from===to){showToast('Choose two different projects.','error');return;}
     buildMaterialUnitMap();
+    const db=fb(),by=window.currentEngineerName||'Admin',typed=trG.value.trim(),batchId=db.collection('transfers').doc().id,list=trBasket.slice();
     try{
-      await fb().collection('transfers').add({fromPrj:from,toPrj:to,material:mat,unit:materialUnitMap[mat.toLowerCase()]||'',qty,gp:trG.value.trim()||'-',status:'pending',createdAt:Date.now(),requestedBy:window.currentEngineerName||'Admin'});
-      trMat.value='';trQ.value='';trG.value='';showToast('Transfer request sent.');
-    }catch(e){console.error(e);showToast('Send failed — allow the transfers collection in Firestore Rules.','error');}
+      let gp=typed||'';
+      await db.runTransaction(async tx=>{
+        let n=0,cref=null;
+        const nw=new Date(),yy=String(nw.getFullYear()).slice(-2),mm=String(nw.getMonth()+1).padStart(2,'0');
+        if(!typed){cref=db.collection('counters').doc('gp_year_'+yy);const c=await tx.get(cref);n=(c.exists?c.data().n:0)+1;gp='GP'+yy+'-'+mm+'-'+String(n).padStart(5,'0');}
+        if(cref)tx.set(cref,{n});
+        const now=Date.now();
+        list.forEach(b=>tx.set(db.collection('transfers').doc(),{fromPrj:from,toPrj:to,material:b.mat,unit:materialUnitMap[b.mat.toLowerCase()]||'',qty:b.qty,remark:b.rem||'',gp:gp||'-',batchId,status:'pending',createdAt:now,requestedBy:by}));
+      });
+      trBasket=[];renderBasket();trMat.value='';trQ.value='';trG.value='';if(document.getElementById('trRem'))document.getElementById('trRem').value='';
+      showToast('Transfer request sent. Gate pass '+gp+'. You can print it from the list below.');
+      if(window.marsAudit)marsAudit('Transfer',gp,from+' to '+to+', '+list.length+' item(s)');
+    }catch(e){console.error(e);showToast('Send failed: '+(e.code||e.message),'error');}
   };
   window.trDecide=async function(id,approve){
-    const db=fb(), ref=db.collection('transfers').doc(id), by=window.currentEngineerName||'Admin';
+    const db=fb(),by=window.currentEngineerName||'Admin',t0=transfers.find(x=>x.id===id);
+    const ids=t0&&t0.batchId?transfers.filter(x=>x.batchId===t0.batchId&&x.status==='pending').map(x=>x.id):[id];
     try{
       await db.runTransaction(async tx=>{
-        const d=await tx.get(ref); if(!d.exists||d.data().status!=='pending')throw new Error('already-decided');
-        const t=d.data();
-        if(approve){
-          const day=new Date().toISOString().slice(0,10), now=Date.now();
-          const base=(prj)=>{const p=projectDatabase.find(x=>x.prjNo===prj)||{};return{createdAt:now,updatedAt:now,dateStr:day,prjNo:prj,prjId:p.id||'',engineerName:p.eng||'',loggedByEngineerName:by,material:t.material,unit:t.unit,procMrr:'-',procQty:0,recPrj:'-',recGp:'-',recQty:0,trGp:'-',trPrj:'-',trQty:0,purpose:'-',issueQty:0,transferId:id};};
-          const out=Object.assign(base(t.fromPrj),{trGp:t.gp,trPrj:t.toPrj,trQty:t.qty});
-          const inn=Object.assign(base(t.toPrj),{recGp:t.gp,recPrj:t.fromPrj,recQty:t.qty});
-          tx.set(db.collection(FIREBASE_COLLECTION).doc('tr_'+id+'_out'),out);
-          tx.set(db.collection(FIREBASE_COLLECTION).doc('tr_'+id+'_in'),inn);
-        }
-        tx.update(ref,{status:approve?'approved':'rejected',decidedBy:by,decidedAt:Date.now()});
+        const refs=ids.map(i=>db.collection('transfers').doc(i)),docs=[];
+        for(const r of refs)docs.push(await tx.get(r));
+        docs.forEach(d=>{if(!d.exists||d.data().status!=='pending')throw new Error('already-decided');});
+        const day=new Date().toISOString().slice(0,10),now=Date.now();
+        docs.forEach((d,k)=>{
+          const t=d.data(),tid=ids[k];
+          if(approve){
+            const base=(prj)=>{const p=projectDatabase.find(x=>x.prjNo===prj)||{};return{createdAt:now,updatedAt:now,dateStr:day,prjNo:prj,prjId:p.id||'',engineerName:p.eng||'',loggedByEngineerName:by,material:t.material,unit:t.unit,procMrr:'-',procQty:0,recPrj:'-',recGp:'-',recQty:0,trGp:'-',trPrj:'-',trQty:0,purpose:'-',issueQty:0,transferId:tid};};
+            tx.set(db.collection(FIREBASE_COLLECTION).doc('tr_'+tid+'_out'),Object.assign(base(t.fromPrj),{trGp:t.gp,trPrj:t.toPrj,trQty:t.qty}));
+            tx.set(db.collection(FIREBASE_COLLECTION).doc('tr_'+tid+'_in'),Object.assign(base(t.toPrj),{recGp:t.gp,recPrj:t.fromPrj,recQty:t.qty}));
+          }
+          tx.update(refs[k],{status:approve?'approved':'rejected',decidedBy:by,decidedAt:now});
+        });
       });
-      showToast(approve?'Approved — both project balances updated.':'Rejected — no balance changed.');
-    }catch(e){showToast(e.message==='already-decided'?'This request was already decided.':'Failed — check Rules/connection.','error');}
+      showToast(approve?'Approved. Both project balances updated.':'Rejected. No balance changed.');
+      if(window.marsAudit)marsAudit('Transfer',t0?t0.gp:id,approve?'Approved':'Rejected');
+    }catch(e){showToast(e.message==='already-decided'?'This request was already decided.':'Failed: '+(e.code||e.message),'error');}
   };
   const badge={pending:marsPill('pending','Pending'),approved:marsPill('approved','Approved'),rejected:marsPill('rejected','Rejected')};
-  function card(t,actions){
-    return `<div class="rounded-xl border p-3 text-sm"><b>${esc(t.fromPrj)} → ${esc(t.toPrj)}</b> · ${esc(t.material)}: ${t.qty} ${esc(t.unit)}<div class="text-xs text-muted">${badge[t.status]} · by ${esc(t.requestedBy)}${t.decidedBy?' · decided by '+esc(t.decidedBy):''} · ${new Date(t.createdAt).toLocaleString()}</div>${actions?`<div class="mt-2 flex gap-2"><button class="btn btn-primary" onclick="trDecide('${t.id}',true)">Approve</button><button class="btn btn-secondary" onclick="trDecide('${t.id}',false)">Reject</button></div>`:''}</div>`;
+  const grp=list=>{const m=new Map();list.forEach(t=>{const k=t.batchId||t.id;if(!m.has(k))m.set(k,[]);m.get(k).push(t);});return [...m.values()];};
+  function card(g,actions){
+    const t=g[0];
+    return `<div class="rounded-xl border border-line bg-white p-3 text-sm"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>${esc(t.fromPrj)} &rarr; ${esc(t.toPrj)}</b>${badge[t.status]}</div><div class="text-xs text-muted">Gate pass ${esc(t.gp&&t.gp!=='-'?t.gp:'-')} &middot; by ${esc(t.requestedBy)}${t.decidedBy?' &middot; decided by '+esc(t.decidedBy):''} &middot; ${new Date(t.createdAt).toLocaleString()}</div>${g.map(x=>`<div class="text-sm py-1 border-t">${esc(x.material)}: <b>${x.qty}</b> ${esc(x.unit)}${x.remark?' <span class="text-xs text-muted">('+esc(x.remark)+')</span>':''}</div>`).join('')}<div class="mt-2 flex gap-2 flex-wrap">${actions?`<button class="btn btn-primary" onclick="trDecide('${t.id}',true)">Approve${g.length>1?' all':''}</button><button class="btn btn-secondary" onclick="trDecide('${t.id}',false)">Reject${g.length>1?' all':''}</button>`:''}<button class="btn btn-secondary" onclick="gpPrint('${t.id}')">Gate Pass PDF</button></div></div>`;
   }
   function render(){
     fillSelects();
-    const inc=transfers.filter(t=>t.status==='pending'&&canDecide(t));
-    trIncoming.innerHTML=inc.map(t=>card(t,true)).join('')||'<div class="text-xs text-muted">No pending requests.</div>';
+    const inc=transfers.filter(t=>t.status==='pending'&&canDecide(t)),G=grp(inc);
+    trIncoming.innerHTML=G.map(g=>card(g,true)).join('')||'<div class="text-xs text-muted">No pending requests.</div>';
     const vis=isAdmin?transfers:transfers.filter(t=>canDecide(t)||isMine(t));
-    trList.innerHTML=vis.map(t=>card(t,false)).join('')||'<div class="text-xs text-muted">No transfers yet.</div>';
-    [trBadge,trBadgeM].forEach(b=>{b.textContent=inc.length;b.classList.toggle('hidden',!inc.length);});  return inc.length;
+    trList.innerHTML=grp(vis).map(g=>card(g,false)).join('')||'<div class="text-xs text-muted">No transfers yet.</div>';
+    [trBadge,trBadgeM].forEach(b=>{b.textContent=G.length;b.classList.toggle('hidden',!G.length);});  return G.length;
   }
   function start(){
     if(!fb()){return setTimeout(start,800);}
@@ -4174,7 +4222,7 @@ async function deleteEntryFromFirebase(firebaseId){
     const db=fb(),ref=db.collection('requisitions').doc(id);
     const slow=setTimeout(()=>showToast('Network is slow - still saving. Please do not tap again.','error'),10000);
     let act='';
-    try{await db.runTransaction(async tx=>{const d=await tx.get(ref);const x=await fn(Object.assign({},d.data(),{id}),tx,db);if(!x)throw new Error('blocked');act=((x.history||[]).slice(-1)[0]||{}).action||'';const lg=x.ledger;delete x.ledger;(lg||[]).forEach(en=>tx.set(db.collection(FIREBASE_COLLECTION).doc(en.id),en.data));tx.update(ref,x);});clearTimeout(slow);showToast('Done.');if(window.marsAudit)marsAudit('Requisition',id,act);return true;}
+    try{await db.runTransaction(async tx=>{const d=await tx.get(ref);const x=await fn(Object.assign({},d.data(),{id}),tx,db);if(!x)throw new Error('blocked');act=((x.history||[]).slice(-1)[0]||{}).action||'';const lg=x.ledger,ct=x.counter;delete x.ledger;delete x.counter;if(ct)tx.set(db.collection('counters').doc(ct.id),{n:ct.n});(lg||[]).forEach(en=>tx.set(db.collection(FIREBASE_COLLECTION).doc(en.id),en.data));tx.update(ref,x);});clearTimeout(slow);showToast('Done.');if(window.marsAudit)marsAudit('Requisition',id,act);return true;}
     catch(e){clearTimeout(slow);showToast(e.message==='blocked'?'Action not allowed at this stage (check your role / project access).':'Failed: '+(e.code||e.message||'check Rules/connection'),'error');console.error('[requisition action failed]',e);return false;}
   }
   window.rqAddRow=function(){
@@ -4237,44 +4285,76 @@ async function deleteEntryFromFirebase(firebaseId){
       return{items,stage:items.some(i=>i.state==='pending')?'procurement':'delivery',history:hist(r,'Purchased '+ids.length+' item(s)'+(part?' (partly)':'')+', awaiting delivery')};
     });
   };
+  const mdl=html=>{const old=document.getElementById('rcvModal');if(old)old.remove();const m=document.createElement('div');m.id='rcvModal';m.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:12px';m.innerHTML='<div class="card p-5" style="background:#fff;max-width:460px;width:100%;margin:auto">'+html+'</div>';document.body.appendChild(m);return m;};
+  let lastMrr='';
+  /* one MRR for every item received in the same visit */
+  function receiveCore(id,picks,ch,nt,page){
+    return mut(id,async(r,tx,db)=>{
+      if(!(isAdmin||(role()==='site'&&myPrj().includes(r.prjNo))))return null;
+      const chosen=picks.map(pk=>({pk,it:r.items.find(i=>i.id===pk.iid)})).filter(c=>c.it&&c.it.state==='purchased'&&c.pk.q>0);
+      if(!chosen.length)return null;
+      for(const c of chosen){const ld=await tx.get(db.collection(FIREBASE_COLLECTION).doc('rq_'+r.id+'_'+c.it.id));c.legacy=ld.exists;}
+      const t=new Date(),now=Date.now(),day=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
+      const yy=String(t.getFullYear()).slice(-2),mm=String(t.getMonth()+1).padStart(2,'0');
+      const cs=await tx.get(db.collection('counters').doc('mrr_year_'+yy)),n=(cs.exists?cs.data().n:0)+1;
+      const mrrNo='MRR'+yy+'-'+mm+'-'+String(n).padStart(5,'0');
+      const p=projectDatabase.find(x=>x.prjNo===r.prjNo)||{};
+      let items=r.items.slice();const ledger=[];
+      chosen.forEach(c=>{
+        const it=c.it,q=c.legacy?it.qty:Math.min(c.pk.q,it.qty);
+        const bal=(typeof computeCurrentBalance==='function')?computeCurrentBalance(r.prjNo,it.material):0;
+        const rec={...it,state:'received',receivedQty:q,receivedBy:who(),receivedAt:now,challanNo:ch||'',receiveNote:nt||'',mrrNo,ledgerPage:page||'',cumStock:Math.round((bal+(c.legacy?0:q))*100)/100};
+        const next=[];
+        items.forEach(i=>{
+          if(i.id!==it.id){next.push(i);return;}
+          if(!c.legacy&&q<it.qty){rec.qty=q;rec.ofQty=it.ofQty||it.qty;next.push(rec);next.push({...it,id:it.id+'_'+now.toString(36),qty:Math.round((it.qty-q)*100)/100,ofQty:it.ofQty||it.qty,state:'purchased'});}
+          else next.push(rec);
+        });
+        items=next;
+        if(!c.legacy)ledger.push({id:'rq_'+r.id+'_'+it.id,data:{createdAt:now,updatedAt:now,dateStr:day,prjNo:r.prjNo,prjId:p.id||'',engineerName:p.eng||'',loggedByEngineerName:who(),material:it.material,unit:it.unit||'',procMrr:mrrNo,procQty:q,recPrj:'-',recGp:'-',recQty:0,trGp:'-',trPrj:'-',trQty:0,purpose:'-',issueQty:0,requisitionId:r.id,supplier:it.supplier||'',challanNo:ch||''}});
+      });
+      const open=items.some(i=>i.state==='pending'),wait=items.some(i=>i.state==='purchased');
+      lastMrr=mrrNo;
+      return{items,ledger,counter:{id:'mrr_year_'+yy,n},stage:open?'procurement':(wait?'delivery':'closed'),history:hist(r,'Received '+chosen.length+' item(s) - '+mrrNo+(ch?' (challan '+ch+')':''))};
+    });
+  }
+  function rqReceiveDo(id,iid,q,ch,nt,pg){return receiveCore(id,[{iid,q}],ch,nt,pg||'');}
   window.rqReceive=(id,iid)=>{
     const r0=reqs.find(x=>x.id===id),it=r0&&r0.items.find(i=>i.id===iid);if(!it)return;
-    const old=document.getElementById('rcvModal');if(old)old.remove();
-    const m=document.createElement('div');m.id='rcvModal';
-    m.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:12px';
-    m.innerHTML='<div class="card p-5" style="background:#fff;max-width:420px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Confirm received</h3><div class="text-xs text-muted mb-3">'+esc(it.material)+(it.poNo?' &middot; '+esc(it.poNo):'')+' &middot; ordered '+it.qty+' '+esc(it.unit)+'</div><div class="space-y-3"><div><label class="field-label">Quantity received</label><input id="rcQ" type="number" step="0.01" class="field" value="'+it.qty+'"></div><div><label class="field-label">Challan / delivery note no (optional)</label><input id="rcC" class="field"></div><div><label class="field-label">Note (optional)</label><input id="rcN" class="field" placeholder="e.g. 2 bags damaged"></div><div class="text-xs text-muted">If you receive less than ordered, the balance stays open as awaiting delivery.</div></div><div class="flex gap-2 mt-4"><button class="btn btn-primary" id="rcOk">Confirm</button><button class="btn btn-secondary" id="rcNo">Cancel</button></div></div>';
-    document.body.appendChild(m);
+    const m=mdl('<h3 class="text-lg font-extrabold text-navy mb-1">Confirm received</h3><div class="text-xs text-muted mb-3">'+esc(it.material)+(it.poNo?' &middot; '+esc(it.poNo):'')+' &middot; ordered '+it.qty+' '+esc(it.unit)+'</div><div class="space-y-3"><div><label class="field-label">Quantity received</label><input id="rcQ" type="number" step="0.01" class="field" value="'+it.qty+'"></div><div><label class="field-label">Challan / delivery note no (optional)</label><input id="rcC" class="field"></div><div><label class="field-label">Ledger page no (optional)</label><input id="rcL" class="field"></div><div><label class="field-label">Note (optional)</label><input id="rcN" class="field" placeholder="e.g. 2 bags damaged"></div><div class="text-xs text-muted">If you receive less than ordered, the balance stays open as awaiting delivery. An MRR number is made automatically.</div></div><div class="flex gap-2 mt-4"><button class="btn btn-primary" id="rcOk">Confirm</button><button class="btn btn-secondary" id="rcNo">Cancel</button></div>');
     m.querySelector('#rcNo').onclick=()=>m.remove();
     const ok=m.querySelector('#rcOk');
     ok.onclick=async()=>{
       const q=parseFloat(m.querySelector('#rcQ').value);
       if(!(q>0)||q>it.qty){showToast('Enter a quantity above 0 and up to '+it.qty+'.','error');return;}
-      const ch=m.querySelector('#rcC').value.trim(),nt=m.querySelector('#rcN').value.trim();
       ok.disabled=true;ok.textContent='Saving...';
-      const done=await rqReceiveDo(id,iid,q,ch,nt);
-      if(done)m.remove();else{ok.disabled=false;ok.textContent='Confirm';}
+      const done=await rqReceiveDo(id,iid,q,m.querySelector('#rcC').value.trim(),m.querySelector('#rcN').value.trim(),m.querySelector('#rcL').value.trim());
+      if(done){m.remove();showToast('Received. '+lastMrr+' created. Print it from the requisition card.');}else{ok.disabled=false;ok.textContent='Confirm';}
     };
   };
-  function rqReceiveDo(id,iid,q,ch,nt){
-    return mut(id,async(r,tx,db)=>{
-      const it2=r.items.find(i=>i.id===iid);
-      if(!(isAdmin||(role()==='site'&&myPrj().includes(r.prjNo)))||!it2||it2.state!=='purchased')return null;
-      const lref=db.collection(FIREBASE_COLLECTION).doc('rq_'+r.id+'_'+iid),ld=await tx.get(lref),legacy=ld.exists;
-      const now=Date.now(),t=new Date(),day=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
-      const items=[];
-      r.items.forEach(i=>{
-        if(i.id!==iid){items.push(i);return;}
-        const rec={...i,state:'received',receivedQty:legacy?i.qty:q,receivedBy:who(),receivedAt:now,challanNo:ch||'',receiveNote:nt||''};
-        if(!legacy&&q<i.qty){rec.qty=q;rec.ofQty=i.ofQty||i.qty;items.push(rec);items.push({...i,id:i.id+'_'+now.toString(36),qty:Math.round((i.qty-q)*100)/100,ofQty:i.ofQty||i.qty,state:'purchased'});}
-        else items.push(rec);
-      });
-      const p=projectDatabase.find(x=>x.prjNo===r.prjNo)||{};
-      const ledger=legacy?[]:[{id:'rq_'+r.id+'_'+iid,data:{createdAt:now,updatedAt:now,dateStr:day,prjNo:r.prjNo,prjId:p.id||'',engineerName:p.eng||'',loggedByEngineerName:who(),material:it2.material,unit:it2.unit||'',procMrr:ch||r.no,procQty:q,recPrj:'-',recGp:'-',recQty:0,trGp:'-',trPrj:'-',trQty:0,purpose:'-',issueQty:0,requisitionId:r.id}}];
-      const open=items.some(i=>i.state==='pending'),wait=items.some(i=>i.state==='purchased');
-      return{items,ledger,stage:open?'procurement':(wait?'delivery':'closed'),history:hist(r,'Received '+(legacy?it2.qty:q)+' '+(it2.unit||'')+' '+it2.material+(ch?' (challan '+ch+')':''))};
-    });
-  }
-  window.rqSetRole=(i,v)=>{engineerDatabase[i].role=v;saveEngineerDatabase(engineerDatabase);showToast('Role updated.');window.rqPanelRefresh&&rqPanelRefresh();};
+  window.rqReceiveAll=function(id){
+    const r0=reqs.find(x=>x.id===id);if(!r0)return;
+    const pur=(r0.items||[]).filter(i=>i.state==='purchased');if(!pur.length){showToast('Nothing is waiting to be received.','error');return;}
+    const rows=pur.map(i=>'<div class="rounded-xl border border-line p-2 text-sm"><label><input type="checkbox" class="ra-c" data-i="'+i.id+'" checked> <b>'+esc(i.material)+'</b></label><div class="text-xs text-muted">'+(i.supplier?esc(i.supplier)+' &middot; ':'')+(i.poNo?esc(i.poNo)+' &middot; ':'')+'ordered '+i.qty+' '+esc(i.unit)+'</div><input class="field ra-q" data-i="'+i.id+'" data-max="'+i.qty+'" type="number" step="0.01" value="'+i.qty+'" style="margin-top:4px"></div>').join('');
+    const m=mdl('<h3 class="text-lg font-extrabold text-navy mb-1">Receive materials</h3><div class="text-xs text-muted mb-3">'+esc(r0.no)+' &middot; '+esc(r0.prjNo)+'. All ticked items go on one MRR.</div><div class="space-y-2">'+rows+'</div><div class="space-y-3 mt-3"><div><label class="field-label">Challan / delivery note no (optional)</label><input id="raC" class="field"></div><div><label class="field-label">Ledger page no (optional)</label><input id="raL" class="field"></div><div><label class="field-label">Note (optional)</label><input id="raN" class="field"></div></div><div class="flex gap-2 mt-4"><button class="btn btn-primary" id="raOk">Receive and make MRR</button><button class="btn btn-secondary" id="raNo">Cancel</button></div>');
+    m.querySelector('#raNo').onclick=()=>m.remove();
+    const ok=m.querySelector('#raOk');
+    ok.onclick=async()=>{
+      const picks=[];let bad='';
+      m.querySelectorAll('.ra-c').forEach(c=>{if(!c.checked)return;const q=m.querySelector('.ra-q[data-i="'+c.dataset.i+'"]'),v=parseFloat(q.value);if(!(v>0)||v>parseFloat(q.dataset.max)+0.0001)bad='Enter a valid quantity for every ticked item (not more than ordered).';else picks.push({iid:c.dataset.i,q:v});});
+      if(bad){showToast(bad,'error');return;}if(!picks.length){showToast('Tick at least one item.','error');return;}
+      ok.disabled=true;ok.textContent='Saving...';
+      const done=await receiveCore(id,picks,m.querySelector('#raC').value.trim(),m.querySelector('#raN').value.trim(),m.querySelector('#raL').value.trim());
+      if(done){m.remove();showToast('Received. '+lastMrr+' created. Print it from the requisition card.');}else{ok.disabled=false;ok.textContent='Receive and make MRR';}
+    };
+  };
+  window.mrrCardHtml=function(r){
+    const rl=role();let h='';
+    const canRecv=rl==='admin'||(rl==='site'&&myPrj().includes(r.prjNo));
+    if(canRecv&&(r.items||[]).some(i=>i.state==='purchased'))h+='<button class="btn btn-primary mt-2" onclick="rqReceiveAll(\''+r.id+'\')">Receive materials (make MRR)</button> ';
+    if(rl!=='proc'){[...new Set((r.items||[]).filter(i=>i.mrrNo).map(i=>i.mrrNo))].forEach(n=>{h+='<button class="btn btn-secondary mt-2" onclick="mrrPrint(\''+r.id+'\',\''+n+'\')">Print '+esc(n)+'</button> ';});}
+    return h?'<div class="flex gap-2 flex-wrap">'+h+'</div>':'';
+  };
   const IS={pending:marsPill('pending','Pending'),cancelled:marsPill('rejected','Cancelled'),purchased:marsPill('progress','Purchased · awaiting delivery'),received:marsPill('approved','Received · added to stock')};
   function card(r){
     const rl=role();
@@ -4289,7 +4369,7 @@ async function deleteEntryFromFirebase(firebaseId){
     if(rl==='dpm'&&r.stage==='dpm')foot=`<button class="btn btn-primary mt-2" onclick="rqForward('${r.id}')">Forward to Executive Director</button>`;
     if(rl==='ed'&&r.stage==='ed')foot=`<div class="mt-2 flex gap-2"><button class="btn btn-primary" onclick="rqEd('${r.id}',true)">Approve</button><button class="btn btn-secondary" onclick="rqEd('${r.id}',false)">Reject</button></div>`;
     if(rl==='proc'&&r.stage==='procurement'&&pending(r).length)foot=`<button class="btn btn-primary mt-2" onclick="rqPurchase('${r.id}')">Confirm purchased items</button>`;
-    return `<div class="rounded-xl border p-3"><b>${esc(r.no)}</b> · ${esc(r.prjNo)}<div class="text-xs text-muted mb-1">${STAGE[r.stage]} · by ${esc(r.requestedBy)} · ${new Date(r.createdAt).toLocaleString()}</div>${items}${foot}${window.poCardHtml?window.poCardHtml(r):''}<button class="btn btn-secondary mt-2" onclick="rqPdf('${r.id}')">PDF</button></div>`;
+    return `<div class="rounded-xl border p-3"><b>${esc(r.no)}</b> · ${esc(r.prjNo)}<div class="text-xs text-muted mb-1">${STAGE[r.stage]} · by ${esc(r.requestedBy)} · ${new Date(r.createdAt).toLocaleString()}</div>${items}${foot}${window.mrrCardHtml?window.mrrCardHtml(r):''}${window.poCardHtml?window.poCardHtml(r):''}<button class="btn btn-secondary mt-2" onclick="rqPdf('${r.id}')">PDF</button></div>`;
   }
   function render(notify){
     const rl=role();
@@ -4518,6 +4598,7 @@ async function deleteEntryFromFirebase(firebaseId){
     let nid='',rl='',pj='';
     if(ok){
       rl=document.getElementById('idRole_'+id).value;pj=document.getElementById('idPrj_'+id).value;
+      if(!rl){showToast('Select the role first (for example DPM / Project Manager).','error');return;}
       if((rl==='site'||rl==='store')&&!pj){showToast('Select a project for this role.','error');return;}
       try{nid=await marsNextEngineerId();await fb().collection('users').doc(String(a.email).toLowerCase()).set({email:String(a.email).toLowerCase(),name:a.name,mobile:a.mobile||'',engineerId:nid,role:rl,projects:pj?[pj]:[],disabled:false,createdAt:Date.now()},{merge:true});}catch(e){showToast('Could not create the account: '+(e.code||e.message),'error');return;}
     }
@@ -4532,7 +4613,7 @@ async function deleteEntryFromFirebase(firebaseId){
   function render(){
     const pend=apps.filter(a=>a.status==='pending').length;
     idBadge.textContent=pend;idBadge.classList.toggle('hidden',!pend);
-    const roleOpts=Object.keys(ROLES).map(k=>`<option value="${k}">${ROLES[k]}</option>`).join(''),prjOpts='<option value="">No project (non-site roles)</option>'+projectDatabase.map(p=>`<option>${esc(p.prjNo)}</option>`).join('');
+    const roleOpts='<option value="">Select role</option>'+Object.keys(ROLES).map(k=>`<option value="${k}">${ROLES[k]}</option>`).join(''),prjOpts='<option value="">No project (non-site roles)</option>'+projectDatabase.map(p=>`<option>${esc(p.prjNo)}</option>`).join('');
     const html=apps.filter(a=>a.status!=='rejected'&&a.status!=='deleted').map(a=>`<div class="rounded-xl border p-3 text-sm"><b>${esc(a.name)}</b> · ${a.role?esc(ROLES[a.role])+' · '+esc(a.prjNo||'All projects'):'New applicant'}<div class="text-xs text-muted">${esc(a.email||'')} · ${esc(a.mobile)}${a.nid?' · NID '+esc(a.nid):''}<br>${esc(a.village)}, ${esc(a.upazila)}, ${esc(a.district)}<br>${a.status==='pending'?marsPill('pending','Pending'):a.status==='approved'?marsPill('approved','Approved'+(a.assignedId?' · ID '+esc(a.assignedId):''))+(a.assignedId?'':' <button class="btn btn-secondary" style="padding:2px 8px" onclick="idGenerate(\''+a.id+'\')">Generate ID</button>'):marsPill('rejected','Rejected')} · ${new Date(a.createdAt).toLocaleString()}</div><div class="flex gap-2 mt-2"><img src="${a.nidPhoto}" style="height:90px;border-radius:8px">${a.signature?`<img src="${a.signature}" style="height:90px;border:1px solid #e2e8f0;border-radius:8px;background:#fff">`:''}</div>${a.status==='pending'?`<div class="mt-2 grid grid-cols-2 gap-2"><select id="idRole_${a.id}" class="field">${roleOpts}</select><select id="idPrj_${a.id}" class="field">${prjOpts}</select></div><div class="mt-2 flex gap-2"><button class="btn btn-primary" onclick="idDecide('${a.id}',true)">Approve &amp; create ID</button><button class="btn btn-secondary" onclick="idDecide('${a.id}',false)">Reject</button></div>`:''}</div>`).join('')||'<div class="text-xs text-muted">No applications yet.</div>';
     window._appsHtml=html;const bx=document.getElementById('adminAppsBox');if(bx)bx.innerHTML=html;
     const b2=document.getElementById('idBadge2');if(b2){b2.textContent=pend;b2.classList.toggle('hidden',!pend);}
@@ -4717,7 +4798,7 @@ async function deleteEntryFromFirebase(firebaseId){
     const lab=full===o.items.length?'Delivered':(any?'Partially delivered':'Awaiting delivery');
     return `<div class="text-xs text-muted">${o.status==='approved'&&!o.sentAt?'<b style="color:#9a3412">Not sent to supplier yet.</b> ':(o.sentAt?'Sent '+dFmt(o.sentAt)+(o.sentVia?' via '+esc(o.sentVia):'')+'. ':'')}${lab} &middot; ${full}/${o.items.length} item(s) received</div>`+spoNote(o);
   };
-  const poBtns=o=>`<button class="btn btn-secondary" onclick="poPrint('${o.id}')">Print</button>${role()==='proc'&&pst(o)!=='rejected'?`<button class="btn btn-secondary" onclick="poEdit('${o.id}')">Edit</button>`:''}${canApprove()&&pst(o)==='pending'?`<button class="btn btn-primary" onclick="poReview('${o.id}')">Review &amp; Approve</button>`:''}${canRecommend()&&pst(o)==='pending'&&!o.recommendedBy?`<button class="btn btn-primary" onclick="poReview('${o.id}')">Review &amp; Recommend</button>`:''}${(role()==='proc'||role()==='admin')&&o.status==='approved'?`<button class="btn ${o.sentAt?'btn-secondary':'btn-primary'}" onclick="poSend('${o.id}')">${o.sentAt?'Sent - resend':'Send to supplier'}</button>`:''}`;
+  const poBtns=o=>`<button class="btn btn-secondary" onclick="poPrint('${o.id}')">Print</button><button class="btn btn-secondary" onclick="poHistory('${o.id}')">History</button>${role()==='proc'&&pst(o)!=='rejected'?`<button class="btn btn-secondary" onclick="poEdit('${o.id}')">Edit</button>`:''}${canApprove()&&pst(o)==='pending'?`<button class="btn btn-primary" onclick="poReview('${o.id}')">Review &amp; Approve</button>`:''}${canRecommend()&&pst(o)==='pending'&&!o.recommendedBy?`<button class="btn btn-primary" onclick="poReview('${o.id}')">Review &amp; Recommend</button>`:''}${(role()==='proc'||role()==='admin')&&o.status==='approved'?`<button class="btn ${o.sentAt?'btn-secondary':'btn-primary'}" onclick="poSend('${o.id}')">${o.sentAt?'Sent - resend':'Send to supplier'}</button>`:''}`;
   window.poReview=function(id){
     const o=pos.find(x=>x.id===id);if(!o||(!canApprove()&&!canRecommend())||pst(o)!=='pending')return;
     const rows=o.items.map(i=>`<div class="flex justify-between text-xs py-1 border-t"><span>${esc(i.material)} <span class="text-muted">${i.qty} ${esc(i.unit)} x ${money(i.rateAfter??i.rate)}</span></span><b>${money(i.amount)}</b></div>`).join('');
@@ -4840,6 +4921,71 @@ async function deleteEntryFromFirebase(firebaseId){
     const pre={rfqId:rf.id,rfqNo:rf.no,suppliers:use.map(v=>({name:v.name})),lines:rf.items.map(it=>({itemId:it.id,material:it.material,unit:it.unit,qty:it.qty,sel:-1,quotes:use.map(v=>{const ln=((invMap[v.token].quote||{}).lines||[]).find(x=>x.id===it.id)||{};return{rate:+ln.rate||0,disc:+ln.disc||0};})}))};
     window.csOpen(rf.requisitionId,null,pre);
   };
+  /* ---------- shared look for printed forms (logo + big watermark) ---------- */
+  const formCss='@page{size:A4 PAGE;margin:8mm}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}body{margin:0;font-family:Tahoma,Verdana,Arial,sans-serif;color:#111}.pgx{position:relative;page-break-after:always;overflow:hidden}.pgx:last-child{page-break-after:auto}.wmk{position:absolute;left:0;top:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:.07;z-index:0}.wmk img{width:340px;max-width:60%}.wmk .wn{margin-top:12px;font-size:38px;font-weight:900;letter-spacing:3px;color:#16294d;text-align:center}.in{position:relative;z-index:1}.ln{display:inline-block;min-width:150px;border-bottom:1px dotted #111;padding:0 6px;font-weight:bold}table.ft{width:100%;border-collapse:collapse}table.ft th,table.ft td{border:1.4px solid #111;padding:4px 6px;font-size:12px}table.ft th{font-weight:bold;text-align:center}.c{text-align:center}.sgn{display:flex;justify-content:space-between;margin-top:34px;font-size:12px}.sgn div{text-align:center;min-width:42%}.sgn .l{border-top:1px solid #111;margin-bottom:3px}';
+  const wmHtml=(lg,nm)=>'<div class="wmk">'+(lg?'<img src="'+lg+'">':'')+'<div class="wn">'+esc(nm)+'</div></div>';
+  const d2=ms=>{const d=new Date(ms);return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getFullYear()).slice(-2);};
+
+  /* ---------- Gate pass (transfer to another project) ---------- */
+  window.gpPrint=function(id){
+    const T=window.marsTransfers?marsTransfers():[],t0=T.find(x=>x.id===id);if(!t0)return;
+    const g=t0.batchId?T.filter(x=>x.batchId===t0.batchId):[t0];
+    const c=co(),lg=logo(),name=c.name||'MARS STRUCTURE LIMITED',addr=c.address||MARS_ADDR;
+    const units=[...new Set(g.map(x=>x.unit||''))],total=units.length===1&&units[0]?g.reduce((a,x)=>a+(+x.qty||0),0):null;
+    const N=Math.max(14,g.length+3);
+    const rows=[];for(let k=0;k<N;k++){const x=g[k];rows.push(x?`<tr><td class="c">${k+1}</td><td>${esc(x.material)}</td><td class="c">${esc(x.unit||'')}</td><td class="c">${esc(x.qty)}</td><td>${esc(x.remark||'')}</td></tr>`:(k===g.length+1?`<tr><td></td><td style="color:#1d3f9e;font-weight:bold;font-size:15px">Transfer to Other Project</td><td></td><td></td><td></td></tr>`:'<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td></tr>'));}
+    if(total!==null)rows.splice(g.length,1,`<tr><td></td><td style="text-align:right;font-weight:bold">Total</td><td class="c">${esc(units[0])}</td><td class="c"><b>${money(total)}</b></td><td></td></tr>`);
+    const approved=t0.status==='approved'&&t0.decidedBy;
+    const page=lab=>`<div class="pgx" style="height:281mm">${wmHtml(lg,name)}<div class="in" style="padding:4mm 6mm">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="font-size:13px;font-weight:bold;font-style:italic;line-height:1.9">Book No: <span class="ln" style="min-width:90px">&nbsp;</span><br>SL. No: <span class="ln" style="min-width:90px">${esc(t0.gp&&t0.gp!=='-'?t0.gp:'')}</span></div><div style="font-weight:bold;font-style:italic;text-decoration:underline;font-size:15px">${lab}</div></div>
+      <div style="text-align:center;margin-top:-6px"><div style="font-family:Georgia,'Times New Roman',serif;font-size:29px;font-weight:900;letter-spacing:.5px">${esc(name)}</div><div style="font-size:12px;font-style:italic">${esc(addr)}</div></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:14px"><div style="font-weight:bold;font-size:15px">GATE PASS</div><div style="font-weight:bold;font-size:13px">Date: <span class="ln">${d2(t0.createdAt)}</span></div></div>
+      <div style="display:flex;justify-content:space-between;margin-top:16px;font-weight:bold;font-size:13px"><div>From: <span class="ln" style="min-width:210px">${esc(t0.fromPrj)}</span></div><div>To: <span class="ln" style="min-width:210px">${esc(t0.toPrj)}</span></div></div>
+      <table class="ft" style="margin-top:14px"><thead><tr><th style="width:9%">SL.</th><th>Materials Name</th><th style="width:11%">Unit</th><th style="width:12%">Qty</th><th style="width:24%">Remarks</th></tr></thead><tbody>${rows.join('').replace(/<tr>/g,'<tr style="height:9.5mm">')}</tbody></table>
+      <div class="sgn" style="margin-top:46px"><div style="text-align:left"><b>Prepared by</b><br><span style="font-size:12px">${esc(t0.requestedBy||'')} &middot; ${d2(t0.createdAt)}</span><div class="l" style="margin-top:20px;width:80%"></div>Site Engineer / Project Engineer</div><div style="text-align:right"><b>Approved by</b><br><span style="font-size:12px">${approved?esc(t0.decidedBy)+' &middot; '+d2(t0.decidedAt):'&nbsp;'}</span><div class="l" style="margin-top:20px;margin-left:20%"></div>Deputy Project Manager / Project Manager</div></div>
+    </div></div>`;
+    printDoc('<html><head><meta charset="utf-8"><title>Gate Pass '+esc(t0.gp||'')+'</title><style>'+formCss.replace('PAGE','portrait')+'</style></head><body>'+['Office Copy','Gate Copy','Receiver Copy'].map(page).join('')+'</body></html>');
+  };
+
+  /* ---------- MRR print (same layout as the paper MRR book) ---------- */
+  window.mrrPrint=function(rid,mrrNo){
+    const r=(window.marsReqs?marsReqs():[]).find(x=>x.id===rid);if(!r)return;
+    const its=(r.items||[]).filter(i=>i.mrrNo===mrrNo);if(!its.length){showToast('No items found for this MRR.','error');return;}
+    const c=co(),lg=logo(),name=c.name||'MARS STRUCTURE LIMITED',addr=c.address||MARS_ADDR,proj=(lastProject(r.prjNo)||{});
+    const when=Math.max(...its.map(i=>i.receivedAt||0)),by=[...new Set(its.map(i=>i.receivedBy).filter(Boolean))].join(', ');
+    const N=Math.max(12,its.length);
+    const rows=[];for(let k=0;k<N;k++){const i=its[k];rows.push(i?`<tr><td class="c">${k+1}</td><td>${esc(i.material)}</td><td class="c">${esc(i.unit||'')}</td><td class="c">${esc(i.receivedQty!=null?i.receivedQty:i.qty)}</td><td>${esc(i.supplier||'')}</td><td class="c">${i.cumStock!=null?esc(i.cumStock):''}</td><td class="c">${esc(i.ledgerPage||'')}</td><td>${esc([i.challanNo?'Challan '+i.challanNo:'',i.receiveNote||''].filter(Boolean).join(', '))}</td></tr>`:'<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>');}
+    const html='<html><head><meta charset="utf-8"><title>'+esc(mrrNo)+'</title><style>'+formCss.replace('PAGE','landscape')+'</style></head><body><div class="pgx" style="height:194mm">'+wmHtml(lg,name)+`<div class="in" style="padding:2mm 6mm">
+      <div style="display:flex;align-items:center;gap:14px">${lg?`<img src="${lg}" style="height:62px">`:''}<div style="flex:1;text-align:center"><div style="font-family:Georgia,'Times New Roman',serif;font-size:27px;font-weight:900">${esc(name)}</div><div style="font-size:12px;font-style:italic">${esc(addr)}</div></div><div style="font-size:12.5px;font-weight:bold;font-style:italic;line-height:1.9">Book No: <span class="ln" style="min-width:90px">&nbsp;</span><br>SL No: <span class="ln" style="min-width:90px">&nbsp;</span></div></div>
+      <div style="text-align:center;font-weight:900;font-size:17px;text-decoration:underline;margin:6px 0">MATERIALS RECEIVE REPORT (MRR)</div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:bold;line-height:2"><div style="flex:1">Project Name: <span class="ln" style="min-width:300px">${esc(r.prjNo)}</span><br>Address: <span class="ln" style="min-width:300px">${esc(proj.address||'')}</span></div><div style="min-width:260px">Date: <span class="ln">${d2(when)}</span><br>MRR No: <span class="ln">${esc(mrrNo)}</span></div></div>
+      <table class="ft" style="margin-top:6px"><thead><tr><th style="width:5%">SL. No</th><th>Material Name</th><th style="width:7%">Unit</th><th style="width:9%">Quantity</th><th style="width:19%">Supplier Name</th><th style="width:10%">Cumulative Stock</th><th style="width:9%">Ledger Page No.</th><th style="width:15%">Remarks</th></tr></thead><tbody>${rows.join('').replace(/<tr>/g,'<tr style="height:8.2mm">')}</tbody></table>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:8px"><div style="font-size:12px;font-style:italic">Note: <b>MRR</b> must be sent to Head Office within <b>02 days</b> after receiving materials at site.</div><div style="text-align:center;font-size:12.5px;font-weight:bold;font-style:italic;min-width:200px"><div style="font-weight:normal;font-style:normal;font-size:11.5px">${esc(by)}</div><div style="border-top:1px solid #111;padding-top:2px">Received By</div></div></div>
+    </div></div></body></html>`;
+    printDoc(html);
+  };
+
+  /* ---------- PO history: everything that happened to this PO ---------- */
+  window.poHistory=function(id){
+    const o=pos.find(x=>x.id===id);if(!o)return;
+    const ev=[],add=(t,k,title,det)=>{if(t)ev.push({t,k,title,det:det||''});};
+    add(o.createdAt,'#3b82f6','PO created',(o.createdBy?'by '+esc(o.createdBy):'')+(o.csNo?' from '+esc(o.csNo):(o.directReason?' (direct purchase: '+esc(o.directReason)+')':'')));
+    add(o.recommendedAt,'#6366f1','Recommended','by '+esc(o.recommendedBy||''));
+    if(o.approvedAt)add(o.approvedAt,o.status==='rejected'?'#ef4444':'#22c55e',o.status==='rejected'?'Rejected':'Approved','by '+esc(o.approvedBy||'')+(o.approvedVia?' via '+esc(o.approvedVia):'')+(o.approvalNote?' - '+esc(o.approvalNote):''));
+    (o.edits||[]).forEach(e=>add(e.at,'#f59e0b','Edited','by '+esc(e.by||'')+(e.note?': '+esc(e.note):'')));
+    if(o.sentAt)add(o.sentAt,'#0ea5e9','Sent to supplier',(o.sentVia?'via '+esc(o.sentVia)+' ':'')+'by '+esc(o.sentBy||''));
+    const sp=spoMap[o.id];
+    if(sp){if(sp.response)add(sp.response.at,'#8b5cf6','Supplier '+(sp.response.action==='accepted'?'accepted':(sp.response.action==='rejected'?'rejected':'asked for a change')),esc(sp.response.note||''));
+      (sp.dispatches||[]).forEach(d=>add(d.at,'#8b5cf6','Supplier dispatched','challan '+esc(d.challan)+(d.expected?', arrives '+esc(d.expected):'')+(d.vehicle?', vehicle '+esc(d.vehicle):'')));}
+    const req=(window.marsReqs?marsReqs():[]).find(x=>x.id===o.requisitionId),got=req?(req.items||[]).filter(i=>i.poNo===o.no&&i.state==='received'):[];
+    got.forEach(i=>add(i.receivedAt,'#16a34a','Received at site',esc(i.material)+': <b>'+(i.receivedQty!=null?i.receivedQty:i.qty)+'</b> '+esc(i.unit||'')+' by '+esc(i.receivedBy||'')+(i.mrrNo?' ('+esc(i.mrrNo)+')':'')+(i.challanNo?', challan '+esc(i.challanNo):'')));
+    ev.sort((a,b)=>a.t-b.t);
+    const summary=(o.items||[]).map(l=>{const rec=got.filter(i=>i.material===l.material).reduce((a,i)=>a+(i.receivedQty!=null?+i.receivedQty:+i.qty),0);return `<div class="text-xs py-1 border-t">${esc(l.material)}: ordered <b>${l.qty}</b> ${esc(l.unit||'')} &middot; received <b>${money(rec)}</b>${rec>=l.qty-0.0001?' <b style="color:#166534">(complete)</b>':(rec>0?' <b style="color:#92400e">(partial)</b>':' <span class="text-muted">(not yet)</span>')}</div>`;}).join('');
+    const mrrs=[...new Set(got.map(i=>i.mrrNo).filter(Boolean))];
+    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:480px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">${esc(o.no)} &middot; history</h3><div class="text-xs text-muted mb-2">${esc(o.supplier.name)} &middot; Tk ${money(o.total)}</div><div class="text-xs font-extrabold text-navy mb-1">Delivery</div>${summary}<div class="text-xs font-extrabold text-navy mt-3 mb-2">Timeline</div><div style="border-left:2px solid #e2e8f0;margin-left:6px;padding-left:12px">${ev.map(e=>`<div style="position:relative;margin-bottom:10px"><span style="position:absolute;left:-19px;top:3px;width:12px;height:12px;border-radius:50%;background:${e.k}"></span><div class="text-sm"><b>${e.title}</b></div><div class="text-xs text-muted">${new Date(e.t).toLocaleString('en-GB')}</div>${e.det?`<div class="text-xs">${e.det}</div>`:''}</div>`).join('')||'<div class="text-xs text-muted">No events yet.</div>'}</div><div class="flex gap-2 mt-3 flex-wrap">${role()!=='proc'?mrrs.map(n=>`<button class="btn btn-secondary" onclick="mrrPrint('${o.requisitionId}','${n}')">Print ${esc(n)}</button>`).join(''):''}<button class="btn btn-secondary" id="phX">Close</button></div></div>`,'poHistModal');
+    m.querySelector('#phX').onclick=()=>m.remove();
+  };
+
   const dBlob=u=>{const a=u.split(','),mime=(a[0].match(/:(.*?);/)||[])[1]||'application/octet-stream',bin=atob(a[1]),arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);return new Blob([arr],{type:mime});};
   window.rfqViewQuote=function(token){
     const inv=invMap[token];if(!inv||inv.status!=='submitted'||role()==='site')return;
@@ -5481,6 +5627,7 @@ async function deleteEntryFromFirebase(firebaseId){
     draw();
   };
 
+  window.marsAfterLogin=afterLogin;
   async function afterLogin(u,silent){
     try{
       const email=String(u.email||'').toLowerCase();
@@ -5488,6 +5635,9 @@ async function deleteEntryFromFirebase(firebaseId){
       if(!snap.exists){if(!silent){showToast('Your account is not approved yet. Please complete the application.');window.marsApplyOpen&&window.marsApplyOpen();}return;}
       const d=snap.data();
       if(d.disabled){await out();showToast('This account is disabled. Contact Admin.','error');return;}
+      const isMgmt=!['site','store'].includes(d.role||'site');
+      if(!silent&&window._portalMode==='management'&&!isMgmt){await out();showToast('This is the Management login. Site engineers and store keepers sign in from the main login page.','error');return;}
+      if(!silent&&window._portalMode!=='management'&&isMgmt){await out();showToast('Management team: please use the Management login.','error');setTimeout(()=>{location.href=location.pathname+'?portal=management';},1400);return;}
       const eng={id:d.engineerId||email,name:d.name||email,projects:d.projects||[],role:d.role||'site'};
       const match=projectDatabase.find(p=>eng.projects.includes(p.prjNo))||projectDatabase[0];
       if(!silent&&window._legacyOff){location.reload();return;}
@@ -5500,10 +5650,16 @@ async function deleteEntryFromFirebase(firebaseId){
   function addBtn(){
     const st=document.getElementById('engineerIdStep');if(!st)return setTimeout(addBtn,800);
     if(document.getElementById('emailSignBtn'))return;
-    const b=document.createElement('button');b.id='emailSignBtn';b.type='button';b.textContent='Sign in with Email';
+    const b=document.createElement('button');b.id='emailSignBtn';b.type='button';b.textContent='Site / Store sign in with Email';
     b.style.cssText='display:block;width:100%;margin:10px 0 0;padding:11px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.55);background:rgba(255,255,255,.12);color:#fff;font-weight:700;font-size:14px;cursor:pointer';
     b.onclick=()=>marsAuthOpen('in');
     const ap=document.getElementById('idRegBtn');ap?st.insertBefore(b,ap):st.appendChild(b);
+    if(!document.getElementById('mgmtBtn')){
+      const mg=document.createElement('button');mg.id='mgmtBtn';mg.type='button';mg.textContent='Management team login';
+      mg.style.cssText='display:block;width:100%;margin:8px 0 0;padding:8px 12px;background:none;border:none;color:#bfdbfe;text-decoration:underline;font-size:14px;cursor:pointer';
+      mg.onclick=()=>{location.href=location.pathname+'?portal=management';};
+      ap?st.insertBefore(mg,ap):st.appendChild(mg);
+    }
   }
   function applySwitch(){
     fb().collection('config').doc('settings').get().then(st=>{
@@ -6096,8 +6252,12 @@ async function deleteEntryFromFirebase(firebaseId){
     const h=new Date().getHours(),hi=h<12?'Good morning,':(h<17?'Good afternoon,':'Good evening,');
     const name=role==='admin'?'Admin':(window.currentEngineerName||'Engineer');
     const dt=new Date().toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
-    const stat=(c,ic,t,v,u,pg)=>'<div class="hx-st hx-c-'+c+'" onclick="showPage(\''+pg+'\')"><div class="hx-ic">'+ic+'</div><div><div class="t">'+t+'</div><div class="v">'+v+'</div><div class="u">'+u+'</div></div>'+arrow('#1e6fe8')+'</div>';
-    const q=(c,ic,t,d,pg)=>'<div class="hx-qt hx-c-'+c+'" onclick="showPage(\''+pg+'\')">'+ic+'<div class="tt">'+t+'</div><div class="ds">'+d+'</div>'+arrow('#1e6fe8')+'</div>';
+    const RN={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement',pmgr:'Purchase Manager',acct:'Accounts',viewer:'Management (view only)'},er=window.currentEngineerRole||'site',ap0=window.currentEngineerAllowedProjects||[];
+    const idLine=role==='admin'?'':'<div class="sb" style="margin:2px 0">'+(window.currentEngineerId&&/^ENG-/.test(window.currentEngineerId)?'ID: '+esc(window.currentEngineerId)+' &middot; ':'')+esc(RN[er]||er)+(ap0.length?' &middot; '+esc(ap0.join(', ')):'')+'</div>';
+    const statRaw=(c,ic,t,v,u,pg)=>'<div class="hx-st hx-c-'+c+'" onclick="showPage(\''+pg+'\')"><div class="hx-ic">'+ic+'</div><div><div class="t">'+t+'</div><div class="v">'+v+'</div><div class="u">'+u+'</div></div>'+arrow('#1e6fe8')+'</div>';
+    const qRaw=(c,ic,t,d,pg)=>'<div class="hx-qt hx-c-'+c+'" onclick="showPage(\''+pg+'\')">'+ic+'<div class="tt">'+t+'</div><div class="ds">'+d+'</div>'+arrow('#1e6fe8')+'</div>';
+    const stat=(c,ic,t,v,u,pg)=>(window.marsAllowed&&!marsAllowed(pg))?'':statRaw(c,ic,t,v,u,pg);
+    const q=(c,ic,t,d,pg)=>(window.marsAllowed&&!marsAllowed(pg))?'':qRaw(c,ic,t,d,pg);
     const qa=[q('blue',ico.plus,'Stock Entry','Record stock in/out','entry'),q('green',ico.swap,'Transfers','Move stock between sites','transfers')];
     if(role==='site'){qa.push(q('orange',ico.doc,'Requisition','Raise a material request','requisition'));qa.push(q('purple',ico.send,'Track Requisition','Follow your requests','track'));}
     else{qa.push(q('orange',ico.cart,'Purchase Orders','Create and manage PO','purchaseorders'));qa.push(role==='proc'?q('purple',ico.send,'Track Requisition','Follow requests','track'):q('purple',ico.chart,'Reports','View reports &amp; analytics','print'));}
@@ -6107,7 +6267,7 @@ async function deleteEntryFromFirebase(firebaseId){
     trs.forEach(t=>{const ms=t.createdAt||t.at||0;act.push({t:ms,ic:ico.swap,bg:IC.green,a:'Stock Transferred',b:esc(t.fromPrj)+' &rarr; '+esc(t.toPrj)+' &bull; '+when(ms),p:t.status==='approved'?['Completed','green']:(t.status==='rejected'?['Rejected','red']:['Pending','orange'])});});
     act.sort((x,y)=>y.t-x.t);
     const rows=act.slice(0,5).map(x=>'<div class="hx-row"><div class="ic" style="background:'+x.bg+'">'+x.ic+'</div><div class="m"><div class="a">'+x.a+'</div><div class="b">'+x.b+'</div></div><span class="hx-pill" style="background:'+PILL[x.p[1]][0]+';color:'+PILL[x.p[1]][1]+'">'+x.p[0]+'</span></div>').join('')||'<div style="padding:18px;color:#64748b;font-size:13px">No recent activity yet.</div>';
-    const html='<div class="hx-greet"><div><div class="hi">'+hi+'</div><div class="nm">'+esc(name)+'</div>'+(window.currentEngineerId&&/^ENG-/.test(window.currentEngineerId)?'<div class="sb" style="margin:2px 0">ID: '+esc(window.currentEngineerId)+'</div>':'')+'<div class="sb">Here&rsquo;s what&rsquo;s happening today.</div></div><div class="dt">'+dt+'<i>Build Today<br>for a Stronger Tomorrow</i><b></b></div></div>'
+    const html='<div class="hx-greet"><div><div class="hi">'+hi+'</div><div class="nm">'+esc(name)+'</div>'+idLine+'<div class="sb">Here&rsquo;s what&rsquo;s happening today.</div></div><div class="dt">'+dt+'<i>Build Today<br>for a Stronger Tomorrow</i><b></b></div></div>'
      +'<div class="hx-hero"><div><div class="l">Open requisitions</div><div><div class="n">'+openReq+'</div><div class="s">in progress</div></div></div><div><div class="l">'+(approver?'Waiting for your approval':(role==='proc'?'Approved POs to send':'Items awaiting delivery'))+'</div><div><div class="n">'+(approver?pendPO:(role==='proc'?toSend:awaiting))+'</div><div class="s">'+(approver?'needs a decision':(role==='proc'?'send to supplier':'to be received'))+'</div></div></div></div>'
      +'<div class="hx-stats">'+stat('blue',ico.box,'Materials',mats,'Active Items','print'.replace('print',role==='proc'?'dashboard':'print'))
        +stat('orange',ico.doc,'Requests',openReq,'Pending','track')
@@ -6200,6 +6360,64 @@ window.marsAudit=function(action,target,detail){
   }catch(e){console.warn(e);}
 };
 (function(){const o=window.logActivity;if(typeof o!=='function')return;window.logActivity=function(a,d){const r=o.apply(this,arguments);try{window.marsAudit('Ledger',a,d);}catch(e){}return r;};})();
+</script>
+<script>
+/* ============ MANAGEMENT LOGIN (?portal=management) ============ */
+(function(){
+  if(new URLSearchParams(location.search).get('portal')!=='management')return;
+  window._portalMode='management';
+  const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  const wrap=document.createElement('div');wrap.id='mgmtPortal';
+  wrap.style.cssText='position:fixed;left:0;top:0;width:100%;height:100%;z-index:2147482000;background:linear-gradient(180deg,#0b1b3a,#16377a);overflow:auto;font-family:Tahoma,Verdana,Arial,sans-serif;color:#111';
+  document.body.appendChild(wrap);
+  const IN='width:100%;box-sizing:border-box;padding:12px;border:1px solid #c5ccd8;border-radius:10px;font-size:15px;background:#fff';
+  const BTN='width:100%;padding:13px;border:0;border-radius:12px;background:#1e6fe8;color:#fff;font-size:15px;font-weight:bold;margin-top:12px';
+  const LNK='border:0;background:none;color:#1e6fe8;font-size:13px;font-weight:bold;padding:8px 4px';
+  const box=h=>'<div style="max-width:420px;margin:0 auto;padding:28px 16px"><div style="text-align:center;color:#fff;margin-bottom:18px"><div style="font-size:13px;letter-spacing:.14em;opacity:.8">MARS STRUCTURE LIMITED</div><div style="font-size:24px;font-weight:800;margin-top:4px">Management Login</div><div style="font-size:12.5px;opacity:.8;margin-top:6px;line-height:1.5">For ED, DPM, Procurement, Purchase Manager, Accounts and management.<br>Site engineers and store keepers sign in from the main page.</div></div>'+h+'<div style="text-align:center;margin-top:14px"><a href="'+location.pathname+'" style="color:#bfdbfe;font-size:13px">&lsaquo; Back to Site / Store login</a></div></div>';
+  const note=(t,ok)=>t?'<div style="font-size:13px;margin-bottom:10px;color:'+(ok?'#166534':'#b91c1c')+'">'+esc(t)+'</div>':'';
+  function form(msg,ok,mode){
+    mode=mode||'in';
+    wrap.innerHTML=box('<div style="background:#fff;border-radius:16px;padding:16px">'+note(msg,ok)+'<input id="mgE" type="email" autocomplete="email" placeholder="Email" style="'+IN+'">'+(mode==='forgot'?'':'<input id="mgP" type="password" autocomplete="current-password" placeholder="Password" style="'+IN+';margin-top:8px">')+'<button id="mgGo" style="'+BTN+'">'+(mode==='forgot'?'Send reset link':'Sign in')+'</button><div style="display:flex;justify-content:space-between;flex-wrap:wrap"><button id="mgFg" style="'+LNK+'">'+(mode==='forgot'?'Back to sign in':'Forgot password?')+'</button></div><div style="font-size:12px;color:#555;margin-top:6px">No account yet? Open the main page and tap <b>Apply for Engineer ID</b>. Admin approves it and sets your role.</div></div>');
+    const g=id=>wrap.querySelector('#'+id);
+    g('mgFg').onclick=()=>form('',false,mode==='forgot'?'in':'forgot');
+    g('mgGo').onclick=async()=>{
+      const em=g('mgE').value.trim().toLowerCase(),pw=g('mgP')?g('mgP').value:'',au=firebase.auth();
+      if(!em){form('Enter your email.',false,mode);return;}
+      g('mgGo').disabled=true;g('mgGo').textContent='Please wait...';
+      try{
+        if(mode==='forgot'){await au.sendPasswordResetEmail(em);form('Reset link sent. Check your inbox and spam folder.',true,'in');return;}
+        if(!pw){form('Enter your password.',false,mode);return;}
+        const c=await au.signInWithEmailAndPassword(em,pw);
+        if(!c.user.emailVerified){await c.user.sendEmailVerification().catch(()=>{});await au.signOut();form('Please verify your email first. We sent the link again. Check inbox and spam, then sign in.',false,'in');return;}
+        wrap.innerHTML=box('<div style="background:#fff;border-radius:16px;padding:24px;text-align:center">Signing you in...</div>');
+        if(window.marsAfterLogin)await window.marsAfterLogin(c.user,false);
+        wait(8000,true);
+      }catch(e){
+        const m={'auth/wrong-password':'Wrong password.','auth/invalid-credential':'Wrong email or password.','auth/user-not-found':'No account with this email.','auth/invalid-email':'This email address is not valid.','auth/too-many-requests':'Too many attempts. Please wait and try again.'}[e&&e.code]||('Could not sign in: '+((e&&e.code)||'error'));
+        form(m,false,mode);
+      }
+    };
+  }
+  function wait(ms,fresh){
+    const t0=Date.now(),iv=setInterval(()=>{
+      if(window.currentAccessRole==='engineer'||window.currentAccessRole==='admin'){clearInterval(iv);wrap.remove();document.documentElement.style.overflow='';return;}
+      if(Date.now()-t0>ms){clearInterval(iv);
+        const u=firebase.auth().currentUser;
+        if(fresh&&u&&!u.isAnonymous)form('Your account is not approved for the management team yet. Ask Admin to set your role.',false,'in');
+        else if(fresh)form('This login is for the management team. Site engineers and store keepers use the main login page.',false,'in');
+        else form('',false,'in');
+      }
+    },300);
+  }
+  window.addEventListener('load',()=>{
+    const au=firebase.auth();let done=false;
+    const start=()=>{if(done)return;done=true;const u=au.currentUser;
+      if(u&&!u.isAnonymous&&u.emailVerified){wrap.innerHTML=box('<div style="background:#fff;border-radius:16px;padding:24px;text-align:center">Signing you in...</div>');wait(9000,false);}
+      else form('',false,'in');};
+    setTimeout(start,1500);
+  });
+  form('',false,'in');
+})();
 </script>
 </body>
 </html>
