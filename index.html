@@ -4426,6 +4426,13 @@ async function deleteEntryFromFirebase(firebaseId){
       im.src=URL.createObjectURL(f);
     });
   }
+  function shrinkImg(f,mx,q){return new Promise((res,rej)=>{
+    if(!/^image\//.test(f.type)){rej(new Error('Choose a photo (JPG or PNG).'));return;}
+    if(f.size>15*1024*1024){rej(new Error('This photo is too large. Take a smaller photo.'));return;}
+    const u=URL.createObjectURL(f),im=new Image();
+    im.onload=()=>{const sc=Math.min(1,mx/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.naturalWidth*sc));c.height=Math.max(1,Math.round(im.naturalHeight*sc));const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);res(c.toDataURL('image/jpeg',q));};
+    im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('This photo could not be read. Try another photo.'));};
+    im.src=u;});}
   function modal(){
     let m=document.getElementById('idReg');if(m){m.style.display='flex';return;}
     m=document.createElement('div');m.id='idReg';
@@ -4437,12 +4444,12 @@ async function deleteEntryFromFirebase(firebaseId){
       <div id="rgBody" class="space-y-3" style="display:none">
         <div><label class="field-label">Full Name</label><input id="rgName" class="field"></div>
         <div><label class="field-label">Mobile</label><input id="rgMob" type="tel" class="field"></div>
-        <div><label class="field-label">NID Number</label><input id="rgNid" inputmode="numeric" class="field"></div>
-        <div><label class="field-label">NID Card Photo</label><input id="rgPhoto" type="file" accept="image/jpeg,image/png" class="field"><div class="text-xs text-muted mt-1">Only the NID card photo. JPG/PNG, 600×380 to 3000×2000 px, 50 KB to 2 MB.</div></div>
+        <div><label class="field-label">NID Number (optional)</label><input id="rgNid" inputmode="numeric" class="field"></div>
+        <div><label class="field-label">ID Card Photo (NID, passport or driving license)</label><input id="rgPhoto" type="file" accept="image/*" class="field"><div class="text-xs text-muted mt-1">Take a clear photo of your ID card. Any size works, it is shrunk automatically.</div></div>
         <div><label class="field-label">District</label><select id="rgDist" class="field"><option value="">Select district</option>${opt(Object.keys(GEO).sort())}</select></div>
         <div><label class="field-label">Upazila</label><select id="rgUpa" class="field"><option value="">Select district first</option></select><input id="rgUpaO" class="field mt-2 hidden" placeholder="Type upazila name"></div>
         <div><label class="field-label">Village / Area</label><input id="rgVil" class="field"></div>
-        <div><label class="field-label">Signature Image</label><input id="rgSigF" type="file" accept="image/jpeg,image/png" class="field"><div class="text-xs text-muted mt-1">Sign on white paper, then photo/scan and crop. JPG/PNG, 250×60 to 350×100 px (best 300×80), 5 KB to 100 KB.</div><img id="rgSigPrev" style="display:none;margin-top:6px;border:1px solid #cbd5e1;border-radius:8px;max-width:100%"></div>
+        <div><label class="field-label">Signature Image (optional)</label><input id="rgSigF" type="file" accept="image/*" class="field"><div class="text-xs text-muted mt-1">Optional. You can add it later.</div><img id="rgSigPrev" style="display:none;margin-top:6px;border:1px solid #cbd5e1;border-radius:8px;max-width:100%"></div>
       </div>
       <div id="rgBtns" class="flex gap-2 mt-4" style="display:none"><button class="btn btn-primary" id="rgSend">Submit Application</button></div><button class="btn btn-secondary mt-3" id="rgClose">Close</button></div>`;
     document.body.appendChild(m);
@@ -4450,15 +4457,8 @@ async function deleteEntryFromFirebase(firebaseId){
     $('rgClose').onclick=()=>m.style.display='none';
     $('rgDist').onchange=()=>{const u=GEO[$('rgDist').value]||[];$('rgUpa').innerHTML='<option value="">Select upazila</option>'+opt(u)+'<option value="__o">Other (type manually)</option>';$('rgUpaO').classList.add('hidden');};
     $('rgUpa').onchange=()=>$('rgUpaO').classList.toggle('hidden',$('rgUpa').value!=='__o');
-    $('rgPhoto').onchange=async e=>{const f=e.target.files[0];nidData='';if(!f)return;
-      const r=await checkImg(f,LIM.nid);
-      if(!r.ok){e.target.value='';showToast(r.msg,'error');return;}
-      const sc=Math.min(1,1000/r.im.naturalWidth),c=document.createElement('canvas');c.width=r.im.naturalWidth*sc;c.height=r.im.naturalHeight*sc;
-      c.getContext('2d').drawImage(r.im,0,0,c.width,c.height);nidData=c.toDataURL('image/jpeg',.7);};
-    $('rgSigF').onchange=async e=>{const f=e.target.files[0];sigData='';$('rgSigPrev').style.display='none';if(!f)return;
-      const r=await checkImg(f,LIM.sig);
-      if(!r.ok){e.target.value='';showToast(r.msg,'error');return;}
-      const fr=new FileReader();fr.onload=()=>{sigData=fr.result;$('rgSigPrev').src=sigData;$('rgSigPrev').style.display='block';};fr.readAsDataURL(f);};
+    $('rgPhoto').onchange=async e=>{const f=e.target.files[0];nidData='';if(!f)return;try{nidData=await shrinkImg(f,1100,.72);showToast('ID photo is ready.');}catch(x){e.target.value='';showToast(x.message,'error');}};
+    $('rgSigF').onchange=async e=>{const f=e.target.files[0];sigData='';$('rgSigPrev').style.display='none';if(!f)return;try{sigData=await shrinkImg(f,420,.85);$('rgSigPrev').src=sigData;$('rgSigPrev').style.display='block';}catch(x){e.target.value='';showToast(x.message,'error');}};
     const gate=async()=>{
       const u=firebase.auth().currentUser;
       if(!u||!u.email||!u.emailVerified){
@@ -4482,7 +4482,7 @@ async function deleteEntryFromFirebase(firebaseId){
     $('rgSend').onclick=async()=>{
       const upa=$('rgUpa').value==='__o'?$('rgUpaO').value.trim():$('rgUpa').value;
       const d={name:$('rgName').value.trim(),mobile:$('rgMob').value.trim(),nid:$('rgNid').value.trim(),district:$('rgDist').value,upazila:upa,village:$('rgVil').value.trim()};
-      if(Object.values(d).some(v=>!v)||!nidData||!sigData){showToast('Fill every field and add a valid NID photo and signature image.','error');return;}
+      if(!d.name||!d.mobile||!d.district||!d.upazila||!d.village||!nidData){showToast('Enter your name, mobile, address (district, upazila, village) and add your ID card photo.','error');return;}
       try{
         const u=firebase.auth().currentUser;
         await fb().collection('engineer_applications').add({...d,email:u.email,nidPhoto:nidData,signature:sigData,status:'pending',createdAt:Date.now()});
@@ -4503,27 +4503,37 @@ async function deleteEntryFromFirebase(firebaseId){
   window.marsRenderApps=()=>{const bx=document.getElementById('adminAppsBox');if(bx)bx.innerHTML=window._appsHtml||'<div class="text-xs text-muted">No applications yet.</div>';};
   window.marsPendingApps=()=>apps.filter(a=>a.status==='pending').length;
   window.marsApps=()=>apps;
+  window.marsNextEngineerId=async function(){
+    const db=fb(),cref=db.collection('counters').doc('engineer_id');let id='';
+    await db.runTransaction(async tx=>{const c=await tx.get(cref),n=(c.exists?c.data().n:0)+1;tx.set(cref,{n});id='ENG-'+String(n).padStart(4,'0');});
+    return id;
+  };
+  window.idGenerate=async function(id){
+    const a=apps.find(x=>x.id===id);if(!isAdmin||!a||a.assignedId)return;
+    try{const nid=await marsNextEngineerId();await fb().collection('engineer_applications').doc(id).update({assignedId:nid});await fb().collection('users').doc(String(a.email).toLowerCase()).set({engineerId:nid},{merge:true});showToast('ID '+nid+' created for '+a.name+'.');}
+    catch(e){showToast('Failed: '+(e.code||e.message),'error');}
+  };
   window.idDecide=async function(id,ok){
     const a=apps.find(x=>x.id===id);if(!isAdmin||!a||a.status!=='pending')return;
     let nid='',rl='',pj='';
     if(ok){
       rl=document.getElementById('idRole_'+id).value;pj=document.getElementById('idPrj_'+id).value;
       if((rl==='site'||rl==='store')&&!pj){showToast('Select a project for this role.','error');return;}
-      try{await fb().collection('users').doc(String(a.email).toLowerCase()).set({email:String(a.email).toLowerCase(),name:a.name,role:rl,projects:pj?[pj]:[],disabled:false,createdAt:Date.now()},{merge:true});}catch(e){showToast('Could not create the account: '+(e.code||e.message),'error');return;}
+      try{nid=await marsNextEngineerId();await fb().collection('users').doc(String(a.email).toLowerCase()).set({email:String(a.email).toLowerCase(),name:a.name,mobile:a.mobile||'',engineerId:nid,role:rl,projects:pj?[pj]:[],disabled:false,createdAt:Date.now()},{merge:true});}catch(e){showToast('Could not create the account: '+(e.code||e.message),'error');return;}
     }
     if(!ok&&!confirm('Reject this application? All personal data (NID, photo, signature, address) will be erased.'))return;
     try{
       const ref=fb().collection('engineer_applications').doc(id);
       if(ok)await ref.update({status:'approved',assignedId:nid,role:rl,prjNo:pj,decidedAt:Date.now(),pinHash:firebase.firestore.FieldValue.delete(),pinSalt:firebase.firestore.FieldValue.delete()});
       else await ref.set({email:a.email,name:a.name,status:'rejected',createdAt:a.createdAt,decidedAt:Date.now()});
-      showToast(ok?'Approved. '+a.email+' can now sign in.':'Rejected and personal data erased.');}
+      showToast(ok?'Approved. ID '+nid+' created. '+a.email+' can now sign in.':'Rejected and personal data erased.');}
     catch(e){showToast('Failed — check Rules/connection.','error');}
   };
   function render(){
     const pend=apps.filter(a=>a.status==='pending').length;
     idBadge.textContent=pend;idBadge.classList.toggle('hidden',!pend);
     const roleOpts=Object.keys(ROLES).map(k=>`<option value="${k}">${ROLES[k]}</option>`).join(''),prjOpts='<option value="">No project (non-site roles)</option>'+projectDatabase.map(p=>`<option>${esc(p.prjNo)}</option>`).join('');
-    const html=apps.filter(a=>a.status!=='rejected'&&a.status!=='deleted').map(a=>`<div class="rounded-xl border p-3 text-sm"><b>${esc(a.name)}</b> · ${a.role?esc(ROLES[a.role])+' · '+esc(a.prjNo||'All projects'):'New applicant'}<div class="text-xs text-muted">${esc(a.email||'')} · ${esc(a.mobile)} · NID ${esc(a.nid)}<br>${esc(a.village)}, ${esc(a.upazila)}, ${esc(a.district)}<br>${a.status==='pending'?marsPill('pending','Pending'):a.status==='approved'?marsPill('approved','Approved'+(a.assignedId?' · ID '+esc(a.assignedId):'')):marsPill('rejected','Rejected')} · ${new Date(a.createdAt).toLocaleString()}</div><div class="flex gap-2 mt-2"><img src="${a.nidPhoto}" style="height:90px;border-radius:8px"><img src="${a.signature}" style="height:90px;border:1px solid #e2e8f0;border-radius:8px;background:#fff"></div>${a.status==='pending'?`<div class="mt-2 grid grid-cols-2 gap-2"><select id="idRole_${a.id}" class="field">${roleOpts}</select><select id="idPrj_${a.id}" class="field">${prjOpts}</select></div><div class="mt-2 flex gap-2"><button class="btn btn-primary" onclick="idDecide('${a.id}',true)">Approve &amp; create ID</button><button class="btn btn-secondary" onclick="idDecide('${a.id}',false)">Reject</button></div>`:''}</div>`).join('')||'<div class="text-xs text-muted">No applications yet.</div>';
+    const html=apps.filter(a=>a.status!=='rejected'&&a.status!=='deleted').map(a=>`<div class="rounded-xl border p-3 text-sm"><b>${esc(a.name)}</b> · ${a.role?esc(ROLES[a.role])+' · '+esc(a.prjNo||'All projects'):'New applicant'}<div class="text-xs text-muted">${esc(a.email||'')} · ${esc(a.mobile)}${a.nid?' · NID '+esc(a.nid):''}<br>${esc(a.village)}, ${esc(a.upazila)}, ${esc(a.district)}<br>${a.status==='pending'?marsPill('pending','Pending'):a.status==='approved'?marsPill('approved','Approved'+(a.assignedId?' · ID '+esc(a.assignedId):''))+(a.assignedId?'':' <button class="btn btn-secondary" style="padding:2px 8px" onclick="idGenerate(\''+a.id+'\')">Generate ID</button>'):marsPill('rejected','Rejected')} · ${new Date(a.createdAt).toLocaleString()}</div><div class="flex gap-2 mt-2"><img src="${a.nidPhoto}" style="height:90px;border-radius:8px">${a.signature?`<img src="${a.signature}" style="height:90px;border:1px solid #e2e8f0;border-radius:8px;background:#fff">`:''}</div>${a.status==='pending'?`<div class="mt-2 grid grid-cols-2 gap-2"><select id="idRole_${a.id}" class="field">${roleOpts}</select><select id="idPrj_${a.id}" class="field">${prjOpts}</select></div><div class="mt-2 flex gap-2"><button class="btn btn-primary" onclick="idDecide('${a.id}',true)">Approve &amp; create ID</button><button class="btn btn-secondary" onclick="idDecide('${a.id}',false)">Reject</button></div>`:''}</div>`).join('')||'<div class="text-xs text-muted">No applications yet.</div>';
     window._appsHtml=html;const bx=document.getElementById('adminAppsBox');if(bx)bx.innerHTML=html;
     const b2=document.getElementById('idBadge2');if(b2){b2.textContent=pend;b2.classList.toggle('hidden',!pend);}
   }
@@ -4730,7 +4740,7 @@ async function deleteEntryFromFirebase(firebaseId){
           if(pst(p)!=='pending')throw new Error('This PO is no longer pending.');
           const rr=db.collection('requisitions').doc(p.requisitionId),rs=await tx.get(rr),r=rs.data(),now=Date.now();
           let items;
-          if(ap)items=r.items.map(i=>(i.poNo===p.no&&i.state==='pending')?{...i,state:'purchased',by:p.createdBy||me,purchasedAt:now,poApprovedBy:me}:i);
+          if(ap)items=r.items.map(i=>(i.poNo===p.no&&i.state==='pending')?{...i,state:'purchased',supplier:p.supplier.name,by:p.createdBy||me,purchasedAt:now,poApprovedBy:me}:i);
           else items=r.items.map(i=>{if(i.poNo===p.no&&i.state==='pending'){const {poNo,...rest}=i;return rest;}return i;});
           const stage=items.some(i=>i.state==='pending')?'procurement':'delivery';
           tx.update(pr,ap?{status:'approved',approvedBy:me,approvedAt:now}:{status:'rejected',approvedBy:me,approvedAt:now,approvalNote:note});
@@ -4885,7 +4895,7 @@ async function deleteEntryFromFirebase(firebaseId){
       +[0,1,2,3].map(k=>{const q=l&&l.quotes[k];return `<div class="grid grid-cols-6 gap-1 items-center"><span class="col-span-2 text-xs cs-sn" data-k="${k}">Supplier ${k+1}</span><input class="field col-span-2 cs-r" data-k="${k}" type="number" step="0.01" placeholder="Rate" value="${q&&q.rate?q.rate:''}"><input class="field cs-d" data-k="${k}" type="number" step="0.01" placeholder="Disc%" value="${q&&q.disc?q.disc:''}"><label class="text-center text-xs"><input type="radio" name="sel_${i.id}" class="cs-p" data-k="${k}"${l&&l.sel===k?' checked':''}> Pick</label></div>`;}).join('')
       +`<input class="cs-why field" placeholder="Reason for not choosing the lowest rate" style="display:none" value="${esc(l&&l.why||'')}"></div>`;
     }).join('');
-    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:520px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Comparative Statement</h3><div class="text-xs text-muted mb-3">${esc(r.no)} &middot; ${esc(r.prjNo)}. Enter each supplier's rate. The lowest rate is picked automatically; change it only with a reason.</div><datalist id="csSupList">${(window.marsSuppliersUsable?marsSuppliersUsable():[]).map(x=>`<option value="${esc(x.name)}">`).join('')}</datalist><div class="space-y-2"><div class="text-xs font-extrabold text-navy">Suppliers (2 to 4)</div>${[0,1,2,3].map(k=>`<input class="field cs-s" data-k="${k}" list="csSupList" autocomplete="off" placeholder="Supplier ${k+1}${k<2?' (required)':''}" value="${esc(names[k])}">`).join('')}<div class="text-xs font-extrabold text-navy">Items</div>${lineHtml}</div><div class="flex gap-2 mt-4"><button class="btn btn-primary" id="csSave">Save CS</button><button class="btn btn-secondary" id="csClose">Close</button></div></div>`,'csModal');
+    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:520px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Comparative Statement</h3><div class="text-xs text-muted mb-3">${esc(r.no)} &middot; ${esc(r.prjNo)}. Enter each supplier's rate. The lowest rate is picked automatically; change it only with a reason.</div><datalist id="csSupList">${(window.marsSuppliersUsable?marsSuppliersUsable():[]).map(x=>`<option value="${esc(x.name)}">`).join('')}</datalist><div class="space-y-2"><div class="text-xs font-extrabold text-navy">Suppliers (2 to 4)</div>${[0,1,2,3].map(k=>`<input class="field cs-s" data-k="${k}" list="csSupList" autocomplete="off" placeholder="Supplier ${k+1}${k<2?' (required)':''}" value="${esc(names[k])}">`).join('')}<div><label class="field-label">Required delivery date (used on the PO)</label><input id="csDd" type="date" class="field" value="${esc((src&&src.deliveryDate)||'')}"></div><div class="text-xs font-extrabold text-navy">Items</div>${lineHtml}</div><div class="flex gap-2 mt-4"><button class="btn btn-primary" id="csSave">Save CS</button><button class="btn btn-secondary" id="csClose">Close</button></div></div>`,'csModal');
     const calc=()=>{
       const sn=[...m.querySelectorAll('.cs-s')].map(x=>x.value.trim());
       m.querySelectorAll('.cs-sn').forEach(e=>{const k=+e.dataset.k;e.textContent=sn[k]||('Supplier '+(k+1));});
@@ -4907,6 +4917,7 @@ async function deleteEntryFromFirebase(firebaseId){
       if(new Set(idx.map(k=>names2[k].toLowerCase())).size!==idx.length){showToast('Supplier names must be different.','error');return;}
       const sups=idx.map(k=>({name:names2[k]})),lines=[];let err='';
       for(const sp of sups){const bl=window.marsSupplierBlocked&&marsSupplierBlocked(sp.name);if(bl){showToast(bl,'error');return;}}
+      const ddv=(m.querySelector('#csDd')||{value:''}).value;if(!ddv){showToast('Choose the required delivery date.','error');return;}
       m.querySelectorAll('.cs-l').forEach(L=>{
         if(err)return;
         const it=its.find(x=>x.id===L.dataset.i);
@@ -4923,18 +4934,50 @@ async function deleteEntryFromFirebase(firebaseId){
       const b=m.querySelector('#csSave');b.disabled=true;b.textContent='Saving...';
       const db=fb(),me=window.currentEngineerName||'Admin';
       try{
-        if(ex)await db.collection('comparative_statements').doc(ex.id).update({suppliers:sups,lines,updatedAt:Date.now(),status:'pending',recommendedBy:null,recommendedAt:null,approvedBy:null,approvedAt:null,approvalNote:null});
+        if(ex)await db.collection('comparative_statements').doc(ex.id).update({suppliers:sups,lines,deliveryDate:ddv,updatedAt:Date.now(),status:'pending',recommendedBy:null,recommendedAt:null,approvedBy:null,approvedAt:null,approvalNote:null});
         else await db.runTransaction(async tx=>{
           const nw=new Date(),yy=String(nw.getFullYear()).slice(-2),mm=String(nw.getMonth()+1).padStart(2,'0');
           const cref=db.collection('counters').doc('cs_year_'+yy),cc=await tx.get(cref),n=(cc.exists?cc.data().n:0)+1;
           tx.set(cref,{n});
-          tx.set(db.collection('comparative_statements').doc(),{status:'pending',no:'CS'+yy+'-'+mm+'-'+String(n).padStart(5,'0'),requisitionId:rid,reqNo:r.no,prjNo:r.prjNo,suppliers:sups,lines,...(pre?{rfqId:pre.rfqId,rfqNo:pre.rfqNo}:{}),createdBy:me,createdAt:Date.now(),updatedAt:Date.now()});
+          tx.set(db.collection('comparative_statements').doc(),{status:'pending',deliveryDate:ddv,no:'CS'+yy+'-'+mm+'-'+String(n).padStart(5,'0'),requisitionId:rid,reqNo:r.no,prjNo:r.prjNo,suppliers:sups,lines,...(pre?{rfqId:pre.rfqId,rfqNo:pre.rfqNo}:{}),createdBy:me,createdAt:Date.now(),updatedAt:Date.now()});
         });
         m.remove();showToast('Comparative Statement saved and sent for approval.');if(window.marsAudit)marsAudit('CS',ex?ex.no:r.no,ex?'Edited':'Created');
       }catch(e){b.disabled=false;b.textContent='Save CS';console.error(e);showToast('Failed: '+(e.code||e.message)+' (check Firestore Rules for comparative_statements)','error');}
     };
   };
   window.csPO=function(csId,k){const c=csList.find(x=>x.id===csId);if(!c)return;if(!['approved','legacy'].includes(csst(c))){showToast('The CS must be approved before a PO can be created.','error');return;}window.poOpen(c.requisitionId,{csId,sup:k});};
+  /* ED approves a CS -> one approved PO per supplier is created in the same step */
+  async function approveCsAndCreatePos(c,me){
+    const db=fb(),cref=db.collection('comparative_statements').doc(c.id),rref=db.collection('requisitions').doc(c.requisitionId),made=[];
+    await db.runTransaction(async tx=>{
+      made.length=0;
+      const cs=await tx.get(cref);if(!cs.exists||(cs.data().status||'legacy')!=='pending')throw new Error('This CS is no longer waiting for approval.');
+      const rs=await tx.get(rref);if(!rs.exists)throw new Error('The requisition was not found.');
+      const r=rs.data();
+      const nw=new Date(),yy=String(nw.getFullYear()).slice(-2),mm=String(nw.getMonth()+1).padStart(2,'0');
+      const ctr=db.collection('counters').doc('po_year_'+yy),cc=await tx.get(ctr);
+      let n=cc.exists?cc.data().n:0;const now=Date.now(),groups={};
+      c.lines.forEach(l=>{const it=r.items.find(i=>i.id===l.itemId&&i.state==='pending'&&!i.poNo);if(it)(groups[l.sel]=groups[l.sel]||[]).push({it,l});});
+      let items=r.items.slice();const hist=[];
+      Object.keys(groups).forEach(k=>{
+        const sp=c.suppliers[+k],fs=(window.marsFindSupplier&&marsFindSupplier(sp.name))||{};
+        n++;const pno='POR'+yy+'-'+mm+'-'+String(n).padStart(5,'0');
+        const pitems=groups[k].map(g=>{const q=g.l.quotes[g.l.sel];return priced(g.it,{rate:q.rate,disc:q.disc||0,spec:''});});
+        const subTotal=r2(pitems.reduce((a,x)=>a+x.qty*x.rate,0)),total=r2(pitems.reduce((a,x)=>a+x.amount,0));
+        const pref=db.collection('purchase_orders').doc();
+        const doc={no:pno,status:'approved',approvedBy:me,approvedAt:now,approvedVia:'CS '+c.no,csId:c.id,csNo:c.no,requisitionId:c.requisitionId,reqNo:r.no,prjNo:r.prjNo,mrfNo:'',subject:'Purchase Order for Supply '+[...new Set(pitems.map(x=>x.material))].slice(0,3).join(', ')+'.',supplier:{name:sp.name,contact:fs.contactPerson||'',phone:fs.phone||'',address:fs.address||''},project:lastProject(r.prjNo),deliveryDate:c.deliveryDate||new Date(now+7*864e5).toISOString().slice(0,10),terms:fs.paymentTerms||'',payMode:'',priority:'Normal',deliveryAddr:'',remarks:'',conditions:co().terms||DEFAULT_TERMS,items:pitems,subTotal,discount:r2(subTotal-total),total,advance:total,createdBy:c.createdBy||me,createdAt:now};
+        tx.set(pref,doc);
+        groups[k].forEach(g=>{items=items.map(i=>i.id===g.it.id?{...i,poNo:pno,state:'purchased',supplier:sp.name,by:c.createdBy||me,purchasedAt:now,poApprovedBy:me}:i);});
+        hist.push({by:me,role:'ed',action:'PO '+pno+' created automatically on approval of '+c.no+' for '+sp.name+' - items ordered, awaiting delivery',at:now});
+        made.push(Object.assign({id:pref.id},doc));
+      });
+      if(!made.length)throw new Error('No pending items are left for this CS.');
+      tx.set(ctr,{n});
+      tx.update(cref,{status:'approved',approvedBy:me,approvedAt:now});
+      tx.update(rref,{items,stage:items.some(i=>i.state==='pending')?'procurement':'delivery',history:(r.history||[]).concat(hist)});
+    });
+    return made;
+  }
   window.csReview=function(id){
     const c=csList.find(x=>x.id===id);if(!c||(!canApprove()&&!canRecommend())||csst(c)!=='pending')return;
     const by={};
@@ -4942,7 +4985,7 @@ async function deleteEntryFromFirebase(firebaseId){
     const tots=Object.keys(by).map(n=>`<div class="text-sm"><b>${esc(n)}</b>: ${by[n].n} item(s), Tk ${money(by[n].t)}</div>`).join('');
     const rows=c.lines.map(l=>{const nets=l.quotes.map(csNet),pos2=nets.filter(v=>v>0),lo=pos2.length?Math.min(...pos2):0,sv=nets[l.sel];
       return `<div class="text-xs py-1 border-t"><b>${esc(l.material)}</b> <span class="text-muted">${l.qty} ${esc(l.unit)}</span><br>${esc(c.suppliers[l.sel].name)} @ Tk ${money(sv)}${sv>lo?` <b style="color:#991b1b">(not the lowest, lowest is Tk ${money(lo)})</b><br>Reason: ${esc(l.why||'')}`:' <b style="color:#166534">(lowest)</b>'}</div>`;}).join('');
-    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:480px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Review ${esc(c.no)}</h3><div class="text-xs text-muted mb-3">${esc(c.prjNo)} &middot; ${esc(c.reqNo)} &middot; prepared by ${esc(c.createdBy||'')}</div><div class="text-xs font-extrabold text-navy mb-1">Selected suppliers</div>${tots}<div class="text-xs font-extrabold text-navy mt-3 mb-1">Item by item</div>${rows}${c.recommendedBy?`<div class="text-xs mt-2" style="color:#3730a3">Recommended by <b>${esc(c.recommendedBy)}</b></div>`:''}<div class="mt-3"><label class="field-label">Reason (needed only when rejecting)</label><input id="csRvN" class="field" placeholder="e.g. Get one more quotation"></div><div class="flex gap-2 mt-4 flex-wrap"><button class="btn btn-primary" id="csRvOk">${canApprove()?'Approve CS':'Recommend to ED'}</button><button class="btn btn-secondary" id="csRvNo">Reject</button><button class="btn btn-secondary" id="csRvX">Close</button></div><div class="text-xs text-muted mt-2">After approval the Procurement officer creates the PO from this CS. The PO needs no second approval.</div></div>`,'csReviewModal');
+    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:480px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Review ${esc(c.no)}</h3><div class="text-xs text-muted mb-3">${esc(c.prjNo)} &middot; ${esc(c.reqNo)} &middot; prepared by ${esc(c.createdBy||'')}</div><div class="text-xs font-extrabold text-navy mb-1">Selected suppliers</div>${tots}<div class="text-xs font-extrabold text-navy mt-3 mb-1">Item by item</div>${rows}${c.recommendedBy?`<div class="text-xs mt-2" style="color:#3730a3">Recommended by <b>${esc(c.recommendedBy)}</b></div>`:''}<div class="mt-3"><label class="field-label">Reason (needed only when rejecting)</label><input id="csRvN" class="field" placeholder="e.g. Get one more quotation"></div><div class="flex gap-2 mt-4 flex-wrap"><button class="btn btn-primary" id="csRvOk">${canApprove()?'Approve CS and create PO':'Recommend to ED'}</button><button class="btn btn-secondary" id="csRvNo">Reject</button><button class="btn btn-secondary" id="csRvX">Close</button></div><div class="text-xs text-muted mt-2">When the ED approves, one approved PO per supplier is created automatically (delivery date: ${esc(c.deliveryDate||'7 days from today')}). Procurement then sends it to the supplier.</div></div>`,'csReviewModal');
     m.querySelector('#csRvX').onclick=()=>m.remove();
     const run=async ap=>{
       const note=m.querySelector('#csRvN').value.trim(),me=window.currentEngineerName||'Admin';
@@ -4951,10 +4994,15 @@ async function deleteEntryFromFirebase(firebaseId){
       const b1=m.querySelector('#csRvOk'),b2=m.querySelector('#csRvNo');b1.disabled=b2.disabled=true;
       const ref=fb().collection('comparative_statements').doc(id),now=Date.now();
       try{
+        let made=[];
         if(ap&&!canApprove())await ref.update({recommendedBy:me,recommendedAt:now});
-        else await ref.update(ap?{status:'approved',approvedBy:me,approvedAt:now}:{status:'rejected',approvedBy:me,approvedAt:now,approvalNote:note});
-        if(window.marsAudit)marsAudit('CS',c.no,ap?(canApprove()?'Approved':'Recommended to ED'):'Rejected: '+note);
-        m.remove();showToast(ap?(canApprove()?'CS approved. Procurement can create the PO.':'Recommended. The ED can now approve.'):'CS rejected.');
+        else if(ap)made=await approveCsAndCreatePos(c,me);
+        else await ref.update({status:'rejected',approvedBy:me,approvedAt:now,approvalNote:note});
+        if(window.marsAudit){marsAudit('CS',c.no,ap?(canApprove()?'Approved':'Recommended to ED'):'Rejected: '+note);made.forEach(o=>marsAudit('PO',o.no,'Created automatically from '+c.no));}
+        let pub=0;
+        for(const o of made){const fs=(window.marsFindSupplier&&marsFindSupplier(o.supplier.name))||{};if(fs.email){const rr=await upsertSupplierPo(o,fs.email);if(rr==='ok')pub++;}}
+        m.remove();
+        showToast(ap?(canApprove()?'CS approved. '+made.length+' PO created: '+made.map(o=>o.no).join(', ')+(pub?'. '+pub+' published in the supplier portal.':'')+' Procurement will send them to the suppliers.':'Recommended. The ED can now approve.'):'CS rejected.');
       }catch(e){b1.disabled=b2.disabled=false;console.error(e);showToast('Failed: '+(e.code||e.message)+' (publish the new Firestore Rules)','error');}
     };
     m.querySelector('#csRvOk').onclick=()=>run(true);m.querySelector('#csRvNo').onclick=()=>run(false);
@@ -5025,7 +5073,7 @@ async function deleteEntryFromFirebase(firebaseId){
         tx.set(cref,{n});
         tx.set(db.collection('purchase_orders').doc(),{no:pno,status:auto?'approved':'pending',...(auto?{approvedBy:csd2.approvedBy||'',approvedAt:csd2.approvedAt||Date.now(),approvedVia:'CS '+csd2.no}:{}),...(meta.csId?{csId:meta.csId,csNo:meta.csNo}:{directReason:f.directReason||''}),requisitionId:rid,reqNo:r.no,prjNo:r.prjNo,mrfNo:f.mrfNo,subject:f.subject,supplier:f.supplier,project:f.project,deliveryDate:f.deliveryDate,terms:f.terms,payMode:f.payMode,priority:f.priority,deliveryAddr:f.deliveryAddr,remarks:f.remarks,conditions:f.conditions,items,subTotal,discount:r2(subTotal-total),total,advance:f.advance===null?total:f.advance,createdBy:by,createdAt:Date.now()});
         if(auto){
-          const nowMs=Date.now(),its2=r.items.map(i=>sel.includes(i)?{...i,poNo:pno,state:'purchased',by,purchasedAt:nowMs,poApprovedBy:csd2.approvedBy||''}:i);
+          const nowMs=Date.now(),its2=r.items.map(i=>sel.includes(i)?{...i,poNo:pno,state:'purchased',supplier:f.supplier.name,by,purchasedAt:nowMs,poApprovedBy:csd2.approvedBy||''}:i);
           tx.update(rref,{items:its2,stage:its2.some(i=>i.state==='pending')?'procurement':'delivery',history:(r.history||[]).concat([{by,role:'proc',action:'PO '+pno+' created from approved '+csd2.no+' - items ordered, awaiting delivery',at:nowMs}])});
         }else tx.update(rref,{items:r.items.map(i=>sel.includes(i)?{...i,poNo:pno}:i),history:(r.history||[]).concat([{by,role:'proc',action:'Created '+pno,at:Date.now()}])});
       });
@@ -5303,6 +5351,313 @@ async function deleteEntryFromFirebase(firebaseId){
     return L.filter(x=>role()!=='site'||!x.prj||x.prj.split(' → ').some(inScope)).sort((a,b)=>b.at-a.at);
   }
   const F=window._logF=window._logF||{type:'',prj:'',q:''};
+  function listHtml(){
+    const q=F.q.toLowerCase();
+    const L=buildLog().filter(x=>(!F.type||x.type===F.type)&&(!F.prj||String(x.prj).includes(F.prj))&&(!q||(x.ref+' '+x.action+' '+x.by).toLowerCase().includes(q))&&inMonth(x.at));
+    const rows=L.slice(0,200).map(x=>`<div style="padding:9px 0;border-top:1px solid #e2e8f0"><div class="text-xs text-muted">${dt(x.at)} · ${window.marsPill?marsPill('neutral',esc(x.type)):esc(x.type)}</div><div class="text-sm"><b>${esc(x.ref)}</b> ${esc(x.action)}</div><div class="text-xs text-muted">by ${esc(x.by||'-')}${x.prj&&x.type!=='Transfer'?' · '+esc(x.prj):''}</div></div>`).join('');
+    return `<div class="text-xs text-muted mb-1">${L.length} record(s)${L.length>200?' — showing the latest 200. Download Excel for all.':''}</div>`+(rows||'<div class="text-xs text-muted py-4">No activity found.</div>');
+  }
+  window.logSet=(k,v)=>{F[k]=v;const b=document.getElementById('logList');if(b)b.innerHTML=listHtml();};
+  window.marsRenderLog=function(){
+    const box=document.getElementById('adminLogBox');if(!box)return;
+    const types=['','Requisition','Transfer','Purchase Order','ID Application'],prj=(typeof projectDatabase!=='undefined'?projectDatabase:[]).map(p=>p.prjNo);
+    box.innerHTML=`<div class="text-xs text-muted mb-3">Every Approve, Cancel, Purchase, Receive, Edit and ID action with who did it and when.</div>
+      <div class="grid grid-cols-2 gap-2 mb-2"><select class="field" onchange="logSet('type',this.value)">${types.map(t=>`<option value="${t}"${F.type===t?' selected':''}>${t||'All types'}</option>`).join('')}</select>
+      <select class="field" onchange="logSet('prj',this.value)"><option value="">All projects</option>${prj.map(p=>`<option${F.prj===p?' selected':''}>${esc(p)}</option>`).join('')}</select></div>
+      <div class="flex flex-wrap gap-2 mb-3"><input class="field" placeholder="Search name, REQ, PO…" value="${esc(F.q)}" oninput="logSet('q',this.value)"><input type="month" class="field exp-month" value="${window._expMonth||''}" style="max-width:160px" onchange="marsSetMonth(this.value)"><button class="btn btn-primary" onclick="marsExport()">Excel</button></div>
+      <div id="logList" style="max-height:55vh;overflow:auto">${listHtml()}</div>`;
+  };
+
+  window.marsExport=function(){
+    if(!window.XLSX){showToast('Excel library could not load. Check the internet connection.','error');return;}
+    const wb=XLSX.utils.book_new();
+    const sheet=(name,head,rows,w)=>{const ws=XLSX.utils.aoa_to_sheet([head].concat(rows.length?rows:[['No data']]));ws['!cols']=(w||head.map(()=>14)).map(x=>({wch:x}));XLSX.utils.book_append_sheet(wb,ws,name);};
+    const R=get('marsReqs').filter(r=>inScope(r.prjNo)&&inMonth(r.createdAt));
+    sheet('Requisitions',['REQ No','Date','Project','Requested By','Requisition Status','Material','Unit','Qty','Original Qty','Present Balance','Required Date','Location','Remarks','Item Status','PO No','Received Qty','Cancel / Reject Reason'],
+      R.flatMap(r=>(r.items||[]).map(i=>[r.no,dt(r.createdAt),r.prjNo,r.requestedBy,STG[r.stage]||r.stage,i.material,i.unit,i.qty,i.ofQty||i.qty,i.bal??'',i.reqDate||'',i.loc||'',i.remark||'',ITS[i.state]||i.state,i.poNo||'',i.state==='received'?(i.receivedQty??i.qty):'',i.cancelReason||(r.stage==='rejected'?((r.history||[]).filter(h=>h.action==='Rejected').pop()||{}).note||'':'')])),
+      [16,17,12,18,22,28,8,9,12,13,13,20,24,26,16,12,34]);
+    const PO=get('marsPOs').filter(o=>inScope(o.prjNo)&&inMonth(o.createdAt));
+    sheet('Purchase Orders',['PO No','Date','Project','REQ No','Supplier','Phone','Delivery Date','Terms','Material','Unit','Qty','Rate','Amount','PO Total','Edits'],
+      PO.flatMap(o=>o.items.map(i=>[o.no,dt(o.createdAt),o.prjNo,o.reqNo,o.supplier.name,o.supplier.phone||'',o.deliveryDate||'',o.terms||'',i.material,i.unit,i.qty,i.rate,i.amount,o.total,(o.edits||[]).length])),
+      [18,17,12,16,24,14,13,18,28,8,9,10,12,12,7]);
+    if(role()!=='site'&&window.marsSuppliers)sheet('Suppliers',['Supplier','Phone','Address','Notes','PO Count','PO Total'],get('marsSuppliers').map(x=>{const o=get('marsPOs').filter(p=>String(p.supplier.name).toLowerCase()===String(x.name).toLowerCase());return[x.name,x.phone||'',x.address||'',x.notes||'',o.length,o.reduce((a,p)=>a+(p.total||0),0)];}),[26,16,34,30,10,14]);
+    const T=get('marsTransfers').filter(t=>(inScope(t.fromPrj)||inScope(t.toPrj))&&inMonth(t.createdAt));
+    sheet('Transfers',['Date','From','To','Material','Qty','Unit','Status','Requested By','Decided By','Decided At'],
+      T.map(t=>[dt(t.createdAt),t.fromPrj,t.toPrj,t.material,t.qty,t.unit||'',t.status,t.requestedBy||'',t.decidedBy||'',dt(t.decidedAt)]),
+      [17,12,12,28,9,8,10,18,18,17]);
+    if(isAdmin){const L=buildLog().filter(x=>inMonth(x.at));sheet('Activity Log',['Time','Type','Reference','Project','Action','By'],L.map(x=>[dt(x.at),x.type,x.ref,x.prj,x.action,x.by]),[17,16,22,22,60,20]);}
+    const n=new Date();XLSX.writeFile(wb,'MARS_Report_'+(window._expMonth||(n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())))+'.xlsx');
+    showToast('Excel report downloaded'+(window._expMonth?' for '+window._expMonth:'')+'.');
+  };
+})();
+</script>
+<script>
+/* ================= BACKUP ================= */
+(function(){
+  const pad=n=>String(n).padStart(2,'0');
+  window.marsRenderBackup=function(){
+    const box=document.getElementById('adminBackupBox');if(!box)return;
+    const lb=+localStorage.getItem('mars_last_backup')||0;
+    box.innerHTML=`<div class="text-sm mb-2">Download a full copy of your data (stock entries, requisitions, transfers, purchase orders, counters, catalog, settings) as one file.</div>
+      <div class="text-xs text-muted mb-3">Last backup on this device: <b>${lb?new Date(lb).toLocaleString():'never'}</b>. Make one at least once a week and keep the file somewhere safe (Google Drive or email to yourself).</div>
+      <button class="btn btn-primary" onclick="marsBackup()">Download backup</button>
+      <div class="text-xs mt-3" style="color:#b45309">The file contains Engineer IDs and coded PINs, so keep it private. Engineer ID applications (NID, photos, signatures) are not included on purpose.</div>`;
+  };
+  window.marsBackup=async function(){
+    const db=window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
+    if(!db){showToast('Not connected to the database.','error');return;}
+    const names=[FIREBASE_COLLECTION,'requisitions','transfers','purchase_orders','counters','stock_checks','catalog','config'];
+    const out={app:'MARS Stock Ledger',exportedAt:new Date().toISOString(),collections:{}};
+    try{
+      for(const n of names){const sn=await db.collection(n).get();out.collections[n]=sn.docs.map(d=>({id:d.id,data:d.data()}));}
+      const blob=new Blob([JSON.stringify(out)],{type:'application/json'}),a=document.createElement('a'),d=new Date();
+      a.href=URL.createObjectURL(blob);a.download='MARS_Backup_'+d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'.json';
+      document.body.appendChild(a);a.click();a.remove();
+      localStorage.setItem('mars_last_backup',String(Date.now()));
+      showToast('Backup downloaded ('+Object.values(out.collections).reduce((x,c)=>x+c.length,0)+' records).');
+      marsRenderBackup();
+    }catch(e){console.error(e);showToast('Backup failed: '+(e.code||e.message),'error');}
+  };
+})();
+</script>
+<script>
+/* ============ EMAIL ACCOUNTS: SIGN IN, PROFILE, PASSWORD, ADMIN ACCOUNTS ============ */
+(function(){
+  const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
+  const A=()=>firebase.auth();
+  const RL={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement',pmgr:'Purchase Manager',acct:'Accounts',viewer:'Management (view only)'};
+  const out=()=>A().signOut().catch(()=>{});
+  const errMsg=e=>{const c=(e&&e.code)||'';
+    if(/invalid-credential|wrong-password|user-not-found/.test(c))return 'Wrong email or password.';
+    if(/email-already-in-use/.test(c))return 'This email already has an account. Sign in instead.';
+    if(/weak-password/.test(c))return 'Password is too weak (at least 6 characters).';
+    if(/invalid-email/.test(c))return 'Enter a valid email address.';
+    if(/too-many-requests/.test(c))return 'Too many attempts. Try again later.';
+    if(/popup-closed|cancelled-popup/.test(c))return 'Sign-in was cancelled.';
+    if(/unauthorized-domain/.test(c))return 'This website address is not authorised in Firebase.';
+    return 'Error: '+(c||(e&&e.message)||'unknown');};
+  const shell=(id,inner)=>{const o=document.getElementById(id);if(o)o.remove();const m=document.createElement('div');m.id=id;
+    m.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:12px';
+    m.innerHTML='<div class="card p-5" style="background:#fff;max-width:440px;width:100%;margin:auto">'+inner+'</div>';document.body.appendChild(m);return m;};
+
+  /* ---- sign in / create account / forgot ---- */
+  window.marsAuthOpen=function(tab){
+    let cur=tab||'in',msg='',ok=false;
+    const draw=()=>{
+      const m=shell('authModal',`<h3 class="text-lg font-extrabold text-navy mb-3">${cur==='in'?'Sign in':cur==='create'?'Create account':'Reset password'}</h3>
+        <div class="space-y-3">
+          <div><label class="field-label">Email (Gmail)</label><input id="auEmail" type="email" autocomplete="email" class="field"></div>
+          ${cur!=='forgot'?`<div><label class="field-label">Password</label><input id="auPw" type="password" autocomplete="${cur==='in'?'current-password':'new-password'}" class="field"></div>`:''}
+          ${cur==='create'?`<div><label class="field-label">Confirm password</label><input id="auPw2" type="password" autocomplete="new-password" class="field"></div>`:''}
+        </div>
+        <div id="auMsg" class="text-sm mt-3" style="color:${ok?'#15803d':'#b91c1c'}">${esc(msg)}</div>
+        <div class="flex flex-wrap gap-2 mt-3"><button class="btn btn-primary" id="auGo">${cur==='in'?'Sign in':cur==='create'?'Create account':'Send reset link'}</button>${cur!=='forgot'?'<button class="btn btn-secondary" id="auG">Continue with Google</button>':''}</div>
+        <div class="text-xs mt-4" style="display:flex;flex-wrap:wrap;gap:14px">
+          ${cur!=='in'?'<a href="javascript:void(0)" id="auIn" style="text-decoration:underline">Sign in</a>':''}${cur!=='create'?'<a href="javascript:void(0)" id="auCr" style="text-decoration:underline">Create account</a>':''}${cur!=='forgot'?'<a href="javascript:void(0)" id="auFg" style="text-decoration:underline">Forgot password?</a>':''}<a href="javascript:void(0)" id="auCl" style="text-decoration:underline">Close</a></div>`);
+      const $=i=>m.querySelector('#'+i),sw=t=>()=>{cur=t;msg='';ok=false;draw();};
+      if($('auIn'))$('auIn').onclick=sw('in');if($('auCr'))$('auCr').onclick=sw('create');if($('auFg'))$('auFg').onclick=sw('forgot');$('auCl').onclick=()=>m.remove();
+      const say=(t,g)=>{msg=t;ok=!!g;const e=$('auMsg');e.textContent=t;e.style.color=g?'#15803d':'#b91c1c';};
+      if($('auG'))$('auG').onclick=async()=>{try{const c=await A().signInWithPopup(new firebase.auth.GoogleAuthProvider());m.remove();afterLogin(c.user);}catch(e){say(errMsg(e));}};
+      $('auGo').onclick=async()=>{
+        const em=$('auEmail').value.trim().toLowerCase(),pw=$('auPw')?$('auPw').value:'';
+        if(!em){say('Enter your email.');return;}
+        $('auGo').disabled=true;
+        try{
+          if(cur==='forgot'){await A().sendPasswordResetEmail(em);say('Reset link sent. Check your inbox and spam folder.',true);}
+          else if(cur==='create'){
+            if(pw.length<6){say('Password must be at least 6 characters.');}
+            else if(pw!==$('auPw2').value){say('The two passwords do not match.');}
+            else{const c=await A().createUserWithEmailAndPassword(em,pw);await c.user.sendEmailVerification();await out();cur='in';ok=true;msg='Account created. We sent a verification link to '+em+'. Open it, then sign in here.';draw();return;}
+          }else{
+            const c=await A().signInWithEmailAndPassword(em,pw);
+            if(!c.user.emailVerified){await c.user.sendEmailVerification().catch(()=>{});await out();say('Please verify your email first. We sent the link again. Check inbox and spam, then sign in.');}
+            else{m.remove();afterLogin(c.user);return;}
+          }
+        }catch(e){say(errMsg(e));}
+        const g=$('auGo');if(g)g.disabled=false;
+      };
+    };
+    draw();
+  };
+
+  async function afterLogin(u,silent){
+    try{
+      const email=String(u.email||'').toLowerCase();
+      const snap=await fb().collection('users').doc(email).get();
+      if(!snap.exists){if(!silent){showToast('Your account is not approved yet. Please complete the application.');window.marsApplyOpen&&window.marsApplyOpen();}return;}
+      const d=snap.data();
+      if(d.disabled){await out();showToast('This account is disabled. Contact Admin.','error');return;}
+      const eng={id:d.engineerId||email,name:d.name||email,projects:d.projects||[],role:d.role||'site'};
+      const match=projectDatabase.find(p=>eng.projects.includes(p.prjNo))||projectDatabase[0];
+      if(!silent&&window._legacyOff){location.reload();return;}
+      window._emailSession=email;
+      window.marsEnterProject(match,eng);
+    }catch(e){console.error(e);showToast('Could not sign in: '+(e.code||e.message),'error');}
+  }
+
+  /* ---- login card button ---- */
+  function addBtn(){
+    const st=document.getElementById('engineerIdStep');if(!st)return setTimeout(addBtn,800);
+    if(document.getElementById('emailSignBtn'))return;
+    const b=document.createElement('button');b.id='emailSignBtn';b.type='button';b.textContent='Sign in with Email';
+    b.style.cssText='display:block;width:100%;margin:10px 0 0;padding:11px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.55);background:rgba(255,255,255,.12);color:#fff;font-weight:700;font-size:14px;cursor:pointer';
+    b.onclick=()=>marsAuthOpen('in');
+    const ap=document.getElementById('idRegBtn');ap?st.insertBefore(b,ap):st.appendChild(b);
+  }
+  function applySwitch(){
+    fb().collection('config').doc('settings').get().then(st=>{
+      window._legacyOff=!!(st.exists&&st.data().legacyLoginOff);
+      if(window._legacyOff)['engId','engPin','engEnter'].forEach(id=>{const e=document.getElementById(id);if(e){e.style.display='none';if(e.previousElementSibling&&e.previousElementSibling.tagName==='LABEL')e.previousElementSibling.style.display='none';}});
+    }).catch(()=>{});
+  }
+  let resumed=false;
+  window.addEventListener('load',()=>{
+    setTimeout(()=>{if(fb())applySwitch();},1200);setTimeout(()=>{if(fb())applySwitch();},3500);
+    A().onAuthStateChanged(async u=>{
+      if(!u||u.isAnonymous||!u.email||!u.emailVerified||resumed||window.currentAccessRole)return;
+      try{const ad=await fb().collection('admins').doc(u.uid).get();if(ad.exists)return;}catch(e){}
+      resumed=true;await afterLogin(u,true);
+    });
+    addBtn();setTimeout(addBtn,2000);
+    setInterval(()=>{const n=document.getElementById('acctNav');if(!n)return;const u=A().currentUser;n.style.display=(window.currentAccessRole==='engineer'&&window._emailSession&&u&&!u.isAnonymous)?'':'none';},1000);});
+
+  /* ---- profile / password / logout ---- */
+  window.marsProfile=function(){
+    const u=A().currentUser;
+    const m=shell('profModal',`<h3 class="text-lg font-extrabold text-navy mb-3">Profile</h3>
+      <div class="text-sm space-y-2"><div><span class="text-muted">Name</span><br><b>${esc(window.currentEngineerName||'')}</b></div><div><span class="text-muted">Email</span><br><b>${esc(u&&u.email||'')}</b></div><div><span class="text-muted">Role</span><br><b>${esc(RL[window.currentEngineerRole]||window.currentEngineerRole||'')}</b></div><div><span class="text-muted">Projects</span><br><b>${esc((window.currentEngineerAllowedProjects||[]).join(', ')||'All')}</b></div></div>
+      <button class="btn btn-secondary mt-4" id="pfC">Close</button>`);
+    m.querySelector('#pfC').onclick=()=>m.remove();
+  };
+  window.marsChangePw=function(){
+    const u=A().currentUser;if(!u)return;
+    if(!u.providerData.some(p=>p.providerId==='password')){showToast('You sign in with Google, so your password is managed by Google.','error');return;}
+    const m=shell('pwModal',`<h3 class="text-lg font-extrabold text-navy mb-3">Change Password</h3>
+      <div class="space-y-3"><div><label class="field-label">Current password</label><input id="pwOld" type="password" class="field" autocomplete="current-password"></div><div><label class="field-label">New password</label><input id="pwNew" type="password" class="field" autocomplete="new-password"></div><div><label class="field-label">Confirm new password</label><input id="pwNew2" type="password" class="field" autocomplete="new-password"></div></div>
+      <div id="pwMsg" class="text-sm mt-3" style="color:#b91c1c"></div>
+      <div class="flex gap-2 mt-3"><button class="btn btn-primary" id="pwGo">Update password</button><button class="btn btn-secondary" id="pwC">Close</button></div>`);
+    const $=i=>m.querySelector('#'+i),say=(t,g)=>{$('pwMsg').textContent=t;$('pwMsg').style.color=g?'#15803d':'#b91c1c';};
+    $('pwC').onclick=()=>m.remove();
+    $('pwGo').onclick=async()=>{
+      const o=$('pwOld').value,n=$('pwNew').value;
+      if(n.length<6){say('New password must be at least 6 characters.');return;}
+      if(n!==$('pwNew2').value){say('The new passwords do not match.');return;}
+      $('pwGo').disabled=true;
+      try{await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email,o));await u.updatePassword(n);say('Password updated.',true);showToast('Password updated.');setTimeout(()=>m.remove(),1200);}
+      catch(e){say(errMsg(e));$('pwGo').disabled=false;}
+    };
+  };
+  window.marsLogout=function(){
+    if(!confirm('Log out of your account?'))return;
+    out().finally(()=>location.reload());
+  };
+
+  /* ---- admin: Accounts tab ---- */
+  let users=[];
+  window.marsRenderUsers=async function(){
+    const box=document.getElementById('adminUsersBox');if(!box)return;
+    box.innerHTML='<div class="text-xs text-muted">Loading accounts…</div>';
+    try{
+      const sn=await fb().collection('users').get();
+      users=sn.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+      let off=false,strict=false;try{const st=await fb().collection('config').doc('settings').get();off=!!(st.exists&&st.data().legacyLoginOff);strict=!!(st.exists&&st.data().strictRules);}catch(e){}
+      window._legacyOff=off;window._strict=strict;
+      box.innerHTML=`<div class="rounded-xl border p-3 mb-3 text-sm" style="${strict?'border-color:#86efac;background:#f0fdf4':'border-color:#fcd34d;background:#fffbeb'}"><b>Database lock: ${strict?'ON':'OFF'}</b><div class="text-xs text-muted mt-1">${strict?'Only approved email accounts (and Admin) can read business data: ledger, requisitions, POs, RFQs, quotations, suppliers. ID and PIN sessions are blocked.':'Anyone who can open the app can still read business data. Turn this ON after every engineer has an email account and has signed in once.'}</div><div class="flex gap-2 mt-2 flex-wrap"><button class="btn ${strict?'btn-secondary':'btn-primary'}" onclick="marsStrictToggle()">${strict?'Turn OFF':'Turn ON'}</button><button class="btn btn-secondary" onclick="marsAuditView()">View audit log</button></div></div><div class="rounded-xl border p-3 mb-3 text-sm"><b>Engineer ID &amp; PIN login: ${off?'OFF':'ON'}</b><div class="text-xs text-muted mt-1">${off?'Everyone must sign in with email and password.':'Old ID and PIN login still works. Turn it OFF only after every engineer has an email account.'}</div><button class="btn btn-secondary mt-2" onclick="marsLegacyToggle()">${off?'Turn ON again':'Turn OFF'}</button></div>
+        <div class="text-xs text-muted mb-3">People who sign in with email and password. Their Role and Projects are set here by email address.</div>
+        <button class="btn btn-primary mb-3" onclick="marsUserEdit(null)">Add account by email</button>
+        <div class="space-y-2">${users.map((u,i)=>`<div class="rounded-xl border p-3 text-sm"><b>${esc(u.name||'')}</b>${u.engineerId?' <span class="text-xs text-muted">· '+esc(u.engineerId)+'</span>':' <button class="btn btn-secondary" style="padding:2px 8px" onclick="marsUserGenId('+i+')">Generate ID</button>'}${u.disabled?' <b style="color:#b91c1c">· Disabled</b>':''}<div class="text-xs text-muted">${esc(u.email||u.id)}<br>${esc(RL[u.role]||u.role)} · ${esc((u.projects||[]).join(', ')||'All projects')}</div><div class="flex gap-2 mt-2"><button class="btn btn-secondary" onclick="marsUserEdit(${i})">Edit</button><button class="btn btn-secondary" onclick="marsUserToggle(${i})">${u.disabled?'Enable':'Disable'}</button><button class="btn btn-secondary" style="color:#b91c1c" onclick="marsUserDelete(${i})">Delete</button></div></div>`).join('')||'<div class="text-xs text-muted">No accounts yet. Approve an application or add one by email.</div>'}</div>`;
+    }catch(e){box.innerHTML='<div class="text-xs" style="color:#b91c1c">Could not load accounts: '+esc(e.code||e.message)+'. Add the users rules block in Firestore.</div>';}
+  };
+  window.marsStrictToggle=async()=>{
+    const on=!window._strict;
+    const live=(users||[]).filter(u=>!u.disabled).length;
+    const msg=on?('Turn the database lock ON?\n\nThis blocks every session that is not Admin or an approved email account (accounts in this list: '+live+').\nThe old ID and PIN login will also be turned OFF.\n\nBefore you continue: sign in once with each engineer email, and test one RFQ / PO. You can turn this OFF here any time.'):'Turn the database lock OFF? Anyone who opens the app will be able to read business data again.';
+    if(on&&!live){showToast('Add at least one approved email account first.','error');return;}
+    if(!confirm(msg))return;
+    try{await fb().collection('config').doc('settings').set(on?{strictRules:true,legacyLoginOff:true}:{strictRules:false},{merge:true});if(window.marsAudit)marsAudit('Security','Database lock',on?'Turned ON':'Turned OFF');showToast(on?'Database lock is ON.':'Database lock is OFF.');marsRenderUsers();}
+    catch(e){showToast('Failed: '+(e.code||e.message)+' (publish the new Firestore Rules first)','error');}
+  };
+  window.marsAuditView=async()=>{
+    try{
+      const sn=await fb().collection('audit_logs').orderBy('at','desc').limit(100).get();
+      const L=sn.docs.map(d=>d.data());
+      const rows=L.map(x=>`<div class="rounded-xl border p-2 text-xs"><b>${esc(x.action)}</b> &middot; ${esc(x.target)}<div class="text-muted">${esc(x.detail)}</div><div class="text-muted">${esc(x.by||x.email||'')} (${esc(x.role||'')}) &middot; ${new Date(x.at).toLocaleString('en-GB')}</div></div>`).join('')||'<div class="text-xs text-muted">No audit entries yet.</div>';
+      const m=shell('auditModal',`<h3 class="text-lg font-extrabold text-navy mb-1">Audit log</h3><div class="text-xs text-muted mb-3">Last 100 important changes.</div><div class="space-y-2" style="max-height:60vh;overflow:auto">${rows}</div><button class="btn btn-secondary mt-3" id="auC">Close</button>`);
+      m.querySelector('#auC').onclick=()=>m.remove();
+    }catch(e){showToast('Could not load audit log: '+(e.code||e.message),'error');}
+  };
+  window.marsLegacyToggle=async()=>{
+    const off=!window._legacyOff;
+    if(!confirm(off?'Turn OFF the old Engineer ID and PIN login?\n\nEvery engineer must then sign in with email and password. Make sure each one already has an account in this list.':'Turn the old Engineer ID and PIN login back ON?'))return;
+    try{await fb().collection('config').doc('settings').set({legacyLoginOff:off},{merge:true});showToast(off?'ID and PIN login is now OFF.':'ID and PIN login is ON again.');marsRenderUsers();}
+    catch(e){showToast('Failed: '+(e.code||e.message),'error');}
+  };
+  window.marsUserGenId=async i=>{const u=users[i];if(!u||u.engineerId)return;try{const id=await marsNextEngineerId();await fb().collection('users').doc(u.id).set({engineerId:id},{merge:true});showToast('ID '+id+' created for '+(u.name||u.email)+'.');marsRenderUsers();}catch(e){showToast('Failed: '+(e.code||e.message),'error');}};
+  window.marsUserToggle=async i=>{const u=users[i];if(!confirm((u.disabled?'Enable ':'Disable ')+u.email+'?'))return;
+    try{await fb().collection('users').doc(u.id).update({disabled:!u.disabled});showToast(u.disabled?'Account enabled.':'Account disabled.');marsRenderUsers();}catch(e){showToast('Failed: '+(e.code||e.message),'error');}};
+  window.marsUserDelete=async i=>{
+    const u=users[i],em=String(u.email||u.id).toLowerCase();
+    if(!confirm('Delete '+em+'?\n\nThis person loses access. The personal data in their application (NID, photo, signature, address) will be erased. Past requisitions, transfers and other records stay.'))return;
+    try{
+      await fb().collection('users').doc(u.id).delete();
+      const sn=await fb().collection('engineer_applications').where('email','==',em).get();
+      await Promise.all(sn.docs.map(d=>{const a=d.data();return d.ref.set({email:a.email,name:a.name||'',status:'deleted',createdAt:a.createdAt||0,decidedAt:Date.now()});}));
+      showToast('Account deleted and personal data erased.');marsRenderUsers();
+    }catch(e){showToast('Failed: '+(e.code||e.message),'error');}
+  };
+  window.marsUserEdit=function(i){
+    const u=i===null?{role:'site',projects:[]}:users[i],prj=(typeof projectDatabase!=='undefined'?projectDatabase:[]).map(p=>p.prjNo);
+    const m=shell('userModal',`<h3 class="text-lg font-extrabold text-navy mb-3">${i===null?'Add account':'Edit account'}</h3>
+      <div class="space-y-3"><div><label class="field-label">Email</label><input id="ueEm" type="email" class="field" value="${esc(u.email||'')}" ${i===null?'':'disabled'}></div>
+      <div><label class="field-label">Name</label><input id="ueNm" class="field" value="${esc(u.name||'')}"></div>
+      <div><label class="field-label">Role</label><select id="ueRl" class="field">${Object.keys(RL).map(k=>`<option value="${k}"${u.role===k?' selected':''}>${RL[k]}</option>`).join('')}</select></div>
+      <div><label class="field-label">Projects</label><div style="max-height:180px;overflow:auto;border:1px solid #cbd5e1;border-radius:12px;padding:8px">${prj.map(p=>`<label style="display:block;font-size:13px;padding:3px 0"><input type="checkbox" class="ue-p" value="${esc(p)}"${(u.projects||[]).includes(p)?' checked':''}> ${esc(p)}</label>`).join('')}</div><div class="text-xs text-muted mt-1">Site Engineers and Store Keepers need at least one project. Other roles can be left empty.</div></div></div>
+      <div class="flex gap-2 mt-4"><button class="btn btn-primary" id="ueSv">Save</button><button class="btn btn-secondary" id="ueCl">Close</button></div>`);
+    const $=id=>m.querySelector('#'+id);$('ueCl').onclick=()=>m.remove();
+    $('ueSv').onclick=async()=>{
+      const em=$('ueEm').value.trim().toLowerCase(),nm=$('ueNm').value.trim(),rl=$('ueRl').value,pj=[...m.querySelectorAll('.ue-p:checked')].map(x=>x.value);
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)||!nm){showToast('Enter a valid email and name.','error');return;}
+      if((rl==='site'||rl==='store')&&!pj.length){showToast('Select at least one project for this role.','error');return;}
+      try{await fb().collection('users').doc(em).set({email:em,name:nm,role:rl,projects:pj,disabled:!!u.disabled,updatedAt:Date.now(),...(i===null?{createdAt:Date.now()}:{})},{merge:true});m.remove();showToast('Account saved.');marsRenderUsers();}
+      catch(e){showToast('Failed: '+(e.code||e.message),'error');}
+    };
+  };
+})();
+</script>
+<script>
+/* ================= SUPPLIERS & PRICE HISTORY ================= */
+(function(){
+  const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
+  const role=()=>isAdmin?'admin':((window.currentEngineerRole==='store')?'site':(window.currentEngineerRole||'site'));
+  const canEdit=()=>role()==='proc'||role()==='admin';
+  const money=n=>Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2});
+  const d8=t=>new Date(t).toLocaleDateString('en-GB');
+  const key=n=>String(n||'').trim().toLowerCase();
+  let sups=[],tab='list',sq='',mq='',started=false,retryAt=0,sf='active',sc='',sp=1;const SUP_N=10;
+  window.marsSuppliers=()=>sups;
+  window.marsSuppliersUsable=()=>sups.filter(x=>!x.archived&&(x.status||'active')==='active');
+  window.marsSupplierBlocked=function(name){const x=window.marsFindSupplier&&window.marsFindSupplier(name);if(!x)return '';if(x.archived)return x.name+' is archived. Restore it in Suppliers first.';const st=x.status||'active';if(st==='blacklisted')return x.name+' is blacklisted'+(x.statusReason?' ('+x.statusReason+')':'')+'. Choose another supplier.';if(st==='inactive')return x.name+' is inactive'+(x.statusReason?' ('+x.statusReason+')':'')+'. Make it Active in Suppliers first.';return '';};
+  window.marsFindSupplier=n=>sups.find(x=>key(x.name)===key(n));
+  const POs=()=>window.marsPOs?marsPOs():[];
+  function lines(){const out=[];POs().forEach(o=>(o.items||[]).forEach(i=>out.push({at:o.createdAt,supplier:o.supplier.name,material:i.material,unit:i.unit,rate:i.rate,qty:i.qty,po:o.no,prj:o.prjNo})));return out.sort((a,b)=>b.at-a.at);}
+  window.marsRateHint=function(mat){
+    const L=lines().filter(x=>key(x.material)===key(mat));
+    if(!L.length)return 'No earlier purchase of this material';
+    const lo=L.reduce((a,b)=>b.rate<a.rate?b:a);
+    return 'Last Tk '+money(L[0].rate)+' ('+esc(L[0].supplier)+', '+d8(L[0].at)+') · Lowest Tk '+money(lo.rate)+' ('+esc(lo.supplier)+')';
+  };
+  window.marsEnsureSupplier=async function(s){
+    try{if(!s.name||window.marsFindSupplier(s.name))return;await fb().collection('suppliers').add({name:s.name.trim(),phone:s.phone||'',address:s.address||'',notes:'',createdAt:Date.now(),createdBy:window.currentEngineerName||'Admin'});}catch(e){console.error('supplier',e);}
+  };
+  function spark(L){
+    const a=L.slice().reverse();if(a.length<2)return '';
+    const W=300,H=70,P=8,mn=Math.min(...a.map(x=>x.rate)),mx=Math.max(...a.map(x=>x.rate)),rg=(mx-mn)||1;
+    const pts=a.map((x,i)=>[P+i*(W-2*P)/(a.length-1),H-P-(x.rate-mn)/rg*(H-2*P)]);
+    return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:70px"><polyline fill="none" stroke="#2563eb" stroke-width="2" points="${pts.map(q=>q.join(',')).join(' ')}"/>${pts.map(q=>`<circle cx="${q[0]}" cy="${q[1]}" r="3" fill="#2563eb"/>`).join('')}</svg>`;
+  }
+  function stats(name){const o=POs().filter(x=>key(x.supplier.name)===key(name));return{n:o.length,total:o.reduce((a,x)=>a+(x.total||0),0),last:o.length?Math.max(...o.map(x=>x.createdAt)):0};}
   const CATS=['Cement','Steel / Rod','Brick, Sand & Stone','Ready Mix / Concrete','Electrical','Plumbing & Sanitary','Paint & Finishing','Tiles & Marble','Hardware & Tools','Shuttering & Scaffolding','Transport / Equipment','Others'];
   const TERMS=['','Cash on delivery','Credit 15 days','Credit 30 days','Credit 45 days','Credit 60 days','PDC','Advance + balance on delivery','Bank transfer'];
   const DTYPES=['Trade License','BIN Certificate','TIN Certificate','Bank Info / Cheque','NID / Passport','Agreement / Work Order','Other'];
@@ -5752,7 +6107,7 @@ async function deleteEntryFromFirebase(firebaseId){
     trs.forEach(t=>{const ms=t.createdAt||t.at||0;act.push({t:ms,ic:ico.swap,bg:IC.green,a:'Stock Transferred',b:esc(t.fromPrj)+' &rarr; '+esc(t.toPrj)+' &bull; '+when(ms),p:t.status==='approved'?['Completed','green']:(t.status==='rejected'?['Rejected','red']:['Pending','orange'])});});
     act.sort((x,y)=>y.t-x.t);
     const rows=act.slice(0,5).map(x=>'<div class="hx-row"><div class="ic" style="background:'+x.bg+'">'+x.ic+'</div><div class="m"><div class="a">'+x.a+'</div><div class="b">'+x.b+'</div></div><span class="hx-pill" style="background:'+PILL[x.p[1]][0]+';color:'+PILL[x.p[1]][1]+'">'+x.p[0]+'</span></div>').join('')||'<div style="padding:18px;color:#64748b;font-size:13px">No recent activity yet.</div>';
-    const html='<div class="hx-greet"><div><div class="hi">'+hi+'</div><div class="nm">'+esc(name)+'</div><div class="sb">Here&rsquo;s what&rsquo;s happening today.</div></div><div class="dt">'+dt+'<i>Build Today<br>for a Stronger Tomorrow</i><b></b></div></div>'
+    const html='<div class="hx-greet"><div><div class="hi">'+hi+'</div><div class="nm">'+esc(name)+'</div>'+(window.currentEngineerId&&/^ENG-/.test(window.currentEngineerId)?'<div class="sb" style="margin:2px 0">ID: '+esc(window.currentEngineerId)+'</div>':'')+'<div class="sb">Here&rsquo;s what&rsquo;s happening today.</div></div><div class="dt">'+dt+'<i>Build Today<br>for a Stronger Tomorrow</i><b></b></div></div>'
      +'<div class="hx-hero"><div><div class="l">Open requisitions</div><div><div class="n">'+openReq+'</div><div class="s">in progress</div></div></div><div><div class="l">'+(approver?'Waiting for your approval':(role==='proc'?'Approved POs to send':'Items awaiting delivery'))+'</div><div><div class="n">'+(approver?pendPO:(role==='proc'?toSend:awaiting))+'</div><div class="s">'+(approver?'needs a decision':(role==='proc'?'send to supplier':'to be received'))+'</div></div></div></div>'
      +'<div class="hx-stats">'+stat('blue',ico.box,'Materials',mats,'Active Items','print'.replace('print',role==='proc'?'dashboard':'print'))
        +stat('orange',ico.doc,'Requests',openReq,'Pending','track')
