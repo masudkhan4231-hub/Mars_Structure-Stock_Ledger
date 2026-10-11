@@ -124,6 +124,49 @@
 
     /* ---- Full finance-style dashboard (rail / trend / mini / dynamics / team / table) ---- */
     .nav-hidden{display:none!important}
+    #introScreen{display:none!important}
+    .lg-link{background:none;border:none;color:#bfdbfe;text-decoration:underline;font-size:13px;cursor:pointer;padding:6px 4px}
+    /* ===== Professional login ===== */
+    #accessOverlay{background:radial-gradient(900px 520px at 8% -5%,rgba(42,155,255,.38),transparent 60%),radial-gradient(800px 520px at 100% 110%,rgba(30,111,232,.35),transparent 60%),linear-gradient(160deg,#061733,#0b2a5c 55%,#0f3d86);overflow-y:auto}
+    .glass-logo .mark{background:linear-gradient(135deg,#2a9bff,#0a55d6)!important;box-shadow:0 6px 16px rgba(30,111,232,.4)!important}
+    .g-field:focus{border-color:#2a9bff!important;box-shadow:0 0 0 3px rgba(42,155,255,.25)!important}
+    #roleChooser.lg-card{width:min(94vw,960px);padding:0;margin:auto;display:grid;grid-template-columns:1.05fr 1fr;border:0;border-radius:24px;background:#fff;overflow:hidden;text-align:left;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:0 40px 90px rgba(2,10,30,.55);color:#0f172a}
+    .lg-brand{position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:26px;padding:34px 36px;color:#fff;background:linear-gradient(160deg,#0a2a5e 0%,#0f3d8a 55%,#1458b8 100%);overflow:hidden}
+    .lg-brand:before{content:"";position:absolute;width:340px;height:340px;border-radius:50%;right:-120px;top:-120px;background:radial-gradient(circle,rgba(255,255,255,.18),transparent 68%)}
+    .lg-brand:after{content:"";position:absolute;width:420px;height:420px;border-radius:50%;left:-170px;bottom:-190px;background:radial-gradient(circle,rgba(255,255,255,.12),transparent 68%)}
+    .lg-brand>*{position:relative;z-index:1}
+    .lg-chip{display:inline-flex;align-self:flex-start;background:#fff;border-radius:16px;padding:12px 18px;box-shadow:0 12px 30px rgba(2,10,30,.3)}
+    .lg-logo{width:190px;height:52px;background-size:contain;background-repeat:no-repeat;background-position:center}
+    .lg-brand-mid h2{margin:0 0 10px;font-size:27px;line-height:1.2;font-weight:800;letter-spacing:-.01em;color:#fff}
+    .lg-brand-mid p{margin:0 0 18px;font-size:14px;line-height:1.6;color:rgba(255,255,255,.82)}
+    .lg-brand-mid ul{list-style:none;margin:0;padding:0;display:grid;gap:11px}
+    .lg-brand-mid li{display:flex;gap:10px;align-items:center;font-size:13.5px;color:rgba(255,255,255,.92)}
+    .lg-brand-mid li span{flex:none;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:12px;font-weight:800}
+    .lg-brand-foot{font-size:11px;letter-spacing:.12em;color:rgba(255,255,255,.6)}
+    .lg-form{padding:40px 44px;display:flex;flex-direction:column;justify-content:center;background:#fff;color:#334155}
+    #roleChooser .lg-title{font-size:25px;font-weight:800;color:#0f172a;margin:0 0 4px;letter-spacing:-.01em}
+    #roleChooser .lg-sub{font-size:14px;color:#64748b;margin:0 0 20px;letter-spacing:0}
+    #roleChooser .g-field-label{color:#334155;font-size:12.5px;font-weight:700;letter-spacing:0;margin:0 0 6px}
+    #roleChooser .g-field{min-height:48px;background:#fff;border:1.5px solid #cbd5e1;color:#0f172a;font-size:15px;border-radius:12px}
+    #roleChooser .g-field::placeholder{color:#94a3b8}
+    #roleChooser .g-field-wrap{position:relative;margin-bottom:0}
+    #roleChooser .g-eye{right:10px;font-size:12.5px;font-weight:700;color:#1e6fe8}
+    #roleChooser .g-btn{min-height:48px;margin-top:18px;border-radius:12px;font-size:15px;letter-spacing:.02em;background:linear-gradient(135deg,#2a8cff,#0a55d6);box-shadow:0 12px 26px rgba(10,85,214,.35)}
+    #roleChooser .g-btn:disabled{opacity:.7}
+    #roleChooser .lg-link{color:#1e6fe8;text-decoration:none;font-size:13.5px;font-weight:600;padding:8px 2px}
+    #roleChooser .lg-link:hover{text-decoration:underline}
+    .lg-row{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 12px}
+    .lg-divider{height:1px;background:#e2e8f0;margin:14px 0 6px}
+    .lg-msg{font-size:13.5px;line-height:1.5;margin:0 0 14px;padding:10px 12px;border-radius:10px}
+    .lg-msg.ok{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}.lg-msg.err{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+    .lg-help{font-size:12.5px;line-height:1.55;color:#64748b;margin-top:10px}
+    .lg-foot{margin-top:18px;font-size:12px;color:#94a3b8;text-align:center}
+    @media(max-width:820px){
+      #roleChooser.lg-card{grid-template-columns:1fr;width:min(94vw,440px);border-radius:20px}
+      .lg-brand{padding:18px 20px;gap:10px}.lg-chip{padding:9px 14px}.lg-logo{width:150px;height:40px}
+      .lg-brand-mid p,.lg-brand-mid ul,.lg-brand-foot{display:none}.lg-brand-mid h2{font-size:15px;margin:0;font-weight:700}
+      .lg-form{padding:24px 22px 22px}
+    }
     .nav-group{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:#94a3b8;padding:14px 12px 4px}
     .fd-rail-wrap{position:relative;overflow:hidden;border-radius:20px}
     .fd-rail{position:relative;z-index:1;display:flex;gap:14px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
@@ -719,22 +762,24 @@ window.marsPill=function(kind,text){
 <div id="accessOverlay" class="hidden-overlay" aria-modal="true" role="dialog" aria-label="MARS Secure Access">
   <div class="glass-blob b1"></div><div class="glass-blob b2"></div><div class="glass-blob b3"></div><div class="glass-blob b4"></div>
 
-  <!-- Role chooser -->
-  <div id="roleChooser" class="glass-panel">
-    <div class="glass-logo"><span class="mark">M</span> MARS STRUCTURE LIMITED</div>
-    <div class="glass-title">Secure Workspace Login</div>
-    <div class="glass-sub">SELECT YOUR ACCESS TYPE</div>
-    <div class="glass-cards">
-      <button class="glass-card" id="chooseAdmin" type="button">
-        <div class="g-icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></div><div class="g-name">ADMIN</div>
-        <div class="g-desc">Password protected control access</div><div class="g-enter">Continue →</div>
-      </button>
-      <button class="glass-card" id="chooseEngineer" type="button">
-        <div class="g-icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17h16M6 17v-3a6 6 0 0112 0v3M12 8V5"/></svg></div><div class="g-name">SITE ENGINEER</div>
-        <div class="g-desc">Project No. + Project ID verification</div><div class="g-enter">Continue →</div>
-      </button>
+  <!-- ID + password login -->
+  <div id="roleChooser" class="glass-panel lg-card">
+    <div class="lg-brand">
+      <div class="lg-chip"><div class="mars-logo-img lg-logo" role="img" aria-label="Mars Structure Limited"></div></div>
+      <div class="lg-brand-mid">
+        <h2>Construction Management System</h2>
+        <p>One secure place for stock, requisition, purchase and delivery across all projects.</p>
+        <ul>
+          <li><span>&#10003;</span> Requisition to delivery, tracked step by step</li>
+          <li><span>&#10003;</span> Approvals with a complete audit trail</li>
+          <li><span>&#10003;</span> Role-based access for every department</li>
+        </ul>
+      </div>
+      <div class="lg-brand-foot">&copy; MARS STRUCTURE LIMITED</div>
     </div>
-    <div class="glass-footer">SECURE ACCESS • MARS STOCK LEDGER MANAGEMENT SYSTEM</div>
+    <div class="lg-form"><div id="lgBody"></div></div>
+    <button class="glass-card" id="chooseAdmin" type="button" style="display:none"></button>
+    <button class="glass-card" id="chooseEngineer" type="button" style="display:none"></button>
   </div>
 
   <!-- Admin login -->
@@ -2841,9 +2886,12 @@ const NAV_ALLOW={
   proc:['dashboard','requisition','track','suppliers','purchaseorders'],
   pmgr:['dashboard','requisition','track','suppliers','purchaseorders','print'],
   acct:['dashboard','track','suppliers','purchaseorders','print'],
+  md:['dashboard','requisition','track','purchaseorders','suppliers','transfers','print'],
+  hr:['dashboard','track','print'],
+  qs:['dashboard','track','purchaseorders','suppliers','print'],
   viewer:['dashboard','track','purchaseorders','print']
 };
-window.marsAllowed=function(page){let r='site';try{r=isAdmin?'admin':(window.currentEngineerRole||'site');}catch(e){}const a=NAV_ALLOW[r]||NAV_ALLOW.site;return a==='*'||a.indexOf(page)>=0;};
+window.marsAllowed=function(page){let r='site';try{r=isAdmin?'admin':(window.currentEngineerRole||'site');}catch(e){}const a=NAV_ALLOW[r]||['dashboard','track'];return a==='*'||a.indexOf(page)>=0;};
 window.marsApplyNav=function(){
   document.querySelectorAll('.nav-item[data-page], .mobile-bottom button[data-page]').forEach(el=>el.classList.toggle('nav-hidden',!window.marsAllowed(el.getAttribute('data-page'))));
   document.querySelectorAll('.nav-group').forEach(g=>{let n=g.nextElementSibling,any=false;while(n&&!n.classList.contains('nav-group')){if(!n.classList.contains('nav-hidden')&&getComputedStyle(n).display!=='none')any=true;n=n.nextElementSibling;}g.classList.toggle('nav-hidden',!any);});
@@ -4209,11 +4257,11 @@ async function deleteEntryFromFirebase(firebaseId){
 (function(){
   const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-  const role=()=>isAdmin?'admin':((window.currentEngineerRole==='store')?'site':(window.currentEngineerRole||'site'));
+  const role=()=>{if(isAdmin)return 'admin';const r=window.currentEngineerRole||'site';return r==='store'?'site':(r==='md'?'ed':((r==='hr'||r==='qs')?'viewer':r));};
   const who=()=>window.currentEngineerName||'Admin';
   const myPrj=()=>window.currentEngineerAllowedProjects||[];
   const STAGE={delivery:marsPill('delivery','Awaiting delivery'),dpm:marsPill('pending','With DPM'),ed:marsPill('pending','With Executive Director'),procurement:marsPill('progress','With Procurement'),closed:marsPill('approved','Closed'),rejected:marsPill('rejected','Rejected')};
-  const ROLES={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement',pmgr:'Purchase Manager',acct:'Accounts',viewer:'Management (view only)'};
+  const ROLES={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement Officer',pmgr:'Procurement Manager',acct:'Accounts Department',md:'Managing Director',hr:'HR & Admin',qs:'QS / Billing',viewer:'Viewer (view only)'};
   let reqs=[],lastCount=0;
   const pending=r=>(r.items||[]).filter(i=>i.state==='pending');
   const actionable=r=>(role()==='site'&&myPrj().includes(r.prjNo)&&(r.items||[]).some(i=>i.state==='purchased'))||(role()==='dpm'&&r.stage==='dpm')||(role()==='ed'&&r.stage==='ed')||(role()==='proc'&&r.stage==='procurement'&&pending(r).length>0);
@@ -4355,6 +4403,7 @@ async function deleteEntryFromFirebase(firebaseId){
     if(rl!=='proc'){[...new Set((r.items||[]).filter(i=>i.mrrNo).map(i=>i.mrrNo))].forEach(n=>{h+='<button class="btn btn-secondary mt-2" onclick="mrrPrint(\''+r.id+'\',\''+n+'\')">Print '+esc(n)+'</button> ';});}
     return h?'<div class="flex gap-2 flex-wrap">'+h+'</div>':'';
   };
+  window.rqSetRole=(i,v)=>{engineerDatabase[i].role=v;saveEngineerDatabase(engineerDatabase);showToast('Role updated.');window.rqPanelRefresh&&rqPanelRefresh();};
   const IS={pending:marsPill('pending','Pending'),cancelled:marsPill('rejected','Cancelled'),purchased:marsPill('progress','Purchased · awaiting delivery'),received:marsPill('approved','Received · added to stock')};
   function card(r){
     const rl=role();
@@ -4490,7 +4539,7 @@ async function deleteEntryFromFirebase(firebaseId){
   const GEO={};"Dhaka:Dhamrai,Dohar,Keraniganj,Nawabganj,Savar,Dhaka Metropolitan|Gazipur:Gazipur Sadar,Kaliakair,Kaliganj,Kapasia,Sreepur|Narayanganj:Araihazar,Bandar,Narayanganj Sadar,Rupganj,Sonargaon|Narsingdi:Belabo,Monohardi,Narsingdi Sadar,Palash,Raipura,Shibpur|Manikganj:Daulatpur,Ghior,Harirampur,Manikganj Sadar,Saturia,Shivalaya,Singair|Munshiganj:Gazaria,Lohajang,Munshiganj Sadar,Sirajdikhan,Sreenagar,Tongibari|Faridpur:Alfadanga,Bhanga,Boalmari,Charbhadrasan,Faridpur Sadar,Madhukhali,Nagarkanda,Sadarpur,Saltha|Gopalganj:Gopalganj Sadar,Kashiani,Kotalipara,Muksudpur,Tungipara|Madaripur:Kalkini,Madaripur Sadar,Rajoir,Shibchar|Rajbari:Baliakandi,Goalanda,Kalukhali,Pangsha,Rajbari Sadar|Shariatpur:Bhedarganj,Damudya,Gosairhat,Naria,Shariatpur Sadar,Zajira|Kishoreganj:Austagram,Bajitpur,Bhairab,Hossainpur,Itna,Karimganj,Katiadi,Kishoreganj Sadar,Kuliarchar,Mithamain,Nikli,Pakundia,Tarail|Tangail:Basail,Bhuapur,Delduar,Dhanbari,Ghatail,Gopalpur,Kalihati,Madhupur,Mirzapur,Nagarpur,Sakhipur,Tangail Sadar|Chattogram:Anwara,Banshkhali,Boalkhali,Chandanaish,Fatikchhari,Hathazari,Karnaphuli,Lohagara,Mirsharai,Patiya,Rangunia,Raozan,Sandwip,Satkania,Sitakunda|Cox's Bazar:Chakaria,Cox's Bazar Sadar,Eidgaon,Kutubdia,Maheshkhali,Pekua,Ramu,Teknaf,Ukhia|Cumilla:Barura,Brahmanpara,Burichang,Chandina,Chauddagram,Daudkandi,Debidwar,Homna,Laksam,Lalmai,Meghna,Monohargonj,Muradnagar,Nangalkot,Cumilla Adarsha Sadar,Cumilla Sadar Dakshin,Titas|Brahmanbaria:Akhaura,Ashuganj,Bancharampur,Bijoynagar,Brahmanbaria Sadar,Kasba,Nabinagar,Nasirnagar,Sarail|Chandpur:Chandpur Sadar,Faridganj,Haimchar,Haziganj,Kachua,Matlab Dakshin,Matlab Uttar,Shahrasti|Feni:Chhagalnaiya,Daganbhuiyan,Feni Sadar,Fulgazi,Parshuram,Sonagazi|Lakshmipur:Kamalnagar,Lakshmipur Sadar,Raipur,Ramganj,Ramgati|Noakhali:Begumganj,Chatkhil,Companiganj,Hatiya,Kabirhat,Noakhali Sadar,Senbagh,Sonaimuri,Subarnachar|Khagrachhari:Dighinala,Guimara,Khagrachhari Sadar,Lakshmichhari,Mahalchhari,Manikchhari,Matiranga,Panchhari,Ramgarh|Rangamati:Baghaichhari,Barkal,Belaichhari,Juraichhari,Kaptai,Kawkhali,Langadu,Naniarchar,Rajasthali,Rangamati Sadar|Bandarban:Alikadam,Bandarban Sadar,Lama,Naikhongchhari,Rowangchhari,Ruma,Thanchi|Rajshahi:Bagha,Bagmara,Charghat,Durgapur,Godagari,Mohanpur,Paba,Puthia,Tanore|Bogura:Adamdighi,Bogura Sadar,Dhunat,Dhupchanchia,Gabtali,Kahaloo,Nandigram,Sariakandi,Shajahanpur,Sherpur,Shibganj,Sonatala|Chapainawabganj:Bholahat,Gomastapur,Nachole,Nawabganj Sadar,Shibganj|Joypurhat:Akkelpur,Joypurhat Sadar,Kalai,Khetlal,Panchbibi|Naogaon:Atrai,Badalgachhi,Dhamoirhat,Mahadebpur,Manda,Naogaon Sadar,Niamatpur,Patnitala,Porsha,Raninagar,Sapahar|Natore:Bagatipara,Baraigram,Gurudaspur,Lalpur,Naldanga,Natore Sadar,Singra|Pabna:Atgharia,Bera,Bhangura,Chatmohar,Faridpur,Ishwardi,Pabna Sadar,Santhia,Sujanagar|Sirajganj:Belkuchi,Chauhali,Kamarkhanda,Kazipur,Raiganj,Shahjadpur,Sirajganj Sadar,Tarash,Ullahpara|Khulna:Batiaghata,Dacope,Dighalia,Dumuria,Koyra,Paikgachha,Phultala,Rupsha,Terokhada|Bagerhat:Bagerhat Sadar,Chitalmari,Fakirhat,Kachua,Mollahat,Mongla,Morrelganj,Rampal,Sarankhola|Chuadanga:Alamdanga,Chuadanga Sadar,Damurhuda,Jibannagar|Jashore:Abhaynagar,Bagherpara,Chaugachha,Jashore Sadar,Jhikargachha,Keshabpur,Manirampur,Sharsha|Jhenaidah:Harinakunda,Jhenaidah Sadar,Kaliganj,Kotchandpur,Maheshpur,Shailkupa|Kushtia:Bheramara,Daulatpur,Khoksa,Kumarkhali,Kushtia Sadar,Mirpur|Magura:Magura Sadar,Mohammadpur,Shalikha,Sreepur|Meherpur:Gangni,Meherpur Sadar,Mujibnagar|Narail:Kalia,Lohagara,Narail Sadar,Naragati|Satkhira:Assasuni,Debhata,Kalaroa,Kaliganj,Satkhira Sadar,Shyamnagar,Tala|Barishal:Agailjhara,Babuganj,Bakerganj,Banaripara,Barishal Sadar,Gaurnadi,Hizla,Mehendiganj,Muladi,Wazirpur|Barguna:Amtali,Bamna,Barguna Sadar,Betagi,Patharghata,Taltali|Bhola:Bhola Sadar,Burhanuddin,Char Fasson,Daulatkhan,Lalmohan,Manpura,Tazumuddin|Jhalokati:Jhalokati Sadar,Kathalia,Nalchity,Rajapur|Patuakhali:Bauphal,Dashmina,Dumki,Galachipa,Kalapara,Mirzaganj,Patuakhali Sadar,Rangabali|Pirojpur:Bhandaria,Kawkhali,Mathbaria,Nazirpur,Nesarabad,Pirojpur Sadar,Zianagar|Sylhet:Balaganj,Beanibazar,Bishwanath,Companiganj,Dakshin Surma,Fenchuganj,Golapganj,Gowainghat,Jaintiapur,Kanaighat,Osmani Nagar,Sylhet Sadar,Zakiganj|Habiganj:Ajmiriganj,Bahubal,Baniachong,Chunarughat,Habiganj Sadar,Lakhai,Madhabpur,Nabiganj,Shayestaganj|Moulvibazar:Barlekha,Juri,Kamalganj,Kulaura,Moulvibazar Sadar,Rajnagar,Sreemangal|Sunamganj:Bishwamvarpur,Chhatak,Dakshin Sunamganj,Derai,Dharampasha,Dowarabazar,Jagannathpur,Jamalganj,Sullah,Sunamganj Sadar,Tahirpur|Rangpur:Badarganj,Gangachara,Kaunia,Mithapukur,Pirgachha,Pirganj,Rangpur Sadar,Taraganj|Dinajpur:Birampur,Birganj,Biral,Bochaganj,Chirirbandar,Dinajpur Sadar,Ghoraghat,Hakimpur,Kaharole,Khansama,Nawabganj,Parbatipur,Phulbari|Gaibandha:Fulchhari,Gaibandha Sadar,Gobindaganj,Palashbari,Sadullapur,Saghata,Sundarganj|Kurigram:Bhurungamari,Char Rajibpur,Chilmari,Kurigram Sadar,Nageshwari,Phulbari,Rajarhat,Raomari,Ulipur|Lalmonirhat:Aditmari,Hatibandha,Kaliganj,Lalmonirhat Sadar,Patgram|Nilphamari:Dimla,Domar,Jaldhaka,Kishoreganj,Nilphamari Sadar,Saidpur|Panchagarh:Atwari,Boda,Debiganj,Panchagarh Sadar,Tetulia|Thakurgaon:Baliadangi,Haripur,Pirganj,Ranisankail,Thakurgaon Sadar|Mymensingh:Bhaluka,Dhobaura,Fulbaria,Gaffargaon,Gauripur,Haluaghat,Ishwarganj,Muktagachha,Mymensingh Sadar,Nandail,Phulpur,Tarakanda,Trishal|Jamalpur:Bakshiganj,Dewanganj,Islampur,Jamalpur Sadar,Madarganj,Melandaha,Sarishabari|Netrokona:Atpara,Barhatta,Durgapur,Kalmakanda,Kendua,Khaliajuri,Madan,Mohanganj,Netrokona Sadar,Purbadhala|Sherpur:Jhenaigati,Nakla,Nalitabari,Sherpur Sadar,Sreebardi".split('|').forEach(x=>{const[a,b]=x.split(':');GEO[a]=b.split(',');});
   const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-  const ROLES={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement',pmgr:'Purchase Manager',acct:'Accounts',viewer:'Management (view only)'};
+  const ROLES={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement Officer',pmgr:'Procurement Manager',acct:'Accounts Department',md:'Managing Director',hr:'HR & Admin',qs:'QS / Billing',viewer:'Viewer (view only)'};
   let nidData='',sigData='';
   const LIM={nid:{minW:600,minH:380,maxW:3000,maxH:2000,minKB:50,maxKB:2048,name:'NID photo'},sig:{minW:250,minH:60,maxW:350,maxH:100,minKB:5,maxKB:100,name:'Signature'}};
   function checkImg(f,L){
@@ -4519,17 +4568,16 @@ async function deleteEntryFromFirebase(firebaseId){
     m.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:12px';
     const opt=a=>a.map(x=>`<option>${esc(x)}</option>`).join('');
     m.innerHTML=`<div class="card p-5" style="background:#fff;max-width:480px;width:100%;margin:auto">
-      <h3 class="text-lg font-extrabold text-navy mb-3">Apply for Engineer ID</h3>
+      <h3 class="text-lg font-extrabold text-navy mb-3">Apply for an account</h3>
       <div id="rgGate" class="mb-3"></div>
       <div id="rgBody" class="space-y-3" style="display:none">
         <div><label class="field-label">Full Name</label><input id="rgName" class="field"></div>
         <div><label class="field-label">Mobile</label><input id="rgMob" type="tel" class="field"></div>
-        <div><label class="field-label">NID Number (optional)</label><input id="rgNid" inputmode="numeric" class="field"></div>
-        <div><label class="field-label">ID Card Photo (NID, passport or driving license)</label><input id="rgPhoto" type="file" accept="image/*" class="field"><div class="text-xs text-muted mt-1">Take a clear photo of your ID card. Any size works, it is shrunk automatically.</div></div>
+        <div><label class="field-label">Department / role you work in</label><select id="rgDept" class="field"><option value="">Select</option>${Object.keys(ROLES).map(k=>`<option value="${k}">${esc(ROLES[k])}</option>`).join('')}</select><div class="text-xs text-muted mt-1">Admin will confirm your role and projects.</div></div>
+        <div><label class="field-label">Passport-size photo</label><input id="rgPhoto" type="file" accept="image/*" class="field"><div class="text-xs text-muted mt-1">A clear photo of your face on a plain background. It is shrunk automatically.</div></div>
         <div><label class="field-label">District</label><select id="rgDist" class="field"><option value="">Select district</option>${opt(Object.keys(GEO).sort())}</select></div>
         <div><label class="field-label">Upazila</label><select id="rgUpa" class="field"><option value="">Select district first</option></select><input id="rgUpaO" class="field mt-2 hidden" placeholder="Type upazila name"></div>
         <div><label class="field-label">Village / Area</label><input id="rgVil" class="field"></div>
-        <div><label class="field-label">Signature Image (optional)</label><input id="rgSigF" type="file" accept="image/*" class="field"><div class="text-xs text-muted mt-1">Optional. You can add it later.</div><img id="rgSigPrev" style="display:none;margin-top:6px;border:1px solid #cbd5e1;border-radius:8px;max-width:100%"></div>
       </div>
       <div id="rgBtns" class="flex gap-2 mt-4" style="display:none"><button class="btn btn-primary" id="rgSend">Submit Application</button></div><button class="btn btn-secondary mt-3" id="rgClose">Close</button></div>`;
     document.body.appendChild(m);
@@ -4537,14 +4585,12 @@ async function deleteEntryFromFirebase(firebaseId){
     $('rgClose').onclick=()=>m.style.display='none';
     $('rgDist').onchange=()=>{const u=GEO[$('rgDist').value]||[];$('rgUpa').innerHTML='<option value="">Select upazila</option>'+opt(u)+'<option value="__o">Other (type manually)</option>';$('rgUpaO').classList.add('hidden');};
     $('rgUpa').onchange=()=>$('rgUpaO').classList.toggle('hidden',$('rgUpa').value!=='__o');
-    $('rgPhoto').onchange=async e=>{const f=e.target.files[0];nidData='';if(!f)return;try{nidData=await shrinkImg(f,1100,.72);showToast('ID photo is ready.');}catch(x){e.target.value='';showToast(x.message,'error');}};
-    $('rgSigF').onchange=async e=>{const f=e.target.files[0];sigData='';$('rgSigPrev').style.display='none';if(!f)return;try{sigData=await shrinkImg(f,420,.85);$('rgSigPrev').src=sigData;$('rgSigPrev').style.display='block';}catch(x){e.target.value='';showToast(x.message,'error');}};
+    $('rgPhoto').onchange=async e=>{const f=e.target.files[0];nidData='';if(!f)return;try{nidData=await shrinkImg(f,480,.8);showToast('Photo is ready.');}catch(x){e.target.value='';showToast(x.message,'error');}};
     const gate=async()=>{
       const u=firebase.auth().currentUser;
       if(!u||!u.email||!u.emailVerified){
-        $('rgGate').innerHTML='<p class="text-sm mb-3">First sign in with your Gmail. Open this page in Chrome (not inside WhatsApp or Facebook).</p><div class="flex flex-wrap gap-2"><button class="btn btn-primary" id="rgG">Sign in with Google</button><button class="btn btn-secondary" id="rgE">Use email &amp; password</button></div>';
-        $('rgG').onclick=async()=>{try{await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider());gate();}catch(e){console.error(e);showToast('Google sign-in failed: '+(e.code||e.message),'error');}};
-        $('rgE').onclick=()=>{m.remove();window.marsAuthOpen('create');};
+        $('rgGate').innerHTML='<p class="text-sm mb-3">First sign in with your Gmail address and password.</p><button class="btn btn-primary" id="rgE">Sign in</button>';
+        $('rgE').onclick=()=>{m.remove();if(window.mrsLoginMode)window.mrsLoginMode('continue');};
         return;
       }
       $('rgGate').innerHTML='<div class="text-sm">Signed in as <b>'+esc(u.email)+'</b></div>';
@@ -4552,7 +4598,7 @@ async function deleteEntryFromFirebase(firebaseId){
         const q=await fb().collection('engineer_applications').where('email','==',u.email).get();
         const mine=q.docs.map(d=>d.data()).sort((a,b)=>b.createdAt-a.createdAt)[0];
         if(mine&&mine.status==='pending'){$('rgGate').innerHTML+='<p class="text-sm mt-2">'+marsPill('pending','Pending')+' Your application is pending. Admin will approve it soon. Open this page again later to see your ID.</p>';return;}
-        if(mine&&mine.status==='approved'){$('rgGate').innerHTML+='<p class="text-sm mt-2">'+marsPill('approved','Approved')+(mine.assignedId?' Your Engineer ID: <b>'+esc(mine.assignedId)+'</b>':' Your account is active. Sign in with your email and password.')+'</p>';return;}
+        if(mine&&mine.status==='approved'){$('rgGate').innerHTML+='<p class="text-sm mt-2">'+marsPill('approved','Approved')+(mine.assignedId?' Your ID: <b>'+esc(mine.assignedId)+'</b>':' Your account is active. Sign in with your email and password.')+'</p>';return;}
         if(mine&&mine.status==='rejected')$('rgGate').innerHTML+='<p class="text-sm mt-2">'+marsPill('rejected','Rejected')+' Your last application was rejected. You can apply again.</p>';
       }catch(e){console.error(e);}
       if(!$('rgName').value)$('rgName').value=u.displayName||'';
@@ -4561,11 +4607,11 @@ async function deleteEntryFromFirebase(firebaseId){
     gate();
     $('rgSend').onclick=async()=>{
       const upa=$('rgUpa').value==='__o'?$('rgUpaO').value.trim():$('rgUpa').value;
-      const d={name:$('rgName').value.trim(),mobile:$('rgMob').value.trim(),nid:$('rgNid').value.trim(),district:$('rgDist').value,upazila:upa,village:$('rgVil').value.trim()};
-      if(!d.name||!d.mobile||!d.district||!d.upazila||!d.village||!nidData){showToast('Enter your name, mobile, address (district, upazila, village) and add your ID card photo.','error');return;}
+      const d={name:$('rgName').value.trim(),mobile:$('rgMob').value.trim(),dept:$('rgDept').value,district:$('rgDist').value,upazila:upa,village:$('rgVil').value.trim()};
+      if(!d.name||!d.mobile||!d.dept||!d.district||!d.upazila||!d.village||!nidData){showToast('Enter your name, mobile, department, address (district, upazila, village) and add your passport-size photo.','error');return;}
       try{
         const u=firebase.auth().currentUser;
-        await fb().collection('engineer_applications').add({...d,email:u.email,nidPhoto:nidData,signature:sigData,status:'pending',createdAt:Date.now()});
+        await fb().collection('engineer_applications').add({...d,email:u.email,photo:nidData,status:'pending',createdAt:Date.now()});
         m.remove();nidData='';sigData='';showToast('Application submitted. After approval, sign in with the same Gmail to see your ID.');
       }catch(e){console.error(e);showToast('Submit failed: '+(e.code||e.message),'error');}
     };
@@ -4583,38 +4629,48 @@ async function deleteEntryFromFirebase(firebaseId){
   window.marsRenderApps=()=>{const bx=document.getElementById('adminAppsBox');if(bx)bx.innerHTML=window._appsHtml||'<div class="text-xs text-muted">No applications yet.</div>';};
   window.marsPendingApps=()=>apps.filter(a=>a.status==='pending').length;
   window.marsApps=()=>apps;
-  window.marsNextEngineerId=async function(){
-    const db=fb(),cref=db.collection('counters').doc('engineer_id');let id='';
-    await db.runTransaction(async tx=>{const c=await tx.get(cref),n=(c.exists?c.data().n:0)+1;tx.set(cref,{n});id='ENG-'+String(n).padStart(4,'0');});
+  const ID_PREFIX={site:'ENG',store:'STR',dpm:'DPM',ed:'ED',md:'MD',proc:'PRC',pmgr:'PRM',acct:'ACC',hr:'HRA',qs:'QSB',viewer:'VWR'};
+  window.marsNextEngineerId=async function(role){
+    const pre=ID_PREFIX[role]||'USR',db=fb(),cref=db.collection('counters').doc(role==='site'?'engineer_id':'id_'+pre);let id='';
+    await db.runTransaction(async tx=>{const c=await tx.get(cref),n=(c.exists?c.data().n:0)+1;tx.set(cref,{n});id=pre+'-'+String(n).padStart(4,'0');});
     return id;
   };
+  window.marsPublishLoginId=(id,email)=>fb().collection('login_ids').doc(id).set({email:String(email).toLowerCase()});
+  window.marsSyncLoginIds=us=>{(us||[]).forEach(u=>{if(u.engineerId&&u.email)fb().collection('login_ids').doc(u.engineerId).set({email:String(u.email).toLowerCase()}).catch(()=>{});});};
   window.idGenerate=async function(id){
     const a=apps.find(x=>x.id===id);if(!isAdmin||!a||a.assignedId)return;
-    try{const nid=await marsNextEngineerId();await fb().collection('engineer_applications').doc(id).update({assignedId:nid});await fb().collection('users').doc(String(a.email).toLowerCase()).set({engineerId:nid},{merge:true});showToast('ID '+nid+' created for '+a.name+'.');}
+    try{const nid=await marsNextEngineerId(a.role||'site');await fb().collection('engineer_applications').doc(id).update({assignedId:nid});await fb().collection('users').doc(String(a.email).toLowerCase()).set({engineerId:nid},{merge:true});await marsPublishLoginId(nid,a.email);showToast('ID '+nid+' created for '+a.name+'.');}
     catch(e){showToast('Failed: '+(e.code||e.message),'error');}
   };
   window.idDecide=async function(id,ok){
     const a=apps.find(x=>x.id===id);if(!isAdmin||!a||a.status!=='pending')return;
-    let nid='',rl='',pj='';
+    let nid='',rl='',pj=[];
     if(ok){
-      rl=document.getElementById('idRole_'+id).value;pj=document.getElementById('idPrj_'+id).value;
-      if(!rl){showToast('Select the role first (for example DPM / Project Manager).','error');return;}
-      if((rl==='site'||rl==='store')&&!pj){showToast('Select a project for this role.','error');return;}
-      try{nid=await marsNextEngineerId();await fb().collection('users').doc(String(a.email).toLowerCase()).set({email:String(a.email).toLowerCase(),name:a.name,mobile:a.mobile||'',engineerId:nid,role:rl,projects:pj?[pj]:[],disabled:false,createdAt:Date.now()},{merge:true});}catch(e){showToast('Could not create the account: '+(e.code||e.message),'error');return;}
-    }
-    if(!ok&&!confirm('Reject this application? All personal data (NID, photo, signature, address) will be erased.'))return;
+      rl=document.getElementById('idRole_'+id).value;
+      pj=[...document.querySelectorAll('.idPrj_'+id)].filter(c=>c.checked).map(c=>c.value);
+      if(!rl){showToast('Select the department / role first.','error');return;}
+      if(['site','store','dpm'].includes(rl)&&!pj.length){showToast('Tick at least one project for this role.','error');return;}
+      try{
+        nid=await marsNextEngineerId(rl);const email=String(a.email).toLowerCase();
+        await fb().collection('users').doc(email).set({email,name:a.name,mobile:a.mobile||'',engineerId:nid,role:rl,projects:pj,photo:a.photo||'',disabled:false,createdAt:Date.now()},{merge:true});
+        await marsPublishLoginId(nid,email);
+      }catch(e){showToast('Could not create the account: '+(e.code||e.message),'error');return;}
+    }else if(!confirm('Reject this application? The photo and address will be erased.'))return;
     try{
       const ref=fb().collection('engineer_applications').doc(id);
-      if(ok)await ref.update({status:'approved',assignedId:nid,role:rl,prjNo:pj,decidedAt:Date.now(),pinHash:firebase.firestore.FieldValue.delete(),pinSalt:firebase.firestore.FieldValue.delete()});
+      if(ok)await ref.update({status:'approved',assignedId:nid,role:rl,projects:pj,decidedAt:Date.now()});
       else await ref.set({email:a.email,name:a.name,status:'rejected',createdAt:a.createdAt,decidedAt:Date.now()});
-      showToast(ok?'Approved. ID '+nid+' created. '+a.email+' can now sign in.':'Rejected and personal data erased.');}
-    catch(e){showToast('Failed — check Rules/connection.','error');}
+      if(window.marsAudit)marsAudit('Account',a.email,ok?'Approved as '+rl+' ('+nid+')':'Rejected');
+      showToast(ok?'Approved. ID '+nid+' created. The person signs in with this ID and the password they chose.':'Rejected and personal data erased.');
+    }catch(e){showToast('Failed: '+(e.code||e.message),'error');}
   };
   function render(){
     const pend=apps.filter(a=>a.status==='pending').length;
     idBadge.textContent=pend;idBadge.classList.toggle('hidden',!pend);
-    const roleOpts='<option value="">Select role</option>'+Object.keys(ROLES).map(k=>`<option value="${k}">${ROLES[k]}</option>`).join(''),prjOpts='<option value="">No project (non-site roles)</option>'+projectDatabase.map(p=>`<option>${esc(p.prjNo)}</option>`).join('');
-    const html=apps.filter(a=>a.status!=='rejected'&&a.status!=='deleted').map(a=>`<div class="rounded-xl border p-3 text-sm"><b>${esc(a.name)}</b> · ${a.role?esc(ROLES[a.role])+' · '+esc(a.prjNo||'All projects'):'New applicant'}<div class="text-xs text-muted">${esc(a.email||'')} · ${esc(a.mobile)}${a.nid?' · NID '+esc(a.nid):''}<br>${esc(a.village)}, ${esc(a.upazila)}, ${esc(a.district)}<br>${a.status==='pending'?marsPill('pending','Pending'):a.status==='approved'?marsPill('approved','Approved'+(a.assignedId?' · ID '+esc(a.assignedId):''))+(a.assignedId?'':' <button class="btn btn-secondary" style="padding:2px 8px" onclick="idGenerate(\''+a.id+'\')">Generate ID</button>'):marsPill('rejected','Rejected')} · ${new Date(a.createdAt).toLocaleString()}</div><div class="flex gap-2 mt-2"><img src="${a.nidPhoto}" style="height:90px;border-radius:8px">${a.signature?`<img src="${a.signature}" style="height:90px;border:1px solid #e2e8f0;border-radius:8px;background:#fff">`:''}</div>${a.status==='pending'?`<div class="mt-2 grid grid-cols-2 gap-2"><select id="idRole_${a.id}" class="field">${roleOpts}</select><select id="idPrj_${a.id}" class="field">${prjOpts}</select></div><div class="mt-2 flex gap-2"><button class="btn btn-primary" onclick="idDecide('${a.id}',true)">Approve &amp; create ID</button><button class="btn btn-secondary" onclick="idDecide('${a.id}',false)">Reject</button></div>`:''}</div>`).join('')||'<div class="text-xs text-muted">No applications yet.</div>';
+    const roleOpts=sel=>'<option value="">Select department / role</option>'+Object.keys(ROLES).map(k=>`<option value="${k}"${k===sel?' selected':''}>${esc(ROLES[k])}</option>`).join('');
+    const html=apps.filter(a=>a.status!=='rejected'&&a.status!=='deleted').map(a=>{
+      const photo=a.photo||a.nidPhoto||'',prj=(a.projects&&a.projects.length)?a.projects:(a.prjNo?[a.prjNo]:[]);
+      return `<div class="rounded-xl border border-line bg-white p-3 text-sm"><div style="display:flex;gap:10px"><img src="${photo}" style="width:64px;height:80px;object-fit:cover;border-radius:8px;border:1px solid #e2e8f0;background:#f1f5f9"><div style="flex:1"><b>${esc(a.name)}</b>${a.role?' &middot; '+esc(ROLES[a.role]||a.role):''}<div class="text-xs text-muted">${esc(a.email||'')} &middot; ${esc(a.mobile||'')}<br>${esc(a.village||'')}${a.village?', ':''}${esc(a.upazila||'')}${a.upazila?', ':''}${esc(a.district||'')}${a.dept?'<br>Applied for: '+esc(ROLES[a.dept]||a.dept):''}${prj.length?'<br>Projects: '+esc(prj.join(', ')):''}</div><div class="mt-1">${a.status==='pending'?marsPill('pending','Pending'):marsPill('approved','Approved'+(a.assignedId?' &middot; ID '+esc(a.assignedId):''))+(a.assignedId?'':' <button class="btn btn-secondary" style="padding:2px 8px" onclick="idGenerate(\''+a.id+'\')">Generate ID</button>')} <span class="text-xs text-muted">${new Date(a.createdAt).toLocaleString()}</span></div></div></div>${a.status==='pending'?`<div class="mt-2"><select id="idRole_${a.id}" class="field">${roleOpts(a.dept)}</select><div class="text-xs font-extrabold text-navy mt-2">Projects (tick one or more)</div><div class="grid grid-cols-2 gap-1 mt-1">${projectDatabase.map(p=>`<label class="text-xs"><input type="checkbox" class="idPrj_${a.id}" value="${esc(p.prjNo)}"> ${esc(p.prjNo)}</label>`).join('')}</div></div><div class="mt-2 flex gap-2"><button class="btn btn-primary" onclick="idDecide('${a.id}',true)">Approve &amp; create ID</button><button class="btn btn-secondary" onclick="idDecide('${a.id}',false)">Reject</button></div>`:''}</div>`;}).join('')||'<div class="text-xs text-muted">No applications yet.</div>';
     window._appsHtml=html;const bx=document.getElementById('adminAppsBox');if(bx)bx.innerHTML=html;
     const b2=document.getElementById('idBadge2');if(b2){b2.textContent=pend;b2.classList.toggle('hidden',!pend);}
   }
@@ -4632,7 +4688,7 @@ async function deleteEntryFromFirebase(firebaseId){
 (function(){
   const VAPID_KEY='PASTE_VAPID_KEY_HERE';
   if(VAPID_KEY.startsWith('PASTE'))window.addEventListener('load',()=>{const n=document.getElementById('pushNav');if(n)n.style.display='none';});
-  const role=()=>isAdmin?'admin':((window.currentEngineerRole==='store')?'site':(window.currentEngineerRole||'site'));
+  const role=()=>{if(isAdmin)return 'admin';const r=window.currentEngineerRole||'site';return r==='store'?'site':(r==='md'?'ed':((r==='hr'||r==='qs')?'viewer':r));};
   async function register(){
     if(!('Notification' in window)||!firebase.messaging.isSupported()||VAPID_KEY.startsWith('PASTE'))return false;
     const reg=await navigator.serviceWorker.register('./firebase-messaging-sw.js');
@@ -4658,7 +4714,7 @@ async function deleteEntryFromFirebase(firebaseId){
 (function(){
   const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-  const role=()=>isAdmin?'admin':((window.currentEngineerRole==='store')?'site':(window.currentEngineerRole||'site'));
+  const role=()=>{if(isAdmin)return 'admin';const r=window.currentEngineerRole||'site';return r==='store'?'site':(r==='md'?'ed':((r==='hr'||r==='qs')?'viewer':r));};
   const money=n=>Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
   const r2=x=>Math.round(x*100)/100;
   const d8=t=>new Date(t).toLocaleDateString('en-GB');
@@ -4835,7 +4891,6 @@ async function deleteEntryFromFirebase(firebaseId){
 
   /* ---------- send approved PO to supplier ---------- */
   async function upsertSupplierPo(o,email){
-    if(!email)return 'no-email';
     const snap={poId:o.id,no:o.no,supplierEmail:String(email).toLowerCase(),supplierName:o.supplier.name,company:co().name||'MARS STRUCTURE LIMITED',prjNo:o.prjNo||'',site:o.deliveryAddr||((o.project&&o.project.address)||''),deliveryDate:o.deliveryDate||'',payMode:o.payMode||'',terms:o.terms||'',remarks:o.remarks||'',conditions:o.conditions||'',items:(o.items||[]).map(i=>({material:i.material,unit:i.unit||'',qty:i.qty,spec:i.spec||'',rate:i.rate,disc:i.disc||0,amount:i.amount})),subTotal:o.subTotal||0,discount:o.discount||0,total:o.total||0,advance:o.advance===undefined?(o.total||0):o.advance,sentAt:Date.now()};
     try{await fb().collection('supplier_pos').doc(o.id).set(snap,{merge:true});return 'ok';}catch(e){console.warn('supplier portal copy',e&&e.code);return 'fail';}
   }
@@ -4843,18 +4898,19 @@ async function deleteEntryFromFirebase(firebaseId){
     const o=pos.find(x=>x.id===id);if(!o||o.status!=='approved'||!(role()==='proc'||role()==='admin'))return;
     const sp=(window.marsFindSupplier&&marsFindSupplier(o.supplier.name))||{},phone=o.supplier.phone||sp.phone||'',email=sp.email||'';
     const company=co().name||'Mars Structure Limited';
-    const msg='Assalamu alaikum. '+company+' Purchase Order '+o.no+' for '+(o.prjNo||'')+' (total Tk '+money(o.total)+(o.deliveryDate?', delivery by '+o.deliveryDate:'')+') is approved. Please confirm and arrange supply. The signed PO copy is attached.';
+    const poLink=location.origin+location.pathname+'?po='+o.id;
+    const msg='Assalamu alaikum. '+company+' Purchase Order '+o.no+' for '+(o.prjNo||'')+' (total Tk '+money(o.total)+(o.deliveryDate?', delivery by '+o.deliveryDate:'')+') is approved. Please confirm, arrange supply and send the dispatch details here: '+poLink+' (the signed PO copy is attached).';
     const sub=encodeURIComponent('Purchase Order '+o.no+' - '+company);
     const wa='https://wa.me/'+(phone?waNum(phone):'')+'?text='+encodeURIComponent(msg);
     const gm='https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(email)+'&su='+sub+'&body='+encodeURIComponent(msg);
     const ml='mailto:'+encodeURIComponent(email)+'?subject='+sub+'&body='+encodeURIComponent(msg);
-    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:480px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Send ${esc(o.no)} to supplier</h3><div class="text-xs text-muted mb-3">${esc(o.supplier.name)}${phone?' &middot; '+esc(phone):''}${email?' &middot; '+esc(email):''}${o.sentAt?'<br>Last sent '+dFmt(o.sentAt)+(o.sentVia?' via '+esc(o.sentVia):'')+' by '+esc(o.sentBy||''):''}<br>${email?'Supplier portal: <b>'+esc(email)+'</b> will see this PO after you mark it as sent.':'<b style="color:#9a3412">No email saved for this supplier, so it will not appear in the supplier portal. Add the email in Suppliers.</b>'}</div><div class="space-y-2"><button class="btn btn-secondary" id="psPr" style="width:100%">1. Print / save the PO as PDF</button><div class="grid grid-cols-3 gap-2"><a class="btn btn-secondary ps-ch" data-v="WhatsApp" target="_blank" rel="noopener" href="${wa}">WhatsApp</a><a class="btn btn-secondary ps-ch" data-v="Gmail" target="_blank" rel="noopener" href="${gm}">Gmail</a><a class="btn btn-secondary ps-ch" data-v="Mail app" href="${ml}">Mail app</a></div><div class="text-xs text-muted">2. Send the PDF with WhatsApp or Gmail (attach the saved PDF).</div><div><label class="field-label">3. Mark as sent. Sent via</label><select id="psVia" class="field">${['WhatsApp','Gmail','Mail app','Printed copy','Hand delivered'].map(x=>`<option>${x}</option>`).join('')}</select></div></div><div class="flex gap-2 mt-4"><button class="btn btn-primary" id="psOk">Mark as sent</button><button class="btn btn-secondary" id="psX">Close</button></div></div>`,'poSendModal');
+    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:480px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">Send ${esc(o.no)} to supplier</h3><div class="text-xs text-muted mb-3">${esc(o.supplier.name)}${phone?' &middot; '+esc(phone):''}${email?' &middot; '+esc(email):''}${o.sentAt?'<br>Last sent '+dFmt(o.sentAt)+(o.sentVia?' via '+esc(o.sentVia):'')+' by '+esc(o.sentBy||''):''}<br>Supplier link (also inside the message): <b>${esc(poLink)}</b></div><div class="space-y-2"><button class="btn btn-secondary" id="psPr" style="width:100%">1. Print / save the PO as PDF</button><div class="grid grid-cols-3 gap-2"><a class="btn btn-secondary ps-ch" data-v="WhatsApp" target="_blank" rel="noopener" href="${wa}">WhatsApp</a><a class="btn btn-secondary ps-ch" data-v="Gmail" target="_blank" rel="noopener" href="${gm}">Gmail</a><a class="btn btn-secondary ps-ch" data-v="Mail app" href="${ml}">Mail app</a></div><div class="text-xs text-muted">2. Send the PDF with WhatsApp or Gmail (attach the saved PDF).</div><div><label class="field-label">3. Mark as sent. Sent via</label><select id="psVia" class="field">${['WhatsApp','Gmail','Mail app','Printed copy','Hand delivered'].map(x=>`<option>${x}</option>`).join('')}</select></div></div><div class="flex gap-2 mt-4"><button class="btn btn-primary" id="psOk">Mark as sent</button><button class="btn btn-secondary" id="psX">Close</button></div></div>`,'poSendModal');
     m.querySelector('#psPr').onclick=()=>window.poPrint(id);
     m.querySelectorAll('.ps-ch').forEach(a=>a.addEventListener('click',()=>{m.querySelector('#psVia').value=a.dataset.v;}));
     m.querySelector('#psX').onclick=()=>m.remove();
     m.querySelector('#psOk').onclick=async()=>{
       const via=m.querySelector('#psVia').value,me=window.currentEngineerName||'Admin',b=m.querySelector('#psOk');b.disabled=true;
-      try{await fb().collection('purchase_orders').doc(id).update({sentAt:Date.now(),sentBy:me,sentVia:via});let nt='';if(email){const rr=await upsertSupplierPo(o,email);nt=rr==='ok'?' It is now in the supplier portal.':' It could not be published to the supplier portal.';}else nt=' No supplier email, so it is not in the supplier portal.';if(window.marsAudit)marsAudit('PO',o.no,'Sent to supplier via '+via);m.remove();showToast('PO marked as sent to '+o.supplier.name+'.'+nt);}
+      try{await fb().collection('purchase_orders').doc(id).update({sentAt:Date.now(),sentBy:me,sentVia:via});let nt='';{const rr=await upsertSupplierPo(o,email||'');nt=rr==='ok'?' The supplier can open the PO from the link.':' The supplier page could not be prepared.';}if(window.marsAudit)marsAudit('PO',o.no,'Sent to supplier via '+via);m.remove();showToast('PO marked as sent to '+o.supplier.name+'.'+nt);}
       catch(e){b.disabled=false;console.error(e);showToast('Failed: '+(e.code||e.message)+' (publish the new Firestore Rules)','error');}
     };
   };
@@ -4907,7 +4963,7 @@ async function deleteEntryFromFirebase(firebaseId){
   function shareModal(rf){
     const rows=rf.invites.map((v,k)=>{const link=portalUrl(v.token),wa='https://wa.me/'+(v.phone?waNum(v.phone):'')+'?text='+encodeURIComponent(rfqMsg(rf,v)),sub=encodeURIComponent('Request for Quotation '+rf.no+' - '+(co().name||'Mars Structure Limited')),gm='https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(v.email||'')+'&su='+sub+'&body='+encodeURIComponent(rfqMsg(rf,v)),ml='mailto:'+encodeURIComponent(v.email||'')+'?subject='+sub+'&body='+encodeURIComponent(rfqMsg(rf,v));
       return `<div class="rounded-xl border border-line bg-white p-3 text-sm space-y-1"><b>${esc(v.name)}</b>${v.phone?' <span class="text-xs text-muted">'+esc(v.phone)+'</span>':''}${v.email?' <span class="text-xs text-muted">'+esc(v.email)+'</span>':''}<input class="field rf-link" readonly value="${esc(link)}" onfocus="this.select()"><div class="flex gap-2 flex-wrap"><button class="btn btn-secondary rf-copy" data-l="${esc(link)}">Copy link</button><a class="btn btn-secondary" target="_blank" rel="noopener" href="${wa}">WhatsApp</a><a class="btn btn-secondary" target="_blank" rel="noopener" href="${gm}">Gmail</a><a class="btn btn-secondary" href="${ml}">Mail app</a><button class="btn btn-secondary" onclick="rfqPrint('${rf.id}',${k})">Print RFQ</button></div></div>`;}).join('');
-    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:520px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">${esc(rf.no)} &middot; send to suppliers</h3><div class="text-xs text-muted mb-3">Each supplier has a private link. They enter rates on their phone and submit before ${dFmt(rf.deadlineMs)}. To attach the RFQ as a PDF: tap Print RFQ, save as PDF, then attach it in Gmail or WhatsApp.</div><div class="space-y-2">${rows}</div><div class="text-xs text-muted mt-3">Suppliers with an email can also sign in at <b>${esc(location.origin+location.pathname+'?portal=supplier')}</b> to see all RFQs sent to that email.</div><div class="flex gap-2 mt-4"><button class="btn btn-secondary" id="rfShX">Close</button></div></div>`,'rfShareModal');
+    const m=overlay(`<div class="card p-5" style="background:#fff;max-width:520px;width:100%;margin:auto"><h3 class="text-lg font-extrabold text-navy mb-1">${esc(rf.no)} &middot; send to suppliers</h3><div class="text-xs text-muted mb-3">Each supplier has a private link. They enter rates on their phone and submit before ${dFmt(rf.deadlineMs)}. To attach the RFQ as a PDF: tap Print RFQ, save as PDF, then attach it in Gmail or WhatsApp.</div><div class="space-y-2">${rows}</div><div class="flex gap-2 mt-4"><button class="btn btn-secondary" id="rfShX">Close</button></div></div>`,'rfShareModal');
     m.querySelector('#rfShX').onclick=()=>m.remove();
     m.querySelectorAll('.rf-copy').forEach(b=>b.onclick=()=>{const t=b.dataset.l,ok=()=>showToast('Link copied.');(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(ok).catch(()=>{const i=b.parentNode.parentNode.querySelector('.rf-link');i.select();document.execCommand('copy');ok();});});
   }
@@ -5146,7 +5202,7 @@ async function deleteEntryFromFirebase(firebaseId){
         else await ref.update({status:'rejected',approvedBy:me,approvedAt:now,approvalNote:note});
         if(window.marsAudit){marsAudit('CS',c.no,ap?(canApprove()?'Approved':'Recommended to ED'):'Rejected: '+note);made.forEach(o=>marsAudit('PO',o.no,'Created automatically from '+c.no));}
         let pub=0;
-        for(const o of made){const fs=(window.marsFindSupplier&&marsFindSupplier(o.supplier.name))||{};if(fs.email){const rr=await upsertSupplierPo(o,fs.email);if(rr==='ok')pub++;}}
+        for(const o of made){const fs=(window.marsFindSupplier&&marsFindSupplier(o.supplier.name))||{};{const rr=await upsertSupplierPo(o,fs.email||'');if(rr==='ok')pub++;}}
         m.remove();
         showToast(ap?(canApprove()?'CS approved. '+made.length+' PO created: '+made.map(o=>o.no).join(', ')+(pub?'. '+pub+' published in the supplier portal.':'')+' Procurement will send them to the suppliers.':'Recommended. The ED can now approve.'):'CS rejected.');
       }catch(e){b1.disabled=b2.disabled=false;console.error(e);showToast('Failed: '+(e.code||e.message)+' (publish the new Firestore Rules)','error');}
@@ -5394,7 +5450,7 @@ async function deleteEntryFromFirebase(firebaseId){
 /* ================= DASHBOARD ================= */
 (function(){
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-  const role=()=>isAdmin?'admin':((window.currentEngineerRole==='store')?'site':(window.currentEngineerRole||'site'));
+  const role=()=>{if(isAdmin)return 'admin';const r=window.currentEngineerRole||'site';return r==='store'?'site':(r==='md'?'ed':((r==='hr'||r==='qs')?'viewer':r));};
   const mine=()=>window.currentEngineerAllowedProjects||[];
   const H=3600000,STUCK=24*H;
   const age=ms=>{const h=Math.floor(ms/H);return h>=24?Math.floor(h/24)+'d '+(h%24)+'h':h+'h';};
@@ -5465,9 +5521,9 @@ async function deleteEntryFromFirebase(firebaseId){
 /* ============ ACTIVITY LOG + EXCEL REPORT ============ */
 (function(){
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-  const role=()=>isAdmin?'admin':((window.currentEngineerRole==='store')?'site':(window.currentEngineerRole||'site'));
+  const role=()=>{if(isAdmin)return 'admin';const r=window.currentEngineerRole||'site';return r==='store'?'site':(r==='md'?'ed':((r==='hr'||r==='qs')?'viewer':r));};
   const mine=()=>window.currentEngineerAllowedProjects||[];
-  const RL={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement',pmgr:'Purchase Manager',acct:'Accounts',viewer:'Management (view only)'};
+  const RL={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement Officer',pmgr:'Procurement Manager',acct:'Accounts Department',md:'Managing Director',hr:'HR & Admin',qs:'QS / Billing',viewer:'Viewer (view only)'};
   const STG={dpm:'With DPM',ed:'With Executive Director',procurement:'With Procurement',delivery:'Awaiting delivery',closed:'Closed',rejected:'Rejected'};
   const ITS={pending:'Pending',cancelled:'Cancelled',purchased:'Purchased (awaiting delivery)',received:'Received'};
   const pad=n=>String(n).padStart(2,'0');
@@ -5572,7 +5628,7 @@ async function deleteEntryFromFirebase(firebaseId){
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
   const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
   const A=()=>firebase.auth();
-  const RL={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement',pmgr:'Purchase Manager',acct:'Accounts',viewer:'Management (view only)'};
+  const RL={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement Officer',pmgr:'Procurement Manager',acct:'Accounts Department',md:'Managing Director',hr:'HR & Admin',qs:'QS / Billing',viewer:'Viewer (view only)'};
   const out=()=>A().signOut().catch(()=>{});
   const errMsg=e=>{const c=(e&&e.code)||'';
     if(/invalid-credential|wrong-password|user-not-found/.test(c))return 'Wrong email or password.';
@@ -5635,9 +5691,6 @@ async function deleteEntryFromFirebase(firebaseId){
       if(!snap.exists){if(!silent){showToast('Your account is not approved yet. Please complete the application.');window.marsApplyOpen&&window.marsApplyOpen();}return;}
       const d=snap.data();
       if(d.disabled){await out();showToast('This account is disabled. Contact Admin.','error');return;}
-      const isMgmt=!['site','store'].includes(d.role||'site');
-      if(!silent&&window._portalMode==='management'&&!isMgmt){await out();showToast('This is the Management login. Site engineers and store keepers sign in from the main login page.','error');return;}
-      if(!silent&&window._portalMode!=='management'&&isMgmt){await out();showToast('Management team: please use the Management login.','error');setTimeout(()=>{location.href=location.pathname+'?portal=management';},1400);return;}
       const eng={id:d.engineerId||email,name:d.name||email,projects:d.projects||[],role:d.role||'site'};
       const match=projectDatabase.find(p=>eng.projects.includes(p.prjNo))||projectDatabase[0];
       if(!silent&&window._legacyOff){location.reload();return;}
@@ -5647,20 +5700,7 @@ async function deleteEntryFromFirebase(firebaseId){
   }
 
   /* ---- login card button ---- */
-  function addBtn(){
-    const st=document.getElementById('engineerIdStep');if(!st)return setTimeout(addBtn,800);
-    if(document.getElementById('emailSignBtn'))return;
-    const b=document.createElement('button');b.id='emailSignBtn';b.type='button';b.textContent='Site / Store sign in with Email';
-    b.style.cssText='display:block;width:100%;margin:10px 0 0;padding:11px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.55);background:rgba(255,255,255,.12);color:#fff;font-weight:700;font-size:14px;cursor:pointer';
-    b.onclick=()=>marsAuthOpen('in');
-    const ap=document.getElementById('idRegBtn');ap?st.insertBefore(b,ap):st.appendChild(b);
-    if(!document.getElementById('mgmtBtn')){
-      const mg=document.createElement('button');mg.id='mgmtBtn';mg.type='button';mg.textContent='Management team login';
-      mg.style.cssText='display:block;width:100%;margin:8px 0 0;padding:8px 12px;background:none;border:none;color:#bfdbfe;text-decoration:underline;font-size:14px;cursor:pointer';
-      mg.onclick=()=>{location.href=location.pathname+'?portal=management';};
-      ap?st.insertBefore(mg,ap):st.appendChild(mg);
-    }
-  }
+  function addBtn(){}
   function applySwitch(){
     fb().collection('config').doc('settings').get().then(st=>{
       window._legacyOff=!!(st.exists&&st.data().legacyLoginOff);
@@ -5716,7 +5756,7 @@ async function deleteEntryFromFirebase(firebaseId){
     box.innerHTML='<div class="text-xs text-muted">Loading accounts…</div>';
     try{
       const sn=await fb().collection('users').get();
-      users=sn.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+      users=sn.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(a.name).localeCompare(String(b.name)));if(window.marsSyncLoginIds)window.marsSyncLoginIds(users);
       let off=false,strict=false;try{const st=await fb().collection('config').doc('settings').get();off=!!(st.exists&&st.data().legacyLoginOff);strict=!!(st.exists&&st.data().strictRules);}catch(e){}
       window._legacyOff=off;window._strict=strict;
       box.innerHTML=`<div class="rounded-xl border p-3 mb-3 text-sm" style="${strict?'border-color:#86efac;background:#f0fdf4':'border-color:#fcd34d;background:#fffbeb'}"><b>Database lock: ${strict?'ON':'OFF'}</b><div class="text-xs text-muted mt-1">${strict?'Only approved email accounts (and Admin) can read business data: ledger, requisitions, POs, RFQs, quotations, suppliers. ID and PIN sessions are blocked.':'Anyone who can open the app can still read business data. Turn this ON after every engineer has an email account and has signed in once.'}</div><div class="flex gap-2 mt-2 flex-wrap"><button class="btn ${strict?'btn-secondary':'btn-primary'}" onclick="marsStrictToggle()">${strict?'Turn OFF':'Turn ON'}</button><button class="btn btn-secondary" onclick="marsAuditView()">View audit log</button></div></div><div class="rounded-xl border p-3 mb-3 text-sm"><b>Engineer ID &amp; PIN login: ${off?'OFF':'ON'}</b><div class="text-xs text-muted mt-1">${off?'Everyone must sign in with email and password.':'Old ID and PIN login still works. Turn it OFF only after every engineer has an email account.'}</div><button class="btn btn-secondary mt-2" onclick="marsLegacyToggle()">${off?'Turn ON again':'Turn OFF'}</button></div>
@@ -5749,7 +5789,7 @@ async function deleteEntryFromFirebase(firebaseId){
     try{await fb().collection('config').doc('settings').set({legacyLoginOff:off},{merge:true});showToast(off?'ID and PIN login is now OFF.':'ID and PIN login is ON again.');marsRenderUsers();}
     catch(e){showToast('Failed: '+(e.code||e.message),'error');}
   };
-  window.marsUserGenId=async i=>{const u=users[i];if(!u||u.engineerId)return;try{const id=await marsNextEngineerId();await fb().collection('users').doc(u.id).set({engineerId:id},{merge:true});showToast('ID '+id+' created for '+(u.name||u.email)+'.');marsRenderUsers();}catch(e){showToast('Failed: '+(e.code||e.message),'error');}};
+  window.marsUserGenId=async i=>{const u=users[i];if(!u||u.engineerId)return;try{const id=await marsNextEngineerId(u.role||'site');await fb().collection('users').doc(u.id).set({engineerId:id},{merge:true});await marsPublishLoginId(id,u.email||u.id);showToast('ID '+id+' created for '+(u.name||u.email)+'.');marsRenderUsers();}catch(e){showToast('Failed: '+(e.code||e.message),'error');}};
   window.marsUserToggle=async i=>{const u=users[i];if(!confirm((u.disabled?'Enable ':'Disable ')+u.email+'?'))return;
     try{await fb().collection('users').doc(u.id).update({disabled:!u.disabled});showToast(u.disabled?'Account enabled.':'Account disabled.');marsRenderUsers();}catch(e){showToast('Failed: '+(e.code||e.message),'error');}};
   window.marsUserDelete=async i=>{
@@ -5786,7 +5826,7 @@ async function deleteEntryFromFirebase(firebaseId){
 (function(){
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
   const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
-  const role=()=>isAdmin?'admin':((window.currentEngineerRole==='store')?'site':(window.currentEngineerRole||'site'));
+  const role=()=>{if(isAdmin)return 'admin';const r=window.currentEngineerRole||'site';return r==='store'?'site':(r==='md'?'ed':((r==='hr'||r==='qs')?'viewer':r));};
   const canEdit=()=>role()==='proc'||role()==='admin';
   const money=n=>Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2});
   const d8=t=>new Date(t).toLocaleDateString('en-GB');
@@ -6021,8 +6061,8 @@ async function deleteEntryFromFirebase(firebaseId){
 <script>
 /* ============ SUPPLIER PORTAL v2 (?rfq=<private token>  or  ?portal=supplier) ============ */
 (function(){
-  const q0=new URLSearchParams(location.search),tk=q0.get('rfq'),hub=q0.get('portal')==='supplier';
-  if(!hub&&(!tk||!/^[a-f0-9]{32}$/.test(tk)))return;
+  const q0=new URLSearchParams(location.search),tk=q0.get('rfq'),poTok=q0.get('po'),hub=false;
+  if(!hub&&!poTok&&(!tk||!/^[a-f0-9]{32}$/.test(tk)))return;
   let cur=tk;
   const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
   const money=n=>Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -6048,6 +6088,7 @@ async function deleteEntryFromFirebase(firebaseId){
       const db=window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
       if(!db||!firebase.auth().currentUser)throw new Error('wait');
       if(hub){hubStart(db);return;}
+      if(poTok){const pd=await db.collection('supplier_pos').doc(poTok).get();if(!pd.exists){wrap.innerHTML=msg('This link is not valid. Please contact the company that sent it.');return;}renderPo(Object.assign({id:pd.id},pd.data()),db);return;}
       const d=await db.collection('rfq_invites').doc(cur).get();
       if(!d.exists){wrap.innerHTML=msg('This link is not valid. Please contact the company that sent it.');return;}
       renderRfq(d.data(),db);
@@ -6233,7 +6274,7 @@ async function deleteEntryFromFirebase(firebaseId){
   const IC={blue:'#e4efff',green:'#dcf6ea',orange:'#ffeadb',purple:'#e9e7ff'};
   const money=n=>Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
   const when=ms=>{if(!ms)return '';const d=new Date(ms);return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})+', '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
-  const rl=()=>{try{if(isAdmin)return 'admin';}catch(e){}const r=window.currentEngineerRole||'site';return r==='store'?'site':r;};
+  const rl=()=>{try{if(isAdmin)return 'admin';}catch(e){}const r=window.currentEngineerRole||'site';return r==='store'?'site':(r==='md'?'ed':((r==='hr'||r==='qs')?'viewer':r));};
   const arrow=c=>'<span class="hx-go" style="color:'+c+'">&rsaquo;</span>';
   let last='';
   function render(){
@@ -6252,7 +6293,7 @@ async function deleteEntryFromFirebase(firebaseId){
     const h=new Date().getHours(),hi=h<12?'Good morning,':(h<17?'Good afternoon,':'Good evening,');
     const name=role==='admin'?'Admin':(window.currentEngineerName||'Engineer');
     const dt=new Date().toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
-    const RN={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement',pmgr:'Purchase Manager',acct:'Accounts',viewer:'Management (view only)'},er=window.currentEngineerRole||'site',ap0=window.currentEngineerAllowedProjects||[];
+    const RN={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement Officer',pmgr:'Procurement Manager',acct:'Accounts Department',md:'Managing Director',hr:'HR & Admin',qs:'QS / Billing',viewer:'Viewer (view only)'},er=window.currentEngineerRole||'site',ap0=window.currentEngineerAllowedProjects||[];
     const idLine=role==='admin'?'':'<div class="sb" style="margin:2px 0">'+(window.currentEngineerId&&/^ENG-/.test(window.currentEngineerId)?'ID: '+esc(window.currentEngineerId)+' &middot; ':'')+esc(RN[er]||er)+(ap0.length?' &middot; '+esc(ap0.join(', ')):'')+'</div>';
     const statRaw=(c,ic,t,v,u,pg)=>'<div class="hx-st hx-c-'+c+'" onclick="showPage(\''+pg+'\')"><div class="hx-ic">'+ic+'</div><div><div class="t">'+t+'</div><div class="v">'+v+'</div><div class="u">'+u+'</div></div>'+arrow('#1e6fe8')+'</div>';
     const qRaw=(c,ic,t,d,pg)=>'<div class="hx-qt hx-c-'+c+'" onclick="showPage(\''+pg+'\')">'+ic+'<div class="tt">'+t+'</div><div class="ds">'+d+'</div>'+arrow('#1e6fe8')+'</div>';
@@ -6361,62 +6402,140 @@ window.marsAudit=function(action,target,detail){
 };
 (function(){const o=window.logActivity;if(typeof o!=='function')return;window.logActivity=function(a,d){const r=o.apply(this,arguments);try{window.marsAudit('Ledger',a,d);}catch(e){}return r;};})();
 </script>
+
 <script>
-/* ============ MANAGEMENT LOGIN (?portal=management) ============ */
+/* ============ LOGIN: ID + password (Gmail is used only to create the account and to reset the password) ============ */
 (function(){
-  if(new URLSearchParams(location.search).get('portal')!=='management')return;
-  window._portalMode='management';
+  const $=id=>document.getElementById(id);
   const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-  const wrap=document.createElement('div');wrap.id='mgmtPortal';
-  wrap.style.cssText='position:fixed;left:0;top:0;width:100%;height:100%;z-index:2147482000;background:linear-gradient(180deg,#0b1b3a,#16377a);overflow:auto;font-family:Tahoma,Verdana,Arial,sans-serif;color:#111';
-  document.body.appendChild(wrap);
-  const IN='width:100%;box-sizing:border-box;padding:12px;border:1px solid #c5ccd8;border-radius:10px;font-size:15px;background:#fff';
-  const BTN='width:100%;padding:13px;border:0;border-radius:12px;background:#1e6fe8;color:#fff;font-size:15px;font-weight:bold;margin-top:12px';
-  const LNK='border:0;background:none;color:#1e6fe8;font-size:13px;font-weight:bold;padding:8px 4px';
-  const box=h=>'<div style="max-width:420px;margin:0 auto;padding:28px 16px"><div style="text-align:center;color:#fff;margin-bottom:18px"><div style="font-size:13px;letter-spacing:.14em;opacity:.8">MARS STRUCTURE LIMITED</div><div style="font-size:24px;font-weight:800;margin-top:4px">Management Login</div><div style="font-size:12.5px;opacity:.8;margin-top:6px;line-height:1.5">For ED, DPM, Procurement, Purchase Manager, Accounts and management.<br>Site engineers and store keepers sign in from the main page.</div></div>'+h+'<div style="text-align:center;margin-top:14px"><a href="'+location.pathname+'" style="color:#bfdbfe;font-size:13px">&lsaquo; Back to Site / Store login</a></div></div>';
-  const note=(t,ok)=>t?'<div style="font-size:13px;margin-bottom:10px;color:'+(ok?'#166534':'#b91c1c')+'">'+esc(t)+'</div>':'';
-  function form(msg,ok,mode){
-    mode=mode||'in';
-    wrap.innerHTML=box('<div style="background:#fff;border-radius:16px;padding:16px">'+note(msg,ok)+'<input id="mgE" type="email" autocomplete="email" placeholder="Email" style="'+IN+'">'+(mode==='forgot'?'':'<input id="mgP" type="password" autocomplete="current-password" placeholder="Password" style="'+IN+';margin-top:8px">')+'<button id="mgGo" style="'+BTN+'">'+(mode==='forgot'?'Send reset link':'Sign in')+'</button><div style="display:flex;justify-content:space-between;flex-wrap:wrap"><button id="mgFg" style="'+LNK+'">'+(mode==='forgot'?'Back to sign in':'Forgot password?')+'</button></div><div style="font-size:12px;color:#555;margin-top:6px">No account yet? Open the main page and tap <b>Apply for Engineer ID</b>. Admin approves it and sets your role.</div></div>');
-    const g=id=>wrap.querySelector('#'+id);
-    g('mgFg').onclick=()=>form('',false,mode==='forgot'?'in':'forgot');
-    g('mgGo').onclick=async()=>{
-      const em=g('mgE').value.trim().toLowerCase(),pw=g('mgP')?g('mgP').value:'',au=firebase.auth();
-      if(!em){form('Enter your email.',false,mode);return;}
-      g('mgGo').disabled=true;g('mgGo').textContent='Please wait...';
-      try{
-        if(mode==='forgot'){await au.sendPasswordResetEmail(em);form('Reset link sent. Check your inbox and spam folder.',true,'in');return;}
-        if(!pw){form('Enter your password.',false,mode);return;}
+  const fdb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
+  const msgHtml=(t,ok)=>t?'<div class="lg-msg '+(ok?'ok':'err')+'">'+esc(t)+'</div>':'';
+  const mask=e=>{const a=String(e).split('@');return a[0].slice(0,2)+'***@'+(a[1]||'');};
+  const ERR={'auth/wrong-password':'Wrong ID or password.','auth/invalid-credential':'Wrong ID or password.','auth/user-not-found':'Wrong ID or password.','auth/invalid-email':'This email address is not valid.','auth/too-many-requests':'Too many attempts. Please wait a few minutes and try again.','auth/email-already-in-use':'This Gmail already has an account. Use "Check my application" below.','auth/weak-password':'Password must be at least 6 characters.','auth/network-request-failed':'No internet connection.'};
+  let busy=false;
+  function pwField(id,ph,ac){return '<div class="g-field-wrap"><input id="'+id+'" class="g-field" type="password" autocomplete="'+ac+'" placeholder="'+ph+'" style="padding-right:64px"><button class="g-eye" type="button" data-eye="'+id+'" aria-label="Show password">Show</button></div>';}
+  const head=(t,sub)=>'<div class="lg-title">'+t+'</div><div class="lg-sub">'+sub+'</div>';
+  const foot='<div class="lg-foot">Need help? Contact your Admin.</div>';
+  function render(mode,msg,ok){
+    const b=$('lgBody');if(!b)return;
+    const L=(id,t)=>'<button class="lg-link" id="'+id+'" type="button">'+t+'</button>';
+    const F=(lab,inner,gap)=>'<label class="g-field-label">'+lab+'</label>'+inner+(gap===false?'':'<div style="height:14px"></div>');
+    let h='';
+    if(mode==='in'){
+      h=head('Welcome back','Sign in with your ID and password')+msgHtml(msg,ok)
+       +F('User ID','<input id="lgId" class="g-field" type="text" autocomplete="username" autocapitalize="characters" placeholder="e.g. ENG-0001">')
+       +F('Password',pwField('lgPw','Enter your password','current-password'),false)
+       +'<button class="g-btn" id="lgGo" type="button">Sign in</button>'
+       +'<div class="lg-row" style="margin-top:10px">'+L('lgFg','Forgot password?')+L('lgAd','Admin login')+'</div><div class="lg-divider"></div>'
+       +'<div class="lg-row"><span style="font-size:13px;color:#64748b;padding:8px 0">New here?</span>'+L('lgSu','Create account')+L('lgCt','Check my application')+'</div>'+foot;
+    }else if(mode==='forgot'){
+      h=head('Reset your password','We will email you a link')+msgHtml(msg,ok)
+       +F('User ID (or Gmail)','<input id="lgId" class="g-field" type="text" placeholder="e.g. ENG-0001" autocapitalize="characters">',false)
+       +'<button class="g-btn" id="lgGo" type="button">Send reset link</button><div style="margin-top:8px">'+L('lgBk','&lsaquo; Back to sign in')+'</div>'
+       +'<div class="lg-help">We send a link to your Gmail. Open it, choose a new password, then sign in with the same ID. Your ID never changes.</div>'+foot;
+    }else if(mode==='signup'){
+      h=head('Create your account','Use your Gmail address')+msgHtml(msg,ok)
+       +F('Gmail address','<input id="lgEm" class="g-field" type="email" autocomplete="email" placeholder="yourname@gmail.com">')
+       +F('Choose a password',pwField('lgPw','At least 6 characters','new-password'))
+       +F('Confirm password',pwField('lgPw2','Type the password again','new-password'),false)
+       +'<button class="g-btn" id="lgGo" type="button">Create account</button><div style="margin-top:8px">'+L('lgBk','&lsaquo; Back to sign in')+'</div>'
+       +'<div class="lg-help"><b>Next steps:</b> open the verification email, then tap "Check my application", fill your details and passport-size photo. Admin approves you and gives you an ID.</div>'+foot;
+    }else if(mode==='continue'){
+      h=head('Your application','Sign in with your Gmail and password')+msgHtml(msg,ok)
+       +F('Gmail address','<input id="lgEm" class="g-field" type="email" autocomplete="email" placeholder="yourname@gmail.com">')
+       +F('Password',pwField('lgPw','The password you chose','current-password'),false)
+       +'<button class="g-btn" id="lgGo" type="button">Continue</button><div style="margin-top:8px">'+L('lgBk','&lsaquo; Back to sign in')+'</div>'
+       +'<div class="lg-help">Fill your details, or check whether Admin has approved you and what your ID is.</div>'+foot;
+    }else if(mode==='reset'){
+      h=head('Choose a new password',esc(window._resetEmail?mask(window._resetEmail):''))+msgHtml(msg,ok)
+       +F('New password',pwField('lgPw','At least 6 characters','new-password'))
+       +F('Confirm password',pwField('lgPw2','Type it again','new-password'),false)
+       +'<button class="g-btn" id="lgGo" type="button">Save new password</button>'+foot;
+    }
+    b.innerHTML=h;
+    const g=id=>$(id);
+    if(g('lgFg'))g('lgFg').onclick=()=>render('forgot');if(g('lgSu'))g('lgSu').onclick=()=>render('signup');if(g('lgCt'))g('lgCt').onclick=()=>render('continue');
+    if(g('lgBk'))g('lgBk').onclick=()=>render('in');
+    if(g('lgAd'))g('lgAd').onclick=()=>{const a=$('chooseAdmin');if(a)a.click();};
+    b.querySelectorAll('[data-eye]').forEach(btn=>btn.onclick=()=>{const i=$(btn.dataset.eye);if(!i)return;const show=i.type==='password';i.type=show?'text':'password';btn.textContent=show?'Hide':'Show';});
+    const go=g('lgGo');if(go){go.onclick=()=>run(mode);b.querySelectorAll('input').forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter')run(mode);}));}
+    const f=b.querySelector('input');setTimeout(()=>{try{if(f&&window.innerWidth>820)f.focus();}catch(e){}},120);
+  }
+  async function lookup(idv){
+    for(let k=0;k<2;k++){try{const d=await fdb().collection('login_ids').doc(idv).get();return d.exists?d.data().email:null;}catch(e){if(k===1)throw e;await new Promise(r=>setTimeout(r,1200));}}
+  }
+  async function run(mode){
+    if(busy)return;const au=firebase.auth(),v=id=>($(id)||{value:''}).value.trim();
+    busy=true;const go=$('lgGo');if(go){go.disabled=true;go.textContent='Please wait...';}
+    try{
+      if(mode==='in'){
+        const raw=v('lgId'),pw=($('lgPw')||{}).value||'';
+        if(!raw||!pw){render('in','Enter your ID and password.');return;}
+        if(raw.indexOf('@')>=0){const a=$('chooseAdmin');if(a)a.click();if($('vaultEmail'))$('vaultEmail').value=raw;if($('vaultPassword'))$('vaultPassword').value=pw;if($('vaultUnlock'))$('vaultUnlock').click();if(go){go.disabled=false;go.textContent='Sign in';}return;}
+        const email=await lookup(raw.toUpperCase().replace(/\s+/g,''));
+        if(!email){render('in','This ID was not found. Check it, or ask Admin.');return;}
+        const c=await au.signInWithEmailAndPassword(email,pw);
+        if(!c.user.emailVerified){await au.signOut();render('in','Your Gmail is not verified yet. Open the verification email, then sign in.');return;}
+        window._legacyOff=true;
+        if(go)go.textContent='Signing in...';
+        await window.marsAfterLogin(c.user,false);
+        render('in');return;
+      }
+      if(mode==='forgot'){
+        const raw=v('lgId');if(!raw){render('forgot','Enter your ID.');return;}
+        let email=raw.indexOf('@')>=0?raw.toLowerCase():await lookup(raw.toUpperCase().replace(/\s+/g,''));
+        if(!email){render('forgot','This ID was not found.');return;}
+        await au.sendPasswordResetEmail(email);
+        render('in','Reset link sent to '+mask(email)+'. Open it, choose a new password, then sign in with your ID.',true);return;
+      }
+      if(mode==='signup'){
+        const em=v('lgEm').toLowerCase(),pw=($('lgPw')||{}).value||'',pw2=($('lgPw2')||{}).value||'';
+        if(!/^[^\s@]+@gmail\.com$/.test(em)){render('signup','Please use your Gmail address (ending with @gmail.com).');return;}
+        if(pw.length<6){render('signup','Password must be at least 6 characters.');return;}
+        if(pw!==pw2){render('signup','The two passwords are not the same.');return;}
+        const c=await au.createUserWithEmailAndPassword(em,pw);await c.user.sendEmailVerification();await au.signOut();
+        render('continue','Account created. We sent a verification link to '+em+'. Open it, then enter your Gmail and password here.',true);return;
+      }
+      if(mode==='continue'){
+        const em=v('lgEm').toLowerCase(),pw=($('lgPw')||{}).value||'';
+        if(!em||!pw){render('continue','Enter your Gmail and password.');return;}
         const c=await au.signInWithEmailAndPassword(em,pw);
-        if(!c.user.emailVerified){await c.user.sendEmailVerification().catch(()=>{});await au.signOut();form('Please verify your email first. We sent the link again. Check inbox and spam, then sign in.',false,'in');return;}
-        wrap.innerHTML=box('<div style="background:#fff;border-radius:16px;padding:24px;text-align:center">Signing you in...</div>');
-        if(window.marsAfterLogin)await window.marsAfterLogin(c.user,false);
-        wait(8000,true);
-      }catch(e){
-        const m={'auth/wrong-password':'Wrong password.','auth/invalid-credential':'Wrong email or password.','auth/user-not-found':'No account with this email.','auth/invalid-email':'This email address is not valid.','auth/too-many-requests':'Too many attempts. Please wait and try again.'}[e&&e.code]||('Could not sign in: '+((e&&e.code)||'error'));
-        form(m,false,mode);
+        if(!c.user.emailVerified){await c.user.sendEmailVerification().catch(()=>{});await au.signOut();render('continue','Please verify your Gmail first. We sent the link again. Check inbox and spam.');return;}
+        window._legacyOff=true;
+        await window.marsAfterLogin(c.user,false);
+        render('continue','If the form did not open, tap Continue again.',true);return;
       }
-    };
-  }
-  function wait(ms,fresh){
-    const t0=Date.now(),iv=setInterval(()=>{
-      if(window.currentAccessRole==='engineer'||window.currentAccessRole==='admin'){clearInterval(iv);wrap.remove();document.documentElement.style.overflow='';return;}
-      if(Date.now()-t0>ms){clearInterval(iv);
-        const u=firebase.auth().currentUser;
-        if(fresh&&u&&!u.isAnonymous)form('Your account is not approved for the management team yet. Ask Admin to set your role.',false,'in');
-        else if(fresh)form('This login is for the management team. Site engineers and store keepers use the main login page.',false,'in');
-        else form('',false,'in');
+      if(mode==='reset'){
+        const pw=($('lgPw')||{}).value||'',pw2=($('lgPw2')||{}).value||'';
+        if(pw.length<6){render('reset','Password must be at least 6 characters.');return;}
+        if(pw!==pw2){render('reset','The two passwords are not the same.');return;}
+        await au.confirmPasswordReset(window._resetCode,pw);
+        try{history.replaceState(null,'',location.pathname);}catch(e){}
+        render('in','Password changed. Sign in with your ID and the new password.',true);return;
       }
-    },300);
+    }catch(e){console.error(e);render(mode==='in'?'in':mode,ERR[e&&e.code]||('Could not continue: '+((e&&e.code)||(e&&e.message)||'error')));}
+    finally{busy=false;}
   }
-  window.addEventListener('load',()=>{
-    const au=firebase.auth();let done=false;
-    const start=()=>{if(done)return;done=true;const u=au.currentUser;
-      if(u&&!u.isAnonymous&&u.emailVerified){wrap.innerHTML=box('<div style="background:#fff;border-radius:16px;padding:24px;text-align:center">Signing you in...</div>');wait(9000,false);}
-      else form('',false,'in');};
-    setTimeout(start,1500);
-  });
-  form('',false,'in');
+  window.mrsLoginMode=(m,msg)=>{if(typeof window.openAccessPortal==='function')window.openAccessPortal('role');render(m,msg);};
+  function boot(){
+    if(typeof window.openAccessPortal==='function')window.openAccessPortal('role');
+    const q=new URLSearchParams(location.search);
+    if(q.get('mode')==='resetPassword'&&q.get('oobCode')){
+      window._resetCode=q.get('oobCode');
+      firebase.auth().verifyPasswordResetCode(window._resetCode).then(em=>{window._resetEmail=em;render('reset');}).catch(()=>render('in','This reset link is not valid any more. Tap "Forgot password?" to get a new one.'));
+      return;
+    }
+    render('in');
+    let first=true;
+    firebase.auth().onAuthStateChanged(u=>{
+      if(!first)return;first=false;
+      if(u&&!u.isAnonymous){
+        const b=$('lgBody');if(b)b.innerHTML='<div class="lg-title" style="margin-top:20px">Signing you in...</div><div class="lg-sub">Please wait a moment.</div>';
+        const t0=Date.now(),iv=setInterval(()=>{if(window.currentAccessRole||Date.now()-t0>9000){clearInterval(iv);if(!window.currentAccessRole)render('in');}},400);
+      }
+    });
+  }
+  if(document.readyState==='complete')setTimeout(boot,50);else window.addEventListener('load',()=>setTimeout(boot,50));
 })();
 </script>
 </body>
