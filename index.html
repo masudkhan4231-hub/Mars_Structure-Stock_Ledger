@@ -555,8 +555,8 @@ window.marsPill=function(kind,text){
 /* ===== MARS mint-glass theme v2 — design only, no logic changes ===== */
 @media screen{
 :root{--m-blue:#0a64c8;--m-sky:#12a0f0;--m-green:#1fa463;--m-ink:#0b1b3a;--m-mut:#5b6b7f;--m-line:#e1eaf6;--m-sb:env(safe-area-inset-bottom,0px);--m-st:env(safe-area-inset-top,0px)}
-html{-webkit-text-size-adjust:100%;text-size-adjust:100%;max-width:100%;overflow-x:hidden}
-body{max-width:100%;overflow-x:hidden;overflow-x:clip;color:var(--m-ink);background:linear-gradient(160deg,#eef2ff 0%,#eefaf3 55%,#fdf3ea 100%) fixed;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;max-width:100%}
+body{max-width:100%;overflow-x:hidden;overflow-x:clip;color:var(--m-ink);background:linear-gradient(160deg,#eef2ff 0%,#eefaf3 55%,#fdf3ea 100%);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
 img{max-width:100%;height:auto}
 button,[role=button],a,select{touch-action:manipulation}
 input,select,textarea{max-width:100%;min-width:0}
@@ -572,7 +572,7 @@ input,select,textarea{max-width:100%;min-width:0}
 .topbar-inner{padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px))}
 
 /* ---- cards ---- */
-.card{background:rgba(255,255,255,.9);border:1px solid rgba(225,234,246,.95);border-radius:24px;box-shadow:0 12px 32px rgba(30,70,120,.08)}
+.card{background:rgba(255,255,255,.92);border:1px solid rgba(225,234,246,.95);border-radius:24px;box-shadow:0 6px 18px rgba(30,70,120,.07)}
 .page-section h2{color:var(--m-blue)}
 .section-title{color:var(--m-ink)}
 body .border-line{border-color:var(--m-line)}
@@ -661,7 +661,6 @@ body:has(#sidebar[style*="display: block"]) .mobile-bottom{display:none!importan
 .mobile-bottom button{flex:1;min-width:0;min-height:52px;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10.5px;font-weight:700;color:var(--m-mut)}
 .mobile-bottom button.mb-active{color:var(--m-blue);background:#e8f2ff}
 .main{padding-bottom:calc(100px + var(--m-sb))}
-.page-section{overflow-x:auto;-webkit-overflow-scrolling:touch}
 input,select,textarea{font-size:16px!important}
 .sm-row{grid-template-columns:1fr}
 .toast{left:12px;right:12px;max-width:none;bottom:calc(88px + var(--m-sb))}
@@ -677,6 +676,12 @@ input,select,textarea{font-size:16px!important}
 <style id="mars-login-v3">
 /* ===== MARS login v3 (blue split card) + coloured splash — design only ===== */
 @media screen{
+/* smoothness: no big blurs, no fixed backgrounds, GPU-friendly fades */
+.app-glow,#accessOverlay .glass-blob{display:none!important}
+#appOpenSplash{will-change:opacity;transform:translateZ(0)}
+.hx-st,.glass-panel,.back-role,.topbar{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+#accessOverlay{will-change:opacity}
+.lg-in,.lg-google,#roleChooser .g-btn{transition:background-color .15s,border-color .15s,box-shadow .15s}
 #appOpenSplash{background:linear-gradient(160deg,#cfe8ff 0%,#e1f6ec 52%,#ffe9d4 100%)!important}
 #appOpenSplash .asp-stage{background:radial-gradient(ellipse 900px 560px at 50% 42%,rgba(255,255,255,.8),transparent 72%)}
 #appOpenSplash .asp-stage:before,#appOpenSplash .asp-stage:after{content:"";position:absolute;border-radius:50%;pointer-events:none}
@@ -687,11 +692,11 @@ input,select,textarea{font-size:16px!important}
 
 #accessOverlay{background:linear-gradient(180deg,#0b7be6 0%,#04479a 100%)!important}
 #accessOverlay .glass-blob.b1,#accessOverlay .glass-blob.b2,#accessOverlay .glass-blob.b3,#accessOverlay .glass-blob.b4{background:radial-gradient(circle,rgba(255,255,255,.14),transparent 70%)}
-#roleChooser.lg-card{position:relative;overflow:hidden;background:#fff;border:0;border-radius:26px;box-shadow:0 30px 70px rgba(2,20,60,.35)}
+#roleChooser.lg-card{position:relative;overflow:hidden;background:#fff;border:0;border-radius:26px;box-shadow:0 14px 36px rgba(2,20,60,.3);transform:translateZ(0)}
 #roleChooser.lg-card:after{content:"";position:absolute;right:-70px;bottom:-70px;width:170px;height:170px;border-radius:50%;background:linear-gradient(135deg,#2a8cff,#0a55c8);pointer-events:none}
 .lg-form{position:relative;z-index:1;background:transparent;padding:40px 48px 44px}
 .lg-brand{background:linear-gradient(150deg,#0d6fdc 0%,#0a55c0 55%,#063f95 100%);border-radius:0 300px 300px 0 / 0 300px 300px 0;padding:36px 80px 36px 40px;min-height:520px}
-.lg-brand:before{content:"";position:absolute;width:210px;height:210px;border-radius:50%;left:46%;right:auto;top:auto;bottom:36px;background:radial-gradient(circle at 35% 28%,#3a9bff,#0a62d0 72%);box-shadow:0 18px 40px rgba(2,30,80,.35),inset 0 0 0 1px rgba(255,255,255,.14)}
+.lg-brand:before{content:"";position:absolute;width:210px;height:210px;border-radius:50%;left:46%;right:auto;top:auto;bottom:36px;background:radial-gradient(circle at 35% 28%,#3a9bff,#0a62d0 72%);box-shadow:none}
 .lg-brand:after{content:"";position:absolute;width:300px;height:300px;border-radius:50%;left:-120px;right:auto;top:auto;bottom:-130px;background:#1a82f2;opacity:.85}
 .lg-brand-mid ul{display:none}
 .lg-welcome{font-size:clamp(30px,4vw,44px);font-weight:800;letter-spacing:.03em;line-height:1.05;color:#fff;margin:0 0 10px}
@@ -725,6 +730,25 @@ input,select,textarea{font-size:16px!important}
 .lg-brand-mid h2{font-size:14px;margin:0;font-weight:600}
 .lg-form{padding:24px 22px 28px}
 #roleChooser .lg-title{font-size:26px}
+}
+</style>
+<style id="mars-login-fit">
+/* login: fit inside the card on every width + clearer text */
+@media screen{
+#roleChooser.lg-card{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
+.lg-brand,.lg-form,.lg-form>*{min-width:0;max-width:100%}
+.lg-in{box-sizing:border-box;width:100%}
+.lg-in input::placeholder{color:#64748b}
+#roleChooser .lg-sub,.lg-foot,.lg-or{color:#475569}
+#roleChooser .lg-link{color:#0a55c0;font-weight:700}
+.lg-row{justify-content:flex-start;gap:2px 18px}
+.lg-welcome{margin-top:8px}
+}
+@media screen and (max-width:820px){
+#roleChooser.lg-card{grid-template-columns:minmax(0,1fr)}
+#roleChooser.lg-card:after,.lg-brand:after{display:none}
+.lg-brand{gap:12px;padding:20px 22px 28px}
+.lg-form{padding:22px 20px 26px}
 }
 </style>
 </head>
