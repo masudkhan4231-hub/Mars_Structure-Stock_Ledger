@@ -1112,6 +1112,8 @@ input,select,textarea{font-size:16px!important}
         <a href="javascript:void(0)" class="nav-item" data-page="track" onclick="showPage('track')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg> Track Requisition</a>
         <a href="javascript:void(0)" class="nav-item" data-page="suppliers" onclick="showPage('suppliers')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l1-5h16l1 5M3 9v11h18V9M3 9h18M9 20v-6h6v6"/></svg> Suppliers</a>
         <a href="javascript:void(0)" class="nav-item" data-page="purchaseorders" onclick="showPage('purchaseorders')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg> Purchase Orders</a>
+        <div class="nav-group">Workshop</div>
+        <a href="javascript:void(0)" class="nav-item" data-page="shutter" onclick="showPage('shutter')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg> Shuttering</a>
         <div class="nav-group" id="ngReports">Reports</div>
         <a href="javascript:void(0)" class="nav-item" data-page="print" onclick="showPage('print')"><svg class="vic" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6M9 9h1"/></svg> Reports</a>
         <div class="nav-group">Admin &amp; Account</div>
@@ -1411,6 +1413,7 @@ input,select,textarea{font-size:16px!important}
           <div id="poPageList" class="space-y-2"></div>
         </section>
 
+        <section id="shutterSection" class="card p-5 md:p-6 page-section page-hidden" data-page="shutter"></section>
         <section id="verifySection" class="card p-5 md:p-6 page-section page-hidden" data-page="verify">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-line">
             <div><div class="section-title">Physical Stock Verification</div><div class="text-xs text-muted mt-1">Count what's actually on site, compare against the system balance, and print a shortage/excess report for the office.</div></div>
@@ -2940,7 +2943,8 @@ input,select,textarea{font-size:16px!important}
 /* Each person sees only the pages that belong to their role */
 const NAV_ALLOW={
   admin:'*',
-  site:['dashboard','entry','transfers','requisition','track','print'],
+  workshop:['shutter','dashboard','track'],
+  site:['shutter','dashboard','entry','transfers','requisition','track','print'],
   store:['dashboard','entry','transfers','requisition','track','print'],
   dpm:['dashboard','requisition','track','transfers','print'],
   ed:['dashboard','requisition','track','purchaseorders','suppliers','transfers','print'],
@@ -4342,7 +4346,7 @@ async function deleteEntryFromFirebase(firebaseId){
   const who=()=>window.currentEngineerName||'Admin';
   const myPrj=()=>window.currentEngineerAllowedProjects||[];
   const STAGE={delivery:marsPill('delivery','Awaiting delivery'),dpm:marsPill('pending','With DPM'),ed:marsPill('pending','With Executive Director'),procurement:marsPill('progress','With Procurement'),closed:marsPill('approved','Closed'),rejected:marsPill('rejected','Rejected')};
-  const ROLES={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement Officer',pmgr:'Procurement Manager',acct:'Accounts Department',md:'Managing Director',hr:'HR & Admin',qs:'QS / Billing',viewer:'Viewer (view only)'};
+  const ROLES={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement Officer',pmgr:'Procurement Manager',acct:'Accounts Department',md:'Managing Director',hr:'HR & Admin',qs:'QS / Billing',workshop:'Workshop In-charge',viewer:'Viewer (view only)'};
   let reqs=[],lastCount=0;
   const pending=r=>(r.items||[]).filter(i=>i.state==='pending');
   const actionable=r=>(role()==='site'&&myPrj().includes(r.prjNo)&&(r.items||[]).some(i=>i.state==='purchased'))||(role()==='dpm'&&r.stage==='dpm')||(role()==='ed'&&r.stage==='ed')||(role()==='proc'&&r.stage==='procurement'&&pending(r).length>0);
@@ -4629,7 +4633,7 @@ async function deleteEntryFromFirebase(firebaseId){
   const GEO={};"Dhaka:Dhamrai,Dohar,Keraniganj,Nawabganj,Savar,Dhaka Metropolitan|Gazipur:Gazipur Sadar,Kaliakair,Kaliganj,Kapasia,Sreepur|Narayanganj:Araihazar,Bandar,Narayanganj Sadar,Rupganj,Sonargaon|Narsingdi:Belabo,Monohardi,Narsingdi Sadar,Palash,Raipura,Shibpur|Manikganj:Daulatpur,Ghior,Harirampur,Manikganj Sadar,Saturia,Shivalaya,Singair|Munshiganj:Gazaria,Lohajang,Munshiganj Sadar,Sirajdikhan,Sreenagar,Tongibari|Faridpur:Alfadanga,Bhanga,Boalmari,Charbhadrasan,Faridpur Sadar,Madhukhali,Nagarkanda,Sadarpur,Saltha|Gopalganj:Gopalganj Sadar,Kashiani,Kotalipara,Muksudpur,Tungipara|Madaripur:Kalkini,Madaripur Sadar,Rajoir,Shibchar|Rajbari:Baliakandi,Goalanda,Kalukhali,Pangsha,Rajbari Sadar|Shariatpur:Bhedarganj,Damudya,Gosairhat,Naria,Shariatpur Sadar,Zajira|Kishoreganj:Austagram,Bajitpur,Bhairab,Hossainpur,Itna,Karimganj,Katiadi,Kishoreganj Sadar,Kuliarchar,Mithamain,Nikli,Pakundia,Tarail|Tangail:Basail,Bhuapur,Delduar,Dhanbari,Ghatail,Gopalpur,Kalihati,Madhupur,Mirzapur,Nagarpur,Sakhipur,Tangail Sadar|Chattogram:Anwara,Banshkhali,Boalkhali,Chandanaish,Fatikchhari,Hathazari,Karnaphuli,Lohagara,Mirsharai,Patiya,Rangunia,Raozan,Sandwip,Satkania,Sitakunda|Cox's Bazar:Chakaria,Cox's Bazar Sadar,Eidgaon,Kutubdia,Maheshkhali,Pekua,Ramu,Teknaf,Ukhia|Cumilla:Barura,Brahmanpara,Burichang,Chandina,Chauddagram,Daudkandi,Debidwar,Homna,Laksam,Lalmai,Meghna,Monohargonj,Muradnagar,Nangalkot,Cumilla Adarsha Sadar,Cumilla Sadar Dakshin,Titas|Brahmanbaria:Akhaura,Ashuganj,Bancharampur,Bijoynagar,Brahmanbaria Sadar,Kasba,Nabinagar,Nasirnagar,Sarail|Chandpur:Chandpur Sadar,Faridganj,Haimchar,Haziganj,Kachua,Matlab Dakshin,Matlab Uttar,Shahrasti|Feni:Chhagalnaiya,Daganbhuiyan,Feni Sadar,Fulgazi,Parshuram,Sonagazi|Lakshmipur:Kamalnagar,Lakshmipur Sadar,Raipur,Ramganj,Ramgati|Noakhali:Begumganj,Chatkhil,Companiganj,Hatiya,Kabirhat,Noakhali Sadar,Senbagh,Sonaimuri,Subarnachar|Khagrachhari:Dighinala,Guimara,Khagrachhari Sadar,Lakshmichhari,Mahalchhari,Manikchhari,Matiranga,Panchhari,Ramgarh|Rangamati:Baghaichhari,Barkal,Belaichhari,Juraichhari,Kaptai,Kawkhali,Langadu,Naniarchar,Rajasthali,Rangamati Sadar|Bandarban:Alikadam,Bandarban Sadar,Lama,Naikhongchhari,Rowangchhari,Ruma,Thanchi|Rajshahi:Bagha,Bagmara,Charghat,Durgapur,Godagari,Mohanpur,Paba,Puthia,Tanore|Bogura:Adamdighi,Bogura Sadar,Dhunat,Dhupchanchia,Gabtali,Kahaloo,Nandigram,Sariakandi,Shajahanpur,Sherpur,Shibganj,Sonatala|Chapainawabganj:Bholahat,Gomastapur,Nachole,Nawabganj Sadar,Shibganj|Joypurhat:Akkelpur,Joypurhat Sadar,Kalai,Khetlal,Panchbibi|Naogaon:Atrai,Badalgachhi,Dhamoirhat,Mahadebpur,Manda,Naogaon Sadar,Niamatpur,Patnitala,Porsha,Raninagar,Sapahar|Natore:Bagatipara,Baraigram,Gurudaspur,Lalpur,Naldanga,Natore Sadar,Singra|Pabna:Atgharia,Bera,Bhangura,Chatmohar,Faridpur,Ishwardi,Pabna Sadar,Santhia,Sujanagar|Sirajganj:Belkuchi,Chauhali,Kamarkhanda,Kazipur,Raiganj,Shahjadpur,Sirajganj Sadar,Tarash,Ullahpara|Khulna:Batiaghata,Dacope,Dighalia,Dumuria,Koyra,Paikgachha,Phultala,Rupsha,Terokhada|Bagerhat:Bagerhat Sadar,Chitalmari,Fakirhat,Kachua,Mollahat,Mongla,Morrelganj,Rampal,Sarankhola|Chuadanga:Alamdanga,Chuadanga Sadar,Damurhuda,Jibannagar|Jashore:Abhaynagar,Bagherpara,Chaugachha,Jashore Sadar,Jhikargachha,Keshabpur,Manirampur,Sharsha|Jhenaidah:Harinakunda,Jhenaidah Sadar,Kaliganj,Kotchandpur,Maheshpur,Shailkupa|Kushtia:Bheramara,Daulatpur,Khoksa,Kumarkhali,Kushtia Sadar,Mirpur|Magura:Magura Sadar,Mohammadpur,Shalikha,Sreepur|Meherpur:Gangni,Meherpur Sadar,Mujibnagar|Narail:Kalia,Lohagara,Narail Sadar,Naragati|Satkhira:Assasuni,Debhata,Kalaroa,Kaliganj,Satkhira Sadar,Shyamnagar,Tala|Barishal:Agailjhara,Babuganj,Bakerganj,Banaripara,Barishal Sadar,Gaurnadi,Hizla,Mehendiganj,Muladi,Wazirpur|Barguna:Amtali,Bamna,Barguna Sadar,Betagi,Patharghata,Taltali|Bhola:Bhola Sadar,Burhanuddin,Char Fasson,Daulatkhan,Lalmohan,Manpura,Tazumuddin|Jhalokati:Jhalokati Sadar,Kathalia,Nalchity,Rajapur|Patuakhali:Bauphal,Dashmina,Dumki,Galachipa,Kalapara,Mirzaganj,Patuakhali Sadar,Rangabali|Pirojpur:Bhandaria,Kawkhali,Mathbaria,Nazirpur,Nesarabad,Pirojpur Sadar,Zianagar|Sylhet:Balaganj,Beanibazar,Bishwanath,Companiganj,Dakshin Surma,Fenchuganj,Golapganj,Gowainghat,Jaintiapur,Kanaighat,Osmani Nagar,Sylhet Sadar,Zakiganj|Habiganj:Ajmiriganj,Bahubal,Baniachong,Chunarughat,Habiganj Sadar,Lakhai,Madhabpur,Nabiganj,Shayestaganj|Moulvibazar:Barlekha,Juri,Kamalganj,Kulaura,Moulvibazar Sadar,Rajnagar,Sreemangal|Sunamganj:Bishwamvarpur,Chhatak,Dakshin Sunamganj,Derai,Dharampasha,Dowarabazar,Jagannathpur,Jamalganj,Sullah,Sunamganj Sadar,Tahirpur|Rangpur:Badarganj,Gangachara,Kaunia,Mithapukur,Pirgachha,Pirganj,Rangpur Sadar,Taraganj|Dinajpur:Birampur,Birganj,Biral,Bochaganj,Chirirbandar,Dinajpur Sadar,Ghoraghat,Hakimpur,Kaharole,Khansama,Nawabganj,Parbatipur,Phulbari|Gaibandha:Fulchhari,Gaibandha Sadar,Gobindaganj,Palashbari,Sadullapur,Saghata,Sundarganj|Kurigram:Bhurungamari,Char Rajibpur,Chilmari,Kurigram Sadar,Nageshwari,Phulbari,Rajarhat,Raomari,Ulipur|Lalmonirhat:Aditmari,Hatibandha,Kaliganj,Lalmonirhat Sadar,Patgram|Nilphamari:Dimla,Domar,Jaldhaka,Kishoreganj,Nilphamari Sadar,Saidpur|Panchagarh:Atwari,Boda,Debiganj,Panchagarh Sadar,Tetulia|Thakurgaon:Baliadangi,Haripur,Pirganj,Ranisankail,Thakurgaon Sadar|Mymensingh:Bhaluka,Dhobaura,Fulbaria,Gaffargaon,Gauripur,Haluaghat,Ishwarganj,Muktagachha,Mymensingh Sadar,Nandail,Phulpur,Tarakanda,Trishal|Jamalpur:Bakshiganj,Dewanganj,Islampur,Jamalpur Sadar,Madarganj,Melandaha,Sarishabari|Netrokona:Atpara,Barhatta,Durgapur,Kalmakanda,Kendua,Khaliajuri,Madan,Mohanganj,Netrokona Sadar,Purbadhala|Sherpur:Jhenaigati,Nakla,Nalitabari,Sherpur Sadar,Sreebardi".split('|').forEach(x=>{const[a,b]=x.split(':');GEO[a]=b.split(',');});
   const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-  const ROLES={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement Officer',pmgr:'Procurement Manager',acct:'Accounts Department',md:'Managing Director',hr:'HR & Admin',qs:'QS / Billing',viewer:'Viewer (view only)'};
+  const ROLES={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement Officer',pmgr:'Procurement Manager',acct:'Accounts Department',md:'Managing Director',hr:'HR & Admin',qs:'QS / Billing',workshop:'Workshop In-charge',viewer:'Viewer (view only)'};
   let nidData='',sigData='';
   const LIM={nid:{minW:600,minH:380,maxW:3000,maxH:2000,minKB:50,maxKB:2048,name:'NID photo'},sig:{minW:250,minH:60,maxW:350,maxH:100,minKB:5,maxKB:100,name:'Signature'}};
   function checkImg(f,L){
@@ -5633,7 +5637,7 @@ async function deleteEntryFromFirebase(firebaseId){
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
   const role=()=>{if(isAdmin)return 'admin';const r=window.currentEngineerRole||'site';return r==='store'?'site':(r==='md'?'ed':((r==='hr'||r==='qs')?'viewer':r));};
   const mine=()=>window.currentEngineerAllowedProjects||[];
-  const RL={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement Officer',pmgr:'Procurement Manager',acct:'Accounts Department',md:'Managing Director',hr:'HR & Admin',qs:'QS / Billing',viewer:'Viewer (view only)'};
+  const RL={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement Officer',pmgr:'Procurement Manager',acct:'Accounts Department',md:'Managing Director',hr:'HR & Admin',qs:'QS / Billing',workshop:'Workshop In-charge',viewer:'Viewer (view only)'};
   const STG={dpm:'With DPM',ed:'With Executive Director',procurement:'With Procurement',delivery:'Awaiting delivery',closed:'Closed',rejected:'Rejected'};
   const ITS={pending:'Pending',cancelled:'Cancelled',purchased:'Purchased (awaiting delivery)',received:'Received'};
   const pad=n=>String(n).padStart(2,'0');
@@ -5738,7 +5742,7 @@ async function deleteEntryFromFirebase(firebaseId){
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
   const fb=()=>window.MARS_FIREBASE&&window.MARS_FIREBASE.db;
   const A=()=>firebase.auth();
-  const RL={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement Officer',pmgr:'Procurement Manager',acct:'Accounts Department',md:'Managing Director',hr:'HR & Admin',qs:'QS / Billing',viewer:'Viewer (view only)'};
+  const RL={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement Officer',pmgr:'Procurement Manager',acct:'Accounts Department',md:'Managing Director',hr:'HR & Admin',qs:'QS / Billing',workshop:'Workshop In-charge',viewer:'Viewer (view only)'};
   const out=()=>A().signOut().catch(()=>{});
   const errMsg=e=>{const c=(e&&e.code)||'';
     if(/invalid-credential|wrong-password|user-not-found/.test(c))return 'Wrong email or password.';
@@ -6403,7 +6407,7 @@ async function deleteEntryFromFirebase(firebaseId){
     const h=new Date().getHours(),hi=h<12?'Good morning,':(h<17?'Good afternoon,':'Good evening,');
     const name=role==='admin'?'Admin':(window.currentEngineerName||'Engineer');
     const dt=new Date().toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
-    const RN={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement Officer',pmgr:'Procurement Manager',acct:'Accounts Department',md:'Managing Director',hr:'HR & Admin',qs:'QS / Billing',viewer:'Viewer (view only)'},er=window.currentEngineerRole||'site',ap0=window.currentEngineerAllowedProjects||[];
+    const RN={site:'Site Engineer',store:'Store Keeper',dpm:'DPM / Project Manager',ed:'Executive Director',proc:'Procurement Officer',pmgr:'Procurement Manager',acct:'Accounts Department',md:'Managing Director',hr:'HR & Admin',qs:'QS / Billing',workshop:'Workshop In-charge',viewer:'Viewer (view only)'},er=window.currentEngineerRole||'site',ap0=window.currentEngineerAllowedProjects||[];
     const idLine=role==='admin'?'':'<div class="sb" style="margin:2px 0">'+(window.currentEngineerId&&/^ENG-/.test(window.currentEngineerId)?'ID: '+esc(window.currentEngineerId)+' &middot; ':'')+esc(RN[er]||er)+(ap0.length?' &middot; '+esc(ap0.join(', ')):'')+'</div>';
     const statRaw=(c,ic,t,v,u,pg)=>'<div class="hx-st hx-c-'+c+'" onclick="showPage(\''+pg+'\')"><div class="hx-ic">'+ic+'</div><div><div class="t">'+t+'</div><div class="v">'+v+'</div><div class="u">'+u+'</div></div>'+arrow('#1e6fe8')+'</div>';
     const qRaw=(c,ic,t,d,pg)=>'<div class="hx-qt hx-c-'+c+'" onclick="showPage(\''+pg+'\')">'+ic+'<div class="tt">'+t+'</div><div class="ds">'+d+'</div>'+arrow('#1e6fe8')+'</div>';
@@ -6687,6 +6691,329 @@ window.marsAudit=function(action,target,detail){
     });
   }
   if(document.readyState==='complete')setTimeout(boot,50);else window.addEventListener('load',()=>setTimeout(boot,50));
+})();
+</script>
+<!-- ===== MARS Workshop & Shuttering Module (Phase 1-3) ===== -->
+<script>
+(function(){
+const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const $=id=>document.getElementById(id), N=v=>Number(v)||0, r4=v=>Math.round(v*1e4)/1e4;
+const who=()=>window.currentEngineerName||'Admin';
+let PO=[],GP=[],ST=[];
+const canOp=()=>{try{return isAdmin||window.currentEngineerRole==='workshop';}catch(e){return false;}};
+const canRecv=()=>canOp()||window.currentEngineerRole==='site';
+function applyRole(){document.querySelectorAll('#shutterSection .shOp').forEach(e=>e.style.display=canOp()?'':'none');
+  document.querySelectorAll('#shutterSection button[onclick^="shReceive"]').forEach(e=>e.style.display=canRecv()?'':'none');}
+setInterval(()=>{applyRole();fillPrj();if(window.shGPrev)shGPrev();},1200);
+function repRows(){
+  const m={},g=(p,s)=>m[p+'|'+s]=m[p+'|'+s]||{p,s,ord:0,prod:0,disp:0,rec:0,tr:0,ret:0,stk:0,ang:0,gp:0,fl:0};
+  PO.forEach(o=>{const r=g(o.prj,o.size);r.ord+=o.planned;r.prod+=o.produced;(o.consumed||[]).forEach(c=>c.lines.forEach(l=>{if(l.kg==null)return;
+    if(l.n==='Angle Bar')r.ang+=l.kg;else if(l.n==='GP Sheet')r.gp+=l.kg;else r.fl+=l.kg;}));});
+  GP.forEach(x=>{if(x.type!=='P2W'){const r=g(x.to,x.size);r.disp+=x.qty;if(x.status==='received')r.rec+=x.recQty;else r.tr+=x.qty;}
+    else{g(x.from,x.size).ret+=x.qty;}});
+  ST.forEach(s=>Object.entries(s.loc||{}).forEach(([k,v])=>{if(v&&k!=='TRANSIT'&&k!=='LOST')g(k,s.size).stk+=v;}));
+  return Object.values(m).sort((a,b)=>(a.p+a.s).localeCompare(b.p+b.s));
+}
+function rep(){const el=$('shRepOut');if(!el)return;
+  const sel=$('shRepPrj'),cur=sel.value,ps=[...new Set(repRows().map(r=>r.p))];
+  sel.innerHTML='<option value="">All projects</option>'+ps.map(p=>`<option ${p===cur?'selected':''}>${esc(p)}</option>`).join('');
+  const kd=$('shRepType').value;if(kd!=='proj'){const q=repHtml(kd,sel.value);el.innerHTML='<style>.shtb table{width:100%;border-collapse:collapse;font-size:11px}.shtb th,.shtb td{border:1px solid #ddd;padding:4px;text-align:center}.shtb th{background:#eef2f7}.shtb tr.tot td{font-weight:bold;background:#f5f7fa}</style><div class="shtb overflow-x-auto">'+q.body+'</div>';window._shRows=[];return;}
+  const rows=repRows().filter(r=>!sel.value||r.p===sel.value),f=v=>r4(v).toFixed(2);window._shRows=rows;
+  el.innerHTML='<table class="w-full text-xs"><tr>'+['Project','Size','Ordered','Produced','Dispatched','Received','In transit','Returned','Stock now','Angle kg','GP kg','Flat kg'].map(h=>`<th align=left>${h}</th>`).join('')+'</tr>'+
+   rows.map(r=>`<tr><td>${esc(pl(r.p))}</td><td>${esc(r.s)}</td><td>${r.ord}</td><td>${r.prod}</td><td>${r.disp}</td><td>${r.rec}</td><td>${r.tr}</td><td>${r.ret}</td><td><b>${r.stk}</b></td><td>${f(r.ang)}</td><td>${f(r.gp)}</td><td>${f(r.fl)}</td></tr>`).join('')+'</table>'+
+   '<div class="mt-4 font-bold text-sm">Project-wise Summary (stock now)</div>'+sumTable(rows)+'<div class="text-xs text-muted mt-2">RFT = length × qty. Workshop reports are separate from the main stock ledger. “WORKSHOP” = finished shutters at the workshop. Flat kg is residual/estimated.</div>';}
+window.shRepCsv=function(){if($('shRepType').value!=='proj')return showToast('Excel (CSV) is only for the Project-wise report. Use Print / PDF for this one.','error');const rows=window._shRows||[];const h=['Project','Size','Ordered','Produced','Dispatched','Received','In transit','Returned','Stock','Angle kg','GP kg','Flat kg'];
+  const csv=[h].concat(rows.map(r=>[r.p,r.s,r.ord,r.prod,r.disp,r.rec,r.tr,r.ret,r.stk,r.ang,r.gp,r.fl])).map(a=>a.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download='workshop-report.csv';a.click();};
+window.shRep=rep;
+let RL=[];
+const PCSS=`@page{size:A4 landscape;margin:8mm}body{font-family:Arial,sans-serif;color:#172033;font-size:11px}h1,h2,p{text-align:center;margin:3px}h1{font-size:20px}h2{font-size:14px}
+.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}table{width:100%;border-collapse:collapse;page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}
+th,td{border:1px solid #999;padding:4px;text-align:center}th{background:#eef2f7}tr.tot td{font-weight:bold;background:#f5f7fa}.nt{font-size:9px;margin-top:8px}
+.sign{display:flex;justify-content:space-between;margin-top:55px}.sig{width:200px;border-top:1px solid #555;text-align:center;padding-top:4px}`;
+const dd=t=>t?new Date(t).toLocaleDateString('en-GB'):'';
+const TL={W2P:'27 Katha → Project',P2P:'Project → Project',P2W:'Project → 27 Katha'};
+const ll=x=>x==='WORKSHOP'?'27 Katha':x;
+function docHtml(title,meta,body,sigs,note){return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)}</title><style>${PCSS}</style></head><body><h1>MARS STRUCTURE LIMITED</h1><h2>${title}</h2>
+<div class="meta">${meta.map(m=>`<span>${m}</span>`).join('')}</div>${body}${note?`<div class="nt">${note}</div>`:''}<div class="sign">${sigs.map(x=>`<div class="sig">${x}</div>`).join('')}</div></body></html>`;}
+function tb(h,rows){return `<table><thead><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>r.t?`<tr class="tot">${r.t.map(c=>`<td>${c}</td>`).join('')}</tr>`:`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;}
+function repHtml(kind,prj){const f=v=>r4(v).toFixed(2),ok=p=>!prj||p===prj,m=['Project: '+esc(prj||'All Projects'),'Date: '+dd(Date.now()),'Prepared By: '+esc(who())];
+  if(kind==='req'){let q=0,sf=0,rf=0;const rows=[];RL.filter(r=>ok(r.prj)).forEach(r=>rqItems(r).forEach(x=>{const s=x.L*x.W/12*x.qty,rt=x.L*x.qty;q+=x.qty;sf+=s;rf+=rt;
+      rows.push([esc(r.no),dd(r.at),esc(r.prj),esc(x.L+' × '+x.W),x.qty,f(s),f(rt),r.date||'-',esc(r.status+(r.woNo?' ('+r.woNo+')':'')),esc(r.by)]);}));
+    rows.push({t:['Total','','','',q,f(sf),f(rf),'','','']});
+    return {title:'SHUTTER REQUISITION REPORT',meta:m,body:tb(['Req No','Date','Project','Size (ft × inch)','Qty','SFT','RFT','Required Date','Status','Requested By'],rows),sigs:['Prepared By','Workshop In-charge','Approved By']};}
+  if(kind==='wo'){let a=0,b=0,g1=0,g2=0,g3=0;const rows=PO.filter(o=>ok(o.prj)).map(o=>{let A=0,G=0,F=0;(o.consumed||[]).forEach(c=>c.lines.forEach(l=>{if(l.kg==null)return;l.n==='Angle Bar'?A+=l.kg:l.n==='GP Sheet'?G+=l.kg:F+=l.kg;}));
+      a+=o.planned;b+=o.produced;g1+=A;g2+=G;g3+=F;return [esc(o.no),esc(o.prj),esc(o.size),o.planned,o.produced,o.planned-o.produced,esc(o.status),f(A),f(G),f(F)];});
+    rows.push({t:['Total','','',a,b,a-b,'',f(g1),f(g2),f(g3)]});
+    return {title:'PRODUCTION / WORK ORDER REPORT',meta:m,body:tb(['Work Order','Project','Size','Planned','Produced','Remaining','Status','Angle (kg)','GP Sheet (kg)','Flat Bar (kg)'],rows),sigs:['Prepared By','Workshop In-charge','Approved By'],note:'Material kg = consumed on production completion. Flat Bar is residual / estimated.'};}
+  if(kind==='move'){let q=0,rc=0,w=0;const rows=GP.filter(g=>ok(g.from)||ok(g.to)).map(g=>{q+=g.qty;rc+=g.recQty||0;w+=g.wt||0;
+      return [esc(g.no),dd(g.at),TL[g.type],esc(ll(g.from)),esc(ll(g.to)),esc(g.size),g.qty,g.status==='received'?g.recQty:'-',g.status==='received'?g.qty-g.recQty:'-',g.wt?f(g.wt):'-',esc(g.status)];});
+    rows.push({t:['Total','','','','','',q,rc,'',f(w),'']});
+    return {title:'SHUTTER DISPATCH &amp; TRANSFER REPORT',meta:m,body:tb(['Gate Pass','Date','Type','From','To','Size','Dispatched','Received','Shortage','Weight (kg)','Status'],rows),sigs:['Prepared By','Workshop In-charge','Site Engineer','Approved By']};}
+  return null;}
+window.shGPPrint=function(no){const g=GP.find(x=>x.no===no);if(!g)return;const a=g.size.split('x'),L=N(a[0]),W=N(a[1]),f=v=>r4(v).toFixed(2);
+  const rows=[['Shutter Size',esc(L+' ft × '+W+' inch')],['Quantity',g.qty+' Nos'],['Total SFT',f(L*W/12*g.qty)],['Total RFT (length)',f(L*g.qty)]];
+  if(g.brk)rows.push(['Total Weight',f(g.brk.wt)+' kg'],['Angle Bar',f(g.brk.ang)+' kg'],['GP Sheet',f(g.brk.gp)+' kg'],['Flat Bar (residual)',f(g.brk.flat)+' kg']);
+  rows.push(['Status',esc(g.status)+(g.status==='received'?' — received '+g.recQty+' Nos'+(g.qty-g.recQty?' (shortage '+(g.qty-g.recQty)+')':''):'')]);
+  const h=docHtml('SHUTTER GATE PASS',['Gate Pass No: '+esc(g.no),'Date: '+dd(g.at),'Type: '+TL[g.type]],
+    `<table style="margin-bottom:10px"><tr><th>From</th><td><b>${esc(ll(g.from))}</b></td><th>To</th><td><b>${esc(ll(g.to))}</b></td></tr></table><table><tbody>${rows.map(r=>`<tr><th style="width:30%;text-align:left">${r[0]}</th><td style="text-align:left">${r[1]}</td></tr>`).join('')}</tbody></table>`,
+    ['Sender<br>'+esc(g.by),'Approved By','Driver / Vehicle','Received By']);
+  printH(h);};
+function printH(h){const fr=document.createElement('iframe');fr.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0';document.body.appendChild(fr);
+  fr.contentDocument.open();fr.contentDocument.write(h);fr.contentDocument.close();setTimeout(()=>{fr.contentWindow.focus();fr.contentWindow.print();setTimeout(()=>fr.remove(),3000);},400);}
+function curHtml(){const k=$('shRepType').value,p=$('shRepPrj').value;if(k==='proj')return pdfHtml(window._shRows||[],p);const r=repHtml(k,p);return docHtml(r.title,r.meta,r.body,r.sigs,r.note);}
+
+const pl=p=>p==='WORKSHOP'?'27 Katha (Workshop)':p;
+function wsum(rows){const m={};rows.forEach(r=>{if(!r.stk)return;const a=String(r.s).split('x'),L=N(a[0]),W=N(a[1]);const p=m[r.p]=m[r.p]||{};const o=p[W]=p[W]||{q:0,sft:0,rft:0};
+  o.q+=r.stk;o.sft+=r.stk*L*W/12;o.rft+=r.stk*L;});return m;}
+function sumTable(rows){const m=wsum(rows),f=v=>r4(v).toFixed(2);
+  let h='<table class="w-full text-xs"><thead><tr><th>Project</th><th>Shutter Width</th><th>Shutters (Nos)</th><th>Total SFT</th><th>Total RFT</th></tr></thead><tbody>';
+  Object.keys(m).forEach(p=>{let tq=0,ts=0,tf=0;Object.keys(m[p]).sort((a,b)=>a-b).forEach((w,i)=>{const o=m[p][w];tq+=o.q;ts+=o.sft;tf+=o.rft;
+    h+=`<tr><td>${i?'':esc(pl(p))}</td><td>${w} inch</td><td>${o.q}</td><td>${f(o.sft)}</td><td>${f(o.rft)}</td></tr>`;});
+    h+=`<tr class="tot"><td>${esc(pl(p))} — Total</td><td></td><td>${tq}</td><td>${f(ts)}</td><td>${f(tf)}</td></tr>`;});
+  return h+'</tbody></table>';}
+function fillPrj(){let all=[];try{all=projectDatabase.map(p=>p.prjNo);}catch(e){}
+  const mine=canOp()?all:(window.currentEngineerAllowedProjects||[]);
+  const set=(id,first,list)=>{const e=$(id);if(!e)return;const k=list.join('|');if(e.dataset.k===k)return;const v=e.value;
+    e.innerHTML=`<option value="">${first}</option>`+list.map(x=>`<option>${esc(x)}</option>`).join('');e.value=v;e.dataset.k=k;};
+  set('shPP','Select project',all);set('shGF','27 Katha (Workshop)',mine);set('shGTo','27 Katha (Workshop)',all);set('shRQP','Select project',mine);
+  const o=$('shGT');if(o){const w=o.querySelector('option[value=W2P]');if(w){w.hidden=w.disabled=!canOp();if(!canOp()&&o.value==='W2P'){o.value='P2P';shGPrev();}}}}
+let RQ=[];
+const rqItems=r=>r.items||[{L:r.L,W:r.W,size:r.size,qty:r.qty}];
+const rqTot=it=>it.reduce((a,x)=>({q:a.q+x.qty,sft:a.sft+x.L*x.W/12*x.qty,rft:a.rft+x.L*x.qty}),{q:0,sft:0,rft:0});
+function rqDraw(){const t=rqTot(RQ);$('shRQBox').innerHTML='<div class="grid gap-2">'+RQ.map((x,i)=>`<div class="flex justify-between items-center text-sm rounded-xl border border-line bg-white p-2"><span>${i+1}. ${x.L} ft × ${x.W} inch · <b>${x.qty}</b> nos · SFT ${r4(x.L*x.W/12*x.qty).toFixed(2)} · RFT ${r4(x.L*x.qty).toFixed(2)}</span><button class="btn btn-secondary" onclick="shRQDel(${i})">✕</button></div>`).join('')+'</div>'+
+  (RQ.length?`<div class="text-xs font-bold mt-1">Total: ${t.q} nos · SFT ${r4(t.sft).toFixed(2)} · RFT ${r4(t.rft).toFixed(2)}</div>`:'');}
+window.shRQAdd=function(){const L=N($('shRQL').value),W=N($('shRQW').value),q=N($('shRQQ').value);
+  if(L<=0||W<=0||q<=0)return showToast('Length, width and quantity required.','error');
+  const e=RQ.find(x=>x.L===L&&x.W===W);if(e)e.qty+=q;else RQ.push({L,W,size:key(L,W),qty:q});
+  $('shRQW').value='';$('shRQQ').value='';rqDraw();$('shRQL').focus();};
+window.shRQDel=i=>{RQ.splice(i,1);rqDraw();};
+window.shNewReq=async function(){
+  if(!canRecv())return showToast('Not allowed.','error');
+  const prj=$('shRQP').value;if(!prj||!RQ.length)return showToast('Select project and add at least one shutter size.','error');
+  const items=RQ.slice();
+  try{await db().runTransaction(async tx=>{const no=await nextNo(tx,'shutter_req','SREQ-');
+    tx.set(db().collection('shutter_req').doc(no),{no,prj,items,date:$('shRQD').value||'',rem:$('shRQR').value.trim(),status:'pending',by:who(),at:Date.now()});});
+    RQ=[];rqDraw();$('shRQR').value='';showToast('Requisition submitted.');}catch(e){showToast('Failed: '+esc(e.message),'error');}
+};
+window.shReqAct=async function(no,act){
+  if(!canOp())return showToast('Only Workshop In-charge / Admin.','error');
+  try{await db().runTransaction(async tx=>{const rr=db().collection('shutter_req').doc(no),r=(await tx.get(rr)).data();
+    if(r.status!=='pending')throw new Error('Already processed');
+    if(act==='rej'){tx.update(rr,{status:'rejected',by2:who()});return;}
+    const cr=db().collection('counters').doc('shutter_po'),cd=await tx.get(cr),n0=cd.exists?cd.data().n:0,items=rqItems(r),wos=[];
+    items.forEach((x,i)=>{const wn='WO-'+String(n0+i+1).padStart(4,'0'),inp=Object.assign(bom(),{L:x.L,W:x.W,qty:x.qty,totalWt:0,angleLen:0}),c=calc(inp);wos.push(wn);
+      tx.set(db().collection('shutter_po').doc(wn),{no:wn,prj:r.prj,size:key(x.L,x.W),L:x.L,W:x.W,planned:x.qty,produced:0,status:'approved',createdBy:who(),createdAt:Date.now(),reqNo:no,
+        bom:{ver:1,input:inp,perShutter:{sft:c.sft,angle:c.ang,gp:c.gp,flat:null,flatVerified:false},policy:'angle-len truncate 2dp'},consumed:[]});});
+    tx.set(cr,{n:n0+items.length});tx.update(rr,{status:'wo_created',woNo:wos.join(', '),by2:who()});});showToast('Work orders created.');}catch(e){showToast(esc(e.message),'error');}
+};
+
+
+function brkOf(q){const w=N($('shGW').value);if(!(w>0))return null;const c=calc(Object.assign(bom(),{L:N($('shGL').value),W:N($('shGW2').value),totalWt:w,qty:q}));
+  return {per:{wt:w,ang:c.ang,gp:c.gp,flat:c.flat},wt:w*q,ang:c.ang*q,gp:c.gp*q,flat:c.flat*q};}
+window.shGPrev=function(){const w=document.querySelector('#shutterSection .shW');if(!w)return;const nw=$('shGT').value==='W2P';w.style.display=nw?'':'none';
+  const o=$('shGPrevOut');if(!o)return;const q=N($('shGQ').value)||1,b=nw?brkOf(q):null;
+  o.innerHTML=b?`<b>${q} shutter × ${r4(b.per.wt)} kg = ${r4(b.wt)} kg</b> → Angle ${r4(b.ang)} kg · GP Sheet ${r4(b.gp)} kg · Flat Bar ${r4(b.flat)} kg ${b.per.flat<0?'<b style="color:#dc2626">(weight too low!)</b>':''}`:(nw?'Enter weight to see Angle / GP / Flat split (optional).':'');};
+function pdfHtml(rows,prj){
+  const f=v=>r4(v).toFixed(2),dt=new Date().toLocaleDateString('en-GB');
+  const by={};rows.forEach(r=>(by[r.p]=by[r.p]||[]).push(r));
+  const K=['ord','prod','disp','rec','tr','ret','stk'],W=['ang','gp','fl'];
+  const sum=L=>{const o={};K.concat(W).forEach(k=>o[k]=L.reduce((a,r)=>a+r[k],0));return o;};
+  const tr=(lab,o,cls)=>`<tr class="${cls||''}"><td>${lab}</td>${K.map(k=>`<td>${o[k]}</td>`).join('')}${W.map(k=>`<td>${f(o[k])}</td>`).join('')}<td>${f(o.ang+o.gp+o.fl)}</td></tr>`;
+  const blocks=Object.keys(by).map(p=>{const L=by[p];
+    return `<div class="blk"><div class="ttl">Project: ${esc(p==='WORKSHOP'?'27 KATHA WORKSHOP (finished stock)':p)}</div><table><thead><tr><th>Shutter Size</th><th>Ordered</th><th>Produced</th><th>Dispatched</th><th>Received</th><th>In Transit</th><th>Returned</th><th>Stock Now</th><th>Angle (kg)</th><th>GP Sheet (kg)</th><th>Flat Bar (kg)</th><th>Total (kg)</th></tr></thead><tbody>${L.map(r=>tr(esc(r.s),r)).join('')}${tr('Total',sum(L),'tot')}</tbody></table></div>`;}).join('');
+  return `<!doctype html><html><head><meta charset="utf-8"><title>MARS Workshop Report</title><style>
+@page{size:A4 landscape;margin:8mm}body{font-family:Arial,sans-serif;color:#172033;font-size:11px}
+h1,h2,p{text-align:center;margin:3px}h1{font-size:20px}h2{font-size:14px}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}
+table{width:100%;border-collapse:collapse;page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}
+th,td{border:1px solid #999;padding:4px;text-align:center}th{background:#eef2f7}tr.tot td{font-weight:bold;background:#f5f7fa}
+.blk{margin-bottom:14px;page-break-inside:avoid}.ttl{font-weight:bold;font-size:12px;margin:10px 0 4px;padding:3px 0;border-bottom:1px solid #333}
+.nt{font-size:9px;margin-top:8px}.sign{display:flex;justify-content:space-between;margin-top:55px}.sig{width:200px;border-top:1px solid #555;text-align:center;padding-top:4px}
+</style></head><body>
+<h1>MARS STRUCTURE LIMITED</h1><h2>WORKSHOP &amp; SHUTTERING REPORT (PROJECT-WISE)</h2>
+<div class="meta"><span>Project: ${esc(prj||'All Projects')}</span><span>Date: ${dt}</span><span>Prepared By: ${esc(who())}</span></div>
+<div class="blk"><div class="ttl">Project-wise Summary (shutters at project, stock now)</div>${sumTable(rows)}</div>
+${blocks||'<p>No data</p>'}
+${Object.keys(by).length>1?`<div class="blk"><div class="ttl">Grand Total</div><table><tbody>${tr('All projects',sum(rows),'tot')}</tbody></table></div>`:''}
+<div class="nt">RFT = shutter length × quantity (width in inch is the shutter name). Quantity in Nos. Flat Bar weight is residual / estimated. This report is separate from the main stock ledger.</div>
+<div class="sign"><div class="sig">Prepared By<br>${esc(who())}</div><div class="sig">Workshop In-charge</div><div class="sig">Site Engineer</div><div class="sig">Approved By</div></div>
+</body></html>`;}
+window.shPdfHtml=pdfHtml;
+window.shRepPdf=function(){const h=curHtml();
+  const fr=document.createElement('iframe');fr.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0';document.body.appendChild(fr);
+  fr.contentDocument.open();fr.contentDocument.write(h);fr.contentDocument.close();
+  setTimeout(()=>{fr.contentWindow.focus();fr.contentWindow.print();setTimeout(()=>fr.remove(),3000);},400);};
+
+
+const db=()=>window.MARS_FIREBASE.db;
+/* ---- pure calculation (exposed for tests) ---- */
+function calc(o){
+  const L=N(o.L),W=N(o.W),q=N(o.qty)||1,tw=N(o.totalWt);
+  const sft=L*W/12;
+  const angleLen=o.angleLen>0?N(o.angleLen):Math.floor((2*L+2*W/12)*100)/100; // policy: truncate 2dp
+  const aU=N(o.angleKg)/N(o.angleFt), gU=N(o.sheetKg)/N(o.sheetSft);
+  const ang=angleLen*aU, gp=sft*gU;
+  const flat=tw>0?tw-ang-gp:null;
+  return {sft,rft:L,angleLen,aU,gU,ang,gp,flat,tw,q,
+    flatVerified:tw>0, tot:{sft:sft*q,ang:ang*q,gp:gp*q,flat:flat==null?null:flat*q,wt:tw*q}};
+}
+window.ShutterCalc=calc;
+const key=(L,W)=>L+'x'+W;
+function runTests(){
+  const c=calc({L:6,W:19,qty:100,totalWt:38.3,angleKg:15.6,angleFt:20,sheetKg:37.1,sheetSft:32,angleLen:15.16});
+  const nw=calc({L:6,W:19,qty:1,totalWt:0,angleKg:15.6,angleFt:20,sheetKg:37.1,sheetSft:32});
+  const ok=(a,b,t=0.002)=>Math.abs(a-b)<=t;
+  return [
+   ['6′×19″ = 9.5 SFT',ok(c.sft,9.5,1e-9)],['100 nos = 950 SFT',ok(c.tot.sft,950,1e-9)],
+   ['Angle unit 0.780 kg/ft',ok(c.aU,0.78,1e-9)],['15.16 ft angle = 11.8248',ok(c.ang,11.8248,1e-4)],
+   ['GP unit 1.159375 kg/SFT',ok(c.gU,1.159375,1e-9)],['GP 9.5 SFT ≈ 11.01',ok(c.gp,11.0131,0.002)],
+   ['Flat residual ≈ 15.46',ok(c.flat,15.4621,0.002)],
+   ['No actual wt → not “verified”',nw.flat===null&&!nw.flatVerified],
+   ['Angle+GP+Flat = Total',ok(c.ang+c.gp+c.flat,38.3,1e-9)]];
+}
+/* ---- UI ---- */
+function tpl(){return `
+<h2 class="text-lg font-extrabold mb-1">Workshop &amp; Shuttering</h2>
+<div class="flex gap-2 flex-wrap mb-4" id="shTabs">
+ <button class="btn btn-primary" data-t="calc">Weight Calculator</button>
+ <button class="btn btn-secondary" data-t="prod">Production</button>
+ <button class="btn btn-secondary" data-t="stock">Stock &amp; Gate Pass</button>
+ <button class="btn btn-secondary" data-t="req">Shutter Requisition</button>
+ <button class="btn btn-secondary" data-t="rep">Workshop Reports</button></div>
+
+<div data-pane="calc">
+ <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+  ${[['shL','Length (ft)',6],['shW','Width (inch)',19],['shQ','Quantity',100],['shTW','Actual total wt (kg)',38.3],
+     ['shAK','Angle std wt (kg)',15.6],['shAF','Angle std len (ft)',20],['shAL','Angle cut len (ft) – blank=auto',''],
+     ['shSK','Sheet wt (kg)',37.1],['shSS','Sheet area (SFT)',32]].map(x=>`<div><label class="field-label">${x[1]}</label><input id="${x[0]}" type="number" step="any" class="field" value="${x[2]}" oninput="shCalc()"></div>`).join('')}
+ </div>
+ <div id="shOut" class="mt-4 overflow-x-auto"></div>
+ <button class="btn btn-secondary mt-3" onclick="shTest()">Run self-tests</button><div id="shTest" class="text-xs mt-2"></div>
+</div>
+
+<div data-pane="prod" style="display:none">
+ <div class="text-xs text-muted mb-2">Uses the calculator inputs above for BOM. Create order → Start → Complete (raw material consumed once per order; partial completion allowed).</div>
+ <div class="grid grid-cols-2 md:grid-cols-4 gap-2 shOp">
+  <div><label class="field-label">Project</label><select id="shPP" class="field"></select></div>
+  <div><label class="field-label">Planned qty</label><input id="shPQ" type="number" class="field"></div>
+  <div class="flex items-end"><button class="btn btn-primary w-full" onclick="shNewPO()">Create Work Order</button></div></div>
+ <div id="shPOList" class="mt-3 grid gap-2"></div>
+</div>
+
+<div data-pane="stock" style="display:none">
+ <div id="shStock" class="mb-4 overflow-x-auto"></div>
+ <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+  <div><label class="field-label">Type</label><select id="shGT" class="field" onchange="shGPrev()"><option value="W2P">27 Katha → Project</option><option value="P2P">Project → Project</option><option value="P2W">Project → 27 Katha</option></select></div>
+  <div><label class="field-label">From (project)</label><select id="shGF" class="field"></select></div>
+  <div><label class="field-label">To (project)</label><select id="shGTo" class="field"></select></div>
+  <div><label class="field-label">Length (ft)</label><input id="shGL" type="number" step="any" class="field" oninput="shGPrev()"></div><div><label class="field-label">Width (inch)</label><input id="shGW2" type="number" step="any" class="field" oninput="shGPrev()"></div>
+  <div><label class="field-label">Quantity</label><input id="shGQ" type="number" class="field" oninput="shGPrev()"></div>
+  <div class="shW"><label class="field-label">Weight per shutter (kg)</label><input id="shGW" type="number" step="any" class="field" oninput="shGPrev()"></div>
+  <div class="flex items-end"><button class="btn btn-primary w-full" onclick="shDispatch()">Dispatch</button></div></div>
+ <div id="shGPrevOut" class="text-xs mt-2"></div>
+ <div id="shGPList" class="mt-3 grid gap-2"></div>
+</div>
+<div data-pane="req" style="display:none"><div class="grid grid-cols-2 md:grid-cols-3 gap-2"><div><label class="field-label">Project</label><select id="shRQP" class="field"></select></div>
+ <div><label class="field-label">Required date</label><input id="shRQD" type="date" class="field"></div><div class="col-span-2 md:col-span-1"><label class="field-label">Remarks (optional)</label><input id="shRQR" class="field"></div></div>
+ <div class="text-xs font-bold mt-3 mb-1">Add shutter sizes (one by one)</div>
+ <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><div><label class="field-label">Length (ft)</label><input id="shRQL" type="number" step="any" class="field"></div><div><label class="field-label">Width (inch)</label><input id="shRQW" type="number" step="any" class="field"></div>
+ <div><label class="field-label">Quantity</label><input id="shRQQ" type="number" class="field" onkeydown="if(event.key==='Enter')shRQAdd()"></div><div class="flex items-end"><button class="btn btn-secondary w-full" onclick="shRQAdd()">+ Add size</button></div></div>
+ <div id="shRQBox" class="mt-3"></div><button class="btn btn-primary mt-3" onclick="shNewReq()">Submit Requisition</button><div id="shReqList" class="mt-4 grid gap-2"></div></div>
+<div data-pane="rep" style="display:none"><div class="flex gap-2 items-end flex-wrap mb-3"><div><label class="field-label">Report</label><select id="shRepType" class="field" onchange="shRep()"><option value="proj">Project-wise Stock &amp; Summary</option><option value="req">Shutter Requisition Report</option><option value="wo">Production / Work Order Report</option><option value="move">Dispatch &amp; Transfer Report</option></select></div><div><label class="field-label">Project</label><select id="shRepPrj" class="field" onchange="shRep()"></select></div><button class="btn btn-secondary" onclick="shRepCsv()">Excel (CSV)</button><button class="btn btn-secondary" onclick="shRepPdf()">Print / PDF</button></div><div id="shRepOut" class="overflow-x-auto"></div></div>`;}
+function bom(){return {L:N($('shL').value),W:N($('shW').value),qty:N($('shQ').value),totalWt:N($('shTW').value),
+  angleKg:N($('shAK').value),angleFt:N($('shAF').value),angleLen:N($('shAL').value),sheetKg:N($('shSK').value),sheetSft:N($('shSS').value)};}
+window.shCalc=function(){
+  const c=calc(bom()),f=v=>v==null?'—':r4(v).toFixed(4);
+  $('shOut').innerHTML=`<table class="w-full text-sm"><tr><th align=left>Material</th><th align=left>Basis</th><th align=right>1 shutter (kg)</th><th align=right>×${c.q} (kg)</th></tr>
+  <tr><td>Angle Bar</td><td>${c.angleLen} ft × ${r4(c.aU)}</td><td align=right>${f(c.ang)}</td><td align=right>${f(c.tot.ang)}</td></tr>
+  <tr><td>GP Sheet</td><td>${r4(c.sft)} SFT × ${r4(c.gU)}</td><td align=right>${f(c.gp)}</td><td align=right>${f(c.tot.gp)}</td></tr>
+  <tr><td>Flat Bar ${c.flatVerified?'<i class="text-xs">(residual)</i>':'<b style="color:#b45309">(not verified – no actual weight)</b>'}</td><td>Total − Angle − GP</td><td align=right>${f(c.flat)}</td><td align=right>${f(c.tot.flat)}</td></tr>
+  <tr><th align=left>Total</th><td></td><th align=right>${f(c.tw||null)}</th><th align=right>${f(c.tot.wt||null)}</th></tr></table>
+  <div class="text-xs text-muted mt-2">SFT ${r4(c.sft)} each · ${r4(c.tot.sft)} total · RFT ${r4(c.rft)} each. Angle length policy: auto = truncate to 2 decimals. Flat Bar is a residual and includes welding/other weight until verified.</div>`;
+};
+window.shTest=function(){$('shTest').innerHTML=runTests().map(t=>`<div style="color:${t[1]?'#047857':'#dc2626'}">${t[1]?'PASS':'FAIL'} — ${t[0]}</div>`).join('');};
+/* ---- Firestore: orders, stock, gate pass, ledger ---- */
+async function nextNo(tx,id,pre){const ref=db().collection('counters').doc(id),c=await tx.get(ref),n=(c.exists?c.data().n:0)+1;tx.set(ref,{n});return pre+String(n).padStart(4,'0');}
+function ledger(tx,e){const ref=db().collection('shutter_ledger').doc();tx.set(ref,Object.assign({at:Date.now(),by:who()},e));}
+window.shNewPO=async function(){if(!canOp())return showToast('Only Workshop In-charge / Admin can do this.','error');
+  const b=bom(),c=calc(b),prj=$('shPP').value.trim(),q=N($('shPQ').value);
+  if(!prj||q<=0||!b.L||!b.W)return showToast('Project, size and planned qty required.','error');
+  try{await db().runTransaction(async tx=>{const no=await nextNo(tx,'shutter_po','WO-');
+   tx.set(db().collection('shutter_po').doc(no),{no,prj,size:key(b.L,b.W),L:b.L,W:b.W,planned:q,produced:0,status:'approved',createdBy:who(),createdAt:Date.now(),
+     bom:{ver:1,input:b,perShutter:{sft:c.sft,angle:c.ang,gp:c.gp,flat:c.flat,flatVerified:c.flatVerified},policy:'angle-len truncate 2dp'},consumed:[]});});
+   showToast('Work order created.');}catch(e){showToast('Failed: '+esc(e.message),'error');}
+};
+window.shPO=async function(no,act){if(!canOp())return showToast('Only Workshop In-charge / Admin can do this.','error');
+  let add=0;if(act==='done'){add=N(prompt('Quantity completed now?'));if(add<=0)return;}
+  try{await db().runTransaction(async tx=>{
+    const pr=db().collection('shutter_po').doc(no),po=(await tx.get(pr)).data();
+    if(act==='start'){if(po.status!=='approved')throw new Error('Already started');tx.update(pr,{status:'in_production'});return;}
+    if(po.status!=='in_production')throw new Error('Order not in production');
+    if(po.produced+add>po.planned)throw new Error('Exceeds planned qty');
+    const sr=db().collection('shutter_stock').doc(po.size),sd=await tx.get(sr),loc=(sd.exists?sd.data().loc:{})||{},before=N(loc.WORKSHOP);
+    loc.WORKSHOP=before+add;tx.set(sr,{size:po.size,L:po.L,W:po.W,loc},{merge:true});
+    const p=po.bom.perShutter,line={n:'Angle Bar',kg:p.angle*add},l2={n:'GP Sheet',kg:p.gp*add},l3={n:'Flat Bar',kg:p.flat==null?null:p.flat*add,est:!p.flatVerified};
+    const prod=po.produced+add,fin=prod>=po.planned;
+    tx.update(pr,{produced:prod,status:fin?'completed':'in_production',consumed:(po.consumed||[]).concat([{at:Date.now(),qty:add,lines:[line,l2,l3]}])});
+    ledger(tx,{type:'PRODUCTION',ref:no,size:po.size,from:'RAW',to:'WORKSHOP',qty:add,before,after:before+add,note:'raw consumed once per batch'});
+  });showToast('Done.');}catch(e){showToast(esc(e.message),'error');}
+};
+window.shDispatch=async function(){if(!canRecv())return showToast('Not allowed.','error');if($('shGT').value==='W2P'&&!canOp())return showToast('New shutters from 27 Katha: Workshop In-charge / Admin only.','error');
+  const L=N($('shGL').value),W=N($('shGW2').value),t=$('shGT').value,q=N($('shGQ').value),size=key(L,W);
+  if(L<=0||W<=0)return showToast('Enter shutter length and width.','error');
+  let f=$('shGF').value.trim()||'WORKSHOP',to=$('shGTo').value.trim()||'WORKSHOP';
+  if(t==='W2P')f='WORKSHOP';if(t==='P2W')to='WORKSHOP';
+  if(q<=0||f===to)return showToast('Check qty / from / to.','error');
+  if(t==='P2P'&&(!$('shGF').value||!$('shGTo').value))return showToast('Select both projects.','error');
+  if(!canOp()&&!(window.currentEngineerAllowedProjects||[]).includes(f))return showToast('You can send only from your own projects.','error');
+  const brk=t==='W2P'?brkOf(q):null;if(brk&&brk.per.flat<0)return showToast('Weight is lower than Angle + GP weight. Check it.','error');
+  try{await db().runTransaction(async tx=>{
+    const sr=db().collection('shutter_stock').doc(size),sd=await tx.get(sr),no=await nextNo(tx,'shutter_gp','SGP-');
+    const loc=(sd.exists?sd.data().loc:{})||{},before=N(loc[f]);
+    if(before<q)throw new Error('Insufficient stock at '+f+' ('+before+')');
+    loc[f]=before-q;loc.TRANSIT=N(loc.TRANSIT)+q;tx.set(sr,{size,L,W,loc},{merge:true});
+    tx.set(db().collection('shutter_gp').doc(no),{no,type:t,size,from:f,to,qty:q,status:'in_transit',by:who(),at:Date.now(),wt:brk?brk.wt:0,brk:brk||null});
+    ledger(tx,{type:'DISPATCH-'+t,ref:no,size,from:f,to:'TRANSIT',qty:q,before,after:before-q});
+  });showToast('Gate pass created.');}catch(e){showToast(esc(e.message),'error');}
+};
+window.shReceive=async function(no){if(!canRecv())return showToast('Not allowed.','error');
+  const rq=N(prompt('Received quantity?'));if(rq<=0)return;
+  try{await db().runTransaction(async tx=>{
+    const gr=db().collection('shutter_gp').doc(no),g=(await tx.get(gr)).data();
+    if(g.status!=='in_transit')throw new Error('Already received');
+    if(rq>g.qty)throw new Error('More than dispatched');
+    const sr=db().collection('shutter_stock').doc(g.size),loc=(await tx.get(sr)).data().loc,before=N(loc[g.to]);
+    loc.TRANSIT=N(loc.TRANSIT)-g.qty;loc[g.to]=before+rq;loc.LOST=N(loc.LOST)+(g.qty-rq);
+    tx.update(sr,{loc});tx.update(gr,{status:'received',recQty:rq,recBy:who(),recAt:Date.now()});
+    ledger(tx,{type:'RECEIVE',ref:no,size:g.size,from:'TRANSIT',to:g.to,qty:rq,before,after:before+rq,note:g.qty-rq?'shortage '+(g.qty-rq):''});
+  });showToast('Received.');}catch(e){showToast(esc(e.message),'error');}
+};
+function listen(){
+  const d=db();
+  d.collection('shutter_req').orderBy('at','desc').limit(60).onSnapshot(s=>{RL=s.docs.map(x=>x.data());rep();const ap=canOp()?null:(window.currentEngineerAllowedProjects||[]);
+   $('shReqList').innerHTML=s.docs.map(x=>x.data()).filter(r=>!ap||ap.includes(r.prj)).map(r=>{const it=rqItems(r),t=rqTot(it);
+    return `<div class="rounded-xl border border-line bg-white p-3 text-sm"><b>${esc(r.no)}</b> · ${esc(r.prj)} · <i>${r.status}${r.woNo?' ('+esc(r.woNo)+')':''}</i>
+    <div class="text-xs">${it.map(x=>esc(x.L+'×'+x.W)+' = <b>'+x.qty+'</b>').join(' · ')}</div>
+    <div class="text-xs text-muted">Total ${t.q} nos · SFT ${r4(t.sft).toFixed(2)} · RFT ${r4(t.rft).toFixed(2)} · By ${esc(r.by)}${r.date?' · needed '+esc(r.date):''}${r.rem?' · '+esc(r.rem):''}</div>
+    ${r.status==='pending'?`<button class="btn btn-primary mt-1 shOp" onclick="shReqAct('${r.no}','wo')">Make Work Orders</button> <button class="btn btn-secondary mt-1 shOp" onclick="shReqAct('${r.no}','rej')">Reject</button>`:''}</div>`;}).join('')||'<div class="text-xs text-muted">No requisitions.</div>';});
+  d.collection('shutter_po').orderBy('createdAt','desc').limit(50).onSnapshot(s=>{PO=s.docs.map(x=>x.data());rep();$('shPOList').innerHTML=s.docs.map(x=>{const o=x.data();
+   return `<div class="rounded-xl border border-line bg-white p-3 text-sm"><b>${esc(o.no)}</b> · ${esc(o.prj)} · ${esc(o.size)} · ${o.produced}/${o.planned} · <i>${o.status}</i>
+   ${o.status==='approved'?`<button class="btn btn-secondary ml-2 shOp" onclick="shPO('${o.no}','start')">Start</button>`:''}
+   ${o.status==='in_production'?`<button class="btn btn-primary ml-2 shOp" onclick="shPO('${o.no}','done')">Complete qty</button>`:''}
+   ${(o.consumed||[]).map(c=>`<div class="text-xs text-muted">+${c.qty}: ${c.lines.map(l=>l.n+' '+(l.kg==null?'—':r4(l.kg))+(l.est?' est':'')).join(' · ')} kg</div>`).join('')}</div>`;}).join('')||'<div class="text-xs text-muted">No work orders.</div>';});
+  d.collection('shutter_stock').onSnapshot(s=>{ST=s.docs.map(x=>x.data());rep();$('shStock').innerHTML='<table class="w-full text-sm"><tr><th align=left>Size</th><th align=left>Location : qty</th></tr>'+s.docs.map(x=>{const o=x.data();
+   return `<tr><td>${esc(o.size)}</td><td>${Object.entries(o.loc||{}).filter(e=>e[1]).map(e=>esc(e[0])+': <b>'+e[1]+'</b>').join(' · ')}</td></tr>`;}).join('')+'</table>';});
+  d.collection('shutter_gp').orderBy('at','desc').limit(50).onSnapshot(s=>{GP=s.docs.map(x=>x.data());rep();$('shGPList').innerHTML=s.docs.map(x=>{const g=x.data();
+   return `<div class="rounded-xl border border-line bg-white p-3 text-sm"><b>${esc(g.no)}</b> · ${g.type} · ${esc(g.size)} · ${g.qty} · ${esc(g.from)} → ${esc(g.to)} · <i>${g.status}</i>
+   ${g.brk?`<div class="text-xs text-muted">Weight ${r4(g.brk.wt)} kg → Angle ${r4(g.brk.ang)} · GP ${r4(g.brk.gp)} · Flat ${r4(g.brk.flat)} kg</div>`:''}${g.status==='in_transit'?`<button class="btn btn-primary ml-2" onclick="shReceive('${g.no}')">Confirm receipt</button>`:''} <button class="btn btn-secondary ml-2" onclick="shGPPrint('${g.no}')">Print</button></div>`;}).join('');});
+}
+function init(){
+  const s=$('shutterSection');if(!s)return;s.innerHTML=tpl();shCalc();
+  s.querySelectorAll('#shTabs button').forEach(b=>b.onclick=()=>{s.querySelectorAll('#shTabs button').forEach(x=>x.className='btn btn-secondary');b.className='btn btn-primary';applyRole();rep();
+    s.querySelectorAll('[data-pane]').forEach(p=>p.style.display=p.dataset.pane===b.dataset.t?'':'none');});
+  let tries=0;const t=setInterval(()=>{if(window.MARS_FIREBASE_AUTH_READY||++tries>40){clearInterval(t);try{listen();}catch(e){console.error(e);}}},500);
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
 </body>
