@@ -6700,37 +6700,48 @@ const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;'
 const $=id=>document.getElementById(id), N=v=>Number(v)||0, r4=v=>Math.round(v*1e4)/1e4;
 const who=()=>window.currentEngineerName||'Admin';
 let PO=[],GP=[],ST=[];
+const NAMES=['Column Shutter','Beam Shutter','Beam Bottom Shutter','Shear Wall Shutter','Stair Beam Shutter','Outside Beam Shutter','Inside Beam Shutter'];
+const CL={N:'New',O:'Old',R:'Repair'};
+const isU=x=>!!(x&&(x.unsize||x.name==='Unsize Shutter'));
+const skey=(nm,cd,L,W)=>(cd||'N')+'~'+String(nm||'Shutter').replace(/[^A-Za-z0-9]/g,'')+'~'+(nm==='Unsize Shutter'?'unsize':L+'x'+W);
+const itSft=x=>isU(x)?N(x.sft):x.L*x.W/12*x.qty, itRft=x=>isU(x)?N(x.rft):x.L*x.qty;
+const fmtL=L=>{L=N(L);let f=Math.floor(L+1e-6),i=Math.round((L-f)*12);if(i>=12){f+=1;i=0;}return f+"'-"+i+'"';};
+const lbl=x=>esc(x.name||'Shutter')+' — '+(isU(x)?'Unsize':esc(fmtL(x.L)+' × '+x.W+'"'))+' ('+CL[x.cond||'N']+')';
+const nameOpts=()=>NAMES.map(n=>`<option>${n}</option>`).join(''),condOpts=()=>Object.keys(CL).map(k=>`<option value="${k}">${CL[k]}</option>`).join('');
+window.shUI=function(){[['shRQN','rqNU','rqU'],['shGN','gNU','gU']].forEach(a=>{const e=$(a[0]);if(!e)return;const U=e.value==='Unsize Shutter';
+  document.querySelectorAll('#shutterSection .'+a[1]).forEach(x=>x.style.display=U?'none':'');document.querySelectorAll('#shutterSection .'+a[2]).forEach(x=>x.style.display=U?'':'none');});};
 const canOp=()=>{try{return isAdmin||window.currentEngineerRole==='workshop';}catch(e){return false;}};
 const canRecv=()=>canOp()||window.currentEngineerRole==='site';
 function applyRole(){document.querySelectorAll('#shutterSection .shOp').forEach(e=>e.style.display=canOp()?'':'none');
   document.querySelectorAll('#shutterSection button[onclick^="shReceive"]').forEach(e=>e.style.display=canRecv()?'':'none');}
-setInterval(()=>{applyRole();fillPrj();if(window.shGPrev)shGPrev();},1200);
+setInterval(()=>{applyRole();fillPrj();if(window.shUI)shUI();if(window.shGPrev)shGPrev();},1200);
 function repRows(){
-  const m={},g=(p,s)=>m[p+'|'+s]=m[p+'|'+s]||{p,s,ord:0,prod:0,disp:0,rec:0,tr:0,ret:0,stk:0,ang:0,gp:0,fl:0};
-  PO.forEach(o=>{const r=g(o.prj,o.size);r.ord+=o.planned;r.prod+=o.produced;(o.consumed||[]).forEach(c=>c.lines.forEach(l=>{if(l.kg==null)return;
+  const m={},g=(p,o)=>{const k=p+'|'+(o.size||'');if(!m[k]){const a=String(o.size||'').split('~').pop().split('x');
+    m[k]={p,s:o.size,name:o.name||'Shutter',cond:o.cond||'N',L:o.L!=null?N(o.L):N(a[0]),W:o.W!=null?N(o.W):N(a[1]),unsize:isU(o),ord:0,prod:0,disp:0,rec:0,tr:0,ret:0,stk:0,ang:0,gp:0,fl:0};}return m[k];};
+  PO.forEach(o=>{const r=g(o.prj,o);r.ord+=o.planned;r.prod+=o.produced;(o.consumed||[]).forEach(c=>c.lines.forEach(l=>{if(l.kg==null)return;
     if(l.n==='Angle Bar')r.ang+=l.kg;else if(l.n==='GP Sheet')r.gp+=l.kg;else r.fl+=l.kg;}));});
-  GP.forEach(x=>{if(x.type!=='P2W'){const r=g(x.to,x.size);r.disp+=x.qty;if(x.status==='received')r.rec+=x.recQty;else r.tr+=x.qty;}
-    else{g(x.from,x.size).ret+=x.qty;}});
-  ST.forEach(s=>Object.entries(s.loc||{}).forEach(([k,v])=>{if(v&&k!=='TRANSIT'&&k!=='LOST')g(k,s.size).stk+=v;}));
-  return Object.values(m).sort((a,b)=>(a.p+a.s).localeCompare(b.p+b.s));
+  GP.forEach(x=>gpLines(x).forEach(l=>{if(x.type!=='P2W'){const r=g(x.to,l);r.disp+=l.qty;if(x.status==='received')r.rec+=l.recQty;else r.tr+=l.qty;}
+    else{g(x.from,l).ret+=l.qty;}}));
+  ST.forEach(s=>Object.entries(s.loc||{}).forEach(([k,v])=>{if(v&&k!=='TRANSIT'&&k!=='LOST')g(k,s).stk+=v;}));
+  return Object.values(m).sort((a,b)=>(a.p+a.name+a.cond+a.s).localeCompare(b.p+b.name+b.cond+b.s));
 }
 function rep(){const el=$('shRepOut');if(!el)return;
   const sel=$('shRepPrj'),cur=sel.value,ps=[...new Set(repRows().map(r=>r.p))];
   sel.innerHTML='<option value="">All projects</option>'+ps.map(p=>`<option ${p===cur?'selected':''}>${esc(p)}</option>`).join('');
   const kd=$('shRepType').value;if(kd!=='proj'){const q=repHtml(kd,sel.value);el.innerHTML='<style>.shtb table{width:100%;border-collapse:collapse;font-size:11px}.shtb th,.shtb td{border:1px solid #ddd;padding:4px;text-align:center}.shtb th{background:#eef2f7}.shtb tr.tot td{font-weight:bold;background:#f5f7fa}</style><div class="shtb overflow-x-auto">'+q.body+'</div>';window._shRows=[];return;}
   const rows=repRows().filter(r=>!sel.value||r.p===sel.value),f=v=>r4(v).toFixed(2);window._shRows=rows;
-  el.innerHTML='<table class="w-full text-xs"><tr>'+['Project','Size','Ordered','Produced','Dispatched','Received','In transit','Returned','Stock now','Angle kg','GP kg','Flat kg'].map(h=>`<th align=left>${h}</th>`).join('')+'</tr>'+
-   rows.map(r=>`<tr><td>${esc(pl(r.p))}</td><td>${esc(r.s)}</td><td>${r.ord}</td><td>${r.prod}</td><td>${r.disp}</td><td>${r.rec}</td><td>${r.tr}</td><td>${r.ret}</td><td><b>${r.stk}</b></td><td>${f(r.ang)}</td><td>${f(r.gp)}</td><td>${f(r.fl)}</td></tr>`).join('')+'</table>'+
+  el.innerHTML='<table class="w-full text-xs"><tr>'+['Project','Shutter','Ordered','Produced','Dispatched','Received','In transit','Returned','Stock now','Angle kg','GP kg','Flat kg'].map(h=>`<th align=left>${h}</th>`).join('')+'</tr>'+
+   rows.map(r=>`<tr><td>${esc(pl(r.p))}</td><td>${lbl(r)}</td><td>${r.ord}</td><td>${r.prod}</td><td>${r.disp}</td><td>${r.rec}</td><td>${r.tr}</td><td>${r.ret}</td><td><b>${r.stk}</b></td><td>${f(r.ang)}</td><td>${f(r.gp)}</td><td>${f(r.fl)}</td></tr>`).join('')+'</table>'+
    '<div class="mt-4 font-bold text-sm">Project-wise Summary (stock now)</div>'+sumTable(rows)+'<div class="text-xs text-muted mt-2">RFT = length × qty. Workshop reports are separate from the main stock ledger. “WORKSHOP” = finished shutters at the workshop. Flat kg is residual/estimated.</div>';}
-window.shRepCsv=function(){if($('shRepType').value!=='proj')return showToast('Excel (CSV) is only for the Project-wise report. Use Print / PDF for this one.','error');const rows=window._shRows||[];const h=['Project','Size','Ordered','Produced','Dispatched','Received','In transit','Returned','Stock','Angle kg','GP kg','Flat kg'];
-  const csv=[h].concat(rows.map(r=>[r.p,r.s,r.ord,r.prod,r.disp,r.rec,r.tr,r.ret,r.stk,r.ang,r.gp,r.fl])).map(a=>a.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+window.shRepCsv=function(){if($('shRepType').value!=='proj')return showToast('Excel (CSV) is only for the Project-wise report. Use Print / PDF for this one.','error');const rows=window._shRows||[];const h=['Project','Shutter','Ordered','Produced','Dispatched','Received','In transit','Returned','Stock','Angle kg','GP kg','Flat kg'];
+  const csv=[h].concat(rows.map(r=>[r.p,r.name+' | '+(r.unsize?'Unsize':r.L+'x'+r.W)+' | '+CL[r.cond],r.ord,r.prod,r.disp,r.rec,r.tr,r.ret,r.stk,r.ang,r.gp,r.fl])).map(a=>a.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download='workshop-report.csv';a.click();};
 window.shRep=rep;
 let RL=[];
-const PCSS=`@page{size:A4 landscape;margin:8mm}body{font-family:Arial,sans-serif;color:#172033;font-size:11px}h1,h2,p{text-align:center;margin:3px}h1{font-size:20px}h2{font-size:14px}
+const PCSS=`@page{size:A4 landscape;margin:8mm 8mm 12mm 8mm;@bottom-right{content:"Page " counter(page) " of " counter(pages);font-size:9px;color:#555}}body{font-family:Arial,sans-serif;color:#172033;font-size:11px}h1,h2,p{text-align:center;margin:3px}h1{font-size:20px}h2{font-size:14px}
 .meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}table{width:100%;border-collapse:collapse;page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}
 th,td{border:1px solid #999;padding:4px;text-align:center}th{background:#eef2f7}tr.tot td{font-weight:bold;background:#f5f7fa}.nt{font-size:9px;margin-top:8px}
-.sign{display:flex;justify-content:space-between;margin-top:55px}.sig{width:200px;border-top:1px solid #555;text-align:center;padding-top:4px}`;
+.sign{display:flex;justify-content:space-between;margin-top:55px;break-inside:avoid;page-break-inside:avoid}.sig{width:200px;border-top:1px solid #555;text-align:center;padding-top:4px}`;
 const dd=t=>t?new Date(t).toLocaleDateString('en-GB'):'';
 const TL={W2P:'27 Katha → Project',P2P:'Project → Project',P2W:'Project → 27 Katha'};
 const ll=x=>x==='WORKSHOP'?'27 Katha':x;
@@ -6738,39 +6749,40 @@ function docHtml(title,meta,body,sigs,note){return `<!doctype html><html><head><
 <div class="meta">${meta.map(m=>`<span>${m}</span>`).join('')}</div>${body}${note?`<div class="nt">${note}</div>`:''}<div class="sign">${sigs.map(x=>`<div class="sig">${x}</div>`).join('')}</div></body></html>`;}
 function tb(h,rows){return `<table><thead><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>r.t?`<tr class="tot">${r.t.map(c=>`<td>${c}</td>`).join('')}</tr>`:`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;}
 function repHtml(kind,prj){const f=v=>r4(v).toFixed(2),ok=p=>!prj||p===prj,m=['Project: '+esc(prj||'All Projects'),'Date: '+dd(Date.now()),'Prepared By: '+esc(who())];
-  if(kind==='req'){let q=0,sf=0,rf=0;const rows=[];RL.filter(r=>ok(r.prj)).forEach(r=>rqItems(r).forEach(x=>{const s=x.L*x.W/12*x.qty,rt=x.L*x.qty;q+=x.qty;sf+=s;rf+=rt;
-      rows.push([esc(r.no),dd(r.at),esc(r.prj),esc(x.L+' × '+x.W),x.qty,f(s),f(rt),r.date||'-',esc(r.status+(r.woNo?' ('+r.woNo+')':'')),esc(r.by)]);}));
-    rows.push({t:['Total','','','',q,f(sf),f(rf),'','','']});
-    return {title:'SHUTTER REQUISITION REPORT',meta:m,body:tb(['Req No','Date','Project','Size (ft × inch)','Qty','SFT','RFT','Required Date','Status','Requested By'],rows),sigs:['Prepared By','Workshop In-charge','Approved By']};}
+  if(kind==='req'){let q=0,sf=0,rf=0,a1=0,a2=0,a3=0;const rows=[];RL.filter(r=>ok(r.prj)).forEach(r=>rqItems(r).forEach(x=>{const s=itSft(x),rt=itRft(x),w=rawI(x);q+=x.qty;sf+=s;rf+=rt;if(w){a1+=w.ang;a2+=w.gp;a3+=w.flat;}
+      rows.push([esc(r.no),dd(r.at),esc(r.prj),lbl(x),x.qty,f(s),f(rt),w?f(w.ang):'-',w?f(w.gp):'-',w?f(w.flat):'-',r.date||'-',esc(r.status+(r.woNo?' ('+r.woNo+')':'')),esc(r.by)]);}));
+    rows.push({t:['Total','','','',q,f(sf),f(rf),f(a1),f(a2),f(a3),'','','']});
+    return {title:'SHUTTER REQUISITION REPORT',meta:m,body:tb(['Req No','Date','Project','Shutter','Qty','SFT','RFT','Angle (kg)','GP Sheet (kg)','Flat Bar (kg est.)','Required Date','Status','Requested By'],rows),sigs:['Prepared By','Workshop In-charge','Approved By'],note:'Raw material is for New shutters only (Old / Repair need none). Flat Bar is estimated from standard weight per SFT.'};}
   if(kind==='wo'){let a=0,b=0,g1=0,g2=0,g3=0;const rows=PO.filter(o=>ok(o.prj)).map(o=>{let A=0,G=0,F=0;(o.consumed||[]).forEach(c=>c.lines.forEach(l=>{if(l.kg==null)return;l.n==='Angle Bar'?A+=l.kg:l.n==='GP Sheet'?G+=l.kg:F+=l.kg;}));
-      a+=o.planned;b+=o.produced;g1+=A;g2+=G;g3+=F;return [esc(o.no),esc(o.prj),esc(o.size),o.planned,o.produced,o.planned-o.produced,esc(o.status),f(A),f(G),f(F)];});
+      a+=o.planned;b+=o.produced;g1+=A;g2+=G;g3+=F;return [esc(o.no),esc(o.prj),lbl(o),o.planned,o.produced,o.planned-o.produced,esc(o.status),f(A),f(G),f(F)];});
     rows.push({t:['Total','','',a,b,a-b,'',f(g1),f(g2),f(g3)]});
-    return {title:'PRODUCTION / WORK ORDER REPORT',meta:m,body:tb(['Work Order','Project','Size','Planned','Produced','Remaining','Status','Angle (kg)','GP Sheet (kg)','Flat Bar (kg)'],rows),sigs:['Prepared By','Workshop In-charge','Approved By'],note:'Material kg = consumed on production completion. Flat Bar is residual / estimated.'};}
-  if(kind==='move'){let q=0,rc=0,w=0;const rows=GP.filter(g=>ok(g.from)||ok(g.to)).map(g=>{q+=g.qty;rc+=g.recQty||0;w+=g.wt||0;
-      return [esc(g.no),dd(g.at),TL[g.type],esc(ll(g.from)),esc(ll(g.to)),esc(g.size),g.qty,g.status==='received'?g.recQty:'-',g.status==='received'?g.qty-g.recQty:'-',g.wt?f(g.wt):'-',esc(g.status)];});
+    return {title:'PRODUCTION / WORK ORDER REPORT',meta:m,body:tb(['Work Order','Project','Shutter','Planned','Produced','Remaining','Status','Angle (kg)','GP Sheet (kg)','Flat Bar (kg)'],rows),sigs:['Prepared By','Workshop In-charge','Approved By'],note:'Material kg = consumed on production completion. Flat Bar is residual / estimated.'};}
+  if(kind==='move'){let q=0,rc=0,w=0;const rows=[];GP.filter(g=>ok(g.from)||ok(g.to)).forEach(g=>gpLines(g).forEach(l=>{q+=l.qty;const r=g.status==='received'?l.recQty:null;if(r!=null)rc+=r;w+=l.wt||0;
+      rows.push([esc(g.no),dd(g.at),TL[g.type],esc(ll(g.from)),esc(ll(g.to)),lbl(l),l.qty,r!=null?r:'-',r!=null?l.qty-r:'-',l.wt?f(l.wt):'-',esc(g.status)]);}));
     rows.push({t:['Total','','','','','',q,rc,'',f(w),'']});
-    return {title:'SHUTTER DISPATCH &amp; TRANSFER REPORT',meta:m,body:tb(['Gate Pass','Date','Type','From','To','Size','Dispatched','Received','Shortage','Weight (kg)','Status'],rows),sigs:['Prepared By','Workshop In-charge','Site Engineer','Approved By']};}
+    return {title:'SHUTTER DISPATCH &amp; TRANSFER REPORT',meta:m,body:tb(['Gate Pass','Date','Type','From','To','Shutter','Dispatched','Received','Shortage','Weight (kg)','Status'],rows),sigs:['Prepared By','Workshop In-charge','Site Engineer','Approved By']};}
   return null;}
-window.shGPPrint=function(no){const g=GP.find(x=>x.no===no);if(!g)return;const a=g.size.split('x'),L=N(a[0]),W=N(a[1]),f=v=>r4(v).toFixed(2);
-  const rows=[['Shutter Size',esc(L+' ft × '+W+' inch')],['Quantity',g.qty+' Nos'],['Total SFT',f(L*W/12*g.qty)],['Total RFT (length)',f(L*g.qty)]];
-  if(g.brk)rows.push(['Total Weight',f(g.brk.wt)+' kg'],['Angle Bar',f(g.brk.ang)+' kg'],['GP Sheet',f(g.brk.gp)+' kg'],['Flat Bar (residual)',f(g.brk.flat)+' kg']);
-  rows.push(['Status',esc(g.status)+(g.status==='received'?' — received '+g.recQty+' Nos'+(g.qty-g.recQty?' (shortage '+(g.qty-g.recQty)+')':''):'')]);
-  const h=docHtml('SHUTTER GATE PASS',['Gate Pass No: '+esc(g.no),'Date: '+dd(g.at),'Type: '+TL[g.type]],
-    `<table style="margin-bottom:10px"><tr><th>From</th><td><b>${esc(ll(g.from))}</b></td><th>To</th><td><b>${esc(ll(g.to))}</b></td></tr></table><table><tbody>${rows.map(r=>`<tr><th style="width:30%;text-align:left">${r[0]}</th><td style="text-align:left">${r[1]}</td></tr>`).join('')}</tbody></table>`,
-    ['Sender<br>'+esc(g.by),'Approved By','Driver / Vehicle','Received By']);
-  printH(h);};
+window.shGPPrint=function(no){const g=GP.find(x=>x.no===no);if(!g)return;const ls=gpLines(g),f=v=>r4(v).toFixed(2),rec=g.status==='received',hasW=ls.some(l=>l.wt);
+  let q=0,sf=0,rf=0,w=0,a=0,b=0,c=0;
+  const rows=ls.map((l,i)=>{const sft=l.sft!=null?l.sft:l.L*l.W/12*l.qty,rft=l.rft!=null?l.rft:l.L*l.qty,k=l.brk;q+=l.qty;sf+=sft;rf+=rft;w+=l.wt||0;if(k){a+=k.ang;b+=k.gp;c+=k.flat;}
+    return [i+1,esc(l.name||'Shutter'),CL[l.cond||'N'],esc(fmtL(l.L)+' × '+l.W+'"'),l.qty,f(sft),f(rft)].concat(hasW?[l.wt?f(l.wt):'-',k?f(k.ang):'-',k?f(k.gp):'-',k?f(k.flat):'-']:[]).concat(rec?[l.recQty]:[]);});
+  rows.push({t:['','Total','','',q,f(sf),f(rf)].concat(hasW?[f(w),f(a),f(b),f(c)]:[]).concat(rec?['']:[])});
+  const heads=['Sl','Shutter Name','Condition','Size (L × W)','Qty','SFT','RFT'].concat(hasW?['Weight (kg)','Angle (kg)','GP Sheet (kg)','Flat Bar (kg)']:[]).concat(rec?['Received']:[]);
+  printH(docHtml('SHUTTER GATE PASS',['Gate Pass No: '+esc(g.no),'Date: '+dd(g.at),'Type: '+TL[g.type]],
+    `<table style="margin-bottom:10px"><tr><th>From</th><td><b>${esc(ll(g.from))}</b></td><th>To</th><td><b>${esc(ll(g.to))}</b></td></tr></table>`+tb(heads,rows),
+    ['Sender<br>'+esc(g.by),'Approved By','Driver / Vehicle','Received By']));};
 function printH(h){const fr=document.createElement('iframe');fr.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0';document.body.appendChild(fr);
   fr.contentDocument.open();fr.contentDocument.write(h);fr.contentDocument.close();setTimeout(()=>{fr.contentWindow.focus();fr.contentWindow.print();setTimeout(()=>fr.remove(),3000);},400);}
 function curHtml(){const k=$('shRepType').value,p=$('shRepPrj').value;if(k==='proj')return pdfHtml(window._shRows||[],p);const r=repHtml(k,p);return docHtml(r.title,r.meta,r.body,r.sigs,r.note);}
 
 const pl=p=>p==='WORKSHOP'?'27 Katha (Workshop)':p;
-function wsum(rows){const m={};rows.forEach(r=>{if(!r.stk)return;const a=String(r.s).split('x'),L=N(a[0]),W=N(a[1]);const p=m[r.p]=m[r.p]||{};const o=p[W]=p[W]||{q:0,sft:0,rft:0};
-  o.q+=r.stk;o.sft+=r.stk*L*W/12;o.rft+=r.stk*L;});return m;}
+function wsum(rows){const m={};rows.forEach(r=>{if(!r.stk)return;const p=m[r.p]=m[r.p]||{};const w=r.unsize?'Unsize':N(r.W),k=(r.name||'Shutter')+'|'+(r.cond||'N')+'|'+w;
+  const o=p[k]=p[k]||{name:r.name||'Shutter',cond:r.cond||'N',w,u:!!r.unsize,q:0,sft:0,rft:0};o.q+=r.stk;if(!r.unsize){o.sft+=r.stk*N(r.L)*N(r.W)/12;o.rft+=r.stk*N(r.L);}});return m;}
 function sumTable(rows){const m=wsum(rows),f=v=>r4(v).toFixed(2);
-  let h='<table class="w-full text-xs"><thead><tr><th>Project</th><th>Shutter Width</th><th>Shutters (Nos)</th><th>Total SFT</th><th>Total RFT</th></tr></thead><tbody>';
-  Object.keys(m).forEach(p=>{let tq=0,ts=0,tf=0;Object.keys(m[p]).sort((a,b)=>a-b).forEach((w,i)=>{const o=m[p][w];tq+=o.q;ts+=o.sft;tf+=o.rft;
-    h+=`<tr><td>${i?'':esc(pl(p))}</td><td>${w} inch</td><td>${o.q}</td><td>${f(o.sft)}</td><td>${f(o.rft)}</td></tr>`;});
-    h+=`<tr class="tot"><td>${esc(pl(p))} — Total</td><td></td><td>${tq}</td><td>${f(ts)}</td><td>${f(tf)}</td></tr>`;});
+  let h='<table class="w-full text-xs"><thead><tr><th>Project</th><th>Shutter Name</th><th>Condition</th><th>Width</th><th>Shutters (Nos)</th><th>Total SFT</th><th>Total RFT</th></tr></thead><tbody>';
+  Object.keys(m).forEach(p=>{let tq=0,ts=0,tf=0;Object.keys(m[p]).sort().forEach((k,i)=>{const o=m[p][k];tq+=o.q;ts+=o.sft;tf+=o.rft;
+    h+=`<tr><td>${i?'':esc(pl(p))}</td><td>${esc(o.name)}</td><td>${CL[o.cond]}</td><td>${o.u?'Unsize':o.w+' inch'}</td><td>${o.q}</td><td>${o.u?'—':f(o.sft)}</td><td>${o.u?'—':f(o.rft)}</td></tr>`;});
+    h+=`<tr class="tot"><td>${esc(pl(p))} — Total</td><td></td><td></td><td></td><td>${tq}</td><td>${f(ts)}</td><td>${f(tf)}</td></tr>`;});
   return h+'</tbody></table>';}
 function fillPrj(){let all=[];try{all=projectDatabase.map(p=>p.prjNo);}catch(e){}
   const mine=canOp()?all:(window.currentEngineerAllowedProjects||[]);
@@ -6780,13 +6792,18 @@ function fillPrj(){let all=[];try{all=projectDatabase.map(p=>p.prjNo);}catch(e){
   const o=$('shGT');if(o){const w=o.querySelector('option[value=W2P]');if(w){w.hidden=w.disabled=!canOp();if(!canOp()&&o.value==='W2P'){o.value='P2P';shGPrev();}}}}
 let RQ=[];
 const rqItems=r=>r.items||[{L:r.L,W:r.W,size:r.size,qty:r.qty}];
-const rqTot=it=>it.reduce((a,x)=>({q:a.q+x.qty,sft:a.sft+x.L*x.W/12*x.qty,rft:a.rft+x.L*x.qty}),{q:0,sft:0,rft:0});
-function rqDraw(){const t=rqTot(RQ);$('shRQBox').innerHTML='<div class="grid gap-2">'+RQ.map((x,i)=>`<div class="flex justify-between items-center text-sm rounded-xl border border-line bg-white p-2"><span>${i+1}. ${x.L} ft × ${x.W} inch · <b>${x.qty}</b> nos · SFT ${r4(x.L*x.W/12*x.qty).toFixed(2)} · RFT ${r4(x.L*x.qty).toFixed(2)}</span><button class="btn btn-secondary" onclick="shRQDel(${i})">✕</button></div>`).join('')+'</div>'+
-  (RQ.length?`<div class="text-xs font-bold mt-1">Total: ${t.q} nos · SFT ${r4(t.sft).toFixed(2)} · RFT ${r4(t.rft).toFixed(2)}</div>`:'');}
-window.shRQAdd=function(){const L=N($('shRQL').value),W=N($('shRQW').value),q=N($('shRQQ').value);
-  if(L<=0||W<=0||q<=0)return showToast('Length, width and quantity required.','error');
-  const e=RQ.find(x=>x.L===L&&x.W===W);if(e)e.qty+=q;else RQ.push({L,W,size:key(L,W),qty:q});
-  $('shRQW').value='';$('shRQQ').value='';rqDraw();$('shRQL').focus();};
+function rawOf(x){if((x.cond||'N')!=='N'||isU(x))return null;const sft=x.L*x.W/12,c=calc(Object.assign(bom(),{L:x.L,W:x.W,qty:1,angleLen:0,totalWt:sft*N($('shKS').value)}));
+  return {ang:c.ang*x.qty,gp:c.gp*x.qty,flat:Math.max(0,c.flat)*x.qty};}
+const rawI=x=>x.raw||rawOf(x);
+const rqTot=it=>it.reduce((a,x)=>{const w=rawI(x)||{ang:0,gp:0,flat:0};return {q:a.q+x.qty,sft:a.sft+itSft(x),rft:a.rft+itRft(x),ang:a.ang+w.ang,gp:a.gp+w.gp,fl:a.fl+w.flat};},{q:0,sft:0,rft:0,ang:0,gp:0,fl:0});
+const rawTxt=w=>w?'Angle '+r4(w.ang).toFixed(2)+' · GP '+r4(w.gp).toFixed(2)+' · Flat '+r4(w.flat).toFixed(2)+' kg (est.)':'No raw material (old / repair)';
+function rqDraw(){const t=rqTot(RQ);$('shRQBox').innerHTML='<div class="grid gap-2">'+RQ.map((x,i)=>`<div class="flex justify-between items-center text-sm rounded-xl border border-line bg-white p-2"><span>${i+1}. ${lbl(x)} · <b>${x.qty}</b> nos · SFT ${r4(itSft(x)).toFixed(2)} · RFT ${r4(itRft(x)).toFixed(2)}<br><span class="text-xs text-muted">${rawTxt(rawI(x))}</span></span><button class="btn btn-secondary" onclick="shRQDel(${i})">✕</button></div>`).join('')+'</div>'+
+  (RQ.length?`<div class="text-xs font-bold mt-1">Total: ${t.q} nos · SFT ${r4(t.sft).toFixed(2)} · RFT ${r4(t.rft).toFixed(2)}<br>Raw material needed: Angle Bar ${r4(t.ang).toFixed(2)} kg · GP Sheet ${r4(t.gp).toFixed(2)} kg · Flat Bar ${r4(t.fl).toFixed(2)} kg (est.)</div>`:'');}
+window.shRQAdd=function(){const nm=$('shRQN').value,cd=$('shRQC').value,q=N($('shRQQ').value),L=r4(N($('shRQL').value)+N($('shRQLi').value)/12),W=N($('shRQW').value);
+  if(q<=0||L<=0||W<=0)return showToast('Length, width and quantity required.','error');
+  const sk=skey(nm,cd,L,W),e=RQ.find(x=>x.size===sk);if(!e&&RQ.length>=50)return showToast('Maximum 50 sizes in one requisition. Submit this and make another.','error');
+  if(e){e.qty+=q;e.raw=rawOf(e);}else{const x={name:nm,cond:cd,L,W,size:sk,qty:q};x.raw=rawOf(x);RQ.push(x);}
+  $('shRQW').value='';$('shRQQ').value='';$('shRQLi').value='';rqDraw();$('shRQL').focus();};
 window.shRQDel=i=>{RQ.splice(i,1);rqDraw();};
 window.shNewReq=async function(){
   if(!canRecv())return showToast('Not allowed.','error');
@@ -6802,16 +6819,16 @@ window.shReqAct=async function(no,act){
     if(r.status!=='pending')throw new Error('Already processed');
     if(act==='rej'){tx.update(rr,{status:'rejected',by2:who()});return;}
     const cr=db().collection('counters').doc('shutter_po'),cd=await tx.get(cr),n0=cd.exists?cd.data().n:0,items=rqItems(r),wos=[];
-    items.forEach((x,i)=>{const wn='WO-'+String(n0+i+1).padStart(4,'0'),inp=Object.assign(bom(),{L:x.L,W:x.W,qty:x.qty,totalWt:0,angleLen:0}),c=calc(inp);wos.push(wn);
-      tx.set(db().collection('shutter_po').doc(wn),{no:wn,prj:r.prj,size:key(x.L,x.W),L:x.L,W:x.W,planned:x.qty,produced:0,status:'approved',createdBy:who(),createdAt:Date.now(),reqNo:no,
-        bom:{ver:1,input:inp,perShutter:{sft:c.sft,angle:c.ang,gp:c.gp,flat:null,flatVerified:false},policy:'angle-len truncate 2dp'},consumed:[]});});
+    items.forEach((x,i)=>{const wn='WO-'+String(n0+i+1).padStart(4,'0'),u=isU(x),inp=Object.assign(bom(),{L:x.L,W:x.W,qty:x.qty,totalWt:0,angleLen:0}),c=u?null:calc(inp);wos.push(wn);
+      tx.set(db().collection('shutter_po').doc(wn),{no:wn,prj:r.prj,name:x.name||'Shutter',cond:x.cond||'N',unsize:u,size:x.size||skey(x.name,x.cond,x.L,x.W),L:x.L,W:x.W,planned:x.qty,produced:0,status:'approved',createdBy:who(),createdAt:Date.now(),reqNo:no,
+        bom:{ver:1,input:inp,perShutter:u?{sft:0,angle:0,gp:0,flat:null,flatVerified:false}:{sft:c.sft,angle:c.ang,gp:c.gp,flat:null,flatVerified:false},policy:'angle-len truncate 2dp'},consumed:[]});});
     tx.set(cr,{n:n0+items.length});tx.update(rr,{status:'wo_created',woNo:wos.join(', '),by2:who()});});showToast('Work orders created.');}catch(e){showToast(esc(e.message),'error');}
 };
 
 
-function brkOf(q){const w=N($('shGW').value);if(!(w>0))return null;const c=calc(Object.assign(bom(),{L:N($('shGL').value),W:N($('shGW2').value),totalWt:w,qty:q}));
+function brkOf(q){const w=N($('shGW').value);if(!(w>0))return null;const c=calc(Object.assign(bom(),{L:r4(N($('shGL').value)+N($('shGLi').value)/12),W:N($('shGW2').value),totalWt:w,qty:q}));
   return {per:{wt:w,ang:c.ang,gp:c.gp,flat:c.flat},wt:w*q,ang:c.ang*q,gp:c.gp*q,flat:c.flat*q};}
-window.shGPrev=function(){const w=document.querySelector('#shutterSection .shW');if(!w)return;const nw=$('shGT').value==='W2P';w.style.display=nw?'':'none';
+window.shGPrev=function(){const w=document.querySelector('#shutterSection .shW');if(!w)return;const nw=$('shGT').value==='W2P'&&$('shGN').value!=='Unsize Shutter';w.style.display=nw?'':'none';
   const o=$('shGPrevOut');if(!o)return;const q=N($('shGQ').value)||1,b=nw?brkOf(q):null;
   o.innerHTML=b?`<b>${q} shutter × ${r4(b.per.wt)} kg = ${r4(b.wt)} kg</b> → Angle ${r4(b.ang)} kg · GP Sheet ${r4(b.gp)} kg · Flat Bar ${r4(b.flat)} kg ${b.per.flat<0?'<b style="color:#dc2626">(weight too low!)</b>':''}`:(nw?'Enter weight to see Angle / GP / Flat split (optional).':'');};
 function pdfHtml(rows,prj){
@@ -6821,14 +6838,14 @@ function pdfHtml(rows,prj){
   const sum=L=>{const o={};K.concat(W).forEach(k=>o[k]=L.reduce((a,r)=>a+r[k],0));return o;};
   const tr=(lab,o,cls)=>`<tr class="${cls||''}"><td>${lab}</td>${K.map(k=>`<td>${o[k]}</td>`).join('')}${W.map(k=>`<td>${f(o[k])}</td>`).join('')}<td>${f(o.ang+o.gp+o.fl)}</td></tr>`;
   const blocks=Object.keys(by).map(p=>{const L=by[p];
-    return `<div class="blk"><div class="ttl">Project: ${esc(p==='WORKSHOP'?'27 KATHA WORKSHOP (finished stock)':p)}</div><table><thead><tr><th>Shutter Size</th><th>Ordered</th><th>Produced</th><th>Dispatched</th><th>Received</th><th>In Transit</th><th>Returned</th><th>Stock Now</th><th>Angle (kg)</th><th>GP Sheet (kg)</th><th>Flat Bar (kg)</th><th>Total (kg)</th></tr></thead><tbody>${L.map(r=>tr(esc(r.s),r)).join('')}${tr('Total',sum(L),'tot')}</tbody></table></div>`;}).join('');
+    return `<div class="blk"><div class="ttl">Project: ${esc(p==='WORKSHOP'?'27 KATHA WORKSHOP (finished stock)':p)}</div><table><thead><tr><th>Shutter</th><th>Ordered</th><th>Produced</th><th>Dispatched</th><th>Received</th><th>In Transit</th><th>Returned</th><th>Stock Now</th><th>Angle (kg)</th><th>GP Sheet (kg)</th><th>Flat Bar (kg)</th><th>Total (kg)</th></tr></thead><tbody>${L.map(r=>tr(lbl(r),r)).join('')}${tr('Total',sum(L),'tot')}</tbody></table></div>`;}).join('');
   return `<!doctype html><html><head><meta charset="utf-8"><title>MARS Workshop Report</title><style>
-@page{size:A4 landscape;margin:8mm}body{font-family:Arial,sans-serif;color:#172033;font-size:11px}
+@page{size:A4 landscape;margin:8mm 8mm 12mm 8mm;@bottom-right{content:"Page " counter(page) " of " counter(pages);font-size:9px;color:#555}}body{font-family:Arial,sans-serif;color:#172033;font-size:11px}
 h1,h2,p{text-align:center;margin:3px}h1{font-size:20px}h2{font-size:14px}.meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}
 table{width:100%;border-collapse:collapse;page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}
 th,td{border:1px solid #999;padding:4px;text-align:center}th{background:#eef2f7}tr.tot td{font-weight:bold;background:#f5f7fa}
-.blk{margin-bottom:14px;page-break-inside:avoid}.ttl{font-weight:bold;font-size:12px;margin:10px 0 4px;padding:3px 0;border-bottom:1px solid #333}
-.nt{font-size:9px;margin-top:8px}.sign{display:flex;justify-content:space-between;margin-top:55px}.sig{width:200px;border-top:1px solid #555;text-align:center;padding-top:4px}
+.blk{margin-bottom:14px}.ttl{break-after:avoid;font-weight:bold;font-size:12px;margin:10px 0 4px;padding:3px 0;border-bottom:1px solid #333}
+.nt{font-size:9px;margin-top:8px}.sign{display:flex;justify-content:space-between;margin-top:55px;break-inside:avoid;page-break-inside:avoid}.sig{width:200px;border-top:1px solid #555;text-align:center;padding-top:4px}
 </style></head><body>
 <h1>MARS STRUCTURE LIMITED</h1><h2>WORKSHOP &amp; SHUTTERING REPORT (PROJECT-WISE)</h2>
 <div class="meta"><span>Project: ${esc(prj||'All Projects')}</span><span>Date: ${dt}</span><span>Prepared By: ${esc(who())}</span></div>
@@ -6885,7 +6902,7 @@ function tpl(){return `
  <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
   ${[['shL','Length (ft)',6],['shW','Width (inch)',19],['shQ','Quantity',100],['shTW','Actual total wt (kg)',38.3],
      ['shAK','Angle std wt (kg)',15.6],['shAF','Angle std len (ft)',20],['shAL','Angle cut len (ft) – blank=auto',''],
-     ['shSK','Sheet wt (kg)',37.1],['shSS','Sheet area (SFT)',32]].map(x=>`<div><label class="field-label">${x[1]}</label><input id="${x[0]}" type="number" step="any" class="field" value="${x[2]}" oninput="shCalc()"></div>`).join('')}
+     ['shSK','Sheet wt (kg)',37.1],['shSS','Sheet area (SFT)',32],['shKS','Est. shutter wt (kg per SFT)',4.0316]].map(x=>`<div><label class="field-label">${x[1]}</label><input id="${x[0]}" type="number" step="any" class="field" value="${x[2]}" oninput="shCalc()"></div>`).join('')}
  </div>
  <div id="shOut" class="mt-4 overflow-x-auto"></div>
  <button class="btn btn-secondary mt-3" onclick="shTest()">Run self-tests</button><div id="shTest" class="text-xs mt-2"></div>
@@ -6895,6 +6912,7 @@ function tpl(){return `
  <div class="text-xs text-muted mb-2">Uses the calculator inputs above for BOM. Create order → Start → Complete (raw material consumed once per order; partial completion allowed).</div>
  <div class="grid grid-cols-2 md:grid-cols-4 gap-2 shOp">
   <div><label class="field-label">Project</label><select id="shPP" class="field"></select></div>
+  <div><label class="field-label">Shutter name</label><select id="shPN" class="field">${nameOpts()}</select></div><div><label class="field-label">Condition</label><select id="shPC" class="field">${condOpts()}</select></div>
   <div><label class="field-label">Planned qty</label><input id="shPQ" type="number" class="field"></div>
   <div class="flex items-end"><button class="btn btn-primary w-full" onclick="shNewPO()">Create Work Order</button></div></div>
  <div id="shPOList" class="mt-3 grid gap-2"></div>
@@ -6906,17 +6924,21 @@ function tpl(){return `
   <div><label class="field-label">Type</label><select id="shGT" class="field" onchange="shGPrev()"><option value="W2P">27 Katha → Project</option><option value="P2P">Project → Project</option><option value="P2W">Project → 27 Katha</option></select></div>
   <div><label class="field-label">From (project)</label><select id="shGF" class="field"></select></div>
   <div><label class="field-label">To (project)</label><select id="shGTo" class="field"></select></div>
-  <div><label class="field-label">Length (ft)</label><input id="shGL" type="number" step="any" class="field" oninput="shGPrev()"></div><div><label class="field-label">Width (inch)</label><input id="shGW2" type="number" step="any" class="field" oninput="shGPrev()"></div>
+  <div><label class="field-label">Shutter name</label><select id="shGN" class="field" onchange="shUI();shGPrev()">${nameOpts()}</select></div><div><label class="field-label">Condition</label><select id="shGC" class="field">${condOpts()}</select></div>
+  <div class="gNU"><label class="field-label">Length (ft)</label><input id="shGL" type="number" step="any" class="field" oninput="shGPrev()"></div><div class="gNU"><label class="field-label">Length extra (inch)</label><input id="shGLi" type="number" step="any" class="field" oninput="shGPrev()"></div><div class="gNU"><label class="field-label">Width (inch)</label><input id="shGW2" type="number" step="any" class="field" oninput="shGPrev()"></div>
   <div><label class="field-label">Quantity</label><input id="shGQ" type="number" class="field" oninput="shGPrev()"></div>
+  <div class="gU" style="display:none"><label class="field-label">Total SFT (optional)</label><input id="shGS" type="number" step="any" class="field"></div><div class="gU" style="display:none"><label class="field-label">Total RFT (optional)</label><input id="shGR" type="number" step="any" class="field"></div>
   <div class="shW"><label class="field-label">Weight per shutter (kg)</label><input id="shGW" type="number" step="any" class="field" oninput="shGPrev()"></div>
-  <div class="flex items-end"><button class="btn btn-primary w-full" onclick="shDispatch()">Dispatch</button></div></div>
- <div id="shGPrevOut" class="text-xs mt-2"></div>
+  <div class="flex items-end"><button class="btn btn-primary w-full" onclick="shGAdd()">+ Add line</button></div></div>
+ <div id="shGPrevOut" class="text-xs mt-2"></div><div id="shGBox" class="mt-3"></div><button class="btn btn-primary mt-3" onclick="shDispatch()">Create Gate Pass</button>
  <div id="shGPList" class="mt-3 grid gap-2"></div>
 </div>
 <div data-pane="req" style="display:none"><div class="grid grid-cols-2 md:grid-cols-3 gap-2"><div><label class="field-label">Project</label><select id="shRQP" class="field"></select></div>
  <div><label class="field-label">Required date</label><input id="shRQD" type="date" class="field"></div><div class="col-span-2 md:col-span-1"><label class="field-label">Remarks (optional)</label><input id="shRQR" class="field"></div></div>
- <div class="text-xs font-bold mt-3 mb-1">Add shutter sizes (one by one)</div>
- <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><div><label class="field-label">Length (ft)</label><input id="shRQL" type="number" step="any" class="field"></div><div><label class="field-label">Width (inch)</label><input id="shRQW" type="number" step="any" class="field"></div>
+ <div class="text-xs font-bold mt-3 mb-1">Add shutters (one by one)</div>
+ <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><div><label class="field-label">Shutter name</label><select id="shRQN" class="field" onchange="shUI()">${nameOpts()}</select></div><div><label class="field-label">Condition</label><select id="shRQC" class="field">${condOpts()}</select></div>
+ <div class="rqNU"><label class="field-label">Length (ft)</label><input id="shRQL" type="number" step="any" class="field"></div><div class="rqNU"><label class="field-label">Length extra (inch)</label><input id="shRQLi" type="number" step="any" class="field" placeholder="e.g. 2 for 5'-2&quot;"></div><div class="rqNU"><label class="field-label">Width (inch)</label><input id="shRQW" type="number" step="any" class="field"></div>
+ <div class="rqU" style="display:none"><label class="field-label">Total SFT (optional)</label><input id="shRQS" type="number" step="any" class="field"></div><div class="rqU" style="display:none"><label class="field-label">Total RFT (optional)</label><input id="shRQT" type="number" step="any" class="field"></div>
  <div><label class="field-label">Quantity</label><input id="shRQQ" type="number" class="field" onkeydown="if(event.key==='Enter')shRQAdd()"></div><div class="flex items-end"><button class="btn btn-secondary w-full" onclick="shRQAdd()">+ Add size</button></div></div>
  <div id="shRQBox" class="mt-3"></div><button class="btn btn-primary mt-3" onclick="shNewReq()">Submit Requisition</button><div id="shReqList" class="mt-4 grid gap-2"></div></div>
 <div data-pane="rep" style="display:none"><div class="flex gap-2 items-end flex-wrap mb-3"><div><label class="field-label">Report</label><select id="shRepType" class="field" onchange="shRep()"><option value="proj">Project-wise Stock &amp; Summary</option><option value="req">Shutter Requisition Report</option><option value="wo">Production / Work Order Report</option><option value="move">Dispatch &amp; Transfer Report</option></select></div><div><label class="field-label">Project</label><select id="shRepPrj" class="field" onchange="shRep()"></select></div><button class="btn btn-secondary" onclick="shRepCsv()">Excel (CSV)</button><button class="btn btn-secondary" onclick="shRepPdf()">Print / PDF</button></div><div id="shRepOut" class="overflow-x-auto"></div></div>`;}
@@ -6936,10 +6958,11 @@ window.shTest=function(){$('shTest').innerHTML=runTests().map(t=>`<div style="co
 async function nextNo(tx,id,pre){const ref=db().collection('counters').doc(id),c=await tx.get(ref),n=(c.exists?c.data().n:0)+1;tx.set(ref,{n});return pre+String(n).padStart(4,'0');}
 function ledger(tx,e){const ref=db().collection('shutter_ledger').doc();tx.set(ref,Object.assign({at:Date.now(),by:who()},e));}
 window.shNewPO=async function(){if(!canOp())return showToast('Only Workshop In-charge / Admin can do this.','error');
-  const b=bom(),c=calc(b),prj=$('shPP').value.trim(),q=N($('shPQ').value);
+  const b=bom(),c=calc(b),prj=$('shPP').value.trim(),q=N($('shPQ').value),nm=$('shPN').value,cd=$('shPC').value;
+  if(nm==='Unsize Shutter')return showToast('Unsize shutters: make a Shutter Requisition and use Make Work Orders.','error');
   if(!prj||q<=0||!b.L||!b.W)return showToast('Project, size and planned qty required.','error');
   try{await db().runTransaction(async tx=>{const no=await nextNo(tx,'shutter_po','WO-');
-   tx.set(db().collection('shutter_po').doc(no),{no,prj,size:key(b.L,b.W),L:b.L,W:b.W,planned:q,produced:0,status:'approved',createdBy:who(),createdAt:Date.now(),
+   tx.set(db().collection('shutter_po').doc(no),{no,prj,name:nm,cond:cd,size:skey(nm,cd,b.L,b.W),L:b.L,W:b.W,planned:q,produced:0,status:'approved',createdBy:who(),createdAt:Date.now(),
      bom:{ver:1,input:b,perShutter:{sft:c.sft,angle:c.ang,gp:c.gp,flat:c.flat,flatVerified:c.flatVerified},policy:'angle-len truncate 2dp'},consumed:[]});});
    showToast('Work order created.');}catch(e){showToast('Failed: '+esc(e.message),'error');}
 };
@@ -6951,41 +6974,62 @@ window.shPO=async function(no,act){if(!canOp())return showToast('Only Workshop I
     if(po.status!=='in_production')throw new Error('Order not in production');
     if(po.produced+add>po.planned)throw new Error('Exceeds planned qty');
     const sr=db().collection('shutter_stock').doc(po.size),sd=await tx.get(sr),loc=(sd.exists?sd.data().loc:{})||{},before=N(loc.WORKSHOP);
-    loc.WORKSHOP=before+add;tx.set(sr,{size:po.size,L:po.L,W:po.W,loc},{merge:true});
+    loc.WORKSHOP=before+add;tx.set(sr,{size:po.size,name:po.name||'Shutter',cond:po.cond||'N',unsize:isU(po),L:po.L||0,W:po.W||0,loc},{merge:true});
     const p=po.bom.perShutter,line={n:'Angle Bar',kg:p.angle*add},l2={n:'GP Sheet',kg:p.gp*add},l3={n:'Flat Bar',kg:p.flat==null?null:p.flat*add,est:!p.flatVerified};
     const prod=po.produced+add,fin=prod>=po.planned;
     tx.update(pr,{produced:prod,status:fin?'completed':'in_production',consumed:(po.consumed||[]).concat([{at:Date.now(),qty:add,lines:[line,l2,l3]}])});
     ledger(tx,{type:'PRODUCTION',ref:no,size:po.size,from:'RAW',to:'WORKSHOP',qty:add,before,after:before+add,note:'raw consumed once per batch'});
   });showToast('Done.');}catch(e){showToast(esc(e.message),'error');}
 };
-window.shDispatch=async function(){if(!canRecv())return showToast('Not allowed.','error');if($('shGT').value==='W2P'&&!canOp())return showToast('New shutters from 27 Katha: Workshop In-charge / Admin only.','error');
-  const L=N($('shGL').value),W=N($('shGW2').value),t=$('shGT').value,q=N($('shGQ').value),size=key(L,W);
-  if(L<=0||W<=0)return showToast('Enter shutter length and width.','error');
+let GB=[];
+const gpLines=g=>g.lines||(()=>{const a=String(g.size).split('~').pop().split('x');return [{size:g.size,name:g.name,cond:g.cond,L:g.L!=null?N(g.L):N(a[0]),W:g.W!=null?N(g.W):N(a[1]),qty:g.qty,sft:g.sft,rft:g.rft,wt:g.wt,brk:g.brk,recQty:g.recQty}];})();
+function shGDraw(){const t=GB.reduce((a,l)=>({q:a.q+l.qty,s:a.s+l.sft,r:a.r+l.rft,w:a.w+(l.wt||0)}),{q:0,s:0,r:0,w:0});
+  $('shGBox').innerHTML='<div class="grid gap-2">'+GB.map((l,i)=>`<div class="flex justify-between items-center text-sm rounded-xl border border-line bg-white p-2"><span>${i+1}. ${lbl(l)} · <b>${l.qty}</b> nos · SFT ${r4(l.sft).toFixed(2)} · RFT ${r4(l.rft).toFixed(2)}${l.brk?`<br><span class="text-xs text-muted">${r4(l.wt)} kg → Angle ${r4(l.brk.ang)} · GP ${r4(l.brk.gp)} · Flat ${r4(l.brk.flat)}</span>`:''}</span><button class="btn btn-secondary" onclick="shGDel(${i})">✕</button></div>`).join('')+'</div>'+
+  (GB.length?`<div class="text-xs font-bold mt-1">Total: ${t.q} nos · SFT ${r4(t.s).toFixed(2)} · RFT ${r4(t.r).toFixed(2)}${t.w?' · '+r4(t.w)+' kg':''}</div>`:'');}
+window.shGDel=i=>{GB.splice(i,1);shGDraw();};
+window.shGAdd=function(){if(!canRecv())return showToast('Not allowed.','error');const t=$('shGT').value;
+  if(t==='W2P'&&!canOp())return showToast('New shutters from 27 Katha: Workshop In-charge / Admin only.','error');
+  const nm=$('shGN').value,cd=$('shGC').value,L=r4(N($('shGL').value)+N($('shGLi').value)/12),W=N($('shGW2').value),q=N($('shGQ').value);
+  if(L<=0||W<=0||q<=0)return showToast('Enter shutter length, width and quantity.','error');
+  if(GB.length>=50)return showToast('Maximum 50 lines in one gate pass.','error');
+  const brk=t==='W2P'?brkOf(q):null;if(brk&&brk.per.flat<0)return showToast('Weight is lower than Angle + GP weight. Check it.','error');
+  GB.push({name:nm,cond:cd,L,W,size:skey(nm,cd,L,W),qty:q,sft:L*W/12*q,rft:L*q,wt:brk?brk.wt:0,brk:brk||null});
+  ['shGW2','shGQ','shGLi','shGW'].forEach(i=>$(i).value='');shGDraw();shGPrev();};
+window.shDispatch=async function(){if(!canRecv())return showToast('Not allowed.','error');const t=$('shGT').value;
+  if(t==='W2P'&&!canOp())return showToast('New shutters from 27 Katha: Workshop In-charge / Admin only.','error');
+  if(!GB.length)return showToast('Add at least one shutter line first.','error');
   let f=$('shGF').value.trim()||'WORKSHOP',to=$('shGTo').value.trim()||'WORKSHOP';
   if(t==='W2P')f='WORKSHOP';if(t==='P2W')to='WORKSHOP';
-  if(q<=0||f===to)return showToast('Check qty / from / to.','error');
+  if(f===to)return showToast('Check From / To.','error');
   if(t==='P2P'&&(!$('shGF').value||!$('shGTo').value))return showToast('Select both projects.','error');
   if(!canOp()&&!(window.currentEngineerAllowedProjects||[]).includes(f))return showToast('You can send only from your own projects.','error');
-  const brk=t==='W2P'?brkOf(q):null;if(brk&&brk.per.flat<0)return showToast('Weight is lower than Angle + GP weight. Check it.','error');
+  const lines=GB.slice();
   try{await db().runTransaction(async tx=>{
-    const sr=db().collection('shutter_stock').doc(size),sd=await tx.get(sr),no=await nextNo(tx,'shutter_gp','SGP-');
-    const loc=(sd.exists?sd.data().loc:{})||{},before=N(loc[f]);
-    if(before<q)throw new Error('Insufficient stock at '+f+' ('+before+')');
-    loc[f]=before-q;loc.TRANSIT=N(loc.TRANSIT)+q;tx.set(sr,{size,L,W,loc},{merge:true});
-    tx.set(db().collection('shutter_gp').doc(no),{no,type:t,size,from:f,to,qty:q,status:'in_transit',by:who(),at:Date.now(),wt:brk?brk.wt:0,brk:brk||null});
-    ledger(tx,{type:'DISPATCH-'+t,ref:no,size,from:f,to:'TRANSIT',qty:q,before,after:before-q});
-  });showToast('Gate pass created.');}catch(e){showToast(esc(e.message),'error');}
+    const refs={},locs={};for(const sz of [...new Set(lines.map(l=>l.size))]){refs[sz]=db().collection('shutter_stock').doc(sz);const d=await tx.get(refs[sz]);locs[sz]=(d.exists?d.data().loc:{})||{};}
+    const no=await nextNo(tx,'shutter_gp','SGP-'),led=[];
+    const need={};lines.forEach(l=>need[l.size]=(need[l.size]||0)+l.qty);
+    lines.forEach(l=>{if(N(locs[l.size][f])<need[l.size])throw new Error('Insufficient stock at '+f+' for '+l.name+' (available '+N(locs[l.size][f])+', needed '+need[l.size]+')');});
+    lines.forEach(l=>{const loc=locs[l.size],before=N(loc[f]);
+      loc[f]=before-l.qty;loc.TRANSIT=N(loc.TRANSIT)+l.qty;led.push({type:'DISPATCH-'+t,ref:no,size:l.size,from:f,to:'TRANSIT',qty:l.qty,before,after:before-l.qty});});
+    const done={};lines.forEach(l=>{if(done[l.size])return;done[l.size]=1;tx.set(refs[l.size],{size:l.size,name:l.name,cond:l.cond,L:l.L,W:l.W,loc:locs[l.size]},{merge:true});});
+    const S=k=>lines.reduce((a,l)=>a+(l[k]||0),0);
+    tx.set(db().collection('shutter_gp').doc(no),{no,type:t,from:f,to,status:'in_transit',by:who(),at:Date.now(),lines:lines.map(l=>Object.assign({},l,{recQty:null})),qty:S('qty'),sft:S('sft'),rft:S('rft'),wt:S('wt')});
+    led.forEach(e=>ledger(tx,e));
+  });GB=[];shGDraw();showToast('Gate pass created.');}catch(e){showToast(esc(e.message),'error');}
 };
-window.shReceive=async function(no){if(!canRecv())return showToast('Not allowed.','error');
-  const rq=N(prompt('Received quantity?'));if(rq<=0)return;
+window.shReceive=async function(no){
+  if(!canRecv())return showToast('Not allowed.','error');
   try{await db().runTransaction(async tx=>{
     const gr=db().collection('shutter_gp').doc(no),g=(await tx.get(gr)).data();
     if(g.status!=='in_transit')throw new Error('Already received');
-    if(rq>g.qty)throw new Error('More than dispatched');
-    const sr=db().collection('shutter_stock').doc(g.size),loc=(await tx.get(sr)).data().loc,before=N(loc[g.to]);
-    loc.TRANSIT=N(loc.TRANSIT)-g.qty;loc[g.to]=before+rq;loc.LOST=N(loc.LOST)+(g.qty-rq);
-    tx.update(sr,{loc});tx.update(gr,{status:'received',recQty:rq,recBy:who(),recAt:Date.now()});
-    ledger(tx,{type:'RECEIVE',ref:no,size:g.size,from:'TRANSIT',to:g.to,qty:rq,before,after:before+rq,note:g.qty-rq?'shortage '+(g.qty-rq):''});
+    const lines=gpLines(g).map(l=>Object.assign({},l));
+    lines.forEach((l,i)=>{const v=$('rc_'+no+'_'+i),rc=v&&v.value!==''?N(v.value):l.qty;if(rc<0||rc>l.qty)throw new Error('Received qty must be between 0 and '+l.qty);l.recQty=rc;});
+    const refs={},locs={};for(const sz of [...new Set(lines.map(l=>l.size))]){refs[sz]=db().collection('shutter_stock').doc(sz);locs[sz]=(await tx.get(refs[sz])).data().loc;}
+    const led=[];lines.forEach(l=>{const loc=locs[l.size],before=N(loc[g.to]);loc.TRANSIT=N(loc.TRANSIT)-l.qty;loc[g.to]=before+l.recQty;loc.LOST=N(loc.LOST)+(l.qty-l.recQty);
+      led.push({type:'RECEIVE',ref:no,size:l.size,from:'TRANSIT',to:g.to,qty:l.recQty,before,after:before+l.recQty,note:l.qty-l.recQty?'shortage '+(l.qty-l.recQty):''});});
+    Object.keys(refs).forEach(sz=>tx.update(refs[sz],{loc:locs[sz]}));
+    tx.update(gr,{status:'received',recQty:lines.reduce((a,l)=>a+l.recQty,0),recBy:who(),recAt:Date.now(),lines});
+    led.forEach(e=>ledger(tx,e));
   });showToast('Received.');}catch(e){showToast(esc(e.message),'error');}
 };
 function listen(){
@@ -6993,19 +7037,21 @@ function listen(){
   d.collection('shutter_req').orderBy('at','desc').limit(60).onSnapshot(s=>{RL=s.docs.map(x=>x.data());rep();const ap=canOp()?null:(window.currentEngineerAllowedProjects||[]);
    $('shReqList').innerHTML=s.docs.map(x=>x.data()).filter(r=>!ap||ap.includes(r.prj)).map(r=>{const it=rqItems(r),t=rqTot(it);
     return `<div class="rounded-xl border border-line bg-white p-3 text-sm"><b>${esc(r.no)}</b> · ${esc(r.prj)} · <i>${r.status}${r.woNo?' ('+esc(r.woNo)+')':''}</i>
-    <div class="text-xs">${it.map(x=>esc(x.L+'×'+x.W)+' = <b>'+x.qty+'</b>').join(' · ')}</div>
-    <div class="text-xs text-muted">Total ${t.q} nos · SFT ${r4(t.sft).toFixed(2)} · RFT ${r4(t.rft).toFixed(2)} · By ${esc(r.by)}${r.date?' · needed '+esc(r.date):''}${r.rem?' · '+esc(r.rem):''}</div>
+    <div class="text-xs">${it.map(x=>lbl(x)+' = <b>'+x.qty+'</b>').join(' · ')}</div>
+    <div class="text-xs text-muted">Total ${t.q} nos · SFT ${r4(t.sft).toFixed(2)} · RFT ${r4(t.rft).toFixed(2)}<br>Raw: Angle ${r4(t.ang).toFixed(2)} · GP ${r4(t.gp).toFixed(2)} · Flat ${r4(t.fl).toFixed(2)} kg (est.) · By ${esc(r.by)}${r.date?' · needed '+esc(r.date):''}${r.rem?' · '+esc(r.rem):''}</div>
     ${r.status==='pending'?`<button class="btn btn-primary mt-1 shOp" onclick="shReqAct('${r.no}','wo')">Make Work Orders</button> <button class="btn btn-secondary mt-1 shOp" onclick="shReqAct('${r.no}','rej')">Reject</button>`:''}</div>`;}).join('')||'<div class="text-xs text-muted">No requisitions.</div>';});
   d.collection('shutter_po').orderBy('createdAt','desc').limit(50).onSnapshot(s=>{PO=s.docs.map(x=>x.data());rep();$('shPOList').innerHTML=s.docs.map(x=>{const o=x.data();
-   return `<div class="rounded-xl border border-line bg-white p-3 text-sm"><b>${esc(o.no)}</b> · ${esc(o.prj)} · ${esc(o.size)} · ${o.produced}/${o.planned} · <i>${o.status}</i>
+   return `<div class="rounded-xl border border-line bg-white p-3 text-sm"><b>${esc(o.no)}</b> · ${esc(o.prj)} · ${lbl(o)} · ${o.produced}/${o.planned} · <i>${o.status}</i>
    ${o.status==='approved'?`<button class="btn btn-secondary ml-2 shOp" onclick="shPO('${o.no}','start')">Start</button>`:''}
    ${o.status==='in_production'?`<button class="btn btn-primary ml-2 shOp" onclick="shPO('${o.no}','done')">Complete qty</button>`:''}
    ${(o.consumed||[]).map(c=>`<div class="text-xs text-muted">+${c.qty}: ${c.lines.map(l=>l.n+' '+(l.kg==null?'—':r4(l.kg))+(l.est?' est':'')).join(' · ')} kg</div>`).join('')}</div>`;}).join('')||'<div class="text-xs text-muted">No work orders.</div>';});
-  d.collection('shutter_stock').onSnapshot(s=>{ST=s.docs.map(x=>x.data());rep();$('shStock').innerHTML='<table class="w-full text-sm"><tr><th align=left>Size</th><th align=left>Location : qty</th></tr>'+s.docs.map(x=>{const o=x.data();
-   return `<tr><td>${esc(o.size)}</td><td>${Object.entries(o.loc||{}).filter(e=>e[1]).map(e=>esc(e[0])+': <b>'+e[1]+'</b>').join(' · ')}</td></tr>`;}).join('')+'</table>';});
-  d.collection('shutter_gp').orderBy('at','desc').limit(50).onSnapshot(s=>{GP=s.docs.map(x=>x.data());rep();$('shGPList').innerHTML=s.docs.map(x=>{const g=x.data();
-   return `<div class="rounded-xl border border-line bg-white p-3 text-sm"><b>${esc(g.no)}</b> · ${g.type} · ${esc(g.size)} · ${g.qty} · ${esc(g.from)} → ${esc(g.to)} · <i>${g.status}</i>
-   ${g.brk?`<div class="text-xs text-muted">Weight ${r4(g.brk.wt)} kg → Angle ${r4(g.brk.ang)} · GP ${r4(g.brk.gp)} · Flat ${r4(g.brk.flat)} kg</div>`:''}${g.status==='in_transit'?`<button class="btn btn-primary ml-2" onclick="shReceive('${g.no}')">Confirm receipt</button>`:''} <button class="btn btn-secondary ml-2" onclick="shGPPrint('${g.no}')">Print</button></div>`;}).join('');});
+  d.collection('shutter_stock').onSnapshot(s=>{ST=s.docs.map(x=>x.data());rep();$('shStock').innerHTML='<table class="w-full text-sm"><tr><th align=left>Shutter</th><th align=left>Location : qty</th></tr>'+s.docs.map(x=>{const o=x.data();
+   return `<tr><td>${lbl(o)}</td><td>${Object.entries(o.loc||{}).filter(e=>e[1]).map(e=>esc(e[0])+': <b>'+e[1]+'</b>').join(' · ')}</td></tr>`;}).join('')+'</table>';});
+  d.collection('shutter_gp').orderBy('at','desc').limit(50).onSnapshot(s=>{GP=s.docs.map(x=>x.data());rep();
+   $('shGPList').innerHTML=GP.map(g=>{const ls=gpLines(g),inT=g.status==='in_transit';
+    return `<div class="rounded-xl border border-line bg-white p-3 text-sm"><b>${esc(g.no)}</b> · ${TL[g.type]} · ${esc(ll(g.from))} → ${esc(ll(g.to))} · <i>${g.status}</i>
+    <div class="mt-1 grid gap-1">${ls.map((l,i)=>`<div class="text-xs">${i+1}. ${lbl(l)} · <b>${l.qty}</b>${l.recQty!=null&&!inT?' → received '+l.recQty:''}${l.brk?' · '+r4(l.wt)+' kg (Angle '+r4(l.brk.ang)+' · GP '+r4(l.brk.gp)+' · Flat '+r4(l.brk.flat)+')':''}${inT?` <input id="rc_${g.no}_${i}" type="number" class="field" style="width:80px;display:inline;padding:2px 6px" value="${l.qty}" title="received qty">`:''}</div>`).join('')}</div>
+    ${inT?`<button class="btn btn-primary mt-2" onclick="shReceive('${g.no}')">Confirm receipt</button>`:''} <button class="btn btn-secondary mt-2" onclick="shGPPrint('${g.no}')">Print</button></div>`;}).join('');});
 }
 function init(){
   const s=$('shutterSection');if(!s)return;s.innerHTML=tpl();shCalc();
