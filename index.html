@@ -1453,6 +1453,8 @@ input,select,textarea{font-size:16px!important}
               <button type="button" onclick="generateAllEngineerReports()" class="btn btn-secondary">⇩ All Project PDFs</button>
               <button type="button" onclick="generateMaterialsSummaryReport()" class="btn btn-warning admin-only">Materials Summary (All Projects)</button>
               <button type="button" onclick="generateProjectMaterialsSummary()" class="btn btn-warning">This Project's Materials (Serial-wise)</button>
+              <select id="catSel" class="field min-w-[200px]" onfocus="fillCatSel()"></select>
+              <button type="button" onclick="generateProjectMaterialsSummary(document.getElementById('catSel').value)" class="btn btn-warning">Category Sheet (all items, one sheet)</button>
               <button type="button" onclick="poReport()" class="btn btn-secondary">PO Report (PDF)</button></div>
           </div>
           <div class="mt-4 pt-3 border-t border-line"><div class="font-extrabold text-sm mb-2">Requisition, Transfer &amp; PO data (Excel)</div>
@@ -2863,7 +2865,7 @@ input,select,textarea{font-size:16px!important}
       printHtml(docHtml);
     }
 
-    function generateProjectMaterialsSummary(){
+    function generateProjectMaterialsSummary(cat){
       const prjNo = document.getElementById('filterProject')?.value;
       if(!prjNo || prjNo === 'ALL'){ alert('Please select one specific Project in the filter above first (not "Show All Projects").'); return; }
       const p = projectDatabase.find(x=>x.prjNo===prjNo);
@@ -2904,7 +2906,8 @@ input,select,textarea{font-size:16px!important}
         t.issue += Number(e.issueQty)||0;
       });
 
-      const rows = Object.values(totals)
+      const catOf=(n)=>{const m=catalog.find(x=>String(x.name).trim().toLowerCase()===String(n).trim().toLowerCase());return m?(m.category||''):'';};
+      const rows = Object.values(totals).filter(t=>!cat||catOf(t.name)===cat)
         // Same as above: don't drop materials that net to exactly 0.00 —
         // they were still received and issued on this project historically.
         .sort((a,b)=>a.name.localeCompare(b.name))
@@ -2922,12 +2925,13 @@ input,select,textarea{font-size:16px!important}
       if(!rows){ alert('No material activity found for this project yet.'); return; }
 
       const docHtml=`<!doctype html><html><head><meta charset="utf-8"><title>MARS Materials Summary — ${escapeHtml(prjNo)}</title>
-      <style>@page{size:A4 landscape;margin:8mm}body{font-family:Arial,sans-serif;font-size:11px}table{width:100%;border-collapse:collapse;margin-top:14px;page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}tfoot{display:table-footer-group}th,td{border:1px solid #999;padding:5px;text-align:center}th{background:#eef2f7}h1,h2{text-align:center;margin:2px 0}.meta{text-align:center;margin:8px 0;color:#555;font-size:10px}</style>
+      <style>@page{size:A4 landscape;margin:8mm 8mm 12mm 8mm;@bottom-right{content:"Page " counter(page) " of " counter(pages);font-size:9px;color:#555}}body{font-family:Arial,sans-serif;font-size:11px}table{width:100%;border-collapse:collapse;margin-top:14px;page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}tfoot{display:table-footer-group}th,td{border:1px solid #999;padding:5px;text-align:center}th{background:#eef2f7}h1,h2{text-align:center;margin:2px 0}.meta{text-align:center;margin:8px 0;color:#555;font-size:10px}</style>
       </head><body>
-      <h1>MARS STRUCTURE LIMITED</h1><h2>MATERIALS SUMMARY — ${escapeHtml(prjNo)}</h2>
+      <h1>MARS STRUCTURE LIMITED</h1><h2>${cat?escapeHtml(String(cat).toUpperCase())+' — ':''}MATERIALS SUMMARY — ${escapeHtml(prjNo)}</h2>
       <div class="meta">Project ID: ${escapeHtml(p?.id||'')} &nbsp;|&nbsp; Engineer: ${escapeHtml(p?.eng||'')}</div>
       <table><thead><tr><th>Sl. No.</th><th>Material</th><th>Unit</th><th>Opening</th><th>Procurement</th><th>Received (Other Site)</th><th>Transferred</th><th>Issued</th><th>Balance</th></tr></thead>
       <tbody>${rows}</tbody></table>
+      <div style="display:flex;justify-content:space-between;margin-top:55px;break-inside:avoid;page-break-inside:avoid"><div style="width:220px;border-top:1px solid #555;text-align:center;padding-top:4px">Prepared By Site Engineer<br>${escapeHtml(p?.eng||'')}</div><div style="width:220px;border-top:1px solid #555;text-align:center;padding-top:4px">Checked By</div></div>
       </body></html>`;
       logActivity('Project Materials Summary', prjNo);
       printHtml(docHtml);
@@ -6737,6 +6741,9 @@ window.shRepCsv=function(){if($('shRepType').value!=='proj')return showToast('Ex
   const csv=[h].concat(rows.map(r=>[r.p,r.name+' | '+(r.unsize?'Unsize':r.L+'x'+r.W)+' | '+CL[r.cond],r.ord,r.prod,r.disp,r.rec,r.tr,r.ret,r.stk,r.ang,r.gp,r.fl])).map(a=>a.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download='workshop-report.csv';a.click();};
 window.shRep=rep;
+window.fillCatSel=function(){const e=document.getElementById('catSel');if(!e||e.dataset.f)return;try{const cs=[...new Set(getMaterialCatalog().map(m=>m.category).filter(Boolean))].sort();if(!cs.length)return;
+  e.innerHTML=cs.map(c=>`<option>${esc(c)}</option>`).join('');const d=cs.find(c=>/shuttering/i.test(c));if(d)e.value=d;e.dataset.f='1';}catch(x){}};
+setTimeout(fillCatSel,1500);setInterval(fillCatSel,4000);
 let RL=[];
 const PCSS=`@page{size:A4 landscape;margin:8mm 8mm 12mm 8mm;@bottom-right{content:"Page " counter(page) " of " counter(pages);font-size:9px;color:#555}}body{font-family:Arial,sans-serif;color:#172033;font-size:11px}h1,h2,p{text-align:center;margin:3px}h1{font-size:20px}h2{font-size:14px}
 .meta{display:flex;justify-content:space-between;margin:12px 0;font-weight:bold}table{width:100%;border-collapse:collapse;page-break-inside:auto}tr{page-break-inside:avoid;break-inside:avoid}thead{display:table-header-group}
@@ -6821,7 +6828,7 @@ window.shReqAct=async function(no,act){
     const cr=db().collection('counters').doc('shutter_po'),cd=await tx.get(cr),n0=cd.exists?cd.data().n:0,items=rqItems(r),wos=[];
     items.forEach((x,i)=>{const wn='WO-'+String(n0+i+1).padStart(4,'0'),u=isU(x),inp=Object.assign(bom(),{L:x.L,W:x.W,qty:x.qty,totalWt:0,angleLen:0}),c=u?null:calc(inp);wos.push(wn);
       tx.set(db().collection('shutter_po').doc(wn),{no:wn,prj:r.prj,name:x.name||'Shutter',cond:x.cond||'N',unsize:u,size:x.size||skey(x.name,x.cond,x.L,x.W),L:x.L,W:x.W,planned:x.qty,produced:0,status:'approved',createdBy:who(),createdAt:Date.now(),reqNo:no,
-        bom:{ver:1,input:inp,perShutter:u?{sft:0,angle:0,gp:0,flat:null,flatVerified:false}:{sft:c.sft,angle:c.ang,gp:c.gp,flat:null,flatVerified:false},policy:'angle-len truncate 2dp'},consumed:[]});});
+        bom:{ver:1,input:inp,perShutter:u?{sft:0,angle:0,gp:0,flat:0,flatVerified:false}:perOf(x.cond,c),policy:'angle-len truncate 2dp'},consumed:[]});});
     tx.set(cr,{n:n0+items.length});tx.update(rr,{status:'wo_created',woNo:wos.join(', '),by2:who()});});showToast('Work orders created.');}catch(e){showToast(esc(e.message),'error');}
 };
 
@@ -6909,12 +6916,14 @@ function tpl(){return `
 </div>
 
 <div data-pane="prod" style="display:none">
- <div class="text-xs text-muted mb-2">Uses the calculator inputs above for BOM. Create order → Start → Complete (raw material consumed once per order; partial completion allowed).</div>
+ <div class="text-xs text-muted mb-2">Select project, shutter name, condition and size, then Create Work Order → Start → Complete (raw material is consumed once per order; partial completion is allowed). Normally Work Orders come from a Shutter Requisition.</div>
  <div class="grid grid-cols-2 md:grid-cols-4 gap-2 shOp">
   <div><label class="field-label">Project</label><select id="shPP" class="field"></select></div>
-  <div><label class="field-label">Shutter name</label><select id="shPN" class="field">${nameOpts()}</select></div><div><label class="field-label">Condition</label><select id="shPC" class="field">${condOpts()}</select></div>
-  <div><label class="field-label">Planned qty</label><input id="shPQ" type="number" class="field"></div>
+  <div><label class="field-label">Shutter name</label><select id="shPN" class="field">${nameOpts()}</select></div><div><label class="field-label">Condition</label><select id="shPC" class="field" onchange="shPCalc()">${condOpts()}</select></div>
+  <div><label class="field-label">Length (ft)</label><input id="shPL" type="number" step="any" class="field" oninput="shPCalc()"></div><div><label class="field-label">Length extra (inch)</label><input id="shPLi" type="number" step="any" class="field" oninput="shPCalc()"></div><div><label class="field-label">Width (inch)</label><input id="shPWd" type="number" step="any" class="field" oninput="shPCalc()"></div>
+  <div><label class="field-label">Planned qty</label><input id="shPQ" type="number" class="field" oninput="shPCalc()"></div>
   <div class="flex items-end"><button class="btn btn-primary w-full" onclick="shNewPO()">Create Work Order</button></div></div>
+ <div id="shPPrev" class="text-xs mt-2 shOp"></div>
  <div id="shPOList" class="mt-3 grid gap-2"></div>
 </div>
 
@@ -6957,13 +6966,17 @@ window.shTest=function(){$('shTest').innerHTML=runTests().map(t=>`<div style="co
 /* ---- Firestore: orders, stock, gate pass, ledger ---- */
 async function nextNo(tx,id,pre){const ref=db().collection('counters').doc(id),c=await tx.get(ref),n=(c.exists?c.data().n:0)+1;tx.set(ref,{n});return pre+String(n).padStart(4,'0');}
 function ledger(tx,e){const ref=db().collection('shutter_ledger').doc();tx.set(ref,Object.assign({at:Date.now(),by:who()},e));}
+const perOf=(cd,c)=>(cd||'N')==='N'?{sft:c.sft,angle:c.ang,gp:c.gp,flat:Math.max(0,c.sft*N($('shKS').value)-c.ang-c.gp),flatVerified:false}:{sft:c.sft,angle:0,gp:0,flat:0,flatVerified:false};
+window.shPCalc=function(){const o=$('shPPrev');if(!o)return;const L=r4(N($('shPL').value)+N($('shPLi').value)/12),W=N($('shPWd').value),q=N($('shPQ').value),cd=$('shPC').value;
+  if(!(L>0&&W>0&&q>0)){o.textContent='';return;}const x={L,W,qty:q,cond:cd},w=rawOf(x);
+  o.textContent=`${fmtL(L)} × ${W}" × ${q} nos · SFT ${r4(L*W/12*q).toFixed(2)} · RFT ${r4(L*q).toFixed(2)} · `+rawTxt(w);};
 window.shNewPO=async function(){if(!canOp())return showToast('Only Workshop In-charge / Admin can do this.','error');
-  const b=bom(),c=calc(b),prj=$('shPP').value.trim(),q=N($('shPQ').value),nm=$('shPN').value,cd=$('shPC').value;
+  const b=Object.assign(bom(),{L:r4(N($('shPL').value)+N($('shPLi').value)/12),W:N($('shPWd').value),totalWt:0,angleLen:0}),c=calc(b),prj=$('shPP').value.trim(),q=N($('shPQ').value),nm=$('shPN').value,cd=$('shPC').value;
   if(nm==='Unsize Shutter')return showToast('Unsize shutters: make a Shutter Requisition and use Make Work Orders.','error');
   if(!prj||q<=0||!b.L||!b.W)return showToast('Project, size and planned qty required.','error');
   try{await db().runTransaction(async tx=>{const no=await nextNo(tx,'shutter_po','WO-');
    tx.set(db().collection('shutter_po').doc(no),{no,prj,name:nm,cond:cd,size:skey(nm,cd,b.L,b.W),L:b.L,W:b.W,planned:q,produced:0,status:'approved',createdBy:who(),createdAt:Date.now(),
-     bom:{ver:1,input:b,perShutter:{sft:c.sft,angle:c.ang,gp:c.gp,flat:c.flat,flatVerified:c.flatVerified},policy:'angle-len truncate 2dp'},consumed:[]});});
+     bom:{ver:1,input:b,perShutter:perOf(cd,c),policy:'angle-len truncate 2dp'},consumed:[]});});
    showToast('Work order created.');}catch(e){showToast('Failed: '+esc(e.message),'error');}
 };
 window.shPO=async function(no,act){if(!canOp())return showToast('Only Workshop In-charge / Admin can do this.','error');
