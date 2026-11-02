@@ -1443,20 +1443,37 @@ input,select,textarea{font-size:16px!important}
         </section>
 
         <section id="filterSection" class="filter-panel card p-4 md:p-5 no-print page-section page-hidden" data-page="print">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
-            <div><div class="section-title">Reports</div><div class="text-xs text-muted mt-1">Filter by project and/or material to focus the report — select both to see just that material's ledger for that project.</div></div>
-            <div class="flex flex-col sm:flex-row gap-2 flex-wrap">
-              <select id="filterProject" onchange="recalculateAndRender()" class="field min-w-[220px]"><option value="ALL">Show All Projects</option></select>
-              <input id="filterMaterial" list="materialsDatalist" autocomplete="off" oninput="recalculateAndRender()" placeholder="Filter by Material (optional)" class="field min-w-[200px]">
-              <button type="button" onclick="downloadPDF()" class="btn btn-success">⇩ Individual PDF</button>
-              <button type="button" onclick="generateCombinedPDF()" class="btn btn-primary">▤ Combined PDF</button>
-              <button type="button" onclick="generateAllEngineerReports()" class="btn btn-secondary">⇩ All Project PDFs</button>
-              <button type="button" onclick="generateMaterialsSummaryReport()" class="btn btn-warning admin-only">Materials Summary (All Projects)</button>
-              <button type="button" onclick="generateProjectMaterialsSummary()" class="btn btn-warning">This Project's Materials (Serial-wise)</button>
-              <select id="catSel" class="field min-w-[200px]" onfocus="fillCatSel()"></select>
-              <button type="button" onclick="generateProjectMaterialsSummary(document.getElementById('catSel').value)" class="btn btn-warning">Category Sheet (all items, one sheet)</button>
-              <button type="button" onclick="poReport()" class="btn btn-secondary">PO Report (PDF)</button></div>
+          <style>
+.rp-group{margin-top:18px}.rp-h{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#64748b;margin:0 4px 8px}
+.rp-list{border:1px solid #e2e7ee;border-radius:16px;overflow:hidden;background:#fff}
+.rp-row{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;text-align:left;background:#fff;border:0;border-bottom:1px solid #eef1f5;cursor:pointer;font:inherit;color:inherit}
+.rp-row:last-child{border-bottom:0}.rp-row:active{background:#f1f5f9}
+.rp-row.admin-only{display:none}.admin-mode .rp-row.admin-only{display:flex}
+.rp-ic{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;flex:none}
+.rp-ic.b{background:#e6f0fd;color:#0b5ed7}.rp-ic.a{background:#fdf0dc;color:#b45309}.rp-ic.g{background:#e3f6ec;color:#15803d}.rp-ic.s{background:#eceff4;color:#475569}
+.rp-row b{display:block;font-size:14px;font-weight:700}.rp-row small{display:block;color:#64748b;font-size:11.5px;margin-top:2px;line-height:1.35}
+.rp-go{margin-left:auto;color:#a0aec0;font-size:22px;line-height:1}.rp-cat{padding:12px 14px;border-bottom:1px solid #eef1f5;background:#fafbfd}
+</style>
+          <div class="section-title">Reports</div>
+          <div class="text-xs text-muted mt-1">Choose a project (and a material if you need one), then tap a report below.</div>
+          <div class="grid gap-3 md:grid-cols-2 mt-3">
+            <div><label class="field-label">Project</label><select id="filterProject" onchange="recalculateAndRender()" class="field w-full"><option value="ALL">Show All Projects</option></select></div>
+            <div><label class="field-label">Material (optional)</label><input id="filterMaterial" list="materialsDatalist" autocomplete="off" oninput="recalculateAndRender()" placeholder="All materials" class="field w-full"></div>
           </div>
+          <div class="rp-group"><div class="rp-h">Stock Ledger</div><div class="rp-list">
+            <button type="button" onclick="downloadPDF()" class="rp-row"><span class="rp-ic g">⇩</span><span><b>Individual PDF</b><small>Stock ledger of the selected project</small></span><span class="rp-go">›</span></button>
+            <button type="button" onclick="generateCombinedPDF()" class="rp-row"><span class="rp-ic b">▤</span><span><b>Combined PDF</b><small>All projects in one PDF</small></span><span class="rp-go">›</span></button>
+            <button type="button" onclick="generateAllEngineerReports()" class="rp-row"><span class="rp-ic s">⇩</span><span><b>All Project PDFs</b><small>Each project’s ledger, one after another</small></span><span class="rp-go">›</span></button>
+          </div></div>
+          <div class="rp-group"><div class="rp-h">Material Summary</div><div class="rp-list">
+            <button type="button" onclick="generateProjectMaterialsSummary()" class="rp-row"><span class="rp-ic a">≡</span><span><b>This Project’s Materials</b><small>Serial-wise list of every material in the selected project</small></span><span class="rp-go">›</span></button>
+            <div class="rp-cat"><label class="field-label">Category</label><select id="catSel" class="field w-full" onfocus="fillCatSel()"></select></div>
+            <button type="button" onclick="generateProjectMaterialsSummary(document.getElementById('catSel').value)" class="rp-row"><span class="rp-ic a">▦</span><span><b>Category Sheet</b><small>All items of the category above in one sheet (selected project)</small></span><span class="rp-go">›</span></button>
+            <button type="button" onclick="generateMaterialsSummaryReport()" class="rp-row admin-only"><span class="rp-ic a">Σ</span><span><b>Materials Summary (All Projects)</b><small>Admin only</small></span><span class="rp-go">›</span></button>
+          </div></div>
+          <div class="rp-group"><div class="rp-h">Procurement</div><div class="rp-list">
+            <button type="button" onclick="poReport()" class="rp-row"><span class="rp-ic s">☰</span><span><b>PO Report</b><small>Purchase orders as PDF</small></span><span class="rp-go">›</span></button>
+          </div></div>
           <div class="mt-4 pt-3 border-t border-line"><div class="font-extrabold text-sm mb-2">Requisition, Transfer &amp; PO data (Excel)</div>
           <div class="flex flex-wrap items-center gap-2 mb-1"><input type="month" class="field exp-month" style="max-width:170px" onchange="marsSetMonth(this.value)"><button class="btn btn-secondary" onclick="marsExport()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Download Excel report</button></div>
           <div class="text-xs text-muted">Pick a month to export only that month. Leave empty for all data.</div></div>
