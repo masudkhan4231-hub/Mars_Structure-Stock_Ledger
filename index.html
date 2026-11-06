@@ -7104,7 +7104,7 @@ const $=id=>document.getElementById(id),N=v=>Number(v)||0,r2=v=>Math.round(v*100
 const db=()=>window.MARS_FIREBASE.db,who=()=>window.currentEngineerName||'Admin';
 const isAd=()=>{try{return !!isAdmin;}catch(e){return false;}},role=()=>window.currentEngineerRole||'site';
 const R=(...l)=>isAd()||l.includes(role());
-const DPM_LIMIT=50000;
+let DPM_LIMIT=50000,PGB=25,PGV=25;
 const canVerify=()=>R('acct'),canPay=()=>R('acct'),canApprove=a=>isAd()||R('ed','md')||(role()==='dpm'&&a<=DPM_LIMIT),seeAll=()=>R('acct','dpm','ed','md','pmgr');
 const money=v=>'Tk '+N(v).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
 const CATS=['Office Expenses','Workshop Expenses','Construction Project Expenses','Material Purchase Expenses','Labour & Wages','Salary Expenses','Contractor Bills','Transport Expenses','Truck Loading & Unloading','Maintenance & Repair','Electricity, Water & Utility Bills','Petty Cash Expenses','Supplier Payments','Advance Payments','Miscellaneous Expenses'];
@@ -7112,7 +7112,12 @@ const DEPTS=['Office','Workshop','Project / Site','Accounts','Procurement','HR &
 const METHODS=['Cash','Bank Transfer','Cheque','bKash','Nagad','Other'];
 const ST={pending_verification:'Pending Verification',pending_approval:'Pending Approval',approved:'Approved',rejected:'Rejected',partially_paid:'Partially Paid',paid:'Paid',cancelled:'Cancelled'};
 const STC={pending_verification:'#b45309',pending_approval:'#b45309',approved:'#0f766e',rejected:'#b91c1c',partially_paid:'#1d4ed8',paid:'#15803d',cancelled:'#6b7280'};
-let BILLS=[],VCH=[],SUP=[],POS=[],CUS=[];
+const ADV=['Staff Advance','Supplier Advance','Contractor Advance','Project Advance','Workshop Advance'];
+const WSUB=['Raw Material Purchase','Welding Rod','Grinding Disc','Workshop Tools','Labour Expenses','Workshop Maintenance','Loading & Unloading','Truck Expenses','Repair Expenses'];
+const CASHA=['Cash in Hand','Petty Cash'];
+const atype=n=>/^Accounts Payable/.test(n)?'Liability':/^Expense/.test(n)?'Expense':/^Advance/.test(n)?'Asset (Advance)':n==='Opening Balance Equity'?'Equity':CASHA.includes(n)?'Cash':'Bank / Mobile';
+const advAcct=b=>'Advance - '+b.advType+' - '+b.payee;
+let BILLS=[],VCH=[],SUP=[],POS=[],CUS=[],WOS=[],GPS=[];
 const cats=()=>[...new Set(CATS.concat(CUS))];
 const today=()=>new Date().toISOString().slice(0,10);
 const dd=t=>t?new Date(t).toLocaleDateString('en-GB'):'';
@@ -7128,6 +7133,23 @@ function words(n){n=Math.round(n*100)/100;const t=Math.floor(n),p=Math.round((n-
   return 'Taka '+(s.trim()||'Zero')+(p?' and '+two(p)+' Paisa':'')+' Only';}
 window.accWords=words;
 async function nextNo(tx,id,pre){const ref=db().collection('counters').doc(id),c=await tx.get(ref),n=(c.exists?c.data().n:0)+1;tx.set(ref,{n});return pre+String(n).padStart(4,'0');}
+function readData(f){return new Promise((res,rej)=>{const isPdf=/pdf/i.test(f.type)||/\.pdf$/i.test(f.name),fr=new FileReader();fr.onerror=()=>rej(new Error('Could not read the file.'));
+  if(isPdf){fr.onload=()=>res({data:fr.result,mime:'application/pdf'});fr.readAsDataURL(f);return;}
+  if(!/^image\//.test(f.type))return rej(new Error('Only a photo or a PDF can be attached.'));
+  fr.onload=()=>{const im=new Image();im.onerror=()=>rej(new Error('Not a valid image.'));im.onload=()=>{const s=Math.min(1,1400/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);res({data:c.toDataURL('image/jpeg',0.72),mime:'image/jpeg'});};im.src=fr.result;};fr.readAsDataURL(f);});}
+async function attach(no,f,type){const r=await readData(f);if(r.data.length>950000)throw new Error('File is too large (limit about 700 KB). Use a smaller photo or compress the PDF.');
+  const id=db().collection('acc_files').doc().id,meta={id,name:f.name.slice(0,80),type,mime:r.mime,kb:Math.round(r.data.length*0.75/1024),by:who(),at:Date.now()};
+  await db().collection('acc_files').doc(id).set({billId:no,type,name:meta.name,mime:r.mime,data:r.data,by:meta.by,at:meta.at});
+  await db().runTransaction(async tx=>{const br=db().collection('acc_bills').doc(no),b=(await tx.get(br)).data();if((b.files||[]).length>=10)throw new Error('Maximum 10 attachments per bill.');tx.update(br,{files:(b.files||[]).concat([meta]),hist:hist(b.hist,'Attached '+meta.name)});});}
+window.acAttach=async function(no){const f=($('af_'+no).files||[])[0];if(!f)return showToast('Choose a file first.','error');
+  try{await attach(no,f,$('at_'+no).value);$('af_'+no).value='';showToast('Attached.');}catch(e){showToast(esc(e.message),'error');}};
+window.acViewFile=async function(id){try{const d=await db().collection('acc_files').doc(id).get();if(!d.exists)return showToast('File not found.','error');const bl=await (await fetch(d.data().data)).blob();window.open(URL.createObjectURL(bl),'_blank');}catch(e){showToast(esc(e.message),'error');}};
+window.acDelFile=async function(no,id){if(!isAd())return showToast('Only Admin can remove an attachment.','error');
+  try{await db().collection('acc_files').doc(id).delete();await db().runTransaction(async tx=>{const br=db().collection('acc_bills').doc(no),b=(await tx.get(br)).data();tx.update(br,{files:(b.files||[]).filter(x=>x.id!==id),hist:hist(b.hist,'Attachment removed by admin')});});showToast('Removed.');}catch(e){showToast(esc(e.message),'error');}};
+async function reserve(tx,list){const refs=list.map(x=>db().collection('counters').doc(x[0])),docs=[];for(const r of refs)docs.push(await tx.get(r));
+  return list.map((x,i)=>{const n0=docs[i].exists?docs[i].data().n:0;tx.set(refs[i],{n:n0+x[2]});return Array.from({length:x[2]},(_,j)=>x[1]+String(n0+j+1).padStart(4,'0'));});}
+function bookTx(tx,no,b,bn){tx.set(db().collection('acc_vouchers').doc(no),{no,type:'JV',date:b.date||today(),billId:bn,kind:'bill',billNo:b.billNo||'',invNo:b.invNo||'',poNo:b.poNo||'',payee:b.payee,prj:b.prj,dept:b.dept,cat:b.cat,purpose:'Bill booked: '+b.purpose,method:'Journal',acct:'Accounts Payable - '+b.payee,amount:b.amount,ref:'',booking:true,
+  lines:[{acct:'Expense - '+b.cat,dr:b.amount,cr:0},{acct:'Accounts Payable - '+b.payee,dr:0,cr:b.amount}],status:'posted',prepared:who(),verifiedBy:b.verifiedBy||'',approvedBy:b.approvedBy||'',at:Date.now()});}
 const hist=(h,act)=>(h||[]).concat([{at:Date.now(),by:who(),act}]);
 const audit=(t,m)=>{try{if(window.marsAudit)marsAudit('ACC',t,m);}catch(e){}};
 const slug=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
@@ -7137,16 +7159,17 @@ function tpl(){return `
 <div class="flex gap-2 flex-wrap mb-4" id="acTabs">
  <button class="btn btn-primary" data-t="ov">Overview</button><button class="btn btn-secondary" data-t="new">New Bill / Expense</button>
  <button class="btn btn-secondary" data-t="bills">Bills</button><button class="btn btn-secondary" data-t="vch">Vouchers</button><button class="btn btn-secondary" data-t="rep">Reports</button></div>
-<datalist id="acSupDl"></datalist><datalist id="acPoDl"></datalist>
+<datalist id="acSupDl"></datalist><datalist id="acPoDl"></datalist><datalist id="acLkDl"></datalist><datalist id="acAcDl"></datalist><datalist id="acSubDl">${WSUB.map(x=>`<option value="${x}">`).join('')}</datalist>
 
-<div data-pane="ov"><div class="mb-3"><label class="field-label">Project</label><select id="acOvP" class="field" onchange="acDraw()"></select></div><div id="acOv"></div></div>
+<div data-pane="ov"><div class="acAdm rounded-xl border border-line bg-white p-3 mb-3" style="display:none"><div class="font-bold text-sm mb-2">Approval limit (Admin)</div><div class="grid grid-cols-2 gap-2"><div><label class="field-label">DPM can approve up to (Tk)</label><input id="acLimIn" type="number" class="field"></div><div class="flex items-end"><button class="btn btn-secondary w-full" onclick="acSetLim()">Save limit</button></div></div><div class="text-xs text-muted mt-1">Above this amount ED / MD approval is required.</div></div><div class="mb-3"><label class="field-label">Project</label><select id="acOvP" class="field" onchange="acDraw()"></select></div><div id="acOv"></div></div>
 
 <div data-pane="new" style="display:none">
  <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-  <div><label class="field-label">Type</label><select id="acK" class="field"><option value="bill">Bill (supplier / contractor)</option><option value="expense">Expense</option></select></div>
+  <div><label class="field-label">Type</label><select id="acK" class="field"><option value="bill">Bill (supplier / contractor)</option><option value="expense">Expense</option><option value="advance">Advance payment</option></select></div>
+  <div><label class="field-label">Advance type (advances only)</label><select id="acAT" class="field">${ADV.map(x=>`<option>${x}</option>`).join('')}</select></div>
   <div><label class="field-label">Date</label><input id="acD" type="date" class="field"></div>
   <div><label class="field-label">Category</label><select id="acC" class="field"></select></div>
-  <div><label class="field-label">Sub-category</label><input id="acS" class="field" placeholder="optional"></div>
+  <div><label class="field-label">Sub-category</label><input id="acS" list="acSubDl" class="field" placeholder="optional"></div>
   <div><label class="field-label">Department</label><select id="acDep" class="field">${DEPTS.map(x=>`<option>${x}</option>`).join('')}</select></div>
   <div><label class="field-label">Project</label><select id="acP" class="field"></select></div>
   <div class="col-span-2"><label class="field-label">Payee / Supplier / Contractor</label><input id="acPy" list="acSupDl" class="field" autocomplete="off"></div>
@@ -7156,21 +7179,28 @@ function tpl(){return `
   <div><label class="field-label">Total amount (Tk)</label><input id="acA" type="number" step="any" class="field"></div>
   <div><label class="field-label">Due date</label><input id="acDu" type="date" class="field"></div>
   <div class="col-span-2"><label class="field-label">Payment purpose</label><input id="acPu" class="field"></div>
+  <div class="col-span-2"><label class="field-label">Linked WO / Gate Pass / Transfer no (workshop, optional)</label><input id="acLk" list="acLkDl" class="field" autocomplete="off"></div>
+  <div><label class="field-label">Attachment type</label><select id="acFT" class="field"><option>Bill / Invoice</option><option>Receipt</option><option>Supporting document</option></select></div>
+  <div class="col-span-2"><label class="field-label">Attach bill / invoice / receipt (photo or PDF, up to about 700 KB)</label><input id="acFile" type="file" accept="image/*,application/pdf" class="field"></div>
   <div class="col-span-2"><label class="field-label">Remarks / attachment reference</label><input id="acRm" class="field" placeholder="e.g. paper bill kept in file no."></div></div>
  <div class="flex gap-2 mt-3 flex-wrap"><button class="btn btn-primary" onclick="acSubmit()">Submit for Verification</button><button class="btn btn-secondary acCat" onclick="acAddCat()">+ New category</button></div>
- <div class="text-xs text-muted mt-2">Flow: Accounts verifies → DPM (up to Tk ${DPM_LIMIT.toLocaleString('en-IN')}) or ED/MD approves → Accounts pays and a voucher is created.</div></div>
+ <div class="text-xs text-muted mt-2">Flow: Accounts verifies → DPM (up to Tk <span id="acLim">${DPM_LIMIT.toLocaleString('en-IN')}</span>) or ED/MD approves → Accounts pays and a voucher is created.</div></div>
 
 <div data-pane="bills" style="display:none"><div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
- <div><label class="field-label">Status</label><select id="acFS" class="field" onchange="acDraw()"><option value="">All</option>${Object.keys(ST).map(k=>`<option value="${k}">${ST[k]}</option>`).join('')}</select></div>
- <div><label class="field-label">Project</label><select id="acFP" class="field" onchange="acDraw()"></select></div>
- <div class="col-span-2"><label class="field-label">Search</label><input id="acFQ" class="field" placeholder="payee, bill / invoice / PO / voucher no" oninput="acDraw()"></div></div><div id="acBills" class="grid gap-2"></div></div>
+ <div><label class="field-label">Status</label><select id="acFS" class="field" onchange="acFiltChg()"><option value="">All</option><option value="overdue">Overdue</option>${Object.keys(ST).map(k=>`<option value="${k}">${ST[k]}</option>`).join('')}</select></div>
+ <div><label class="field-label">Project</label><select id="acFP" class="field" onchange="acFiltChg()"></select></div>
+ <div class="col-span-2"><label class="field-label">Search</label><input id="acFQ" class="field" placeholder="payee, bill / invoice / PO / voucher no" oninput="acFiltChg()"></div></div><div id="acBills" class="grid gap-2"></div></div>
 
-<div data-pane="vch" style="display:none"><div id="acVch" class="grid gap-2"></div></div>
+<div data-pane="vch" style="display:none">
+ <div class="acCat rounded-xl border border-line bg-white p-3 mb-3"><div class="font-bold text-sm mb-2">Opening balance (Cash / Bank)</div><div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+  <div><label class="field-label">Account</label><input id="acOA" list="acAcDl" class="field" placeholder="Cash in Hand / City Bank"></div><div><label class="field-label">Amount (Tk)</label><input id="acOM" type="number" step="any" class="field"></div>
+  <div><label class="field-label">As of date</label><input id="acOD" type="date" class="field"></div><div class="flex items-end"><button class="btn btn-secondary w-full" onclick="acOpening()">Post opening balance</button></div></div></div>
+ <div id="acVch" class="grid gap-2"></div></div>
 
 <div data-pane="rep" style="display:none"><div class="grid grid-cols-2 md:grid-cols-5 gap-2">
- <div class="col-span-2"><label class="field-label">Report</label><select id="acRK" class="field"><option value="vreg">Payment Voucher Register</option><option value="dly">Daily / Monthly Expense</option><option value="sup">Supplier Outstanding</option><option value="prj">Project-wise Expense</option></select></div>
+ <div class="col-span-2"><label class="field-label">Report</label><select id="acRK" class="field" onchange="acFillRA()"><option value="vreg">Payment Voucher Register</option><option value="dly">Daily / Monthly Expense</option><option value="sup">Supplier Outstanding</option><option value="prj">Project-wise Expense</option><option value="con">Contractor Payment</option><option value="wsx">Workshop Expense</option><option value="adv">Advance Adjustment</option><option value="cb">Cash Book</option><option value="bb">Bank Book</option><option value="gl">General Ledger</option><option value="tb">Trial Balance</option><option value="sl">Supplier Ledger</option><option value="cl">Contractor Ledger</option><option value="al">Advance Ledger</option><option value="el">Expense Ledger</option><option value="ap">Accounts Payable</option><option value="coa">Chart of Accounts</option></select></div>
  <div><label class="field-label">Voucher type</label><select id="acRT" class="field"><option value="">All</option><option>CPV</option><option>BPV</option><option>PCV</option><option>JV</option></select></div>
- <div><label class="field-label">Project</label><select id="acRP" class="field"></select></div><div></div>
+ <div><label class="field-label">Project</label><select id="acRP" class="field"></select></div><div class="col-span-2"><label class="field-label">Account (books / ledger)</label><select id="acRA" class="field"></select></div>
  <div><label class="field-label">From</label><input id="acRF" type="date" class="field"></div><div><label class="field-label">To</label><input id="acRTo" type="date" class="field"></div>
  <div class="flex items-end gap-2 col-span-2"><button class="btn btn-primary" onclick="acRepPdf()">Print / PDF</button><button class="btn btn-secondary" onclick="acRepCsv()">Excel (CSV)</button></div></div></div>`;}
 /* ---------- data helpers ---------- */
@@ -7179,8 +7209,12 @@ function fill(){const ps=prjs(),k=ps.join('|');
   [['acOvP','All projects'],['acFP','All projects'],['acRP','All projects']].forEach(a=>{const e=$(a[0]);if(!e||e.dataset.k===k)return;const v=e.value;e.innerHTML=`<option value="">${a[1]}</option>`+ps.map(x=>`<option>${esc(x)}</option>`).join('');e.value=v;e.dataset.k=k;});
   const p=$('acP');if(p&&p.dataset.k!==k){const v=p.value;p.innerHTML='<option value="">No project (office / general)</option>'+ps.map(x=>`<option>${esc(x)}</option>`).join('');p.value=v;p.dataset.k=k;}
   const c=$('acC'),ck=cats().join('|');if(c&&c.dataset.k!==ck){const v=c.value;c.innerHTML=cats().map(x=>`<option>${esc(x)}</option>`).join('');if(v)c.value=v;c.dataset.k=ck;}
-  document.querySelectorAll('#accSection .acCat').forEach(e=>e.style.display=R('acct')?'':'none');
+  document.querySelectorAll('#accSection .acCat').forEach(e=>e.style.display=R('acct')?'':'none');document.querySelectorAll('#accSection .acAdm').forEach(e=>e.style.display=isAd()?'':'none');
   if($('acD')&&!$('acD').value)$('acD').value=today();}
+function setLim(){const e=$('acLim');if(e)e.textContent=DPM_LIMIT.toLocaleString('en-IN');const i=$('acLimIn');if(i&&!i.value)i.value=DPM_LIMIT;}
+window.acSetLim=async function(){const v=r2(N($('acLimIn').value));if(!isAd())return showToast('Admin only.','error');if(v<=0)return showToast('Enter a limit.','error');
+  try{await db().collection('config').doc('accounts').set({dpmLimit:v,by:who(),at:Date.now()},{merge:true});showToast('Approval limit saved.');}catch(e){showToast(esc(e.message),'error');}};
+window.acFiltChg=function(){PGB=25;acDraw();};window.acMore=function(w){if(w==='b')PGB+=25;else PGV+=25;acDraw();};
 window.acPoPick=function(){const po=POS.find(x=>x.no===$('acPo').value.trim());if(!po)return;
   if(!$('acPy').value&&po.supplier)$('acPy').value=po.supplier.name||'';if(po.prjNo&&prjs().includes(po.prjNo))$('acP').value=po.prjNo;if(!N($('acA').value)&&po.total)$('acA').value=po.total;};
 window.acAddCat=async function(){if(!R('acct'))return;const n=(prompt('New category name?')||'').trim();if(!n)return;
@@ -7191,12 +7225,13 @@ window.acSubmit=async function(){
   if(!py||amt<=0||!$('acPu').value.trim())return showToast('Payee, amount and purpose are required.','error');
   const ref=inv||bn,key=kind==='bill'&&ref?'B~'+slug(py)+'~'+slug(ref):null;
   const doc={kind,date:$('acD').value||today(),cat:$('acC').value,sub:$('acS').value.trim(),dept:$('acDep').value,prj:$('acP').value,payee:py,billNo:bn,invNo:inv,poNo:$('acPo').value.trim(),
-    amount:amt,paid:0,dueDate:$('acDu').value||'',purpose:$('acPu').value.trim(),rem:$('acRm').value.trim(),status:'pending_verification',by:who(),at:Date.now(),hist:hist([],'Submitted')};
+    amount:amt,paid:0,adjusted:0,advType:kind==='advance'?$('acAT').value:'',link:$('acLk').value.trim(),dueDate:$('acDu').value||'',purpose:$('acPu').value.trim(),rem:$('acRm').value.trim(),status:'pending_verification',by:who(),at:Date.now(),hist:hist([],'Submitted')};
   try{await db().runTransaction(async tx=>{
     const kr=key?db().collection('acc_keys').doc(key):null;if(kr&&(await tx.get(kr)).exists)throw new Error('Duplicate: this bill / invoice is already recorded for '+py+'.');
-    const no=await nextNo(tx,kind==='bill'?'acc_bill':'acc_exp',kind==='bill'?'BILL-':'EXP-');doc.no=no;
+    const pf=kind==='bill'?['acc_bill','BILL-']:kind==='advance'?['acc_adv','ADV-']:['acc_exp','EXP-'],no=await nextNo(tx,pf[0],pf[1]);doc.no=no;
     tx.set(db().collection('acc_bills').doc(no),doc);if(kr)tx.set(kr,{bill:no,at:Date.now()});});
-    audit(doc.no,'Created '+money(amt)+' '+py);showToast('Submitted: '+doc.no);['acBn','acIn','acPo','acA','acPu','acRm','acS'].forEach(i=>$(i).value='');}catch(e){showToast(esc(e.message),'error');}};
+    audit(doc.no,'Created '+money(amt)+' '+py);showToast('Submitted: '+doc.no);
+    const af=($('acFile').files||[])[0];if(af){try{await attach(doc.no,af,$('acFT').value);$('acFile').value='';}catch(e){showToast('Bill saved, but the attachment failed: '+esc(e.message),'error');}}['acBn','acIn','acPo','acA','acPu','acRm','acS','acLk'].forEach(i=>$(i).value='');}catch(e){showToast(esc(e.message),'error');}};
 /* ---------- workflow ---------- */
 window.acFlow=async function(no,act){
   let note='';if(act==='rej'||act==='cancel'){note=(prompt('Reason?')||'').trim();if(!note)return;}
@@ -7213,33 +7248,73 @@ window.acPay=async function(no){
     if(!['approved','partially_paid'].includes(b.status))throw new Error('Bill is not approved for payment.');
     if(amt>due(b)+0.004)throw new Error('Payment is more than the due amount ('+money(due(b))+').');
     const pk=ref&&m!=='Cash'?db().collection('acc_keys').doc('P~'+slug(m)+'~'+slug(ref)):null;if(pk&&(await tx.get(pk)).exists)throw new Error('This payment reference is already used.');
-    vno=await nextNo(tx,'acc_'+ty,ty+'-');const np=r2(b.paid+amt),st=np>=b.amount-0.004?'paid':'partially_paid';
+    const need=b.kind==='bill'&&!b.booked,nm=await reserve(tx,need?[['acc_'+ty,ty+'-',1],['acc_JV','JV-',1]]:[['acc_'+ty,ty+'-',1]]);vno=nm[0][0];if(need)bookTx(tx,nm[1][0],b,no);
+    const np=r2(b.paid+amt),st=np>=b.amount-0.004?'paid':'partially_paid';
     tx.set(db().collection('acc_vouchers').doc(vno),{no:vno,type:ty,date:dt,billId:no,kind:b.kind,billNo:b.billNo||'',invNo:b.invNo||'',poNo:b.poNo||'',payee:b.payee,prj:b.prj,dept:b.dept,cat:b.cat,purpose:b.purpose,method:m,acct:ac,amount:amt,ref,
-      lines:[{acct:b.kind==='bill'?'Accounts Payable - '+b.payee:'Expense - '+b.cat,dr:amt,cr:0},{acct:ac,dr:0,cr:amt}],status:'posted',prepared:who(),verifiedBy:b.verifiedBy||'',approvedBy:b.approvedBy||'',at:Date.now()});
-    if(pk)tx.set(pk,{v:vno,at:Date.now()});tx.update(r,{paid:np,status:st,hist:hist(b.hist,'Paid '+money(amt)+' via '+m+' ('+vno+')')});});
+      lines:[{acct:b.kind==='advance'?advAcct(b):b.kind==='bill'?'Accounts Payable - '+b.payee:'Expense - '+b.cat,dr:amt,cr:0},{acct:ac,dr:0,cr:amt}],status:'posted',prepared:who(),verifiedBy:b.verifiedBy||'',approvedBy:b.approvedBy||'',link:b.link||'',at:Date.now()});
+    if(pk)tx.set(pk,{v:vno,at:Date.now()});tx.update(r,Object.assign({paid:np,status:st,hist:hist(b.hist,'Paid '+money(amt)+' via '+m+' ('+vno+')')},need?{booked:true}:{}));});
     audit(no,'Paid '+money(amt)+' '+vno);showToast('Voucher '+vno+' created.');}catch(e){showToast(esc(e.message),'error');}};
 window.acReverse=async function(no){
   if(!canPay())return showToast('Only Accounts can reverse.','error');const why=(prompt('Reason for reversal?')||'').trim();if(!why)return;
-  try{await db().runTransaction(async tx=>{const vr=db().collection('acc_vouchers').doc(no),v=(await tx.get(vr)).data();if(v.status!=='posted'||v.revOf)throw new Error('This voucher cannot be reversed.');
-    const br=db().collection('acc_bills').doc(v.billId),b=(await tx.get(br)).data(),jn=await nextNo(tx,'acc_JV','JV-'),np=Math.max(0,r2(b.paid-v.amount));
+  try{await db().runTransaction(async tx=>{const vr=db().collection('acc_vouchers').doc(no),v=(await tx.get(vr)).data();if(v.status!=='posted'||v.revOf||v.booking)throw new Error('This voucher cannot be reversed.');
+    const br=v.billId?db().collection('acc_bills').doc(v.billId):null,b=br?(await tx.get(br)).data():null,ar=v.advId?db().collection('acc_bills').doc(v.advId):null,ad=ar?(await tx.get(ar)).data():null;
+    if(b&&b.kind==='advance'&&N(b.adjusted)>r2(b.paid-v.amount)+0.004)throw new Error('Reverse the advance adjustments first.');
+    const jn=await nextNo(tx,'acc_JV','JV-'),np=b?Math.max(0,r2(b.paid-v.amount)):0;
     tx.update(vr,{status:'reversed',revNo:jn,revBy:who(),revAt:Date.now()});
     tx.set(db().collection('acc_vouchers').doc(jn),Object.assign({},v,{no:jn,type:'JV',revOf:no,date:today(),purpose:'Reversal of '+no+': '+why,lines:v.lines.map(l=>({acct:l.acct,dr:l.cr,cr:l.dr})),status:'posted',prepared:who(),at:Date.now(),revNo:null}));
-    tx.update(br,{paid:np,status:np<=0?'approved':'partially_paid',hist:hist(b.hist,'Payment '+no+' reversed ('+jn+'): '+why)});});audit(no,'Reversed');showToast('Reversed.');}catch(e){showToast(esc(e.message),'error');}};
+    if(br)tx.update(br,{paid:np,status:np<=0?'approved':'partially_paid',hist:hist(b.hist,'Payment '+no+' reversed ('+jn+'): '+why)});
+    if(ar)tx.update(ar,{adjusted:Math.max(0,r2(N(ad.adjusted)-v.amount)),hist:hist(ad.hist,'Adjustment '+no+' reversed ('+jn+')')});});audit(no,'Reversed');showToast('Reversed.');}catch(e){showToast(esc(e.message),'error');}};
+window.acAdjust=async function(adv){if(!canPay())return showToast('Only Accounts can adjust advances.','error');
+  const tn=$('ab_'+adv).value,amt=r2(N($('aa_'+adv).value));if(!tn||amt<=0)return showToast('Select a bill and amount.','error');
+  try{await db().runTransaction(async tx=>{const ar=db().collection('acc_bills').doc(adv),tr=db().collection('acc_bills').doc(tn),a=(await tx.get(ar)).data(),t=(await tx.get(tr)).data();
+    if(a.kind!=='advance'||t.kind==='advance')throw new Error('Invalid selection.');if(a.payee.trim().toLowerCase()!==t.payee.trim().toLowerCase())throw new Error('Advance and bill must be of the same payee.');
+    if(!['approved','partially_paid'].includes(t.status))throw new Error('Bill is not open for payment.');
+    const rem=r2(a.paid-N(a.adjusted));if(amt>rem+0.004)throw new Error('More than the remaining advance ('+money(rem)+').');if(amt>due(t)+0.004)throw new Error('More than the bill due ('+money(due(t))+').');
+    const need=t.kind==='bill'&&!t.booked,nm=(await reserve(tx,[['acc_JV','JV-',need?2:1]]))[0],jn=nm[0];if(need)bookTx(tx,nm[1],t,tn);const np=r2(t.paid+amt),st=np>=t.amount-0.004?'paid':'partially_paid';
+    tx.set(db().collection('acc_vouchers').doc(jn),{no:jn,type:'JV',date:today(),billId:tn,advId:adv,kind:t.kind,billNo:t.billNo||'',invNo:t.invNo||'',poNo:t.poNo||'',payee:t.payee,prj:t.prj,dept:t.dept,cat:t.cat,purpose:'Advance '+adv+' adjusted against '+tn,method:'Advance adjustment',acct:advAcct(a),amount:amt,ref:adv,
+      lines:[{acct:t.kind==='bill'?'Accounts Payable - '+t.payee:'Expense - '+t.cat,dr:amt,cr:0},{acct:advAcct(a),dr:0,cr:amt}],status:'posted',prepared:who(),verifiedBy:t.verifiedBy||'',approvedBy:t.approvedBy||'',at:Date.now()});
+    tx.update(tr,Object.assign({paid:np,status:st,hist:hist(t.hist,'Advance '+adv+' adjusted '+money(amt)+' ('+jn+')')},need?{booked:true}:{}));tx.update(ar,{adjusted:r2(N(a.adjusted)+amt),hist:hist(a.hist,'Adjusted '+money(amt)+' against '+tn+' ('+jn+')')});});
+    audit(adv,'Adjusted');showToast('Advance adjusted.');}catch(e){showToast(esc(e.message),'error');}};
+window.acOpening=async function(){if(!R('acct'))return showToast('Only Accounts.','error');const ac=$('acOA').value.trim(),amt=r2(N($('acOM').value)),dt=$('acOD').value||today();
+  if(!ac||amt===0||/^(Accounts Payable|Expense|Advance)/.test(ac))return showToast('Enter a cash / bank account and amount.','error');
+  const L=amt>0?[{acct:ac,dr:amt,cr:0},{acct:'Opening Balance Equity',dr:0,cr:amt}]:[{acct:ac,dr:0,cr:-amt},{acct:'Opening Balance Equity',dr:-amt,cr:0}];
+  try{await db().runTransaction(async tx=>{const jn=await nextNo(tx,'acc_JV','JV-');tx.set(db().collection('acc_vouchers').doc(jn),{no:jn,type:'JV',date:dt,billId:'',payee:'Opening balance',prj:'',dept:'Accounts',cat:'Opening Balance',purpose:'Opening balance - '+ac,method:'Journal',acct:ac,amount:Math.abs(amt),ref:'',lines:L,status:'posted',prepared:who(),at:Date.now()});});
+    showToast('Opening balance posted.');$('acOM').value='';}catch(e){showToast(esc(e.message),'error');}};
+function advInfo(b){const rem=r2(b.paid-N(b.adjusted)),st=rem<=0&&b.paid>0?'Settled':N(b.adjusted)>0?'Partially adjusted':'Open';
+  let h=`<div class="text-xs mt-1">Advance paid ${money(b.paid)} · Adjusted ${money(N(b.adjusted))} · <b>Remaining ${money(rem)}</b> · ${st}</div>`;
+  if(canPay()&&rem>0){const t=BILLS.filter(x=>x.kind!=='advance'&&['approved','partially_paid'].includes(x.status)&&x.payee.trim().toLowerCase()===b.payee.trim().toLowerCase());
+    h+=t.length?`<div class="grid grid-cols-2 gap-2 mt-2"><div><label class="field-label">Adjust against</label><select id="ab_${b.no}" class="field">${t.map(x=>`<option value="${x.no}">${x.no} · due ${money(due(x))}</option>`).join('')}</select></div><div><label class="field-label">Amount (Tk)</label><input id="aa_${b.no}" type="number" step="any" class="field" value="${Math.min(rem,due(t[0]))}"></div><div class="col-span-2"><button class="btn btn-secondary" onclick="acAdjust('${b.no}')">Adjust advance</button></div></div>`:'<div class="text-xs text-muter mt-1">No approved bill of this payee to adjust against.</div>';}
+  return h;}
+/* ---------- ledgers ---------- */
+function lines(){const o=[];VCH.forEach(v=>(v.lines||[]).forEach(l=>o.push({a:l.acct,dr:N(l.dr),cr:N(l.cr),d:v.date,t:v.at||0,no:v.no,ty:v.type,pay:v.payee,pu:v.purpose})));
+  return o.sort((x,y)=>(x.d+String(x.t).padStart(15,'0')).localeCompare(y.d+String(y.t).padStart(15,'0')));}
+const gAcc=k=>{const all=accts();return k==='sl'?all.filter(a=>/^Accounts Payable - /.test(a)):k==='al'?all.filter(a=>/^Advance - /.test(a)):k==='el'?all.filter(a=>/^Expense - /.test(a)):k==='cl'?all.filter(a=>/^Accounts Payable - /.test(a)&&BILLS.some(b=>b.cat==='Contractor Bills'&&'Accounts Payable - '+b.payee===a)):[];};
+const accts=()=>[...new Set(lines().map(l=>l.a).concat(CASHA))].sort();
+const net=a=>lines().filter(l=>l.a===a).reduce((x,l)=>x+l.dr-l.cr,0);
+const bsum=t=>r2(accts().filter(a=>atype(a)===t).reduce((x,a)=>x+net(a),0));
+const drcr=v=>(v<-0.004?'Cr ':'Dr ')+Math.abs(r2(v)).toFixed(2);
+function ledgerRows(a,f,to,ac){const L=lines().filter(l=>l.a===a),op=L.filter(l=>f&&l.d<f).reduce((x,l)=>x+l.dr-l.cr,0);let run=op;const rows=[[ac?esc(a):'',f?dsp(f):'',esc('Opening balance'),'','','','',drcr(op)]];
+  let td=0,tc=0;L.filter(l=>(!f||l.d>=f)&&(!to||l.d<=to)).forEach(l=>{run+=l.dr-l.cr;td+=l.dr;tc+=l.cr;rows.push([ac?esc(a):'',dsp(l.d),esc(l.no)+' ('+l.ty+')',esc(l.pay||''),esc(l.pu||'').slice(0,60),l.dr?r2(l.dr).toFixed(2):'',l.cr?r2(l.cr).toFixed(2):'',drcr(run)]);});
+  rows.push({t:[ac?esc(a):'','','Closing balance','','',r2(td).toFixed(2),r2(tc).toFixed(2),drcr(run)]});return rows;}
+window.acFillRA=function(){const e=$('acRA');if(!e)return;const k=$('acRK').value,all=accts(),lst=k==='cb'?all.filter(a=>atype(a)==='Cash'):k==='bb'?all.filter(a=>atype(a)==='Bank / Mobile'):k==='gl'?[''].concat(all):['sl','cl','al','el'].includes(k)?[''].concat(gAcc(k)):[];
+  const key=k+'|'+lst.join('|');if(e.dataset.k===key)return;const v=e.value;e.innerHTML=lst.map(a=>`<option value="${esc(a)}">${a?esc(a):'All accounts'}</option>`).join('');if(lst.includes(v))e.value=v;e.dataset.k=key;e.disabled=!lst.length;
+  const dl=$('acAcDl');if(dl)dl.innerHTML=all.filter(a=>['Cash','Bank / Mobile'].includes(atype(a))).map(a=>`<option value="${esc(a)}">`).join('');};
 /* ---------- drawing ---------- */
 const vis=b=>seeAll()||b.by===who();
 const mine=()=>BILLS.filter(vis);
 window.acDraw=function(){const op=$('acOvP')?$('acOvP').value:'';draw(op);drawBills();drawV();};
 function draw(op){const el=$('acOv');if(!el)return;const B=mine().filter(b=>!op||b.prj===op),V=VCH.filter(v=>(!op||v.prj===op)&&v.status!=='reversed'&&v.type!=='JV'&&(seeAll()||v.prepared===who()||true));
   const td=today(),mo=td.slice(0,7),S=a=>r2(a.reduce((x,y)=>x+y,0)),pay=V.filter(v=>v.status==='posted');
-  const outs=B.filter(open_),pv=B.filter(b=>b.status==='pending_verification').length,pa=B.filter(b=>b.status==='pending_approval').length;
+  const outs=B.filter(b=>open_(b)&&b.kind!=='advance'),pv=B.filter(b=>b.status==='pending_verification').length,pa=B.filter(b=>b.status==='pending_approval').length;
   const card=(t,v,c)=>`<div style="border-left:4px solid ${c||'#0f766e'};background:#f4f7f9;border-radius:10px;padding:9px 11px"><div style="font-size:11px;color:#64748b;font-weight:700;text-transform:uppercase">${t}</div><div style="font-size:17px;font-weight:800">${v}</div></div>`;
   const sup={};outs.forEach(b=>{sup[b.payee]=(sup[b.payee]||0)+due(b);});
-  el.innerHTML=`<div class="grid grid-cols-2 md:grid-cols-4 gap-2">${card('Expenses today',money(S(pay.filter(v=>v.date===td).map(v=>v.amount))))}${card('This month',money(S(pay.filter(v=>(v.date||'').startsWith(mo)).map(v=>v.amount))))}${card('Total paid',money(S(pay.map(v=>v.amount))),'#15803d')}${card('Outstanding',money(S(outs.map(due))),'#b91c1c')}${card('Pending verification',pv,'#b45309')}${card('Pending approval',pa,'#b45309')}${card('Cash paid',money(S(pay.filter(v=>v.method==='Cash').map(v=>v.amount))),'#475569')}${card('Bank / mobile paid',money(S(pay.filter(v=>v.method!=='Cash').map(v=>v.amount))),'#475569')}</div>
+  el.innerHTML=`<div class="grid grid-cols-2 md:grid-cols-4 gap-2">${card('Expenses today',money(S(pay.filter(v=>v.date===td).map(v=>v.amount))))}${card('This month',money(S(pay.filter(v=>(v.date||'').startsWith(mo)).map(v=>v.amount))))}${card('Total paid',money(S(pay.map(v=>v.amount))),'#15803d')}${card('Outstanding',money(S(outs.map(due))),'#b91c1c')}${card('Pending verification',pv,'#b45309')}${card('Pending approval',pa,'#b45309')}${card('Cash paid',money(S(pay.filter(v=>v.method==='Cash').map(v=>v.amount))),'#475569')}${card('Bank / mobile paid',money(S(pay.filter(v=>v.method!=='Cash').map(v=>v.amount))),'#475569')}${seeAll()?card('Cash balance',money(bsum('Cash')),'#0f766e')+card('Bank / mobile balance',money(bsum('Bank / Mobile')),'#0f766e'):''}${card('Workshop expenses',money(S(pay.filter(v=>v.dept==='Workshop'||v.cat==='Workshop Expenses').map(v=>v.amount))),'#475569')}${card('Contractor outstanding',money(S(outs.filter(b=>b.cat==='Contractor Bills').map(due))),'#b91c1c')}${card('Advance remaining',money(S(B.filter(b=>b.kind==='advance').map(b=>b.paid-N(b.adjusted)))),'#475569')}</div>
   <div class="mt-4 font-bold text-sm">Supplier / payee outstanding</div>${Object.keys(sup).length?'<table class="w-full text-sm mt-1">'+Object.entries(sup).sort((a,b)=>b[1]-a[1]).slice(0,8).map(e=>`<tr><td>${esc(e[0])}</td><td align=right><b>${money(e[1])}</b></td></tr>`).join('')+'</table>':'<div class="text-xs text-muted">No outstanding.</div>'}`;}
 function drawBills(){const el=$('acBills');if(!el)return;const fs=$('acFS').value,fp=$('acFP').value,q=$('acFQ').value.trim().toLowerCase();
   const vn=b=>VCH.filter(v=>v.billId===b.no).map(v=>v.no).join(' ');
-  const L=mine().filter(b=>(!fs||b.status===fs)&&(!fp||b.prj===fp)&&(!q||[b.no,b.payee,b.billNo,b.invNo,b.poNo,vn(b)].join(' ').toLowerCase().includes(q)));
-  el.innerHTML=L.map(b=>{let a='';const d=due(b),ovd=b.dueDate&&b.dueDate<today()&&open_(b)&&d>0;
+  const L=mine().filter(b=>(!fs||(fs==='overdue'?(b.dueDate&&b.dueDate<today()&&open_(b)&&due(b)>0):b.status===fs))&&(!fp||b.prj===fp)&&(!q||[b.no,b.payee,b.billNo,b.invNo,b.poNo,vn(b)].join(' ').toLowerCase().includes(q)));
+  const more=L.length>PGB?`<button class="btn btn-secondary" onclick="acMore('b')">Show more (${L.length-PGB} left)</button>`:'';
+  el.innerHTML=L.slice(0,PGB).map(b=>{let a='';const d=due(b),ovd=b.dueDate&&b.dueDate<today()&&open_(b)&&d>0;
     if(b.status==='pending_verification'&&canVerify())a+=`<button class="btn btn-primary" onclick="acFlow('${b.no}','verify')">Verify &amp; forward</button> <button class="btn btn-secondary" onclick="acFlow('${b.no}','rej')">Reject</button>`;
     if(b.status==='pending_approval')a+=canApprove(b.amount)?`<button class="btn btn-primary" onclick="acFlow('${b.no}','approve')">Approve</button> <button class="btn btn-secondary" onclick="acFlow('${b.no}','rej')">Reject</button>`:`<span class="text-xs text-muted">Needs ED / MD approval (above Tk ${DPM_LIMIT.toLocaleString('en-IN')})</span>`;
     if(['pending_verification','pending_approval'].includes(b.status)&&(isAd()||b.by===who()))a+=` <button class="btn btn-secondary" onclick="acFlow('${b.no}','cancel')">Cancel</button>`;
@@ -7250,14 +7325,19 @@ function drawBills(){const el=$('acBills');if(!el)return;const fs=$('acFS').valu
       <div><label class="field-label">Reference / txn ID</label><input id="pr_${b.no}" class="field"></div><div><label class="field-label">Payment date</label><input id="pd_${b.no}" type="date" class="field" value="${today()}"></div>
       <div class="col-span-2"><button class="btn btn-primary" onclick="acPay('${b.no}')">Pay &amp; create voucher</button></div></div>`;
     return `<div class="rounded-xl border border-line bg-white p-3 text-sm"><div><b>${esc(b.no)}</b> · ${stat(b.status)}${ovd?' <b style="color:#b91c1c;font-size:11px">OVERDUE</b>':''}</div>
-    <div class="mt-1"><b>${esc(b.payee)}</b> · ${esc(b.cat)}${b.prj?' · '+esc(b.prj):''}</div><div class="text-xs text-muted">${esc(b.purpose)}${b.invNo?' · Inv '+esc(b.invNo):''}${b.billNo?' · Bill '+esc(b.billNo):''}${b.poNo?' · PO '+esc(b.poNo):''}${b.dueDate?' · due '+dsp(b.dueDate):''}</div>
-    <div class="mt-1">Total <b>${money(b.amount)}</b> · Paid ${money(b.paid)} · Due <b>${money(d)}</b></div><div class="mt-2">${a}</div>
-    <details class="mt-2"><summary class="text-xs text-muted">History</summary>${(b.hist||[]).map(h=>`<div class="text-xs">${dd(h.at)} · ${esc(h.by)} · ${esc(h.act)}</div>`).join('')}</details></div>`;}).join('')||'<div class="text-xs text-muted">No bills.</div>';}
+    <div class="mt-1"><b>${esc(b.payee)}</b> · ${esc(b.cat)}${b.kind==='advance'?' · <b>'+esc(b.advType)+'</b>':''}${b.prj?' · '+esc(b.prj):''}</div><div class="text-xs text-muted">${esc(b.purpose)}${b.invNo?' · Inv '+esc(b.invNo):''}${b.billNo?' · Bill '+esc(b.billNo):''}${b.poNo?' · PO '+esc(b.poNo):''}${b.dueDate?' · due '+dsp(b.dueDate):''}</div>
+    <div class="mt-1">Total <b>${money(b.amount)}</b> · Paid ${money(b.paid)} · Due <b>${money(d)}</b></div>${b.kind==='advance'?advInfo(b):''}${b.link?'<div class="text-xs text-muted">Linked: '+esc(b.link)+'</div>':''}${filesHtml(b)}<div class="mt-2">${a}</div>
+    <details class="mt-2"><summary class="text-xs text-muted">History</summary>${(b.hist||[]).map(h=>`<div class="text-xs">${dd(h.at)} · ${esc(h.by)} · ${esc(h.act)}</div>`).join('')}</details></div>`;}).join('')+more||'<div class="text-xs text-muted">No bills.</div>';}
+function filesHtml(b){const fs=b.files||[];let h='<div class="mt-2 text-xs"><b>Attachments</b> '+(fs.length?'':'<span class="text-muted">none</span>');
+  h+=fs.map(f=>` · <a href="#" onclick="acViewFile('${f.id}');return false" style="color:#0b5ed7">${esc(f.name)}</a> <span class="text-muted">(${esc(f.type)}, ${f.kb} KB)</span>${isAd()?` <a href="#" onclick="acDelFile('${b.no}','${f.id}');return false" style="color:#b91c1c">✕</a>`:''}`).join('');
+  if(b.status!=='cancelled'&&fs.length<10)h+=`<div class="flex gap-2 flex-wrap items-center mt-1"><input id="af_${b.no}" type="file" accept="image/*,application/pdf" class="field" style="max-width:220px"><select id="at_${b.no}" class="field" style="max-width:150px"><option>Bill / Invoice</option><option>Receipt</option><option>Supporting document</option></select><button class="btn btn-secondary" onclick="acAttach('${b.no}')">Attach</button></div>`;
+  return h+'</div>';}
 window.acMeth=function(no){$('pt_'+no).value=$('pm_'+no).value==='Cash'?'CPV':'BPV';};
 function drawV(){const el=$('acVch');if(!el)return;const bs=new Set(mine().map(b=>b.no));
-  el.innerHTML=VCH.filter(v=>bs.has(v.billId)).map(v=>`<div class="rounded-xl border border-line bg-white p-3 text-sm"><b>${esc(v.no)}</b> · ${v.type} · ${dsp(v.date)} · ${v.status==='reversed'?'<b style="color:#b91c1c">REVERSED ('+esc(v.revNo)+')</b>':'posted'}
+  const VL=VCH.filter(v=>v.billId?bs.has(v.billId):seeAll()),vmore=VL.length>PGV?`<button class="btn btn-secondary" onclick="acMore('v')">Show more (${VL.length-PGV} left)</button>`:'';
+  el.innerHTML=VL.slice(0,PGV).map(v=>`<div class="rounded-xl border border-line bg-white p-3 text-sm"><b>${esc(v.no)}</b> · ${v.type} · ${dsp(v.date)} · ${v.status==='reversed'?'<b style="color:#b91c1c">REVERSED ('+esc(v.revNo)+')</b>':'posted'}
    <div>${esc(v.payee)} · <b>${money(v.amount)}</b> · ${esc(v.method)}${v.ref?' · '+esc(v.ref):''}</div><div class="text-xs text-muted">${esc(v.purpose)}</div>
-   <div class="mt-2"><button class="btn btn-secondary" onclick="acVPrint('${v.no}')">Print voucher</button>${v.status==='posted'&&!v.revOf&&canPay()?` <button class="btn btn-secondary" onclick="acReverse('${v.no}')">Reverse</button>`:''}</div></div>`).join('')||'<div class="text-xs text-muted">No vouchers.</div>';}
+   <div class="mt-2"><button class="btn btn-secondary" onclick="acVPrint('${v.no}')">Print voucher</button>${v.status==='posted'&&!v.revOf&&!v.booking&&canPay()?` <button class="btn btn-secondary" onclick="acReverse('${v.no}')">Reverse</button>`:''}</div></div>`).join('')+vmore||'<div class="text-xs text-muted">No vouchers.</div>';}
 /* ---------- voucher print ---------- */
 function logo(){try{const d=document.createElement('div');d.className='mars-logo-img';d.style.cssText='position:absolute;left:-9999px;width:10px;height:10px';document.body.appendChild(d);const u=getComputedStyle(d).backgroundImage;d.remove();const m=u.match(/url\(["']?([^"')]+)["']?\)/);return m?m[1]:'';}catch(e){return '';}}
 window.acVHtml=function(v){const co=(window.marsCompany&&marsCompany())||{},lg=logo(),f=x=>r2(x).toFixed(2),tn={CPV:'CASH PAYMENT VOUCHER',BPV:'BANK PAYMENT VOUCHER',PCV:'PETTY CASH VOUCHER',JV:'JOURNAL VOUCHER'}[v.type]||'PAYMENT VOUCHER';
@@ -7278,31 +7358,52 @@ window.acVPrint=function(no){const v=VCH.find(x=>x.no===no);if(v&&window.marsDoc
 /* ---------- reports ---------- */
 function repData(){const k=$('acRK').value,t=$('acRT').value,p=$('acRP').value,f=$('acRF').value,to=$('acRTo').value,m=x=>money(x).replace('Tk ','');
   const inR=d=>(!f||d>=f)&&(!to||d<=to);const meta=['Project: '+esc(p||'All Projects'),'Period: '+(f?dsp(f):'start')+' to '+(to?dsp(to):'today'),'Prepared By: '+esc(who())];
-  const bs=new Set(mine().map(b=>b.no)),V=VCH.filter(v=>bs.has(v.billId)&&(!p||v.prj===p)&&inR(v.date)&&(!t||v.type===t));
+  const bs=new Set(mine().map(b=>b.no)),V=VCH.filter(v=>(v.billId?bs.has(v.billId):seeAll())&&(!p||v.prj===p)&&inR(v.date)&&(!t||v.type===t));
   if(k==='vreg'){let s=0;const rows=V.map(v=>{if(v.status==='posted'&&v.type!=='JV')s+=v.amount;return [esc(v.no),dsp(v.date),v.type,esc(v.payee),esc(v.prj||'-'),esc(v.cat),esc(v.method),esc(v.acct),m(v.amount),esc(v.ref||'-'),v.status];});
     rows.push({t:['Total paid (excl. reversed / JV)','','','','','','','',m(s),'','']});return {title:'PAYMENT VOUCHER REGISTER',meta,heads:['Voucher','Date','Type','Payee','Project','Category','Method','Account','Amount (Tk)','Reference','Status'],rows};}
   if(k==='dly'){const d={};V.filter(v=>v.status==='posted'&&v.type!=='JV').forEach(v=>{const x=d[v.date]=d[v.date]||{n:0,a:0,c:0,b:0};x.n++;x.a+=v.amount;v.method==='Cash'?x.c+=v.amount:x.b+=v.amount;});
     let n=0,a=0,c=0,b=0;const rows=Object.keys(d).sort().map(k=>{const x=d[k];n+=x.n;a+=x.a;c+=x.c;b+=x.b;return [dsp(k),x.n,m(x.c),m(x.b),m(x.a)];});rows.push({t:['Total',n,m(c),m(b),m(a)]});
     return {title:'DAILY / MONTHLY EXPENSE REPORT',meta,heads:['Date','Vouchers','Cash (Tk)','Bank / mobile (Tk)','Total (Tk)'],rows};}
-  const B=mine().filter(b=>(!p||b.prj===p)&&inR(b.date)&&!['rejected','cancelled'].includes(b.status));
-  if(k==='sup'){const s={};B.forEach(b=>{const x=s[b.payee]=s[b.payee]||{n:0,t:0,p:0};x.n++;x.t+=b.amount;x.p+=b.paid;});let t=0,pd=0;
+  const B=mine().filter(b=>(!p||b.prj===p)&&inR(b.date)&&!['rejected','cancelled'].includes(b.status)&&b.kind!=='advance');
+  if(['cb','bb','gl','tb','sl','cl','al','el','ap','coa'].includes(k)){if(!seeAll())return null;const ra=$('acRA').value;
+    if(k==='tb'){let D=0,C=0;const rows=accts().map(a=>{const L=lines().filter(l=>l.a===a&&(!to||l.d<=to)),d=L.reduce((x,l)=>x+l.dr,0),c=L.reduce((x,l)=>x+l.cr,0),n=d-c;D+=n>0?n:0;C+=n<0?-n:0;return [esc(a),atype(a),m(d),m(c),n>0?m(n):'',n<0?m(-n):''];});
+      rows.push({t:['Total','','','',m(D),m(C)]});return {title:'TRIAL BALANCE'+(D===C||Math.abs(D-C)<0.005?' (BALANCED)':' (NOT BALANCED)'),meta:['As of: '+(to?dsp(to):'today'),'Prepared By: '+esc(who())],heads:['Account','Type','Total debit (Tk)','Total credit (Tk)','Balance Dr (Tk)','Balance Cr (Tk)'],rows};}
+    const mt=['Period: '+(f?dsp(f):'start')+' to '+(to?dsp(to):'today'),'Prepared By: '+esc(who())],H8=['Account','Date','Voucher','Particulars','Purpose','Debit / Receipt (Tk)','Credit / Payment (Tk)','Balance'];
+    if(['sl','cl','al','el'].includes(k)){const list=ra?[ra]:gAcc(k);if(!list.length)return {title:'NO ACCOUNT',meta,heads:['Info'],rows:[['No account found']]};const rows=[];list.forEach(a=>ledgerRows(a,f,to,true).forEach(r=>rows.push(r)));
+      return {title:{sl:'SUPPLIER LEDGER',cl:'CONTRACTOR LEDGER',al:'ADVANCE LEDGER',el:'EXPENSE LEDGER'}[k],meta:mt,heads:H8,rows};}
+    if(k==='ap'){let B1=0,P1=0;const rows=accts().filter(a=>/^Accounts Payable - /.test(a)).map(a=>{const L=lines().filter(l=>l.a===a&&(!to||l.d<=to)),c=L.reduce((x,l)=>x+l.cr,0),d=L.reduce((x,l)=>x+l.dr,0);B1+=c;P1+=d;return [esc(a.replace('Accounts Payable - ','')),m(c),m(d),m(c-d)];});
+      rows.push({t:['Total',m(B1),m(P1),m(B1-P1)]});return {title:'ACCOUNTS PAYABLE REPORT',meta:['As of: '+(to?dsp(to):'today'),'Prepared By: '+esc(who())],heads:['Supplier / Contractor','Billed (Tk)','Paid + adjusted (Tk)','Payable (Tk)'],rows};}
+    if(k==='coa'){const base={Cash:1001,'Bank / Mobile':1101,'Asset (Advance)':1201,Liability:2001,Equity:3001,Expense:5001},cnt={};const rows=accts().sort((a,b)=>atype(a).localeCompare(atype(b))||a.localeCompare(b)).map(a=>{const t=atype(a);cnt[t]=(cnt[t]||0);return [base[t]+cnt[t]++,esc(a),t,drcr(net(a))];});
+      return {title:'CHART OF ACCOUNTS',meta:['As of: today','Prepared By: '+esc(who())],heads:['Code','Account','Type','Balance'],rows};}
+    const list=k==='gl'?(ra?[ra]:accts()):[ra||(k==='cb'?'Cash in Hand':accts().find(a=>atype(a)==='Bank / Mobile')||'')];if(!list[0])return {title:'NO ACCOUNT',meta,heads:['Info'],rows:[['No account found']]};
+    const rows=[];list.forEach(a=>ledgerRows(a,f,to,k==='gl').forEach(r=>rows.push(r)));
+    return {title:(k==='cb'?'CASH BOOK — ':k==='bb'?'BANK BOOK — ':'GENERAL LEDGER')+(k==='gl'?'':esc(list[0])),meta:['Period: '+(f?dsp(f):'start')+' to '+(to?dsp(to):'today'),'Prepared By: '+esc(who())],heads:['Account','Date','Voucher','Particulars','Purpose','Debit / Receipt (Tk)','Credit / Payment (Tk)','Balance'],rows};}
+  if(k==='adv'){const A=mine().filter(b=>b.kind==='advance'&&(!p||b.prj===p)&&!['rejected','cancelled'].includes(b.status));let pd=0,ad=0;
+    const rows=A.map(b=>{const rem=r2(b.paid-N(b.adjusted));pd+=b.paid;ad+=N(b.adjusted);return [esc(b.no),dsp(b.date),esc(b.advType),esc(b.payee),esc(b.prj||'-'),m(b.paid),m(N(b.adjusted)),m(rem),rem<=0&&b.paid>0?'Settled':N(b.adjusted)>0?'Partially adjusted':b.paid>0?'Open':ST[b.status]];});
+    rows.push({t:['Total','','','','',m(pd),m(ad),m(pd-ad),'']});return {title:'ADVANCE ADJUSTMENT REPORT',meta,heads:['Advance','Date','Type','Party','Project','Advance paid (Tk)','Adjusted (Tk)','Remaining (Tk)','Settlement'],rows};}
+  if(k==='wsx'){const W=B.filter(b=>b.dept==='Workshop'||b.cat==='Workshop Expenses');let t=0,pd=0;
+    const rows=W.map(b=>{t+=b.amount;pd+=b.paid;return [esc(b.no),dsp(b.date),esc(b.sub||'-'),esc(b.payee),esc(b.link||'-'),esc(b.purpose),m(b.amount),m(b.paid),m(b.amount-b.paid)];});
+    rows.push({t:['Total','','','','','',m(t),m(pd),m(t-pd)]});return {title:'WORKSHOP EXPENSE REPORT',meta,heads:['No','Date','Sub-category','Payee','Linked WO / Gate Pass','Purpose','Amount (Tk)','Paid (Tk)','Due (Tk)'],rows};}
+  if(k==='sup'||k==='con'){const s={};B.filter(b=>k!=='con'||b.cat==='Contractor Bills').forEach(b=>{const x=s[b.payee]=s[b.payee]||{n:0,t:0,p:0};x.n++;x.t+=b.amount;x.p+=b.paid;});let t=0,pd=0;
     const rows=Object.keys(s).sort().map(k=>{const x=s[k];t+=x.t;pd+=x.p;return [esc(k),x.n,m(x.t),m(x.p),m(x.t-x.p)];});rows.push({t:['Total','',m(t),m(pd),m(t-pd)]});
-    return {title:'SUPPLIER / CONTRACTOR OUTSTANDING REPORT',meta,heads:['Payee','Bills','Billed (Tk)','Paid (Tk)','Outstanding (Tk)'],rows};}
+    return {title:k==='con'?'CONTRACTOR PAYMENT REPORT':'SUPPLIER / CONTRACTOR OUTSTANDING REPORT',meta,heads:['Payee','Bills','Billed (Tk)','Paid (Tk)','Outstanding (Tk)'],rows};}
   const g={};B.forEach(b=>{const k=(b.prj||'No project')+'|'+b.cat,x=g[k]=g[k]||{p:b.prj||'No project',c:b.cat,t:0,pd:0};x.t+=b.amount;x.pd+=b.paid;});let T=0,P=0;
   const rows=Object.values(g).sort((a,b)=>(a.p+a.c).localeCompare(b.p+b.c)).map(x=>{T+=x.t;P+=x.pd;return [esc(x.p),esc(x.c),m(x.t),m(x.pd),m(x.t-x.pd)];});rows.push({t:['Total','',m(T),m(P),m(T-P)]});
   return {title:'PROJECT-WISE EXPENSE REPORT',meta,heads:['Project','Category','Total bills / expenses (Tk)','Paid (Tk)','Outstanding (Tk)'],rows};}
-window.acRepPdf=function(){const r=repData(),D=window.marsDoc;if(!D)return;D.printH(D.docHtml(r.title,r.meta,D.tb(r.heads,r.rows),['Prepared By','Accounts','Approved By']));};
-window.acRepCsv=function(){const r=repData(),cl=c=>'"'+String(c).replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&#039;/g,"'").replace(/"/g,'""')+'"';
+window.acRepPdf=function(){const r=repData(),D=window.marsDoc;if(!D)return;if(!r)return showToast('Books and ledgers are for Accounts / management only.','error');D.printH(D.docHtml(r.title,r.meta,D.tb(r.heads,r.rows),['Prepared By','Accounts','Approved By']));};
+window.acRepCsv=function(){const r=repData();if(!r)return showToast('Not allowed.','error');const cl=c=>'"'+String(c).replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&#039;/g,"'").replace(/"/g,'""')+'"';
   const csv=[r.heads].concat(r.rows.map(x=>x.t||x)).map(a=>a.map(cl).join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download='accounts-report.csv';a.click();};
 /* ---------- init ---------- */
-function listen(){const d=db(),snap=(c,fn,o)=>{let q=d.collection(c);if(o)q=q.orderBy(o,'desc').limit(300);q.onSnapshot(fn,e=>console.error(c,e));};
+function lk(){const e=$('acLkDl');if(e)e.innerHTML=WOS.concat(GPS).filter(Boolean).map(x=>`<option value="${esc(x)}">`).join('');}
+function listen(){const d=db();d.collection('config').doc('accounts').onSnapshot(sn=>{if(sn.exists&&N(sn.data().dpmLimit)>0)DPM_LIMIT=N(sn.data().dpmLimit);setLim();acDraw();},()=>{});const snap=(c,fn,o)=>{let q=d.collection(c);if(o)q=q.orderBy(o,'desc').limit(300);q.onSnapshot(fn,e=>console.error(c,e));};
   snap('acc_bills',s=>{BILLS=s.docs.map(x=>x.data());acDraw();},'at');snap('acc_vouchers',s=>{VCH=s.docs.map(x=>x.data());acDraw();},'at');
   d.collection('acc_cats').onSnapshot(s=>{CUS=s.docs.map(x=>x.data().name);fill();});
   d.collection('suppliers').onSnapshot(s=>{SUP=s.docs.map(x=>x.data().name).filter(Boolean);const e=$('acSupDl');if(e)e.innerHTML=SUP.map(x=>`<option value="${esc(x)}">`).join('');},()=>{});
+  d.collection('shutter_po').onSnapshot(s=>{WOS=s.docs.map(x=>x.data().no);lk();},()=>{});d.collection('shutter_gp').onSnapshot(s=>{GPS=s.docs.map(x=>x.data().no);lk();},()=>{});
   d.collection('purchase_orders').onSnapshot(s=>{POS=s.docs.map(x=>x.data());const e=$('acPoDl');if(e)e.innerHTML=POS.map(x=>`<option value="${esc(x.no)}">`).join('');},()=>{});}
 function init(){const s=$('accSection');if(!s)return;s.innerHTML=tpl();
   s.querySelectorAll('#acTabs button').forEach(b=>b.onclick=()=>{s.querySelectorAll('#acTabs button').forEach(x=>x.className='btn btn-secondary');b.className='btn btn-primary';s.querySelectorAll('[data-pane]').forEach(p=>p.style.display=p.dataset.pane===b.dataset.t?'':'none');acDraw();});
-  setInterval(fill,1500);fill();let n=0;const t=setInterval(()=>{if(window.MARS_FIREBASE_AUTH_READY||++n>40){clearInterval(t);try{listen();}catch(e){console.error(e);}}},500);}
+  setInterval(()=>{fill();acFillRA();},1500);fill();let n=0;const t=setInterval(()=>{if(window.MARS_FIREBASE_AUTH_READY||++n>40){clearInterval(t);try{listen();}catch(e){console.error(e);}}},500);}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
