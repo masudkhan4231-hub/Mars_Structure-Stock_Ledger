@@ -4102,6 +4102,7 @@ async function deleteEntryFromFirebase(firebaseId){
     if(!email||!pass){setAdminStatus('EMAIL AND PASSWORD REQUIRED','error');return}
     if(!firebase.auth){setAdminStatus('AUTH NOT AVAILABLE','error');return}
     card.classList.add('scanning');input.disabled=true;unlock.disabled=true;setAdminStatus('VERIFYING CREDENTIALS','scanning');
+    window.__adminAttempt=Date.now(); // the admin box must never log a normal user into the app
     firebase.auth().signInWithEmailAndPassword(email,pass).then((cred)=>{
       // Signing in only proves this is a real account — it does NOT by itself
       // mean this person is an approved Admin. Confirm their UID is actually
@@ -4126,6 +4127,7 @@ async function deleteEntryFromFirebase(firebaseId){
             });
           }
           firebase.auth().signOut().then(()=>firebase.auth().signInAnonymously());
+          if(bootSnap.exists){ failAdmin('NOT AN ADMIN ACCOUNT — USE THE EMAIL LOGIN'); return; }
           failAdmin('NOT YET AUTHORIZED AS ADMIN');
           setTimeout(()=>prompt('This account is signed in but not yet approved as Admin.\nYour UID (tap the box below, select all, then copy):', uid),300);
         });
@@ -5863,7 +5865,7 @@ async function deleteEntryFromFirebase(firebaseId){
   window.addEventListener('load',()=>{
     setTimeout(()=>{if(fb())applySwitch();},1200);setTimeout(()=>{if(fb())applySwitch();},3500);
     A().onAuthStateChanged(async u=>{
-      if(!u||u.isAnonymous||!u.email||!u.emailVerified||resumed||window.currentAccessRole)return;
+      if(!u||u.isAnonymous||!u.email||!u.emailVerified||resumed||window.currentAccessRole||(Date.now()-(window.__adminAttempt||0)<8000))return;
       try{const ad=await fb().collection('admins').doc(u.uid).get();if(ad.exists)return;}catch(e){}
       resumed=true;await afterLogin(u,true);
     });
@@ -7526,6 +7528,30 @@ function init(){const s=$('accSection');if(!s)return;s.innerHTML=tpl();
   s.querySelectorAll('#acTabs button').forEach(b=>b.onclick=()=>{s.querySelectorAll('#acTabs button').forEach(x=>x.className='btn btn-secondary');b.className='btn btn-primary';s.querySelectorAll('[data-pane]').forEach(p=>p.style.display=p.dataset.pane===b.dataset.t?'':'none');acDraw();});
   setInterval(()=>{fill();acFillRA();},1500);fill();let n=0;const t=setInterval(()=>{if(window.MARS_FIREBASE_AUTH_READY||++n>40){clearInterval(t);try{listen();}catch(e){console.error(e);}}},500);}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+<!-- ===== Back-button navigation (phone Back goes to the previous page, not out of the app) ===== -->
+<script>
+(function(){
+  if(window.__marsNav)return;window.__marsNav=true;
+  const orig=window.showPage;if(typeof orig!=='function')return;
+  let popping=false,armed=0,ready=false;
+  const cur=()=>window.currentPage||'dashboard';
+  const menuOpen=()=>{const s=document.getElementById('sidebar');return window.innerWidth<900&&!!s&&s.style.display==='block';};
+  const modalOpen=()=>{const r=document.getElementById('modalRoot');return !!(r&&r.innerHTML.trim());};
+  const push=()=>{try{history.pushState({mars:1,page:cur()},'');}catch(e){}};
+  window.showPage=function(page){const before=cur(),r=orig.apply(this,arguments),now=cur();
+    if(ready&&!popping&&now!==before)push();return r;};
+  function init(){try{history.replaceState({mars:'base'},'');history.pushState({mars:1,page:cur()},'');ready=true;}catch(e){}}
+  window.addEventListener('popstate',function(e){
+    if(!ready)return;const st=e.state||{};
+    if(modalOpen()){try{closeAdminModal();}catch(x){}push();return;}
+    if(menuOpen()){try{toggleMobileMenu(false);}catch(x){}push();return;}
+    if(st.mars===1&&st.page){popping=true;try{orig(st.page);}finally{popping=false;}return;}
+    if(Date.now()-armed<2200){history.back();return;}
+    armed=Date.now();push();try{showToast('Press back again to exit');}catch(x){}
+  });
+  if(document.readyState==='complete')init();else window.addEventListener('load',init);
 })();
 </script>
 </body>
